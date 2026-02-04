@@ -1,4 +1,4 @@
-package com.example.pokemonbattle;
+package com.example.pokemonbattle.controller;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;

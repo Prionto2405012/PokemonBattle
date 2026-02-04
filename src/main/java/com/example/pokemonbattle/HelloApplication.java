@@ -10,8 +10,13 @@ import javafx.stage.Stage;
 public class HelloApplication extends Application {
     @Override
     public void start(@SuppressWarnings("exports") Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("hello-view.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("/com/example/pokemonbattle/view/hello-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 320, 240);
+        scene.getStylesheets().add(
+                HelloApplication.class.getResource(
+                        "/com/example/pokemonbattle/css/style.css"
+                ).toExternalForm()
+        );
         stage.setTitle("Hello!");
         stage.setScene(scene);
         stage.show();
