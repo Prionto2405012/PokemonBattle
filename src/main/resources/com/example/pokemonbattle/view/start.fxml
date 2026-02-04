@@ -2,15 +2,27 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.VBox?>
-
 <?import javafx.scene.control.Button?>
-<VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.example.pokemonbattle.controller.HelloController">
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<!-- 
+  Start/Splash Screen
+  Shows game title and loading message, then auto-transitions to welcome screen
+-->
+<VBox alignment="CENTER" spacing="30.0" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.example.pokemonbattle.controller.StartController"
+      style="-fx-background-color: linear-gradient(to bottom, #1e3c72, #2a5298);">
   <padding>
-    <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+    <Insets bottom="40.0" left="40.0" right="40.0" top="40.0"/>
   </padding>
 
-  <Label fx:id="welcomeText"/>
-  <Button text="Hello!" onAction="#onHelloButtonClick"/>
+  <!-- Game Title -->
+  <Label fx:id="titleLabel" text="POKEMON BATTLE" styleClass="title-label"/>
+
+  <!-- Loading Message -->
+  <Label fx:id="loadingLabel" text="Loading..." styleClass="subtitle-label"/>
+
+  <!-- Skip Button (optional - allows skipping splash screen) -->
+  <Button text="Press to Start" onAction="#onStartButtonClick" styleClass="button-orange"/>
 </VBox>

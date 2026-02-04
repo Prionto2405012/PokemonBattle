@@ -1,14 +1,46 @@
 package com.example.pokemonbattle.controller;
 
+import com.example.pokemonbattle.util.SceneManager;
+
+import javafx.animation.PauseTransition;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.util.Duration;
 
-public class HelloController {
+/**
+ * Controller for the Start/Splash Screen.
+ * Shows initial loading or splash content, then transitions to Welcome screen.
+ */
+public class StartController {
     @FXML
-    private Label welcomeText;
+    private Label titleLabel;
 
     @FXML
-    protected void onHelloButtonClick() {
-        welcomeText.setText("Welcome to JavaFX Application!");
+    private Label loadingLabel;
+
+    /**
+     * Called automatically by JavaFX after FXML is loaded.
+     */
+    @FXML
+    public void initialize() {
+        // Auto-transition to welcome screen after 3 seconds
+        PauseTransition delay = new PauseTransition(Duration.seconds(3));
+        delay.setOnFinished(event -> goToWelcomeScreen());
+        delay.play();
+    }
+
+    /**
+     * Manual button click to skip splash screen.
+     */
+    @FXML
+    protected void onStartButtonClick() {
+        goToWelcomeScreen();
+    }
+
+    /**
+     * Navigate to the welcome screen.
+     */
+    private void goToWelcomeScreen() {
+        SceneManager.switchScene("wc.fxml", "Pokemon Battle - Welcome", 800, 600);
     }
 }

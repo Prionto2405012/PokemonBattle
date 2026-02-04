@@ -11,8 +11,8 @@ module com.example.pokemonbattle {
     requires eu.hansolo.tilesfx;
     requires com.almasb.fxgl.all;
 
-    opens com.example.pokemonbattle to javafx.fxml;
+    opens com.example.pokemonbattle.controller to javafx.fxml;
     exports com.example.pokemonbattle;
     exports com.example.pokemonbattle.controller;
-    opens com.example.pokemonbattle.controller to javafx.fxml;
+    exports com.example.pokemonbattle.util;
 }

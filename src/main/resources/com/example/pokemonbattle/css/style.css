@@ -2,3 +2,206 @@
     -fx-font-family: "Segoe UI";
     -fx-background-color: #a6d9c9;
 }
+
+/* ============================================
+   BUTTON STYLES - Base Configuration
+   ============================================ */
+
+.button {
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-cursor: hand;
+    cursor: pointer;
+    -fx-font-size: 16px;
+    font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-padding: 12px 30px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 8, 0, 0, 4);
+    transition: all 0.3s ease;
+}
+
+/* Hover Effect - Brightens and lifts the button */
+.button:hover {
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 12, 0, 0, 6);
+    -fx-cursor: hand;
+    cursor: pointer;
+}
+
+/* Pressed/Clicked Effect - Inset shadow */
+.button:pressed {
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
+    -fx-effect: innershadow(gaussian, rgba(0, 0, 0, 0.6), 8, 0, 0, 2);
+    -fx-translate-y: 2px;
+}
+
+/* ============================================
+   BUTTON COLOR VARIANTS with Linear Gradients
+   ============================================ */
+
+/* Red Button - New Game / Primary Action */
+.button-red {
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #e74c3c, #c0392b);
+    -fx-border-color: #a93226;
+    -fx-border-width: 2px;
+}
+
+.button-red:hover {
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #f25c4c, #d5463a);
+}
+
+.button-red:pressed {
+    -fx-background-color: linear-gradient(from 100% 100% to 0% 0%, #c0392b, #a93226);
+}
+
+/* Blue Button - Load / Info Action */
+.button-blue {
+    -fx-background-color: linear-gradient(from 45deg, #3498db, #2980b9);
+    -fx-border-color: #1f618d;
+    -fx-border-width: 2px;
+}
+
+.button-blue:hover {
+    -fx-background-color: linear-gradient(from 45deg, #5dade2, #3498db);
+}
+
+.button-blue:pressed {
+    -fx-background-color: linear-gradient(from 225deg, #2980b9, #1f618d);
+}
+
+/* Purple Button - Settings / Special */
+.button-purple {
+    -fx-background-color: linear-gradient(from 90deg, #9b59b6, #8e44ad);
+    -fx-border-color: #6c3483;
+    -fx-border-width: 2px;
+}
+
+.button-purple:hover {
+    -fx-background-color: linear-gradient(from 90deg, #af7ac5, #9b59b6);
+}
+
+.button-purple:pressed {
+    -fx-background-color: linear-gradient(from 270deg, #8e44ad, #6c3483);
+}
+
+/* Gray Button - Back / Secondary */
+.button-gray {
+    -fx-background-color: linear-gradient(from 135deg, #95a5a6, #7f8c8d);
+    -fx-border-color: #5d6d7e;
+    -fx-border-width: 2px;
+}
+
+.button-gray:hover {
+    -fx-background-color: linear-gradient(from 135deg, #a9b8b9, #8d9fa1);
+}
+
+.button-gray:pressed {
+    -fx-background-color: linear-gradient(from 315deg, #7f8c8d, #5d6d7e);
+}
+
+/* Dark Gray Button - Exit / Danger */
+.button-dark {
+    -fx-background-color: linear-gradient(from 180deg, #34495e, #2c3e50);
+    -fx-border-color: #1a252f;
+    -fx-border-width: 2px;
+}
+
+.button-dark:hover {
+    -fx-background-color: linear-gradient(from 180deg, #445869, #34495e);
+}
+
+.button-dark:pressed {
+    -fx-background-color: linear-gradient(from 0deg, #2c3e50, #1a252f);
+}
+
+/* Green Button - Continue / Success */
+.button-green {
+    -fx-background-color: linear-gradient(from 60deg, #27ae60, #229954);
+    -fx-border-color: #1d8348;
+    -fx-border-width: 2px;
+}
+
+.button-green:hover {
+    -fx-background-color: linear-gradient(from 60deg, #2ecc71, #27ae60);
+}
+
+.button-green:pressed {
+    -fx-background-color: linear-gradient(from 240deg, #229954, #1d8348);
+}
+
+/* Orange Button - Warning / Start */
+.button-orange {
+    -fx-background-color: linear-gradient(from 120deg, #ff6b6b, #ee5a52);
+    -fx-border-color: #d63031;
+    -fx-border-width: 2px;
+}
+
+.button-orange:hover {
+    -fx-background-color: linear-gradient(from 120deg, #ff7979, #ff6b6b);
+}
+
+.button-orange:pressed {
+    -fx-background-color: linear-gradient(from 300deg, #ee5a52, #d63031);
+}
+
+/* ============================================
+   LABEL STYLES
+   ============================================ */
+
+.label {
+    -fx-text-fill: white;
+}
+
+.title-label {
+    -fx-font-size: 48px;
+    font-size: 48px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.6), 10, 0, 0, 3);
+}
+
+.subtitle-label {
+    -fx-font-size: 18px;
+    font-size: 18px;
+    -fx-text-fill: #e0e0e0;
+}
+
+/* ============================================
+   TEXT FIELD STYLES
+   ============================================ */
+
+.text-field {
+    -fx-background-color: white;
+    -fx-background-radius: 6px;
+    -fx-border-color: #bdc3c7;
+    -fx-border-radius: 6px;
+    -fx-border-width: 2px;
+    -fx-padding: 10px;
+    -fx-font-size: 18px;
+    font-size: 18px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 4, 0, 0, 2);
+}
+
+.text-field:focused {
+    -fx-border-color: #3498db;
+    -fx-effect: dropshadow(gaussian, rgba(52, 152, 219, 0.4), 8, 0, 0, 2);
+}
+
+/* ============================================
+   VBOX AND CONTAINER STYLES
+   ============================================ */
+
+.screen-container {
+    -fx-background-color: linear-gradient(to bottom, #1e3c72, #2a5298);
+}
+
+.welcome-container {
+    -fx-background-color: linear-gradient(to bottom, #2a5298, #3a7bd5);
+}
+
+.menu-container {
+    -fx-background-color: linear-gradient(to bottom, #3a7bd5, #00d2ff);
+}
