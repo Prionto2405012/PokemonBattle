@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Font?>
+
+<!-- 
+  Welcome Screen
+  Collects player name before proceeding to main menu
+-->
+<VBox alignment="CENTER" spacing="25.0" 
+      xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.example.pokemonbattle.controller.WcController"
+      styleClass="welcome-container"
+      minWidth="800" minHeight="600">
+  <padding>
+    <Insets bottom="40.0" left="40.0" right="40.0" top="40.0"/>
+  </padding>
+
+  <!-- Welcome Message -->
+  <Label text="Welcome, Trainer!" styleClass="title-label"/>
+
+  <!-- Instructions -->
+  <Label text="Enter your name to begin your journey:" styleClass="subtitle-label"/>
+
+  <!-- Player Name Input -->
+  <TextField fx:id="playerNameField" promptText="Your Name" maxWidth="300"/>
+
+  <!-- Button Container -->
+  <HBox spacing="15.0" alignment="CENTER">
+    <Button text="Back" onAction="#onBackButtonClick" styleClass="button-gray"/>
+    <Button text="Continue" onAction="#onContinueButtonClick" styleClass="button-green"/>
+  </HBox>
+</VBox>

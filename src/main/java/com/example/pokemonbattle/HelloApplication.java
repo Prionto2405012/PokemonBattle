@@ -1,24 +1,25 @@
 package com.example.pokemonbattle;
 
-import java.io.IOException;
+import com.example.pokemonbattle.util.SceneManager;
 
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+/**
+ * Main JavaFX Application class for PokemonBattle.
+ * This is the single entry point - do not create additional Application subclasses.
+ */
 public class HelloApplication extends Application {
     @Override
-    public void start(@SuppressWarnings("exports") Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("/com/example/pokemonbattle/view/hello-view.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 320, 240);
-        scene.getStylesheets().add(
-                HelloApplication.class.getResource(
-                        "/com/example/pokemonbattle/css/style.css"
-                ).toExternalForm()
-        );
-        stage.setTitle("Hello!");
-        stage.setScene(scene);
-        stage.show();
+    public void start(Stage stage) {
+        // Initialize the SceneManager with the primary stage
+        SceneManager.initialize(stage);
+        
+        // Load the start/splash screen as the initial view
+        SceneManager.switchScene("start.fxml", "Pokemon Battle - Start", 800, 600);
+    }
+
+    public static void main(String[] args) {
+        launch(args);
     }
 }

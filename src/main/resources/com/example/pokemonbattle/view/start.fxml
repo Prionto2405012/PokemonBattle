@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox alignment="CENTER" spacing="30.0" 
+      xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.example.pokemonbattle.controller.StartController"
+      styleClass="start-container"
+      minWidth="800" minHeight="600">
+  <padding>
+    <Insets bottom="40.0" left="40.0" right="40.0" top="40.0"/>
+  </padding>
+
+  <!-- Game Title
+  <Label fx:id="titleLabel" text="POKEMON BATTLE" styleClass="title-label"/> -->
+
+  <!-- Loading Message -->
+  <!-- <Label fx:id="loadingLabel" text="Loading..." styleClass="subtitle-label"/> -->
+
+  <!-- Skip Button (optional - allows skipping splash screen) -->
+  <Button text="Press to Start" onAction="#onStartButtonClick" styleClass="button-orange"/>
+</VBox>
