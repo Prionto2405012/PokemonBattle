@@ -16,7 +16,7 @@ public class StartController {
      */
     @FXML
     public void initialize() {
-        // Auto-transition to welcome screen after 3 seconds
+        // Auto-transition to welcome screen after 3 seconds (optional)
         // PauseTransition delay = new PauseTransition(Duration.seconds(3));
         // delay.setOnFinished(event -> goToWelcomeScreen());
         // delay.play();

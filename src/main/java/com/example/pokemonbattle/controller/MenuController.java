@@ -1,57 +1,135 @@
 package com.example.pokemonbattle.controller;
 
+import java.util.List;
+
 import com.example.pokemonbattle.util.SceneManager;
 
-import javafx.application.Platform;
+import javafx.animation.ScaleTransition;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 
 /**
- * Controller for the Main Menu Screen.
- * Provides navigation to game features.
+ * Controller for Main Menu screen with keyboard navigation.
  */
 public class MenuController {
-    
-    /**
-     * Handle "New Game" button click.
-     */
+
     @FXML
-    protected void onNewGameButtonClick() {
-        System.out.println("New Game clicked - implement game logic here");
-        // TODO: Load game screen
-        // SceneManager.switchScene("game.fxml", "Pokemon Battle - Game", 1024, 768);
+    private VBox menuVBox;
+
+    @FXML
+    private Button newGameButton;
+    @FXML
+    private Button loadGameButton;
+    @FXML
+    private Button settingsButton;
+    @FXML
+    private Button backButton;
+    @FXML
+    private Button exitButton;
+
+    private List<Button> menuButtons;
+    private int selectedIndex = 0;
+
+    @FXML
+    public void initialize() {
+        // List of buttons in menu order
+        menuButtons = List.of(newGameButton, loadGameButton, settingsButton, backButton, exitButton);
+
+        // Make VBox focusable to receive keyboard events
+        menuVBox.setFocusTraversable(true);
+        menuVBox.requestFocus();
+
+        // Set initial selection highlight
+        updateSelection();
     }
-    
+
     /**
-     * Handle "Load Game" button click.
+     * Keyboard navigation handler.
+     * Arrow keys / WASD to move, Enter/Space to select.
      */
     @FXML
-    protected void onLoadGameButtonClick() {
-        System.out.println("Load Game clicked - implement save/load logic here");
-        // TODO: Show load game dialog
+    private void onKeyPressed(KeyEvent event) {
+        KeyCode code = event.getCode();
+
+        switch (code) {
+            case UP, W -> {
+                selectedIndex = (selectedIndex - 1 + menuButtons.size()) % menuButtons.size();
+                updateSelection();
+            }
+            case DOWN, S -> {
+                selectedIndex = (selectedIndex + 1) % menuButtons.size();
+                updateSelection();
+            }
+            case ENTER, SPACE -> {
+                // Fire the selected button
+                menuButtons.get(selectedIndex).fire();
+            }
+            default -> {
+                // Optional: add left/right navigation if needed
+            }
+        }
     }
-    
+
     /**
-     * Handle "Settings" button click.
+     * Updates visual selection for the currently focused button.
      */
-    @FXML
-    protected void onSettingsButtonClick() {
-        System.out.println("Settings clicked - implement settings screen here");
-        // TODO: Load settings screen
+    private void updateSelection() {
+        // Reset all buttons: remove style and reset scale
+        menuButtons.forEach(b -> {
+            b.getStyleClass().remove("button-selected");
+            b.setScaleX(1);
+            b.setScaleY(1);
+        });
+
+        // Apply 'selected' style to currently selected button
+        Button selectedButton = menuButtons.get(selectedIndex);
+        if (!selectedButton.getStyleClass().contains("button-selected")) {
+            selectedButton.getStyleClass().add("button-selected");
+        }
+
+        // Smooth scale-up animation
+        ScaleTransition st = new ScaleTransition(Duration.millis(100), selectedButton);
+        st.setToX(1.1);
+        st.setToY(1.1);
+        st.play();
+
+        // Request focus so Enter key works
+        selectedButton.requestFocus();
     }
-    
-    /**
-     * Handle "Back" button click - return to welcome screen.
-     */
+
+    // ===== Button action handlers =====
+
     @FXML
-    protected void onBackButtonClick() {
-        SceneManager.switchScene("wc.fxml", "Pokemon Battle - Welcome", 800, 600);
+    private void onNewGameButtonClick() {
+        System.out.println("New Game clicked!");
+        // SceneManager.switchScene("newgame.fxml", "New Game", 800, 600);
     }
-    
-    /**
-     * Handle "Exit" button click - close application.
-     */
+
     @FXML
-    protected void onExitButtonClick() {
-        Platform.exit();
+    private void onLoadGameButtonClick() {
+        System.out.println("Load Game clicked!");
+        // SceneManager.switchScene("loadgame.fxml", "Load Game", 800, 600);
+    }
+
+    @FXML
+    private void onSettingsButtonClick() {
+        System.out.println("Settings clicked!");
+        // SceneManager.switchScene("settings.fxml", "Settings", 800, 600);
+    }
+
+    @FXML
+    private void onBackButtonClick() {
+        System.out.println("Back clicked!");
+        SceneManager.switchScene("wc.fxml", "Welcome", 800, 600);
+    }
+
+    @FXML
+    private void onExitButtonClick() {
+        System.out.println("Exit clicked!");
+        System.exit(0);
     }
 }

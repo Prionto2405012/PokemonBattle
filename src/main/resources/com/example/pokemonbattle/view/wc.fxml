@@ -12,9 +12,12 @@
   Welcome Screen
   Collects player name before proceeding to main menu
 -->
-<VBox alignment="CENTER" spacing="25.0" xmlns:fx="http://javafx.com/fxml"
+<VBox alignment="CENTER" spacing="25.0" 
+      xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.example.pokemonbattle.controller.WcController"
-      styleClass="welcome-container">
+      styleClass="welcome-container"
+      minWidth="800" minHeight="600">
   <padding>
     <Insets bottom="40.0" left="40.0" right="40.0" top="40.0"/>
   </padding>

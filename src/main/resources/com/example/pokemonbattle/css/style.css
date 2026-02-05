@@ -1,6 +1,6 @@
 .root {
     -fx-font-family: "Segoe UI";
-    -fx-background-color: #c0f0e9; /* very light cyan/teal */
+    /* -fx-background-color: #c0f0e9; very light cyan/teal */
 }
 
 .button {
@@ -19,8 +19,8 @@
 }
 
 .button:hover {
-    -fx-scale-x: 1.06;
-    -fx-scale-y: 1.06;
+    -fx-scale-x: 1.12;
+    -fx-scale-y: 1.12;
     -fx-effect: dropshadow(gaussian, rgba(0, 80, 60, 0.5), 16, 0, 0, 3.5);
 }
 
@@ -31,6 +31,11 @@
     -fx-effect: innershadow(gaussian, rgba(10, 70, 55, 0.7), 8, 0, 0, 1.5);
 }
 
+.button-selected {
+    -fx-scale-x: 1.12;
+    -fx-scale-y: 1.12;
+    -fx-effect: dropshadow(gaussian, rgba(0, 100, 80, 0.6), 20, 0, 0, 3);
+}
 /* Green Button - Continue / Success */
 .button-green {
     -fx-background-color: linear-gradient(from 10% 0% to 100% 100%, #146758, #5fa995);
@@ -126,13 +131,25 @@
 
 
 .start-container {
-    -fx-background-color: linear-gradient(from 0% 0% to 0% 100%, #57ad8b, #a7dbc2);
+    -fx-background-image: url("/com/example/pokemonbattle/assets/start_bg.jpg");
+    -fx-background-size: cover;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
 }
 
 .welcome-container {
-    -fx-background-color: linear-gradient(from 0% 0% to 0% 100%, #96d2c9, #26846e);
+    -fx-background-image: url("/com/example/pokemonbattle/assets/wc_bg.jpg");
+    -fx-background-size: cover;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+    /* -fx-background-color: rgba(50, 150, 130, 0.2); semi-transparent overlay */
 }
 
+
 .menu-container {
-    -fx-background-color: linear-gradient(from 0% 0% to 0% 100%, #9be5d4, #679ba6fe);
+    -fx-background-image: url("/com/example/pokemonbattle/assets/menu1.jpg");
+    -fx-background-size: cover;
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+    /* -fx-background-color: rgba(155, 229, 212, 0.2); semi-transparent overlay */
 }

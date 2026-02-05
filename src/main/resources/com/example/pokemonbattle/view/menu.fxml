@@ -10,9 +10,13 @@
   Main Menu Screen
   Provides access to all game features
 -->
-<VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
+<VBox fx:id="menuVBox" alignment="CENTER" spacing="20.0" 
+      xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.example.pokemonbattle.controller.MenuController"
-      styleClass="menu-container">
+      styleClass="menu-container"
+      onKeyPressed="#onKeyPressed"
+      minWidth="800" minHeight="600">
   <padding>
     <Insets bottom="40.0" left="40.0" right="40.0" top="40.0"/>
   </padding>
@@ -24,13 +28,9 @@
   <Label text=" "/>
 
   <!-- Menu Buttons -->
-  <Button text="New Game" onAction="#onNewGameButtonClick" prefWidth="250" styleClass="button-red"/>
-
-  <Button text="Load Game" onAction="#onLoadGameButtonClick" prefWidth="250" styleClass="button-blue"/>
-
-  <Button text="Settings" onAction="#onSettingsButtonClick" prefWidth="250" styleClass="button-purple"/>
-
-  <Button text="Back" onAction="#onBackButtonClick" prefWidth="250" styleClass="button-gray"/>
-
-  <Button text="Exit" onAction="#onExitButtonClick" prefWidth="250" styleClass="button-dark"/>
+  <Button fx:id="newGameButton" text="New Game" onAction="#onNewGameButtonClick" prefWidth="250" styleClass="button-red"/>
+  <Button fx:id="loadGameButton" text="Load Game" onAction="#onLoadGameButtonClick" prefWidth="250" styleClass="button-blue"/>
+  <Button fx:id="settingsButton" text="Settings" onAction="#onSettingsButtonClick" prefWidth="250" styleClass="button-purple"/>
+  <Button fx:id="backButton" text="Back" onAction="#onBackButtonClick" prefWidth="250" styleClass="button-gray"/>
+  <Button fx:id="exitButton" text="Exit" onAction="#onExitButtonClick" prefWidth="250" styleClass="button-dark"/>
 </VBox>

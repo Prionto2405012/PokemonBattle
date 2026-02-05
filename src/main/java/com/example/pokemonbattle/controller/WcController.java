@@ -17,6 +17,13 @@ public class WcController {
      * Handle "Continue" button click.
      */
     @FXML
+    public void initialize() {
+        // Focus on the text field for immediate typing
+        if (playerNameField != null) {
+            playerNameField.requestFocus();
+        }
+    }
+    @FXML
     protected void onContinueButtonClick() {
         String playerName = playerNameField.getText().trim();
         
