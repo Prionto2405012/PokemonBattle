@@ -11,7 +11,7 @@ import javafx.stage.Stage;
  */
 public class HelloApplication extends Application {
     @Override
-    public void start(@SuppressWarnings("exports") Stage stage) {
+    public void start(Stage stage) {
         // Initialize the SceneManager with the primary stage
         SceneManager.initialize(stage);
         

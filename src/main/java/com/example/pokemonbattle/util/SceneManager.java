@@ -47,8 +47,7 @@ public class SceneManager {
             primaryStage.setScene(scene);
             primaryStage.show();
         } catch (IOException e) {
-            System.err.println("Error loading FXML file: " + fxmlFile);
-            e.printStackTrace();
+            throw new RuntimeException("Error loading FXML file: " + fxmlFile, e);
         }
     }
 
