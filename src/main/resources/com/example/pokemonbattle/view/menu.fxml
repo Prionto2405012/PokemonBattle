@@ -12,13 +12,13 @@
 -->
 <VBox alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.example.pokemonbattle.controller.MenuController"
-      style="-fx-background-color: linear-gradient(to bottom, #3a7bd5, #00d2ff);">
+      styleClass="menu-container">
   <padding>
     <Insets bottom="40.0" left="40.0" right="40.0" top="40.0"/>
   </padding>
 
   <!-- Title -->
-  <Label text="MAIN MENU" styleClass="title-label"/>
+  <Label text="MAIN MENU" styleClass="menu-label"/>
 
   <!-- Spacer -->
   <Label text=" "/>

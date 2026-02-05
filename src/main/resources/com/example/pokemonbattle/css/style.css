@@ -1,207 +1,138 @@
 .root {
     -fx-font-family: "Segoe UI";
-    -fx-background-color: #a6d9c9;
+    -fx-background-color: #c0f0e9; /* very light cyan/teal */
 }
-
-/* ============================================
-   BUTTON STYLES - Base Configuration
-   ============================================ */
 
 .button {
-    -fx-background-radius: 8px;
-    -fx-border-radius: 8px;
-    -fx-cursor: hand;
-    cursor: pointer;
-    -fx-font-size: 16px;
-    font-size: 16px;
+    -fx-font-size: 18px;
     -fx-font-weight: bold;
-    -fx-text-fill: white;
-    -fx-padding: 12px 30px;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 8, 0, 0, 4);
-    transition: all 0.3s ease;
+    -fx-text-fill: #b2dcd9;
+
+    -fx-background-radius: 12px;
+    -fx-border-radius: 12px;
+    -fx-padding: 14px 36px;
+
+    -fx-effect: dropshadow(gaussian, rgba(30, 120, 100, 0.35), 10, 0, 0, 2.5);
+
+    -fx-scale-x: 1;
+    -fx-scale-y: 1;
 }
 
-/* Hover Effect - Brightens and lifts the button */
 .button:hover {
-    -fx-scale-x: 1.05;
-    -fx-scale-y: 1.05;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 12, 0, 0, 6);
-    -fx-cursor: hand;
-    cursor: pointer;
+    -fx-scale-x: 1.06;
+    -fx-scale-y: 1.06;
+    -fx-effect: dropshadow(gaussian, rgba(0, 80, 60, 0.5), 16, 0, 0, 3.5);
 }
 
-/* Pressed/Clicked Effect - Inset shadow */
 .button:pressed {
-    -fx-scale-x: 0.98;
-    -fx-scale-y: 0.98;
-    -fx-effect: innershadow(gaussian, rgba(0, 0, 0, 0.6), 8, 0, 0, 2);
+    -fx-scale-x: 0.97;
+    -fx-scale-y: 0.97;
     -fx-translate-y: 2px;
-}
-
-/* ============================================
-   BUTTON COLOR VARIANTS with Linear Gradients
-   ============================================ */
-
-/* Red Button - New Game / Primary Action */
-.button-red {
-    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #e74c3c, #c0392b);
-    -fx-border-color: #a93226;
-    -fx-border-width: 2px;
-}
-
-.button-red:hover {
-    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #f25c4c, #d5463a);
-}
-
-.button-red:pressed {
-    -fx-background-color: linear-gradient(from 100% 100% to 0% 0%, #c0392b, #a93226);
-}
-
-/* Blue Button - Load / Info Action */
-.button-blue {
-    -fx-background-color: linear-gradient(from 45deg, #3498db, #2980b9);
-    -fx-border-color: #1f618d;
-    -fx-border-width: 2px;
-}
-
-.button-blue:hover {
-    -fx-background-color: linear-gradient(from 45deg, #5dade2, #3498db);
-}
-
-.button-blue:pressed {
-    -fx-background-color: linear-gradient(from 225deg, #2980b9, #1f618d);
-}
-
-/* Purple Button - Settings / Special */
-.button-purple {
-    -fx-background-color: linear-gradient(from 90deg, #9b59b6, #8e44ad);
-    -fx-border-color: #6c3483;
-    -fx-border-width: 2px;
-}
-
-.button-purple:hover {
-    -fx-background-color: linear-gradient(from 90deg, #af7ac5, #9b59b6);
-}
-
-.button-purple:pressed {
-    -fx-background-color: linear-gradient(from 270deg, #8e44ad, #6c3483);
-}
-
-/* Gray Button - Back / Secondary */
-.button-gray {
-    -fx-background-color: linear-gradient(from 135deg, #95a5a6, #7f8c8d);
-    -fx-border-color: #5d6d7e;
-    -fx-border-width: 2px;
-}
-
-.button-gray:hover {
-    -fx-background-color: linear-gradient(from 135deg, #a9b8b9, #8d9fa1);
-}
-
-.button-gray:pressed {
-    -fx-background-color: linear-gradient(from 315deg, #7f8c8d, #5d6d7e);
-}
-
-/* Dark Gray Button - Exit / Danger */
-.button-dark {
-    -fx-background-color: linear-gradient(from 180deg, #34495e, #2c3e50);
-    -fx-border-color: #1a252f;
-    -fx-border-width: 2px;
-}
-
-.button-dark:hover {
-    -fx-background-color: linear-gradient(from 180deg, #445869, #34495e);
-}
-
-.button-dark:pressed {
-    -fx-background-color: linear-gradient(from 0deg, #2c3e50, #1a252f);
+    -fx-effect: innershadow(gaussian, rgba(10, 70, 55, 0.7), 8, 0, 0, 1.5);
 }
 
 /* Green Button - Continue / Success */
 .button-green {
-    -fx-background-color: linear-gradient(from 60deg, #27ae60, #229954);
-    -fx-border-color: #1d8348;
-    -fx-border-width: 2px;
+    -fx-background-color: linear-gradient(from 10% 0% to 100% 100%, #146758, #5fa995);
+    -fx-border-color: #4c897c;
+    -fx-border-width: 1px;
 }
+.button-green:hover { -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #26a08e, #a4ebcb); }
+.button-green:pressed { -fx-background-color: linear-gradient(from 100% 100% to 0% 0%, #1e8f7b, #7ed6a3); }
 
-.button-green:hover {
-    -fx-background-color: linear-gradient(from 60deg, #2ecc71, #27ae60);
+/* Blue Button - Load / Info */
+.button-blue {
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #23595f, #98e2f3);
+    -fx-border-color: #38727e;
+    -fx-border-width: 1px;
 }
+.button-blue:hover { -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #18474e, #74aaaf); }
+.button-blue:pressed { -fx-background-color: linear-gradient(from 100% 100% to 0% 0%, #325a64, #00d2ff); }
 
-.button-green:pressed {
-    -fx-background-color: linear-gradient(from 240deg, #229954, #1d8348);
+/* Purple Button - Settings / Accent */
+.button-purple {
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #284060, #8f9dc2);
+    -fx-border-color: #556799;
+    -fx-border-width: 1px;
 }
+.button-purple:hover { -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #183251, #6eb594); }
+.button-purple:pressed { -fx-background-color: linear-gradient(from 100% 100% to 0% 0%, #273a5f, #4cc4ba); }
 
-/* Orange Button - Warning / Start */
+/* Red Button - New Game / Alert (muted coral) */
+.button-red {
+    -fx-background-color: linear-gradient(from 0% 10% to 70% 100%, #09573c, #59b1a1);
+    -fx-border-color: #80c2a4;
+    -fx-border-width: 1px;
+}
+.button-red:hover { -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #2f561f, #31c196); }
+.button-red:pressed { -fx-background-color: linear-gradient(from 100% 100% to 0% 0%, #0e4326, #02b562); }
+
+/* Orange Button - Start / Warning */
 .button-orange {
-    -fx-background-color: linear-gradient(from 120deg, #ff6b6b, #ee5a52);
-    -fx-border-color: #d63031;
-    -fx-border-width: 2px;
+    -fx-background-color: linear-gradient(from 0% 10% to 90% 100%, #0b413c, #66aba0);
+    -fx-border-color: #85a9a1f9;
+    -fx-border-width: 1px;
 }
+.button-orange:hover { -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #3b726f, #89e0cc); }
+.button-orange:pressed { -fx-background-color: linear-gradient(from 100% 100% to 0% 0%, #21574f, #76e0d8); }
 
-.button-orange:hover {
-    -fx-background-color: linear-gradient(from 120deg, #ff7979, #ff6b6b);
+/* Gray Button - Back / Neutral */
+.button-gray {
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #485f5b, #85afa5);
+    -fx-border-color: #5d9e91;
+    -fx-border-width: 1px;
 }
+.button-gray:hover { -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #355650, #a8d9cc); }
+.button-gray:pressed { -fx-background-color: linear-gradient(from 100% 100% to 0% 0%, #1f5145, #89c4b8); }
 
-.button-orange:pressed {
-    -fx-background-color: linear-gradient(from 300deg, #ee5a52, #d63031);
+/* Dark Button - Exit / Danger */
+.button-dark {
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #6b2a2a, #c6886f);
+    -fx-border-color: #ba808e;
+    -fx-border-width: 1px;
 }
+.button-dark:hover { -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #853a47, #d8adaa); }
+.button-dark:pressed { -fx-background-color: linear-gradient(from 100% 100% to 0% 0%, #781e1e, #ee9f99); }
 
-/* ============================================
-   LABEL STYLES
-   ============================================ */
-
-.label {
-    -fx-text-fill: white;
+.label { -fx-text-fill: #03403a; }
+.menu-label {
+    -fx-font-size: 36px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1c6964 !important; /* bright cyan */
+    -fx-effect: dropshadow(gaussian, rgba(0, 50, 45, 0.6), 10, 0, 0, 2);
 }
-
 .title-label {
     -fx-font-size: 48px;
-    font-size: 48px;
     -fx-font-weight: bold;
-    -fx-text-fill: white;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.6), 10, 0, 0, 3);
+    -fx-text-fill: #06847c;
+    -fx-effect: dropshadow(gaussian, rgba(0, 50, 45, 0.6), 10, 0, 0, 2);
 }
-
-.subtitle-label {
-    -fx-font-size: 18px;
-    font-size: 18px;
-    -fx-text-fill: #e0e0e0;
-}
-
-/* ============================================
-   TEXT FIELD STYLES
-   ============================================ */
+.subtitle-label { -fx-font-size: 18px; -fx-text-fill: #0a5c50; }
 
 .text-field {
-    -fx-background-color: white;
+    -fx-background-color: rgb(189, 235, 230);
     -fx-background-radius: 6px;
-    -fx-border-color: #bdc3c7;
+    -fx-border-color: #8aa69e;
     -fx-border-radius: 6px;
-    -fx-border-width: 2px;
+    -fx-border-width: 1px;
     -fx-padding: 10px;
     -fx-font-size: 18px;
-    font-size: 18px;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 4, 0, 0, 2);
+    -fx-effect: dropshadow(gaussian, rgba(0, 100, 80, 0.2), 4, 0, 0, 1);
 }
-
 .text-field:focused {
-    -fx-border-color: #3498db;
-    -fx-effect: dropshadow(gaussian, rgba(52, 152, 219, 0.4), 8, 0, 0, 2);
+    -fx-border-color: #33d3bf;
+    -fx-effect: dropshadow(gaussian, rgba(0, 150, 120, 0.4), 8, 0, 0, 1);
 }
 
-/* ============================================
-   VBOX AND CONTAINER STYLES
-   ============================================ */
 
-.screen-container {
-    -fx-background-color: linear-gradient(to bottom, #1e3c72, #2a5298);
+.start-container {
+    -fx-background-color: linear-gradient(from 0% 0% to 0% 100%, #57ad8b, #a7dbc2);
 }
 
 .welcome-container {
-    -fx-background-color: linear-gradient(to bottom, #2a5298, #3a7bd5);
+    -fx-background-color: linear-gradient(from 0% 0% to 0% 100%, #96d2c9, #26846e);
 }
 
 .menu-container {
-    -fx-background-color: linear-gradient(to bottom, #3a7bd5, #00d2ff);
+    -fx-background-color: linear-gradient(from 0% 0% to 0% 100%, #9be5d4, #679ba6fe);
 }

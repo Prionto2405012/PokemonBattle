@@ -14,7 +14,7 @@
 -->
 <VBox alignment="CENTER" spacing="25.0" xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.example.pokemonbattle.controller.WcController"
-      style="-fx-background-color: linear-gradient(to bottom, #2a5298, #3a7bd5);">
+      styleClass="welcome-container">
   <padding>
     <Insets bottom="40.0" left="40.0" right="40.0" top="40.0"/>
   </padding>

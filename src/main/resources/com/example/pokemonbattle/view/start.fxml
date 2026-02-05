@@ -6,13 +6,9 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<!-- 
-  Start/Splash Screen
-  Shows game title and loading message, then auto-transitions to welcome screen
--->
 <VBox alignment="CENTER" spacing="30.0" xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.example.pokemonbattle.controller.StartController"
-      style="-fx-background-color: linear-gradient(to bottom, #1e3c72, #2a5298);">
+      styleClass="start-container">
   <padding>
     <Insets bottom="40.0" left="40.0" right="40.0" top="40.0"/>
   </padding>
