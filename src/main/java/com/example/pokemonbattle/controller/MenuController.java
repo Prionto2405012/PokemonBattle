@@ -15,6 +15,7 @@ import javafx.util.Duration;
 /**
  * Controller for Main Menu screen with keyboard navigation.
  */
+@SuppressWarnings("unused") // Methods are called by FXML
 public class MenuController {
 
     @FXML
@@ -52,7 +53,7 @@ public class MenuController {
      * Arrow keys / WASD to move, Enter/Space to select.
      */
     @FXML
-    private void onKeyPressed(KeyEvent event) {
+    void onKeyPressed(KeyEvent event) {
         KeyCode code = event.getCode();
 
         switch (code) {
@@ -104,31 +105,31 @@ public class MenuController {
     // ===== Button action handlers =====
 
     @FXML
-    private void onNewGameButtonClick() {
+    void onNewGameButtonClick() {
         System.out.println("New Game clicked!");
         // SceneManager.switchScene("newgame.fxml", "New Game", 800, 600);
     }
 
     @FXML
-    private void onLoadGameButtonClick() {
+    void onLoadGameButtonClick() {
         System.out.println("Load Game clicked!");
         // SceneManager.switchScene("loadgame.fxml", "Load Game", 800, 600);
     }
 
     @FXML
-    private void onSettingsButtonClick() {
+    void onSettingsButtonClick() {
         System.out.println("Settings clicked!");
         // SceneManager.switchScene("settings.fxml", "Settings", 800, 600);
     }
 
     @FXML
-    private void onBackButtonClick() {
+    void onBackButtonClick() {
         System.out.println("Back clicked!");
         SceneManager.switchScene("wc.fxml", "Welcome", 800, 600);
     }
 
     @FXML
-    private void onExitButtonClick() {
+    void onExitButtonClick() {
         System.out.println("Exit clicked!");
         System.exit(0);
     }

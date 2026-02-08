@@ -9,6 +9,7 @@ import javafx.scene.control.TextField;
  * Controller for the Welcome Screen.
  * Collects player name/info before proceeding to main menu.
  */
+@SuppressWarnings("unused") // Methods are called by FXML
 public class WcController {
     @FXML
     private TextField playerNameField;

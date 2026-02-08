@@ -14,7 +14,7 @@ public class SceneManager {
     private static Stage primaryStage;
     private static final String RESOURCE_PATH = "/com/example/pokemonbattle/";
     private static final String CSS_PATH = RESOURCE_PATH + "css/style.css";
-
+    
     /**
      * Initialize the SceneManager with the primary stage.
      * Call this once from HelloApplication.start()
@@ -49,18 +49,13 @@ public class SceneManager {
             } else {
                 scene.getStylesheets().add(cssUrl.toExternalForm());
                 System.out.println("Applied stylesheet: " + cssUrl.toExternalForm());
-                var testImage = SceneManager.class.getResource(RESOURCE_PATH + "assets/start_bg.jpg");
-                if (testImage == null) {
-                    System.err.println("ERROR: start_bg.jpg NOT FOUND");
-                } else {
-                    System.out.println("✓ Image found: " + testImage.toExternalForm());
-                }
             }
             
             primaryStage.setTitle(title);
             primaryStage.setScene(scene);
             primaryStage.show();
-        } catch (IOException e) {
+        } 
+        catch (IOException e) {
             throw new RuntimeException("Error loading FXML file: " + fxmlFile, e);
         }
     }
