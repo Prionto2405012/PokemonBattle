@@ -6,8 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="61af2b7f-9b75-4fca-be8c-30a663f2f0c8" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pokemonbattle/database/pokemon_moves_gen1_3.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pokemonbattle/database/pokemon_stats_gen1_3.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pokemonbattle/HelloApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pokemonbattle/HelloApplication.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
