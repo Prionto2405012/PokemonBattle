@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
@@ -10,27 +13,48 @@
   Main Menu Screen
   Provides access to all game features
 -->
-<VBox fx:id="menuVBox" alignment="CENTER" spacing="20.0" 
-      xmlns="http://javafx.com/javafx"
-      xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.example.pokemonbattle.controller.MenuController"
-      styleClass="menu-container"
-      onKeyPressed="#onKeyPressed"
-      minWidth="800" minHeight="600">
-  <padding>
-    <Insets bottom="40.0" left="40.0" right="40.0" top="40.0"/>
-  </padding>
+<VBox alignment="CENTER" minHeight="600" minWidth="800" spacing="30.0" 
+      styleClass="menu-container" 
+      stylesheets="@../css/style.css" 
+      xmlns="http://javafx.com/javafx/25" 
+      xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="com.example.pokemonbattle.controller.MenuController">
+  <children>
 
-  <!-- Title -->
-  <Label text="MAIN MENU" styleClass="menu-label"/>
+    <StackPane fx:id="rootPane" VBox.vgrow="ALWAYS">
 
-  <!-- Spacer -->
-  <Label text=" "/>
+        <!-- Background image -->
+        <ImageView fx:id="bgImage"
+                   preserveRatio="false"
+                   pickOnBounds="true">
+            <image>
+                <Image url="@../assets/menu1.png"/>
+            </image>
+        </ImageView>
 
-  <!-- Menu Buttons -->
-  <Button fx:id="newGameButton" text="New Game" onAction="#onNewGameButtonClick" prefWidth="250" styleClass="button-red"/>
-  <Button fx:id="loadGameButton" text="Load Game" onAction="#onLoadGameButtonClick" prefWidth="250" styleClass="button-blue"/>
-  <Button fx:id="settingsButton" text="Settings" onAction="#onSettingsButtonClick" prefWidth="250" styleClass="button-purple"/>
-  <Button fx:id="backButton" text="Back" onAction="#onBackButtonClick" prefWidth="250" styleClass="button-gray"/>
-  <Button fx:id="exitButton" text="Exit" onAction="#onExitButtonClick" prefWidth="250" styleClass="button-dark"/>
+        <!-- Content overlay -->
+        <VBox fx:id="menuVBox" alignment="CENTER" spacing="20.0" 
+              onKeyPressed="#onKeyPressed"
+              focusTraversable="true">
+          <padding>
+            <Insets bottom="40.0" left="40.0" right="40.0" top="40.0"/>
+          </padding>
+
+          <!-- Title -->
+          <Label text="MAIN MENU" styleClass="menu-label"/>
+
+          <!-- Spacer -->
+          <Label text=" "/>
+
+          <!-- Menu Buttons -->
+          <Button fx:id="newGameButton" text="New Game" onAction="#onNewGameButtonClick" prefWidth="250" styleClass="button-red"/>
+          <Button fx:id="loadGameButton" text="Load Game" onAction="#onLoadGameButtonClick" prefWidth="250" styleClass="button-blue"/>
+          <Button fx:id="settingsButton" text="Settings" onAction="#onSettingsButtonClick" prefWidth="250" styleClass="button-purple"/>
+          <Button fx:id="backButton" text="Back" onAction="#onBackButtonClick" prefWidth="250" styleClass="button-gray"/>
+          <Button fx:id="exitButton" text="Exit" onAction="#onExitButtonClick" prefWidth="250" styleClass="button-dark"/>
+        </VBox>
+
+    </StackPane>
+
+  </children>
 </VBox>

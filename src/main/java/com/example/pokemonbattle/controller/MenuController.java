@@ -7,8 +7,10 @@ import com.example.pokemonbattle.util.SceneManager;
 import javafx.animation.ScaleTransition;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
@@ -18,6 +20,10 @@ import javafx.util.Duration;
 @SuppressWarnings("unused") // Methods are called by FXML
 public class MenuController {
 
+    @FXML
+    private StackPane rootPane; // Root container for background image
+    @FXML
+    private ImageView bgImage; // Background image
     @FXML
     private VBox menuVBox;
 
@@ -37,6 +43,12 @@ public class MenuController {
 
     @FXML
     public void initialize() {
+        // Bind background image to fill the container (with null check)
+        if (bgImage != null && rootPane != null) {
+            bgImage.fitWidthProperty().bind(rootPane.widthProperty());
+            bgImage.fitHeightProperty().bind(rootPane.heightProperty());
+        }
+        
         // List of buttons in menu order
         menuButtons = List.of(newGameButton, loadGameButton, settingsButton, backButton, exitButton);
 
