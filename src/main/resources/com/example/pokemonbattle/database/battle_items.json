@@ -1,0 +1,104 @@
+[
+  {
+    "id": 17,
+    "name": "potion",
+    "category": "healing",
+    "effect": "Used on a friendly Pok\u00e9mon\n:   Restores 20 HP."
+  },
+  {
+    "id": 26,
+    "name": "super-potion",
+    "category": "healing",
+    "effect": "Used on a party Pok\u00e9mon\n:   Restores 50 HP."
+  },
+  {
+    "id": 25,
+    "name": "hyper-potion",
+    "category": "healing",
+    "effect": "Used on a party Pok\u00e9mon\n:   Restores 200 HP."
+  },
+  {
+    "id": 24,
+    "name": "max-potion",
+    "category": "healing",
+    "effect": "Used on a party Pok\u00e9mon\n:   Restores HP to full."
+  },
+  {
+    "id": 23,
+    "name": "full-restore",
+    "category": "healing",
+    "effect": "Used on a party Pok\u00e9mon\n:   Restores HP to full and cures any status ailment and confusion."
+  },
+  {
+    "id": 28,
+    "name": "revive",
+    "category": "revival",
+    "effect": "Used on a party Pok\u00e9mon\n:   Revives the Pok\u00e9mon and restores half its HP."
+  },
+  {
+    "id": 29,
+    "name": "max-revive",
+    "category": "revival",
+    "effect": "Used on a party Pok\u00e9mon\n:   Revives the Pok\u00e9mon and restores its HP to full."
+  },
+  {
+    "id": 18,
+    "name": "antidote",
+    "category": "status-cures",
+    "effect": "Used on a party Pok\u00e9mon\n:   Cures poison."
+  },
+  {
+    "id": 19,
+    "name": "burn-heal",
+    "category": "status-cures",
+    "effect": "Used on a party Pok\u00e9mon\n:   Cures a burn."
+  },
+  {
+    "id": 20,
+    "name": "ice-heal",
+    "category": "status-cures",
+    "effect": "Used on a party Pok\u00e9mon\n:   Cures freezing."
+  },
+  {
+    "id": 21,
+    "name": "awakening",
+    "category": "status-cures",
+    "effect": "Used on a party Pok\u00e9mon\n:   Cures sleep."
+  },
+  {
+    "id": 22,
+    "name": "paralyze-heal",
+    "category": "status-cures",
+    "effect": "Used on a party Pok\u00e9mon\n:   Cures paralysis."
+  },
+  {
+    "id": 27,
+    "name": "full-heal",
+    "category": "status-cures",
+    "effect": "Used on a party Pok\u00e9mon\n:   Cures any status ailment and confusion."
+  },
+  {
+    "id": 38,
+    "name": "ether",
+    "category": "pp-recovery",
+    "effect": "Used on a party Pok\u00e9mon\n:   Restores 10 PP for a selected move."
+  },
+  {
+    "id": 39,
+    "name": "max-ether",
+    "category": "pp-recovery",
+    "effect": "Used on a party Pok\u00e9mon\n:   Restores PP to full for a selected move."
+  },
+  {
+    "id": 40,
+    "name": "elixir",
+    "category": "pp-recovery",
+    "effect": "Used on a party Pok\u00e9mon\n:   Restores 10 PP for each move."
+  },
+  {
+    "id": 41,
+    "name": "max-elixir",
+    "category": "pp-recovery",
+    "effect": "Used on a party Pok\u00e9mon\n:   Restores PP to full for each move."
+  }
+]
