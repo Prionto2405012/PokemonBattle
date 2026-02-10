@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<StackPane fx:id="overlayRoot" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
+    fx:controller="com.example.pokemonbattle.controller.PokemonSelectionOverlayController"
+    styleClass="overlay-root" alignment="CENTER"
+    onMouseClicked="#onBackgroundClick">
+
+    <!-- Glassmorphism Container -->
+    <VBox alignment="TOP_CENTER" spacing="15" maxWidth="960" maxHeight="600" 
+        styleClass="overlay-container">
+        <padding>
+            <Insets top="20" bottom="20" left="25" right="25" />
+        </padding>
+
+        <!-- Header -->
+        <VBox alignment="CENTER" spacing="8">
+            <Label text="Select Your Team" styleClass="overlay-title">
+                <font>
+                    <Font name="System Bold" size="28" />
+                </font>
+            </Label>
+            <Label fx:id="selectionCountLabel" text="Selected: 0 / 6"
+                styleClass="overlay-selection-count">
+                <font>
+                    <Font size="16" />
+                </font>
+            </Label>
+        </VBox>
+
+        <!-- Main Content Area -->
+        <HBox spacing="15" VBox.vgrow="ALWAYS">
+            <!-- Pokemon Grid ScrollPane -->
+            <ScrollPane fx:id="pokemonScrollPane" fitToWidth="true" 
+                prefWidth="600" prefHeight="440"
+                styleClass="overlay-pokemon-scroll">
+                <content>
+                    <GridPane fx:id="pokemonGrid" hgap="10" vgap="10">
+                        <padding>
+                            <Insets top="10" bottom="10" left="10" right="10" />
+                        </padding>
+                    </GridPane>
+                </content>
+            </ScrollPane>
+
+            <!--Stats Panel -->
+            <VBox fx:id="statsPanel" spacing="10" prefWidth="310" prefHeight="440"
+                styleClass="overlay-stats-panel">
+                
+                <!-- Pokemon Name -->
+                <Label fx:id="statsPokemonName" text="Hover over a Pokémon" 
+                    styleClass="overlay-stats-name">
+                    <font>
+                        <Font name="System Bold" size="20" />
+                    </font>
+                </Label>
+
+                <!-- Pokemon Sprite -->
+                <StackPane prefHeight="100" alignment="CENTER">
+                    <VBox fx:id="statsSpriteContainer" alignment="CENTER" />
+                </StackPane>
+
+                <!-- Types -->
+                <HBox fx:id="statsTypesBox" spacing="8" alignment="CENTER" />
+
+                <!-- Stats Details -->
+                <VBox fx:id="statsDetailsBox" spacing="8" 
+                    styleClass="overlay-stats-details">
+                    <Label text="Stats:" styleClass="overlay-stats-details-label" />
+                </VBox>
+
+                <!-- Moves -->
+                <VBox fx:id="statsMovesBox" spacing="6"
+                    styleClass="overlay-stats-moves">
+                    <Label text="Moves:" styleClass="overlay-stats-moves-label" />
+                </VBox>
+            </VBox>
+        </HBox>
+
+        <!-- Action Buttons -->
+        <HBox alignment="CENTER" spacing="20">
+            <Button fx:id="clearButton" text="Clear Selection" 
+                prefHeight="38" prefWidth="160"
+                styleClass="button-dark"
+                onAction="#onClearSelection">
+                <font>
+                    <Font size="15" />
+                </font>
+            </Button>
+            
+            <Button fx:id="doneButton" text="Done" 
+                prefHeight="38" prefWidth="160"
+                styleClass="button-green"
+                onAction="#onDone">
+                <font>
+                    <Font size="15" />
+                </font>
+            </Button>
+        </HBox>
+    </VBox>
+
+</StackPane>
