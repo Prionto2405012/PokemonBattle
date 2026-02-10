@@ -13,7 +13,7 @@
   Main Menu Screen
   Provides access to all game features
 -->
-<VBox alignment="CENTER" minHeight="600" minWidth="800" spacing="30.0" 
+<VBox alignment="CENTER" minHeight="700" minWidth="1200" spacing="30.0" 
       styleClass="menu-container" 
       stylesheets="@../css/style.css" 
       xmlns="http://javafx.com/javafx/25" 

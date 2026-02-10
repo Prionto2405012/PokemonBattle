@@ -15,7 +15,7 @@
   Welcome Screen
   Collects player name before proceeding to main menu
 -->
-<VBox alignment="CENTER" minHeight="700" minWidth="900" spacing="30.0" 
+<VBox alignment="CENTER" minHeight="700" minWidth="1200" spacing="30.0" 
       styleClass="welcome-container" 
       stylesheets="@../css/style.css" 
       xmlns="http://javafx.com/javafx/25" 

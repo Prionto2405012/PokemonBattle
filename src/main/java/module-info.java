@@ -16,7 +16,9 @@ module com.example.pokemonbattle {
     opens com.example.pokemonbattle to javafx.fxml;
     opens com.example.pokemonbattle.controller to javafx.fxml;
     opens com.example.pokemonbattle.util to javafx.fxml;
+    opens com.example.pokemonbattle.model to javafx.fxml;
     exports com.example.pokemonbattle;
     exports com.example.pokemonbattle.controller;
+    exports com.example.pokemonbattle.model;
     exports com.example.pokemonbattle.util;
 }
