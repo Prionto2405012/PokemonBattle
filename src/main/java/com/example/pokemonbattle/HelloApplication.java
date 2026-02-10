@@ -13,6 +13,7 @@ public class HelloApplication extends Application {
     @Override
     public void start(Stage stage) {
         // Initialize the SceneManager with the primary stage
+        stage.setResizable(true);
         SceneManager.initialize(stage);
         
         // Load the start/splash screen as the initial view

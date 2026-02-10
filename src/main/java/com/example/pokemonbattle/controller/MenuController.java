@@ -7,16 +7,23 @@ import com.example.pokemonbattle.util.SceneManager;
 import javafx.animation.ScaleTransition;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
 /**
  * Controller for Main Menu screen with keyboard navigation.
  */
+@SuppressWarnings("unused") // Methods are called by FXML
 public class MenuController {
 
+    @FXML
+    private StackPane rootPane; // Root container for background image
+    @FXML
+    private ImageView bgImage; // Background image
     @FXML
     private VBox menuVBox;
 
@@ -36,6 +43,12 @@ public class MenuController {
 
     @FXML
     public void initialize() {
+        // Bind background image to fill the container (with null check)
+        if (bgImage != null && rootPane != null) {
+            bgImage.fitWidthProperty().bind(rootPane.widthProperty());
+            bgImage.fitHeightProperty().bind(rootPane.heightProperty());
+        }
+        
         // List of buttons in menu order
         menuButtons = List.of(newGameButton, loadGameButton, settingsButton, backButton, exitButton);
 
@@ -52,7 +65,7 @@ public class MenuController {
      * Arrow keys / WASD to move, Enter/Space to select.
      */
     @FXML
-    private void onKeyPressed(KeyEvent event) {
+    void onKeyPressed(KeyEvent event) {
         KeyCode code = event.getCode();
 
         switch (code) {
@@ -104,31 +117,31 @@ public class MenuController {
     // ===== Button action handlers =====
 
     @FXML
-    private void onNewGameButtonClick() {
+    void onNewGameButtonClick() {
         System.out.println("New Game clicked!");
         // SceneManager.switchScene("newgame.fxml", "New Game", 800, 600);
     }
 
     @FXML
-    private void onLoadGameButtonClick() {
+    void onLoadGameButtonClick() {
         System.out.println("Load Game clicked!");
         // SceneManager.switchScene("loadgame.fxml", "Load Game", 800, 600);
     }
 
     @FXML
-    private void onSettingsButtonClick() {
+    void onSettingsButtonClick() {
         System.out.println("Settings clicked!");
         // SceneManager.switchScene("settings.fxml", "Settings", 800, 600);
     }
 
     @FXML
-    private void onBackButtonClick() {
+    void onBackButtonClick() {
         System.out.println("Back clicked!");
         SceneManager.switchScene("wc.fxml", "Welcome", 800, 600);
     }
 
     @FXML
-    private void onExitButtonClick() {
+    void onExitButtonClick() {
         System.out.println("Exit clicked!");
         System.exit(0);
     }
