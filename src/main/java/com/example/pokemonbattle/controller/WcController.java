@@ -1,5 +1,6 @@
 package com.example.pokemonbattle.controller;
 
+
 import com.example.pokemonbattle.util.SceneManager;
 
 import javafx.fxml.FXML;
@@ -47,7 +48,7 @@ public class WcController {
         
         // TODO: Store player name in a model/session manager
         System.out.println("Player name: " + playerName);
-        
+
         // Navigate to main menu
         SceneManager.switchScene("menu.fxml", "Pokemon Battle - Menu", 800, 600);
     }

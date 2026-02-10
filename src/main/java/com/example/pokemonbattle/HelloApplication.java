@@ -17,7 +17,7 @@ public class HelloApplication extends Application {
         SceneManager.initialize(stage);
         
         // Load the start/splash screen as the initial view
-        SceneManager.switchScene("start.fxml", "Pokemon Battle - Start", 800, 600);
+        SceneManager.switchScene("start.fxml", "Pokemon Battle - Start", 1200, 700);
     }
 
     public static void main(String[] args) {

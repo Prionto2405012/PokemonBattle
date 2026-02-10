@@ -119,25 +119,25 @@ public class MenuController {
     @FXML
     void onNewGameButtonClick() {
         System.out.println("New Game clicked!");
-        // SceneManager.switchScene("newgame.fxml", "New Game", 800, 600);
+        // SceneManager.switchScene("newgame.fxml", "New Game", 1200, 700);
     }
 
     @FXML
     void onLoadGameButtonClick() {
         System.out.println("Load Game clicked!");
-        // SceneManager.switchScene("loadgame.fxml", "Load Game", 800, 600);
+        // SceneManager.switchScene("loadgame.fxml", "Load Game", 1200, 700);
     }
 
     @FXML
     void onSettingsButtonClick() {
         System.out.println("Settings clicked!");
-        // SceneManager.switchScene("settings.fxml", "Settings", 800, 600);
+        // SceneManager.switchScene("settings.fxml", "Settings", 1200, 700);
     }
 
     @FXML
     void onBackButtonClick() {
         System.out.println("Back clicked!");
-        SceneManager.switchScene("wc.fxml", "Welcome", 800, 600);
+        SceneManager.switchScene("wc.fxml", "Welcome", 1200, 700);
     }
 
     @FXML
