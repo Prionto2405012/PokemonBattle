@@ -1030,7 +1030,7 @@ public class NewGameController {
             case "fairy" -> "#EE99AC";
             case "normal" -> "#A8A878";
             case "fighting" -> "#C03028";
-            case "flying" -> "#A890F0";
+            case "flying" -> "#b0ceee";
             case "poison" -> "#A040A0";
             case "ground" -> "#E0C068";
             case "rock" -> "#B8A038";

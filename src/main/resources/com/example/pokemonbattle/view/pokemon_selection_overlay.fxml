@@ -12,34 +12,25 @@
 
 <StackPane fx:id="overlayRoot" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
     fx:controller="com.example.pokemonbattle.controller.PokemonSelectionOverlayController"
-    style="-fx-background-color: rgba(0, 0, 0, 0.5);" alignment="CENTER"
+    styleClass="overlay-root" alignment="CENTER"
     onMouseClicked="#onBackgroundClick">
 
     <!-- Glassmorphism Container -->
     <VBox alignment="TOP_CENTER" spacing="15" maxWidth="960" maxHeight="600" 
-        style="-fx-background-color: rgba(255, 255, 255, 0.15); 
-               -fx-background-radius: 20; 
-               -fx-border-color: rgba(255, 255, 255, 0.3); 
-               -fx-border-width: 2; 
-               -fx-border-radius: 20;
-               -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.4), 25, 0, 0, 5);
-               -fx-backdrop-filter: blur(10px);">
+        styleClass="overlay-container">
         <padding>
             <Insets top="20" bottom="20" left="25" right="25" />
         </padding>
 
         <!-- Header -->
         <VBox alignment="CENTER" spacing="8">
-            <Label text="Select Your Team" styleClass="title-label"
-                style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #ffffff; 
-                       -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 8, 0, 0, 2);">
+            <Label text="Select Your Team" styleClass="overlay-title">
                 <font>
                     <Font name="System Bold" size="28" />
                 </font>
             </Label>
             <Label fx:id="selectionCountLabel" text="Selected: 0 / 6"
-                style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #78C850;
-                       -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 5, 0, 0, 1);">
+                styleClass="overlay-selection-count">
                 <font>
                     <Font size="16" />
                 </font>
@@ -51,11 +42,7 @@
             <!-- Pokemon Grid ScrollPane -->
             <ScrollPane fx:id="pokemonScrollPane" fitToWidth="true" 
                 prefWidth="600" prefHeight="440"
-                style="-fx-background: rgba(0, 0, 0, 0.2); 
-                       -fx-background-color: transparent;
-                       -fx-border-color: rgba(255, 255, 255, 0.2); 
-                       -fx-border-width: 1; 
-                       -fx-border-radius: 12;">
+                styleClass="overlay-pokemon-scroll">
                 <content>
                     <GridPane fx:id="pokemonGrid" hgap="10" vgap="10">
                         <padding>
@@ -67,17 +54,11 @@
 
             <!--Stats Panel -->
             <VBox fx:id="statsPanel" spacing="10" prefWidth="310" prefHeight="440"
-                style="-fx-background-color: rgba(0, 0, 0, 0.3); 
-                       -fx-background-radius: 12; 
-                       -fx-border-color: rgba(255, 255, 255, 0.25); 
-                       -fx-border-width: 1.5; 
-                       -fx-border-radius: 12;
-                       -fx-padding: 15;">
+                styleClass="overlay-stats-panel">
                 
                 <!-- Pokemon Name -->
                 <Label fx:id="statsPokemonName" text="Hover over a Pokémon" 
-                    style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #ffffff;
-                           -fx-wrap-text: true;">
+                    styleClass="overlay-stats-name">
                     <font>
                         <Font name="System Bold" size="20" />
                     </font>
@@ -93,18 +74,14 @@
 
                 <!-- Stats Details -->
                 <VBox fx:id="statsDetailsBox" spacing="8" 
-                    style="-fx-background-color: rgba(255, 255, 255, 0.1); 
-                           -fx-background-radius: 8; 
-                           -fx-padding: 10;">
-                    <Label text="Stats:" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #f8d030;" />
+                    styleClass="overlay-stats-details">
+                    <Label text="Stats:" styleClass="overlay-stats-details-label" />
                 </VBox>
 
                 <!-- Moves -->
                 <VBox fx:id="statsMovesBox" spacing="6"
-                    style="-fx-background-color: rgba(255, 255, 255, 0.1); 
-                           -fx-background-radius: 8; 
-                           -fx-padding: 10;">
-                    <Label text="Moves:" style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #6890F0;" />
+                    styleClass="overlay-stats-moves">
+                    <Label text="Moves:" styleClass="overlay-stats-moves-label" />
                 </VBox>
             </VBox>
         </HBox>

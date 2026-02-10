@@ -173,7 +173,7 @@ public class PokemonSelectionOverlayController {
         // Select indicator
         Label selectIndicator = new Label(isSelected ? "✓ SELECTED" : "CLICK TO SELECT");
         selectIndicator.setStyle("-fx-font-size: 10px; -fx-text-fill: " + 
-                (isSelected ? "#78C850" : "#aaaaaa") + "; -fx-font-weight: bold;");
+                (isSelected ? "#163c03" : "#05273b") + "; -fx-font-weight: bold;");
 
         card.getChildren().addAll(sprite, nameLabel, typesBox, selectIndicator);
 
@@ -208,20 +208,20 @@ public class PokemonSelectionOverlayController {
      */
     private void updateCardStyle(VBox card, boolean isSelected) {
         if (isSelected) {
-            card.setStyle("-fx-background-color: linear-gradient(from 0% 0% to 100% 100%, rgba(120, 200, 80, 0.4), rgba(120, 200, 80, 0.25)); " +
-                    "-fx-background-radius: 10; " +
-                    "-fx-border-color: rgba(120, 200, 80, 0.8); " +
-                    "-fx-border-width: 3; " +
-                    "-fx-border-radius: 10; " +
-                    "-fx-effect: dropshadow(gaussian, rgba(120, 200, 80, 0.6), 15, 0, 0, 0); " +
+            card.setStyle("-fx-background-color: linear-gradient(from 0% 0% to 100% 100%, rgba(126, 189, 185, 0.92), rgba(106, 173, 140, 0.95)); " +
+                    "-fx-background-radius: 12; " +
+                    "-fx-border-color: rgba(120, 200, 160, 0.5); " +
+                    "-fx-border-width: 2; " +
+                    "-fx-border-radius: 12; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0, 80, 70, 0.3), 8, 0, 0, 2); " +
                     "-fx-cursor: hand;");
         } else {
-            card.setStyle("-fx-background-color: linear-gradient(from 0% 0% to 100% 100%, rgba(255, 255, 255, 0.15), rgba(240, 250, 245, 0.1)); " +
-                    "-fx-background-radius: 10; " +
-                    "-fx-border-color: rgba(255, 255, 255, 0.3); " +
-                    "-fx-border-width: 1.5; " +
-                    "-fx-border-radius: 10; " +
-                    "-fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.3), 8, 0, 0, 2); " +
+            card.setStyle("-fx-background-color: linear-gradient(from 0% 0% to 100% 100%, rgba(175, 239, 235, 0.92), rgba(167, 231, 199, 0.95)); " +
+                    "-fx-background-radius: 12; " +
+                    "-fx-border-color: rgba(120, 200, 160, 0.5); " +
+                    "-fx-border-width: 2; " +
+                    "-fx-border-radius: 12; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0, 80, 70, 0.3), 8, 0, 0, 2); " +
                     "-fx-cursor: hand;");
         }
     }

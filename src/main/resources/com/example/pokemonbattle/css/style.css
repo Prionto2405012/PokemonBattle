@@ -198,7 +198,7 @@
 
 /* Pokemon Card Styles */
 .pokemon-card {
-    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, rgba(255, 255, 255, 0.92), rgba(240, 250, 245, 0.95));
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, rgba(175, 239, 235, 0.92), rgba(167, 231, 199, 0.95));
     -fx-background-radius: 12;
     -fx-border-color: rgba(120, 200, 160, 0.5);
     -fx-border-width: 2;
@@ -296,4 +296,92 @@
 .scroll-bar:horizontal .decrement-button {
     -fx-background-color: transparent;
     -fx-padding: 0;
+}
+
+/* ===== Pokemon Selection Overlay Styles ===== */
+
+/* Overlay Background */
+.overlay-root {
+    -fx-background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Overlay Container */
+.overlay-container {
+    -fx-background-color: rgba(176, 229, 199, 0.85);
+    -fx-background-radius: 20;
+    -fx-border-color: rgba(21, 92, 86, 0.65);
+    -fx-border-width: 2;
+    -fx-border-radius: 20;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.4), 25, 0, 0, 5);
+}
+
+/* Overlay Title */
+.overlay-title {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #ffffff;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 8, 0, 0, 2);
+}
+
+/* Selection Count Label */
+.overlay-selection-count {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #78C850;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 5, 0, 0, 1);
+}
+
+/* Pokemon ScrollPane in Overlay */
+.overlay-pokemon-scroll {
+    -fx-background: rgba(127, 216, 234, 0.481);
+    -fx-background-color: transparent;
+    -fx-border-color: rgba(9, 36, 51, 0.35);
+    -fx-border-width: 1;
+    -fx-border-radius: 12;
+}
+
+/* Stats Panel in Overlay */
+.overlay-stats-panel {
+    -fx-background-color: rgba(9, 94, 74, 0.45);
+    -fx-background-radius: 12;
+    -fx-border-color: rgba(190, 232, 219, 0.484);
+    -fx-border-width: 1.5;
+    -fx-border-radius: 12;
+    -fx-padding: 15;
+}
+
+/* Stats Pokemon Name */
+.overlay-stats-name {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #ffffff;
+    -fx-wrap-text: true;
+}
+
+/* Stats Details Container */
+.overlay-stats-details {
+    -fx-background-color: rgba(180, 233, 222, 0.35);
+    -fx-background-radius: 8;
+    -fx-padding: 10;
+}
+
+/* Stats Details Label */
+.overlay-stats-details-label {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #f8d030;
+}
+
+/* Stats Moves Container */
+.overlay-stats-moves {
+    -fx-background-color: rgba(180, 233, 222, 0.35);
+    -fx-background-radius: 8;
+    -fx-padding: 10;
+}
+
+/* Stats Moves Label */
+.overlay-stats-moves-label {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #6890F0;
 }
