@@ -11,7 +11,7 @@ import java.util.Objects;
  */
 public class PokemonInstance {
     private final PokemonSpecies species;
-    private int level;
+    private final int level;
 
     // Battle stats
     private int maxHp;

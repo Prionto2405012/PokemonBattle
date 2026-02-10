@@ -6,21 +6,12 @@
   <component name="ChangeListManager">
     <list default="true" id="61af2b7f-9b75-4fca-be8c-30a663f2f0c8" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pokemonbattle/HelloApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pokemonbattle/HelloApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pokemonbattle/controller/MenuController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pokemonbattle/controller/MenuController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pokemonbattle/controller/StartController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pokemonbattle/controller/StartController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pokemonbattle/controller/WcController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pokemonbattle/controller/WcController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pokemonbattle/assets/Arkhai.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pokemonbattle/assets/menu1.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pokemonbattle/assets/menu2.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pokemonbattle/assets/menu3.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pokemonbattle/assets/start_bg.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pokemonbattle/assets/wc_bg.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pokemonbattle/controller/NewGameController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pokemonbattle/controller/NewGameController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pokemonbattle/model/PokemonInstance.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pokemonbattle/model/PokemonInstance.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/pokemonbattle/util/SceneManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/pokemonbattle/util/SceneManager.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pokemonbattle/css/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pokemonbattle/css/style.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pokemonbattle/view/menu.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pokemonbattle/view/menu.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pokemonbattle/view/start.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pokemonbattle/view/start.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pokemonbattle/view/wc.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pokemonbattle/view/wc.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pokemonbattle/view/new_game.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pokemonbattle/view/new_game.fxml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

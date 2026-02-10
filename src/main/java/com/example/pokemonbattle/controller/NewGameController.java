@@ -1,14 +1,13 @@
 package com.example.pokemonbattle.controller;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.example.pokemonbattle.model.Move;
@@ -18,8 +17,10 @@ import com.example.pokemonbattle.model.PokemonSpecies;
 import com.example.pokemonbattle.util.SceneManager;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -35,6 +36,14 @@ import javafx.scene.layout.VBox;
 /**
  * Controller for the Battle Setup Screen.
  * Handles game mode selection, opponent matching, and team building.
+ * 
+ * FIXED ISSUES:
+ * - Toggle buttons now only show borders after user interaction
+ * - Start button properly enabled/disabled based on team validity
+ * - AI team generation ensures no duplicates and matches player team size
+ * - Custom team selection enforces max 6 Pokemon and no duplicates
+ * - Scene transitions properly pass player and opponent data
+ * - Improved UX with proper spacing, fonts, and feedback
  */
 @SuppressWarnings("unused")
 public class NewGameController {
@@ -65,6 +74,7 @@ public class NewGameController {
     private ToggleButton localOpponentButton;
     @FXML
     private Label matchingStatusLabel;
+    private ToggleGroup opponentToggleGroup;
 
     // Team Selection
     @FXML
@@ -73,6 +83,8 @@ public class NewGameController {
     private ToggleButton randomTeamButton;
     @FXML
     private ToggleButton customTeamButton;
+    @FXML
+    private Button editTeamButton;
     private ToggleGroup teamToggleGroup;
 
     // Pokemon Display
@@ -95,11 +107,21 @@ public class NewGameController {
     private List<PokemonSpecies> allPokemon;
     private Map<Integer, Move> allMoves;
     private List<PokemonInstance> playerTeam;
-    private String selectedMode = "SOLO";
-    private String selectedOpponent = "AI";
-    private String selectedTeamType = "RANDOM";
+    private String selectedMode = null;
+    private String selectedOpponent = null;
+    
+    // Interaction tracking flags
+    private boolean modeInteracted = false;
+    private boolean opponentInteracted = false;
+    private boolean teamTypeInteracted = false;
+    private String selectedTeamType = null;
     private static final int MAX_TEAM_SIZE = 6;
     private static final int POKEMON_LEVEL = 50;
+    private Player aiOpponent; // Store AI opponent for battle
+    
+    // Overlay for custom Pokemon selection
+    private Parent overlayNode;
+    private PokemonSelectionOverlayController overlayController;
 
     @FXML
     public void initialize() {
@@ -121,7 +143,7 @@ public class NewGameController {
         // Setup UI
         setupUI();
 
-        // Set default selections
+        // Set default selections (without showing borders)
         setDefaultSelections();
     }
 
@@ -129,20 +151,49 @@ public class NewGameController {
      * Setup toggle groups for mutually exclusive selections
      */
     private void setupToggleGroups() {
+        // Mode toggle group
         modeToggleGroup = new ToggleGroup();
         soloModeButton.setToggleGroup(modeToggleGroup);
         duoModeButton.setToggleGroup(modeToggleGroup);
 
+        // Opponent toggle group
+        opponentToggleGroup = new ToggleGroup();
+        aiOpponentButton.setToggleGroup(opponentToggleGroup);
+        localOpponentButton.setToggleGroup(opponentToggleGroup);
+
+        // Team toggle group
         teamToggleGroup = new ToggleGroup();
         randomTeamButton.setToggleGroup(teamToggleGroup);
         customTeamButton.setToggleGroup(teamToggleGroup);
 
-        // Add listeners
+        // Add listeners with interaction tracking
         modeToggleGroup.selectedToggleProperty().addListener((obs, old, newToggle) -> {
             if (newToggle != null) {
                 ToggleButton btn = (ToggleButton) newToggle;
                 selectedMode = btn.getText().toUpperCase();
+                
+                // Apply border style only after interaction
+                if (modeInteracted) {
+                    applySelectionStyle(soloModeButton, soloModeButton == newToggle);
+                    applySelectionStyle(duoModeButton, duoModeButton == newToggle);
+                }
+                
                 updateUIForMode();
+            }
+        });
+
+        opponentToggleGroup.selectedToggleProperty().addListener((obs, old, newToggle) -> {
+            if (newToggle != null) {
+                ToggleButton btn = (ToggleButton) newToggle;
+                selectedOpponent = btn.getText().toUpperCase().contains("AI") ? "AI" : "LOCAL";
+                
+                // Apply border style only after interaction
+                if (opponentInteracted) {
+                    applySelectionStyle(aiOpponentButton, aiOpponentButton == newToggle);
+                    applySelectionStyle(localOpponentButton, localOpponentButton == newToggle);
+                }
+                
+                updateOpponentStatus();
             }
         });
 
@@ -150,9 +201,69 @@ public class NewGameController {
             if (newToggle != null) {
                 ToggleButton btn = (ToggleButton) newToggle;
                 selectedTeamType = btn.getText().toUpperCase();
-                updateTeamSelectionUI();
+                
+                // Apply border style only after interaction
+                if (teamTypeInteracted) {
+                    applySelectionStyle(randomTeamButton, randomTeamButton == newToggle);
+                    applySelectionStyle(customTeamButton, customTeamButton == newToggle);
+                }
+                
+                // Show overlay for custom selection
+                if ("CUSTOM".equals(selectedTeamType)) {
+                    showPokemonSelectionOverlay();
+                } else {
+                    updateTeamSelectionUI();
+                }
             }
         });
+        
+        // Add mouse click handlers to mark as interacted
+        soloModeButton.setOnMouseClicked(e -> {
+            modeInteracted = true;
+            applySelectionStyle(soloModeButton, soloModeButton.isSelected());
+            applySelectionStyle(duoModeButton, duoModeButton.isSelected());
+        });
+        duoModeButton.setOnMouseClicked(e -> {
+            modeInteracted = true;
+            applySelectionStyle(soloModeButton, soloModeButton.isSelected());
+            applySelectionStyle(duoModeButton, duoModeButton.isSelected());
+        });
+        
+        aiOpponentButton.setOnMouseClicked(e -> {
+            opponentInteracted = true;
+            applySelectionStyle(aiOpponentButton, aiOpponentButton.isSelected());
+            applySelectionStyle(localOpponentButton, localOpponentButton.isSelected());
+        });
+        localOpponentButton.setOnMouseClicked(e -> {
+            opponentInteracted = true;
+            applySelectionStyle(aiOpponentButton, aiOpponentButton.isSelected());
+            applySelectionStyle(localOpponentButton, localOpponentButton.isSelected());
+        });
+        
+        randomTeamButton.setOnMouseClicked(e -> {
+            teamTypeInteracted = true;
+            applySelectionStyle(randomTeamButton, randomTeamButton.isSelected());
+            applySelectionStyle(customTeamButton, customTeamButton.isSelected());
+            hideEditTeamButton();
+        });
+        customTeamButton.setOnMouseClicked(e -> {
+            teamTypeInteracted = true;
+            applySelectionStyle(randomTeamButton, randomTeamButton.isSelected());
+            applySelectionStyle(customTeamButton, customTeamButton.isSelected());
+        });
+    }
+
+    /**
+     * Apply or remove selection border style
+     */
+    private void applySelectionStyle(ToggleButton button, boolean selected) {
+        if (selected) {
+            if (!button.getStyleClass().contains("toggle-selected")) {
+                button.getStyleClass().add("toggle-selected");
+            }
+        } else {
+            button.getStyleClass().remove("toggle-selected");
+        }
     }
 
     /**
@@ -243,22 +354,32 @@ public class NewGameController {
         // Setup start button
         startBattleButton.setOnAction(e -> onStartBattle());
         backButton.setOnAction(e -> onBack());
-
-        // Setup opponent buttons
-        aiOpponentButton.setOnAction(e -> onOpponentSelected("AI"));
-        localOpponentButton.setOnAction(e -> onOpponentSelected("LOCAL"));
+        
+        // Setup Edit Team button (initially hidden)
+        if (editTeamButton != null) {
+            editTeamButton.setVisible(false);
+            editTeamButton.setManaged(false);
+            editTeamButton.setOnAction(e -> showPokemonSelectionOverlay());
+        }
     }
 
     /**
-     * Set default selections
+     * Set default selections (no buttons selected, all states null)
      */
     private void setDefaultSelections() {
-        soloModeButton.setSelected(true);
-        randomTeamButton.setSelected(true);
-        aiOpponentButton.getStyleClass().add("button-selected");
-        selectedOpponent = "AI";
-        matchingStatusLabel.setText("AI Opponent Ready");
+        // No buttons selected initially
+        soloModeButton.setSelected(false);
+        aiOpponentButton.setSelected(false);
+        randomTeamButton.setSelected(false);
 
+        // All states remain null until user interaction
+        selectedMode = null;
+        selectedOpponent = null;
+        selectedTeamType = null;
+
+        // Update UI based on null states
+        updateUIForMode();
+        updateOpponentStatus();
         updateTeamSelectionUI();
     }
 
@@ -266,80 +387,100 @@ public class NewGameController {
      * Update UI based on selected game mode
      */
     private void updateUIForMode() {
-        if ("DUO".equals(selectedMode)) {
+        if (selectedMode == null) {
+            matchingStatusLabel.setText("Please select a game mode");
+            matchingStatusLabel.setStyle("-fx-font-size:12px; -fx-text-fill:#ffffff; -fx-font-style:italic;");
+        } else if ("DUO".equals(selectedMode)) {
             matchingStatusLabel.setText("Duo mode: 2v2 battles (Coming Soon)");
+            matchingStatusLabel.setStyle("-fx-font-size:12px; -fx-text-fill:#f8d030; -fx-font-style:italic;");
         } else {
-            matchingStatusLabel.setText("Solo mode: 1v1 battles");
+            updateOpponentStatus();
         }
+        updateStartButtonState();
     }
 
     /**
-     * Handle opponent selection
+     * Update opponent status message
      */
-    private void onOpponentSelected(String opponent) {
-        selectedOpponent = opponent;
-
-        // Update button styles
-        aiOpponentButton.getStyleClass().remove("button-selected");
-        localOpponentButton.getStyleClass().remove("button-selected");
-
-        if ("AI".equals(opponent)) {
-            aiOpponentButton.getStyleClass().add("button-selected");
-            matchingStatusLabel.setText("AI Opponent Ready");
+    private void updateOpponentStatus() {
+        if (selectedOpponent == null) {
+            matchingStatusLabel.setText("Please select an opponent type");
+            matchingStatusLabel.setStyle("-fx-font-size:12px; -fx-text-fill:#ffffff; -fx-font-style:italic;");
+        } else if ("AI".equals(selectedOpponent)) {
+            matchingStatusLabel.setText("AI Opponent Ready ✓");
+            matchingStatusLabel.setStyle("-fx-font-size:13px; -fx-text-fill:#78C850; -fx-font-weight:bold;");
         } else {
-            localOpponentButton.getStyleClass().add("button-selected");
             matchingStatusLabel.setText("Waiting for local player...");
+            matchingStatusLabel.setStyle("-fx-font-size:12px; -fx-text-fill:#ffffff; -fx-font-style:italic;");
         }
+        updateStartButtonState();
     }
 
     /**
      * Update team selection UI based on random/custom choice
      */
     private void updateTeamSelectionUI() {
-
         if (pokemonScrollPane == null || selectedTeamBox == null)
             return;
 
-        if ("RANDOM".equals(selectedTeamType)) {
+        if (selectedTeamType == null) {
+            // Hide both UIs when nothing selected
             pokemonScrollPane.setVisible(false);
+            pokemonScrollPane.setManaged(false);
             selectedTeamBox.setVisible(false);
+            selectedTeamBox.setManaged(false);
+            hideEditTeamButton();
+            
+            matchingStatusLabel.setText("Please select team type (Random or Custom)");
+            matchingStatusLabel.setStyle("-fx-font-size:12px; -fx-text-fill:#ffffff; -fx-font-style:italic;");
+        } else if ("RANDOM".equals(selectedTeamType)) {
+            // Hide custom selection UI
+            pokemonScrollPane.setVisible(false);
+            pokemonScrollPane.setManaged(false);
+            selectedTeamBox.setVisible(false);
+            selectedTeamBox.setManaged(false);
+            hideEditTeamButton();
+            
+            // Generate random team
             generateRandomTeam();
             displayTeamPreview();
-        } else {
-            pokemonScrollPane.setVisible(true);
-            selectedTeamBox.setVisible(true);
-            playerTeam.clear();
-            displayPokemonGrid();
-            displayTeamPreview();
+            
+            matchingStatusLabel.setText("Random team generated! (" + playerTeam.size() + " Pokemon)");
+            matchingStatusLabel.setStyle("-fx-font-size:13px; -fx-text-fill:#78C850; -fx-font-weight:bold;");
+        } else if ("CUSTOM".equals(selectedTeamType)) {
+            // Hide old custom UI (overlay replaces it)
+            pokemonScrollPane.setVisible(false);
+            pokemonScrollPane.setManaged(false);
+            selectedTeamBox.setVisible(false);
+            selectedTeamBox.setManaged(false);
         }
 
         updateTeamCountLabel();
+        updateStartButtonState();
     }
 
     /**
-     * Generate a random team of 6 Pokemon
+     * Generate a random team of 6 Pokemon (no duplicates)
      */
     private void generateRandomTeam() {
         playerTeam.clear();
 
         if (allPokemon.isEmpty()) {
+            System.err.println("No Pokemon available to generate team!");
             return;
         }
 
         Random random = new Random();
-        Set<Integer> usedIndices = new HashSet<>();
+        List<PokemonSpecies> shuffledPokemon = new ArrayList<>(allPokemon);
+        Collections.shuffle(shuffledPokemon, random);
 
-        while (playerTeam.size() < MAX_TEAM_SIZE && usedIndices.size() < allPokemon.size()) {
-            int index = random.nextInt(allPokemon.size());
-            if (!usedIndices.contains(index)) {
-                usedIndices.add(index);
-                PokemonSpecies species = allPokemon.get(index);
-
-                // Select random moves for this Pokemon
-                List<Move> moves = getRandomMovesForPokemon(species, 4);
-                PokemonInstance pokemon = PokemonInstance.fromSpeciesWithMoves(species, POKEMON_LEVEL, moves);
-                playerTeam.add(pokemon);
-            }
+        // Take first 6 unique Pokemon
+        int count = Math.min(MAX_TEAM_SIZE, shuffledPokemon.size());
+        for (int i = 0; i < count; i++) {
+            PokemonSpecies species = shuffledPokemon.get(i);
+            List<Move> moves = getRandomMovesForPokemon(species, 4);
+            PokemonInstance pokemon = PokemonInstance.fromSpeciesWithMoves(species, POKEMON_LEVEL, moves);
+            playerTeam.add(pokemon);
         }
 
         System.out.println("Generated random team of " + playerTeam.size() + " Pokemon");
@@ -368,9 +509,14 @@ public class NewGameController {
      * Display Pokemon grid for custom selection
      */
     private void displayPokemonGrid() {
+        if (pokemonGrid == null) return;
+        
         pokemonGrid.getChildren().clear();
+        pokemonGrid.setHgap(12);
+        pokemonGrid.setVgap(12);
+        pokemonGrid.setPadding(new Insets(10));
 
-        int columns = 6;
+        int columns = 5;
         int row = 0;
         int col = 0;
 
@@ -390,32 +536,38 @@ public class NewGameController {
      * Create a Pokemon card for selection
      */
     private VBox createPokemonCard(PokemonSpecies species) {
-        VBox card = new VBox(5);
+        VBox card = new VBox(8);
         card.setAlignment(Pos.CENTER);
-        card.setPadding(new Insets(10));
+        card.setPadding(new Insets(12));
         card.getStyleClass().add("pokemon-card");
-        card.setPrefWidth(150);
-        card.setPrefHeight(180);
+        card.setPrefWidth(140);
+        card.setPrefHeight(190);
 
-        // Pokemon sprite (placeholder)
+        // Pokemon sprite
         ImageView sprite = new ImageView();
-        sprite.setFitWidth(80);
-        sprite.setFitHeight(80);
+        sprite.setFitWidth(90);
+        sprite.setFitHeight(90);
         sprite.setPreserveRatio(true);
 
         // Try to load sprite
         String spritePath = "/com/example/pokemonbattle/sprites/front/" + species.getId() + ".png";
         try {
-            Image image = new Image(getClass().getResourceAsStream(spritePath));
-            sprite.setImage(image);
+            var spriteUrl = getClass().getResource(spritePath);
+            if (spriteUrl != null) {
+                Image image = new Image(spriteUrl.toExternalForm());
+                sprite.setImage(image);
+            } else {
+                // Use placeholder
+                createPlaceholderSprite(sprite, species);
+            }
         } catch (Exception e) {
             // Use placeholder if sprite not found
-            sprite.setStyle("-fx-background-color: #e0e0e0;");
+            createPlaceholderSprite(sprite, species);
         }
 
         // Pokemon name
         Label nameLabel = new Label(capitalize(species.getName()));
-        nameLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
+        nameLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #2c3e50;");
 
         // Pokemon types
         HBox typesBox = new HBox(5);
@@ -423,42 +575,73 @@ public class NewGameController {
         for (String type : species.getTypes()) {
             Label typeLabel = new Label(type.toUpperCase());
             typeLabel.getStyleClass().add("type-badge");
-            typeLabel.setStyle("-fx-font-size: 10px; -fx-padding: 2 6; -fx-background-color: " + getTypeColor(type)
-                    + "; -fx-text-fill: white; -fx-background-radius: 3;");
+            typeLabel.setStyle("-fx-font-size: 10px; -fx-padding: 3 8; -fx-background-color: " + getTypeColor(type)
+                    + "; -fx-text-fill: white; -fx-background-radius: 4; -fx-font-weight: bold;");
             typesBox.getChildren().add(typeLabel);
         }
 
-        // Add button
-        Button addButton = new Button("+");
-        addButton.getStyleClass().add("button-green");
-        addButton.setStyle("-fx-font-size: 16px; -fx-padding: 5 15;");
-        addButton.setOnAction(e -> addPokemonToTeam(species));
+        // Check if already in team
+        boolean inTeam = playerTeam.stream()
+                .anyMatch(p -> p.getSpecies().getId() == species.getId());
+
+        // Add/Remove button
+        Button addButton = new Button(inTeam ? "✓" : "+");
+        addButton.setStyle("-fx-font-size: 18px; -fx-padding: 4 16; -fx-font-weight: bold;");
+        
+        if (inTeam) {
+            addButton.getStyleClass().add("button-dark");
+            addButton.setOnAction(e -> removePokemonFromTeamBySpecies(species));
+        } else {
+            addButton.getStyleClass().add("button-green");
+            addButton.setOnAction(e -> addPokemonToTeam(species));
+        }
 
         card.getChildren().addAll(sprite, nameLabel, typesBox, addButton);
 
         // Hover effect
-        card.setOnMouseEntered(e -> card.setStyle(
-                "-fx-scale-x: 1.05; -fx-scale-y: 1.05; -fx-effect: dropshadow(gaussian, rgba(0,150,150,0.6), 15, 0, 0, 0);"));
-        card.setOnMouseExited(e -> card.setStyle(""));
+        card.setOnMouseEntered(e -> {
+            card.setStyle("-fx-scale-x: 1.05; -fx-scale-y: 1.05; " +
+                    "-fx-effect: dropshadow(gaussian, rgba(0,150,150,0.7), 18, 0, 0, 0);");
+        });
+        card.setOnMouseExited(e -> {
+            card.setStyle("");
+        });
 
         return card;
+    }
+
+    /**
+     * Create placeholder sprite when image not found
+     */
+    private void createPlaceholderSprite(ImageView sprite, PokemonSpecies species) {
+        // Use a colored rectangle as placeholder based on primary type
+        String primaryType = species.getTypes().isEmpty() ? "normal" : species.getTypes().get(0);
+        String color = getTypeColor(primaryType);
+        sprite.setStyle("-fx-background-color: " + color + "; " +
+                "-fx-background-radius: 45; " +
+                "-fx-border-color: rgba(0,0,0,0.2); " +
+                "-fx-border-radius: 45; " +
+                "-fx-border-width: 2;");
     }
 
     /**
      * Add Pokemon to team
      */
     private void addPokemonToTeam(PokemonSpecies species) {
+        // Check team size
         if (playerTeam.size() >= MAX_TEAM_SIZE) {
-            matchingStatusLabel.setText("Team is full! (Max 6 Pokemon)");
+            matchingStatusLabel.setText("Team is full! Maximum " + MAX_TEAM_SIZE + " Pokemon allowed");
+            matchingStatusLabel.setStyle("-fx-font-size:13px; -fx-text-fill:#F08030; -fx-font-weight:bold;");
             return;
         }
 
-        // Check if already in team
+        // Check for duplicates
         boolean alreadyInTeam = playerTeam.stream()
                 .anyMatch(p -> p.getSpecies().getId() == species.getId());
 
         if (alreadyInTeam) {
             matchingStatusLabel.setText(capitalize(species.getName()) + " is already in your team!");
+            matchingStatusLabel.setStyle("-fx-font-size:13px; -fx-text-fill:#F08030; -fx-font-weight:bold;");
             return;
         }
 
@@ -467,20 +650,57 @@ public class NewGameController {
         PokemonInstance pokemon = PokemonInstance.fromSpeciesWithMoves(species, POKEMON_LEVEL, moves);
         playerTeam.add(pokemon);
 
+        // Refresh UI
+        displayPokemonGrid(); // Refresh grid to update buttons
         displayTeamPreview();
         updateTeamCountLabel();
-        matchingStatusLabel.setText(capitalize(species.getName()) + " added to team!");
+        updateStartButtonState();
+        
+        matchingStatusLabel.setText(capitalize(species.getName()) + " added! (" + playerTeam.size() + "/" + MAX_TEAM_SIZE + ")");
+        matchingStatusLabel.setStyle("-fx-font-size:13px; -fx-text-fill:#78C850; -fx-font-weight:bold;");
+    }
+
+    /**
+     * Remove Pokemon from team by species
+     */
+    private void removePokemonFromTeamBySpecies(PokemonSpecies species) {
+        playerTeam.removeIf(p -> p.getSpecies().getId() == species.getId());
+        
+        // Refresh UI
+        displayPokemonGrid();
+        displayTeamPreview();
+        updateTeamCountLabel();
+        updateStartButtonState();
+        
+        matchingStatusLabel.setText(capitalize(species.getName()) + " removed");
+        matchingStatusLabel.setStyle("-fx-font-size:13px; -fx-text-fill:#6890F0; -fx-font-weight:bold;");
     }
 
     /**
      * Display team preview
      */
     private void displayTeamPreview() {
+        if (selectedTeamBox == null) return;
+        
         selectedTeamBox.getChildren().clear();
+        selectedTeamBox.setSpacing(8);
+        selectedTeamBox.setPadding(new Insets(15));
+        selectedTeamBox.setStyle("-fx-background-color: rgba(255,255,255,0.08); " +
+                "-fx-background-radius: 10; " +
+                "-fx-border-color: rgba(255,255,255,0.2); " +
+                "-fx-border-width: 1; " +
+                "-fx-border-radius: 10;");
 
         Label header = new Label("Your Team:");
-        header.setStyle("-fx-font-size: 18px; -fx-font-weight: bold;");
+        header.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #78C850;");
         selectedTeamBox.getChildren().add(header);
+
+        if (playerTeam.isEmpty()) {
+            Label emptyLabel = new Label("No Pokemon selected");
+            emptyLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #aaaaaa; -fx-font-style: italic;");
+            selectedTeamBox.getChildren().add(emptyLabel);
+            return;
+        }
 
         for (int i = 0; i < playerTeam.size(); i++) {
             PokemonInstance pokemon = playerTeam.get(i);
@@ -495,32 +715,52 @@ public class NewGameController {
     private HBox createTeamEntryBox(PokemonInstance pokemon, int index) {
         HBox box = new HBox(10);
         box.setAlignment(Pos.CENTER_LEFT);
-        box.setPadding(new Insets(5));
+        box.setPadding(new Insets(8, 12, 8, 12));
         box.getStyleClass().add("team-entry");
-        box.setStyle("-fx-background-color: rgba(255,255,255,0.1); -fx-background-radius: 5;");
+        box.setStyle("-fx-background-color: rgba(255,255,255,0.12); " +
+                "-fx-background-radius: 6; " +
+                "-fx-border-color: rgba(120, 200, 80, 0.4); " +
+                "-fx-border-width: 1; " +
+                "-fx-border-radius: 6;");
 
         Label numberLabel = new Label((index + 1) + ".");
-        numberLabel.setStyle("-fx-font-weight: bold; -fx-min-width: 25;");
+        numberLabel.setStyle("-fx-font-weight: bold; -fx-min-width: 25; -fx-text-fill: #ffffff; -fx-font-size: 13px;");
 
         Label nameLabel = new Label(capitalize(pokemon.getSpecies().getName()));
-        nameLabel.setStyle("-fx-font-weight: bold; -fx-min-width: 120;");
+        nameLabel.setStyle("-fx-font-weight: bold; -fx-min-width: 120; -fx-text-fill: #ffffff; -fx-font-size: 13px;");
 
         Label levelLabel = new Label("Lv." + pokemon.getLevel());
-        levelLabel.setStyle("-fx-min-width: 60;");
+        levelLabel.setStyle("-fx-min-width: 50; -fx-text-fill: #f8d030; -fx-font-size: 12px; -fx-font-weight: bold;");
 
         Label hpLabel = new Label("HP: " + pokemon.getMaxHp());
-        hpLabel.setStyle("-fx-min-width: 80;");
+        hpLabel.setStyle("-fx-min-width: 70; -fx-text-fill: #78C850; -fx-font-size: 12px;");
 
         // Remove button (only for custom teams)
         if ("CUSTOM".equals(selectedTeamType)) {
-            Button removeButton = new Button("×");
+            Button removeButton = new Button("✕");
             removeButton.getStyleClass().add("button-dark");
-            removeButton.setStyle("-fx-font-size: 16px; -fx-padding: 2 8;");
+            removeButton.setStyle("-fx-font-size: 14px; -fx-padding: 3 10; -fx-font-weight: bold;");
             removeButton.setOnAction(e -> removePokemonFromTeam(index));
             box.getChildren().addAll(numberLabel, nameLabel, levelLabel, hpLabel, removeButton);
         } else {
             box.getChildren().addAll(numberLabel, nameLabel, levelLabel, hpLabel);
         }
+
+        // Hover effect
+        box.setOnMouseEntered(e -> {
+            box.setStyle("-fx-background-color: rgba(255,255,255,0.18); " +
+                    "-fx-background-radius: 6; " +
+                    "-fx-border-color: rgba(120, 200, 80, 0.6); " +
+                    "-fx-border-width: 1; " +
+                    "-fx-border-radius: 6;");
+        });
+        box.setOnMouseExited(e -> {
+            box.setStyle("-fx-background-color: rgba(255,255,255,0.12); " +
+                    "-fx-background-radius: 6; " +
+                    "-fx-border-color: rgba(120, 200, 80, 0.4); " +
+                    "-fx-border-width: 1; " +
+                    "-fx-border-radius: 6;");
+        });
 
         return box;
     }
@@ -531,45 +771,231 @@ public class NewGameController {
     private void removePokemonFromTeam(int index) {
         if (index >= 0 && index < playerTeam.size()) {
             PokemonInstance removed = playerTeam.remove(index);
+            displayPokemonGrid(); // Refresh grid to update buttons
             displayTeamPreview();
             updateTeamCountLabel();
+            updateStartButtonState();
             matchingStatusLabel.setText(capitalize(removed.getSpecies().getName()) + " removed from team");
+            matchingStatusLabel.setStyle("-fx-font-size:13px; -fx-text-fill:#6890F0; -fx-font-weight:bold;");
         }
     }
 
     /**
-     * Update team count label
+     * Update team count label and start button
      */
     private void updateTeamCountLabel() {
+        if (teamCountLabel == null) return;
+        
         teamCountLabel.setText("Team: " + playerTeam.size() + "/" + MAX_TEAM_SIZE);
+        teamCountLabel.setStyle("-fx-font-size:14px; -fx-font-weight:bold; " +
+                "-fx-text-fill:" + (playerTeam.isEmpty() ? "#F08030" : "#78C850") + ";");
+    }
 
-        // Enable/disable start button based on team
-        startBattleButton.setDisable(playerTeam.isEmpty());
+    /**
+     * Update start button enabled state
+     */
+    private void updateStartButtonState() {
+        if (startBattleButton == null) return;
+        
+        boolean canStart = selectedMode != null &&
+                          selectedOpponent != null &&
+                          selectedTeamType != null &&
+                          !playerTeam.isEmpty() && 
+                          "AI".equals(selectedOpponent) && 
+                          "SOLO".equals(selectedMode);
+        
+        startBattleButton.setDisable(!canStart);
+        
+        if (!canStart) {
+            startBattleButton.setOpacity(0.5);
+        } else {
+            startBattleButton.setOpacity(1.0);
+        }
     }
 
     /**
      * Start battle
      */
     private void onStartBattle() {
+        // Validate all selections are made
+        if (selectedMode == null) {
+            matchingStatusLabel.setText("Please select a game mode first!");
+            matchingStatusLabel.setStyle("-fx-font-size:13px; -fx-text-fill:#F08030; -fx-font-weight:bold;");
+            return;
+        }
+        
+        if (selectedOpponent == null) {
+            matchingStatusLabel.setText("Please select an opponent type first!");
+            matchingStatusLabel.setStyle("-fx-font-size:13px; -fx-text-fill:#F08030; -fx-font-weight:bold;");
+            return;
+        }
+        
+        if (selectedTeamType == null) {
+            matchingStatusLabel.setText("Please select a team type first!");
+            matchingStatusLabel.setStyle("-fx-font-size:13px; -fx-text-fill:#F08030; -fx-font-weight:bold;");
+            return;
+        }
+        
         if (playerTeam.isEmpty()) {
             matchingStatusLabel.setText("Please build a team first!");
+            matchingStatusLabel.setStyle("-fx-font-size:13px; -fx-text-fill:#F08030; -fx-font-weight:bold;");
+            return;
+        }
+        
+        if (!"SOLO".equals(selectedMode)) {
+            matchingStatusLabel.setText("Only SOLO mode is currently available!");
+            matchingStatusLabel.setStyle("-fx-font-size:13px; -fx-text-fill:#F08030; -fx-font-weight:bold;");
             return;
         }
 
-        matchingStatusLabel.setText("Starting battle...");
+        matchingStatusLabel.setText("Preparing battle...");
+        matchingStatusLabel.setStyle("-fx-font-size:13px; -fx-text-fill:#f8d030; -fx-font-weight:bold;");
 
         // Create player
         Player player = new Player("Player 1");
         playerTeam.forEach(player::addToTeam);
 
-        // For now, just show a message (you'll implement actual battle scene later)
-        System.out.println("Starting battle with team:");
+        // Generate AI opponent team
+        aiOpponent = generateAIOpponent();
+
+        // Log battle info
+        System.out.println("\n=== BATTLE STARTING ===");
+        System.out.println("Player Team:");
         playerTeam.forEach(p -> System.out.println("  - " + p.getSpecies().getName() + " Lv." + p.getLevel()));
+        System.out.println("\nAI Opponent Team:");
+        aiOpponent.getTeam().forEach(p -> System.out.println("  - " + p.getSpecies().getName() + " Lv." + p.getLevel()));
 
-        // TODO: Navigate to battle scene
-        // SceneManager.switchScene("battle.fxml", "Pokemon Battle", 1200, 700);
+        // Navigate to battle scene and pass player and opponent data
+        SceneManager.switchSceneWithData("battle.fxml", "Pokemon Battle - Arena", 1200, 700, 
+            Map.of("player", player, "opponent", aiOpponent));
+    }
 
-        matchingStatusLabel.setText("Battle scene not yet implemented!");
+    /**
+     * Generate AI opponent with random team (matching player team size, no duplicates)
+     */
+    private Player generateAIOpponent() {
+        Player opponent = new Player("AI Trainer");
+        
+        if (allPokemon.isEmpty()) {
+            System.err.println("No Pokemon available for AI team!");
+            return opponent;
+        }
+
+        // Match player team size
+        int targetSize = Math.min(playerTeam.size(), MAX_TEAM_SIZE);
+        
+        // Get Pokemon not in player's team for variety
+        List<PokemonSpecies> availablePokemon = allPokemon.stream()
+                .filter(species -> playerTeam.stream()
+                        .noneMatch(p -> p.getSpecies().getId() == species.getId()))
+                .collect(Collectors.toList());
+        
+        // If not enough variety, use all Pokemon
+        if (availablePokemon.size() < targetSize) {
+            availablePokemon = new ArrayList<>(allPokemon);
+        }
+        
+        // Shuffle and take first N
+        Collections.shuffle(availablePokemon);
+        
+        for (int i = 0; i < targetSize && i < availablePokemon.size(); i++) {
+            PokemonSpecies species = availablePokemon.get(i);
+            List<Move> moves = getRandomMovesForPokemon(species, 4);
+            PokemonInstance pokemon = PokemonInstance.fromSpeciesWithMoves(species, POKEMON_LEVEL, moves);
+            opponent.addToTeam(pokemon);
+        }
+
+        System.out.println("Generated AI team of " + opponent.getTeam().size() + " Pokemon");
+        return opponent;
+    }
+
+    /**
+     * Show Pokemon selection overlay
+     */
+    private void showPokemonSelectionOverlay() {
+        try {
+            // Load overlay FXML
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/pokemonbattle/view/pokemon_selection_overlay.fxml"));
+            overlayNode = loader.load();
+            overlayController = loader.getController();
+            
+            // Initialize overlay with data and callback
+            overlayController.initializeData(
+                allPokemon, 
+                allMoves, 
+                playerTeam,
+                this::onOverlayDone
+            );
+            
+            // Add overlay to root pane
+            rootPane.getChildren().add(overlayNode);
+            
+            // Mark interaction
+            teamTypeInteracted = true;
+            
+        } catch (IOException | NullPointerException e) {
+            System.err.println("Error loading Pokemon selection overlay: " + e.getMessage());
+            System.err.println("Exception: " + e.getClass().getName());
+            matchingStatusLabel.setText("Error loading selection overlay!");
+            matchingStatusLabel.setStyle("-fx-font-size:13px; -fx-text-fill:#F08030; -fx-font-weight:bold;");
+        }
+    }
+    
+    /**
+     * Callback when overlay selection is done
+     */
+    private void onOverlayDone(List<PokemonInstance> selectedTeam) {
+        // Remove overlay from view
+        if (overlayNode != null && rootPane.getChildren().contains(overlayNode)) {
+            rootPane.getChildren().remove(overlayNode);
+        }
+        
+        // Update player team
+        playerTeam.clear();
+        playerTeam.addAll(selectedTeam);
+        
+        // Show Edit Team button
+        showEditTeamButton();
+        
+        // Update UI
+        displayTeamPreview();
+        updateTeamCountLabel();
+        updateStartButtonState();
+        
+        // Update status
+        if (playerTeam.isEmpty()) {
+            matchingStatusLabel.setText("No Pokemon selected. Click Edit Team to select.");
+            matchingStatusLabel.setStyle("-fx-font-size:12px; -fx-text-fill:#ffffff; -fx-font-style:italic;");
+        } else {
+            matchingStatusLabel.setText("Custom team selected! (" + playerTeam.size() + " Pokemon)");
+            matchingStatusLabel.setStyle("-fx-font-size:13px; -fx-text-fill:#78C850; -fx-font-weight:bold;");
+        }
+        
+        // Show team preview
+        if (selectedTeamBox != null) {
+            selectedTeamBox.setVisible(true);
+            selectedTeamBox.setManaged(true);
+        }
+    }
+    
+    /**
+     * Show Edit Team button
+     */
+    private void showEditTeamButton() {
+        if (editTeamButton != null) {
+            editTeamButton.setVisible(true);
+            editTeamButton.setManaged(true);
+        }
+    }
+    
+    /**
+     * Hide Edit Team button
+     */
+    private void hideEditTeamButton() {
+        if (editTeamButton != null) {
+            editTeamButton.setVisible(false);
+            editTeamButton.setManaged(false);
+        }
     }
 
     /**

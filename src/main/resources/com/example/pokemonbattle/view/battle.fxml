@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox alignment="CENTER" minHeight="700" minWidth="1200" spacing="20.0"
+    styleClass="battle-screen" stylesheets="@../css/style.css"
+    xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
+    fx:controller="com.example.pokemonbattle.controller.BattleController">
+
+    <children>
+
+        <StackPane fx:id="rootPane" VBox.vgrow="ALWAYS">
+
+            <!-- Background Image -->
+            <ImageView fx:id="bgImage" pickOnBounds="true" preserveRatio="false">
+                <image>
+                    <Image url="@../assets/new_game.png" />
+                </image>
+            </ImageView>
+
+            <!-- Battle Layout -->
+            <VBox alignment="CENTER" spacing="30" StackPane.alignment="CENTER">
+                <padding>
+                    <Insets top="20" bottom="20" left="40" right="40" />
+                </padding>
+
+                <!-- Title -->
+                <Label fx:id="battleTitleLabel" styleClass="title-label" text="Battle Arena">
+                    <font>
+                        <Font name="System Bold" size="28" />
+                    </font>
+                </Label>
+
+                <!-- Battle Info Section -->
+                <HBox alignment="CENTER" spacing="100" prefHeight="400">
+                    <!-- Player Team Info -->
+                    <VBox alignment="CENTER" spacing="15" prefWidth="400"
+                        style="-fx-background-color: rgba(255,255,255,0.1); -fx-background-radius: 15; -fx-border-color: rgba(255,255,255,0.3); -fx-border-width: 2; -fx-border-radius: 15; -fx-padding: 20;">
+                        
+                        <Label fx:id="playerNameLabel" text="Player 1" styleClass="menu-label"
+                            style="-fx-font-size: 22px; -fx-text-fill: #78C850;">
+                            <font>
+                                <Font name="System Bold" size="22" />
+                            </font>
+                        </Label>
+                        
+                        <Label fx:id="playerTeamLabel" text="Team: Loading..." 
+                            style="-fx-font-size: 14px; -fx-text-fill: #ffffff; -fx-wrap-text: true;" />
+                        
+                        <VBox fx:id="playerPokemonBox" spacing="8" alignment="CENTER">
+                            <padding>
+                                <Insets top="10" />
+                            </padding>
+                        </VBox>
+                    </VBox>
+
+                    <!-- VS Label -->
+                    <Label text="VS" styleClass="title-label"
+                        style="-fx-font-size: 48px; -fx-text-fill: #F08030; -fx-font-weight: bold;">
+                        <font>
+                            <Font name="System Bold" size="48" />
+                        </font>
+                    </Label>
+
+                    <!-- Opponent Team Info -->
+                    <VBox alignment="CENTER" spacing="15" prefWidth="400"
+                        style="-fx-background-color: rgba(255,255,255,0.1); -fx-background-radius: 15; -fx-border-color: rgba(255,255,255,0.3); -fx-border-width: 2; -fx-border-radius: 15; -fx-padding: 20;">
+                        
+                        <Label fx:id="opponentNameLabel" text="AI Trainer" styleClass="menu-label"
+                            style="-fx-font-size: 22px; -fx-text-fill: #F08030;">
+                            <font>
+                                <Font name="System Bold" size="22" />
+                            </font>
+                        </Label>
+                        
+                        <Label fx:id="opponentTeamLabel" text="Team: Loading..." 
+                            style="-fx-font-size: 14px; -fx-text-fill: #ffffff; -fx-wrap-text: true;" />
+                        
+                        <VBox fx:id="opponentPokemonBox" spacing="8" alignment="CENTER">
+                            <padding>
+                                <Insets top="10" />
+                            </padding>
+                        </VBox>
+                    </VBox>
+                </HBox>
+
+                <!-- Status Label -->
+                <Label fx:id="battleStatusLabel" text="Battle will begin shortly..."
+                    style="-fx-font-size: 16px; -fx-text-fill: #f8d030; -fx-font-weight: bold; -fx-font-style: italic;" />
+
+                <!-- Action Buttons -->
+                <HBox alignment="CENTER" spacing="30">
+                    <Button fx:id="startBattleButton" prefHeight="40" prefWidth="180"
+                        styleClass="button-green" text="START BATTLE">
+                        <font>
+                            <Font size="16" />
+                        </font>
+                    </Button>
+                    
+                    <Button fx:id="backButton" prefHeight="40" prefWidth="180"
+                        styleClass="button-gray" text="Back to Setup">
+                        <font>
+                            <Font size="16" />
+                        </font>
+                    </Button>
+                </HBox>
+
+            </VBox>
+
+        </StackPane>
+
+    </children>
+</VBox>
