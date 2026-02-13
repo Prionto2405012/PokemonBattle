@@ -19,6 +19,7 @@ public class PokemonInstance extends PokemonSpecies {
     private int spAttack;
     private int spDefense;
     private int speed;
+    private boolean fainted = false;
 
     private final List<MoveSlot> moves = new ArrayList<>();
 
@@ -126,16 +127,24 @@ public class PokemonInstance extends PokemonSpecies {
         moves.add(new MoveSlot(move));
     }
 
-    public boolean isFainted() { return currentHp <= 0; }
+    public boolean isFainted() { return fainted; }
+
+    public void setFainted(boolean fainted) { this.fainted = fainted; }
 
     public void takeDamage(int amt) {
         if (amt <= 0) return;
         currentHp = Math.max(0, currentHp - amt);
+        if (currentHp <= 0) {
+            fainted = true;
+        }
     }
 
     public void heal(int amt) {
         if (amt <= 0) return;
         currentHp = Math.min(maxHp, currentHp + amt);
+        if (currentHp > 0) {
+            fainted = false;
+        }
     }
 
     public void restoreAllPp() {
