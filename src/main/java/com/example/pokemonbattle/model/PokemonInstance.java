@@ -118,7 +118,7 @@ public class PokemonInstance extends PokemonSpecies {
     public int getSpDefense() { return spDefense; }
     public int getSpeed() { return speed; }
 
-    public List<MoveSlot> getMoves() { return Collections.unmodifiableList(moves); }
+    public List<MoveSlot> getBattleMoves() { return Collections.unmodifiableList(moves); }
 
     public void addMove(Move move) {
         if (moves.size() >= 4) return;

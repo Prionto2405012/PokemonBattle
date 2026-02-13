@@ -560,7 +560,7 @@ public class NewGameController {
 
         // Check if already in team
         boolean inTeam = playerTeam.stream()
-                .anyMatch(p -> p.getSpecies().getId() == species.getId());
+                .anyMatch(p -> p.getId() == species.getId());
 
         // Add/Remove button
         Button addButton = new Button(inTeam ? "✓" : "+");
@@ -615,7 +615,7 @@ public class NewGameController {
 
         // Check for duplicates
         boolean alreadyInTeam = playerTeam.stream()
-                .anyMatch(p -> p.getSpecies().getId() == species.getId());
+                .anyMatch(p -> p.getId() == species.getId());
 
         if (alreadyInTeam) {
             matchingStatusLabel.setText(capitalize(species.getName()) + " is already in your team!");
@@ -642,7 +642,7 @@ public class NewGameController {
      * Remove Pokemon from team by species
      */
     private void removePokemonFromTeamBySpecies(PokemonSpecies species) {
-        playerTeam.removeIf(p -> p.getSpecies().getId() == species.getId());
+        playerTeam.removeIf(p -> p.getId() == species.getId());
         
         // Refresh UI
         displayPokemonGrid();
@@ -704,7 +704,7 @@ public class NewGameController {
         Label numberLabel = new Label((index + 1) + ".");
         numberLabel.setStyle("-fx-font-weight: bold; -fx-min-width: 25; -fx-text-fill: #ffffff; -fx-font-size: 13px;");
 
-        Label nameLabel = new Label(capitalize(pokemon.getSpecies().getName()));
+        Label nameLabel = new Label(capitalize(pokemon.getName()));
         nameLabel.setStyle("-fx-font-weight: bold; -fx-min-width: 120; -fx-text-fill: #ffffff; -fx-font-size: 13px;");
 
         Label levelLabel = new Label("Lv." + pokemon.getLevel());
@@ -753,7 +753,7 @@ public class NewGameController {
             displayTeamPreview();
             updateTeamCountLabel();
             updateStartButtonState();
-            matchingStatusLabel.setText(capitalize(removed.getSpecies().getName()) + " removed from team");
+            matchingStatusLabel.setText(capitalize(removed.getName()) + " removed from team");
             matchingStatusLabel.setStyle("-fx-font-size:13px; -fx-text-fill:#6890F0; -fx-font-weight:bold;");
         }
     }

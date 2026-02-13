@@ -4,6 +4,7 @@ module com.example.pokemonbattle {
     requires javafx.web;
     requires transitive javafx.graphics;
     requires java.logging;
+    requires com.google.gson;
 
     requires org.controlsfx.controls;
     requires com.dlsc.formsfx;
@@ -16,7 +17,7 @@ module com.example.pokemonbattle {
     opens com.example.pokemonbattle to javafx.fxml;
     opens com.example.pokemonbattle.controller to javafx.fxml;
     opens com.example.pokemonbattle.util to javafx.fxml;
-    opens com.example.pokemonbattle.model to javafx.fxml;
+    opens com.example.pokemonbattle.model to javafx.fxml, com.google.gson;
     exports com.example.pokemonbattle;
     exports com.example.pokemonbattle.controller;
     exports com.example.pokemonbattle.model;

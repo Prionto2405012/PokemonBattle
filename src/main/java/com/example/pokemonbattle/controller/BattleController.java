@@ -103,11 +103,11 @@ public class BattleController {
         StringBuilder teamInfo = new StringBuilder("Team Size: " + player.getTeam().size() + "\n");
         
         for (PokemonInstance pokemon : player.getTeam()) {
-            teamInfo.append("• ").append(capitalize(pokemon.getSpecies().getName()))
+            teamInfo.append("• ").append(capitalize(pokemon.getName()))
                     .append(" (Lv.").append(pokemon.getLevel()).append(")\n");
             
             // Create a simple label for each Pokemon
-            Label pokemonLabel = new Label(capitalize(pokemon.getSpecies().getName()) + 
+            Label pokemonLabel = new Label(capitalize(pokemon.getName()) + 
                     " - Lv." + pokemon.getLevel() + " - HP: " + pokemon.getMaxHp());
             pokemonLabel.setStyle("-fx-text-fill: #ffffff; -fx-font-size: 13px; -fx-padding: 5;");
             playerPokemonBox.getChildren().add(pokemonLabel);
@@ -125,11 +125,11 @@ public class BattleController {
         StringBuilder teamInfo = new StringBuilder("Team Size: " + opponent.getTeam().size() + "\n");
         
         for (PokemonInstance pokemon : opponent.getTeam()) {
-            teamInfo.append("• ").append(capitalize(pokemon.getSpecies().getName()))
+            teamInfo.append("• ").append(capitalize(pokemon.getName()))
                     .append(" (Lv.").append(pokemon.getLevel()).append(")\n");
             
             // Create a simple label for each Pokemon
-            Label pokemonLabel = new Label(capitalize(pokemon.getSpecies().getName()) + 
+            Label pokemonLabel = new Label(capitalize(pokemon.getName()) + 
                     " - Lv." + pokemon.getLevel() + " - HP: " + pokemon.getMaxHp());
             pokemonLabel.setStyle("-fx-text-fill: #ffffff; -fx-font-size: 13px; -fx-padding: 5;");
             opponentPokemonBox.getChildren().add(pokemonLabel);
@@ -142,13 +142,29 @@ public class BattleController {
      * Start the actual battle (placeholder for now)
      */
     private void onStartBattle() {
-        battleStatusLabel.setText("Battle system not yet implemented - Backend in progress!");
-        battleStatusLabel.setStyle("-fx-font-size:16px; -fx-text-fill:#F08030; -fx-font-weight:bold;");
+        // Create player with random team
+        player = new Player("Player");
+        player.generateRandomTeam();
+        
+        // Create opponent with random team
+        opponent = new Player("Opponent");
+        opponent.generateRandomTeam();
+        
+        // Display teams
+        playerNameLabel.setText(player.getName());
+        displayPlayerTeam();
+        
+        opponentNameLabel.setText(opponent.getName());
+        displayOpponentTeam();
+        
+        battleStatusLabel.setText("Battle Started!");
+        battleStatusLabel.setStyle("-fx-font-size:16px; -fx-text-fill:#78C850; -fx-font-weight:bold;");
         startBattleButton.setDisable(true);
         
-        System.out.println("\n=== BATTLE START REQUESTED ===");
-        System.out.println("TODO: Implement battle logic here");
+        System.out.println("\n=== BATTLE START ===");
+        System.out.println("Player's team: " + player.getTeam().size() + " Pokemon");
         System.out.println("Player's first Pokemon: " + player.getTeam().get(0).getName());
+        System.out.println("Opponent's team: " + opponent.getTeam().size() + " Pokemon");
         System.out.println("Opponent's first Pokemon: " + opponent.getTeam().get(0).getName());
     }
 
