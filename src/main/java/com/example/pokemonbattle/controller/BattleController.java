@@ -148,8 +148,8 @@ public class BattleController {
         
         System.out.println("\n=== BATTLE START REQUESTED ===");
         System.out.println("TODO: Implement battle logic here");
-        System.out.println("Player's first Pokemon: " + player.getTeam().get(0).getSpecies().getName());
-        System.out.println("Opponent's first Pokemon: " + opponent.getTeam().get(0).getSpecies().getName());
+        System.out.println("Player's first Pokemon: " + player.getTeam().get(0).getName());
+        System.out.println("Opponent's first Pokemon: " + opponent.getTeam().get(0).getName());
     }
 
     /**

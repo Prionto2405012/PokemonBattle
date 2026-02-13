@@ -3,14 +3,12 @@ package com.example.pokemonbattle.model;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 
 /**
- * Represents a Pokémon instance used in battle. Holds a reference to the species,
- * level, current HP, computed battle stats and up to 4 moves with remaining PP.
+ * Represents a Pokémon instance used in battle. Inherits species data and adds
+ * instance-level state: level, current HP, computed battle stats and up to 4 moves with remaining PP.
  */
-public class PokemonInstance {
-    private final PokemonSpecies species;
+public class PokemonInstance extends PokemonSpecies {
     private final int level;
 
     // Battle stats
@@ -24,10 +22,64 @@ public class PokemonInstance {
 
     private final List<MoveSlot> moves = new ArrayList<>();
 
-    public PokemonInstance(PokemonSpecies species, int level) {
-        this.species = Objects.requireNonNull(species);
+    // Static reference to all available Pokemon species (set during data loading)
+    private static List<PokemonSpecies> allPokemonSpecies = new ArrayList<>();
+
+    /**
+     * Set the global list of all available Pokemon species.
+     * Call this after loading Pokemon from JSON data.
+     */
+    public static void setAllPokemonSpecies(List<PokemonSpecies> pokemonList) {
+        allPokemonSpecies = pokemonList;
+    }
+
+    /**
+     * Constructor by Pokemon ID (1-493)
+     */
+    public PokemonInstance(int pokemonId, int level) {
+        super();
+        PokemonSpecies species = findSpeciesById(pokemonId);
+        if (species == null) {
+            throw new IllegalArgumentException("Pokemon with ID " + pokemonId + " not found");
+        }
+        
+        // Copy species data to this instance
+        this.setId(species.getId());
+        this.setName(species.getName());
+        this.setTypes(new ArrayList<>(species.getTypes()));
+        this.setStats(species.getStats());
+        this.setMoves(new ArrayList<>(species.getMoves()));
+        this.setSelectedMoves(new ArrayList<>(species.getSelectedMoves()));
+        
         this.level = Math.max(1, level);
         calculateStatsFromSpecies();
+    }
+
+    /**
+     * Constructor by PokemonSpecies object
+     */
+    public PokemonInstance(PokemonSpecies species, int level) {
+        // Copy species data to this instance
+        super();
+        this.setId(species.getId());
+        this.setName(species.getName());
+        this.setTypes(new ArrayList<>(species.getTypes()));
+        this.setStats(species.getStats());
+        this.setMoves(new ArrayList<>(species.getMoves()));
+        this.setSelectedMoves(new ArrayList<>(species.getSelectedMoves()));
+        
+        this.level = Math.max(1, level);
+        calculateStatsFromSpecies();
+    }
+
+    /**
+     * Find a Pokemon species by ID from the loaded species list
+     */
+    private static PokemonSpecies findSpeciesById(int id) {
+        return allPokemonSpecies.stream()
+                .filter(p -> p.getId() == id)
+                .findFirst()
+                .orElse(null);
     }
 
     /**
@@ -44,7 +96,7 @@ public class PokemonInstance {
     }
 
     private void calculateStatsFromSpecies() {
-        PokemonSpecies.Stats s = species.getStats();
+        Stats s = this.getStats();
         // Standard Pokémon stat formulas (simplified, no IV/EVs)
         this.maxHp = Math.max(1, ((s.getHp() * 2 * level) / 100) + level + 10);
         this.attack = Math.max(1, ((s.getAttack() * 2 * level) / 100) + 5);
@@ -56,7 +108,6 @@ public class PokemonInstance {
         this.currentHp = this.maxHp;
     }
 
-    public PokemonSpecies getSpecies() { return species; }
     public int getLevel() { return level; }
 
     public int getMaxHp() { return maxHp; }
@@ -93,7 +144,7 @@ public class PokemonInstance {
 
     @Override
     public String toString() {
-        return String.format("%s (Lv%d) %d/%dHP", species.getName(), level, currentHp, maxHp);
+        return String.format("%s (Lv%d) %d/%dHP", this.getName(), level, currentHp, maxHp);
     }
 
     public static class MoveSlot {

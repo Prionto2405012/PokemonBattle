@@ -68,6 +68,6 @@ public class Player {
     @Override
     public String toString() {
         return String.format("Player[%s, team=%d, current=%s]", 
-                name, team.size(), currentPokemon != null ? currentPokemon.getSpecies().getName() : "none");
+                name, team.size(), currentPokemon != null ? currentPokemon.getName() : "none");
     }
 }
