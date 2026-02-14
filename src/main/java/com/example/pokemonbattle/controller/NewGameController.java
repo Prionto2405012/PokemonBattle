@@ -298,6 +298,7 @@ public class NewGameController {
             
             // Set the static reference for PokemonInstance to use
             PokemonInstance.setAllPokemonSpecies(allPokemon);
+            PokemonInstance.setAllMoves(allMoves);
             
             System.out.println("Loaded " + allPokemon.size() + " Pokemon species from JSON");
         } catch (Exception e) {

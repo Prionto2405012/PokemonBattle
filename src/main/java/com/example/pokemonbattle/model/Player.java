@@ -28,6 +28,10 @@ public class Player {
     public void addToTeam(PokemonInstance pokemon) {
         if (pokemon != null && team.size() < 6) {
             team.add(pokemon);
+            // Set as current Pokemon if it's the first
+            if (currentPokemon == null) {
+                currentPokemon = pokemon;
+            }
         }
     }
 

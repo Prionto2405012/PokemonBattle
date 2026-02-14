@@ -2,7 +2,9 @@ package com.example.pokemonbattle.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Represents a Pokémon instance used in battle. Inherits species data and adds
@@ -25,6 +27,8 @@ public class PokemonInstance extends PokemonSpecies {
 
     // Static reference to all available Pokemon species (set during data loading)
     private static List<PokemonSpecies> allPokemonSpecies = new ArrayList<>();
+    // Static reference to all available moves (set during data loading)
+    private static Map<Integer, Move> allMoves = new HashMap<>();
 
     /**
      * Set the global list of all available Pokemon species.
@@ -32,6 +36,14 @@ public class PokemonInstance extends PokemonSpecies {
      */
     public static void setAllPokemonSpecies(List<PokemonSpecies> pokemonList) {
         allPokemonSpecies = pokemonList;
+    }
+
+    /**
+     * Set the global map of all available moves.
+     * Call this after loading moves from JSON data.
+     */
+    public static void setAllMoves(Map<Integer, Move> movesMap) {
+        allMoves = movesMap;
     }
 
     /**
@@ -54,6 +66,7 @@ public class PokemonInstance extends PokemonSpecies {
         
         this.level = Math.max(1, level);
         calculateStatsFromSpecies();
+        populateMovesFromSelectedMoves();
     }
 
     /**
@@ -71,6 +84,7 @@ public class PokemonInstance extends PokemonSpecies {
         
         this.level = Math.max(1, level);
         calculateStatsFromSpecies();
+        populateMovesFromSelectedMoves();
     }
 
     /**
@@ -81,6 +95,19 @@ public class PokemonInstance extends PokemonSpecies {
                 .filter(p -> p.getId() == id)
                 .findFirst()
                 .orElse(null);
+    }
+
+    /**
+     * Populate the moves list from selectedMoves using the allMoves map
+     */
+    private void populateMovesFromSelectedMoves() {
+        moves.clear();
+        for (Integer moveId : this.getSelectedMoves()) {
+            Move move = allMoves.get(moveId);
+            if (move != null) {
+                addMove(move);
+            }
+        }
     }
 
     /**
