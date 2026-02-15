@@ -4,6 +4,7 @@ module com.example.pokemonbattle {
     requires javafx.web;
     requires transitive javafx.graphics;
     requires java.logging;
+    requires java.sql;  // For SQLite database operations
 
     requires org.controlsfx.controls;
     requires com.dlsc.formsfx;

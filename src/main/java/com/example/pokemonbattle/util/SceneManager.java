@@ -16,7 +16,6 @@ import javafx.stage.Stage;
 public class SceneManager {
     private static Stage primaryStage;
     private static final String RESOURCE_PATH = "/com/example/pokemonbattle/";
-    private static final String CSS_PATH = RESOURCE_PATH + "css/style.css";
     private static final Map<String, Object> sceneData = new HashMap<>();
     
     /**
@@ -66,14 +65,7 @@ public class SceneManager {
             FXMLLoader loader = new FXMLLoader(fxmlUrl);
             Scene scene = new Scene(loader.load(), width, height);
             
-            // Verify and apply global stylesheet
-            var cssUrl = SceneManager.class.getResource(CSS_PATH);
-            if (cssUrl == null) {
-                System.err.println("WARNING: CSS file not found: " + CSS_PATH);
-            } else {
-                scene.getStylesheets().add(cssUrl.toExternalForm());
-                System.out.println("Applied stylesheet: " + cssUrl.toExternalForm());
-            }
+            // CSS stylesheets are now loaded directly from FXML files
             
             primaryStage.setTitle(title);
             primaryStage.setScene(scene);

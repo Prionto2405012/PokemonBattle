@@ -14,7 +14,7 @@
 <?import javafx.scene.text.Font?>
 
 <VBox alignment="CENTER" minHeight="670" minWidth="1150" spacing="20.0"
-    styleClass="battle-setup-screen" stylesheets="@../css/style.css"
+    styleClass="battle-setup-screen" stylesheets="@../css/common.css,@../css/new_game.css"
     xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
     fx:controller="com.example.pokemonbattle.controller.NewGameController">
 

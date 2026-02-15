@@ -13,6 +13,7 @@
 <StackPane fx:id="overlayRoot" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
     fx:controller="com.example.pokemonbattle.controller.PokemonSelectionOverlayController"
     styleClass="overlay-root" alignment="CENTER"
+    stylesheets="@../css/common.css,@../css/pokemon_selection_overlay.css"
     onMouseClicked="#onBackgroundClick">
 
     <!-- Glassmorphism Container -->

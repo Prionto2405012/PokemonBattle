@@ -1,0 +1,296 @@
+/* ===== Welcome Screen Styles ===== */
+/* Professional Glassmorphism Authentication UI */
+/* Color Palette: Warm tones (peach, cherry, maroon, coffee) */
+
+/* ==================== CONTAINER STYLES ==================== */
+
+/* Main welcome container */
+.welcome-container {
+    -fx-background-color: transparent;
+}
+
+/* Background image styling */
+.wc-background {
+    -fx-opacity: 0.95;
+}
+
+/* Transparent ScrollPane for overlay */
+.wc-scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background: transparent;
+}
+
+.wc-scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+.wc-scroll-pane .content {
+    -fx-background-color: transparent;
+}
+
+/* ==================== AUTHENTICATION CARD ==================== */
+
+/* Glassmorphic authentication card */
+.glass-blur-layer {
+    -fx-background-color: rgba(255,255,255,0.18);
+    -fx-background-radius: 18px;
+    -fx-border-radius: 18px;
+    -fx-border-color: rgba(255,255,255,0.35);
+    -fx-border-width: 1px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 30, 0.2, 0, 10);
+}
+.auth-card {
+    -fx-background-radius: 16px;
+    -fx-border-width: 1.5px;
+    -fx-border-radius: 16px;
+    -fx-effect: dropshadow(gaussian, rgba(139, 69, 19, 0.25), 24, 0.15, 0, 6);
+    -fx-padding: 35px 40px;
+}
+
+/* ==================== TYPOGRAPHY ==================== */
+
+/* Main authentication title */
+.auth-title {
+    -fx-font-size: 38px;
+    -fx-font-weight: bold;
+    -fx-text-fill: linear-gradient(to bottom, #8B4513, #A0522D);
+    -fx-alignment: center;
+    -fx-effect: dropshadow(gaussian, rgba(255, 255, 255, 0.7), 2, 0, 0, 1);
+}
+
+/* Field labels */
+.field-label {
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #6B4423;
+    -fx-padding: 0 0 4 0;
+}
+
+/* ==================== TAB NAVIGATION ==================== */
+
+/* Tab container border */
+.auth-tabs {
+    -fx-border-color: rgba(160, 82, 45, 0.3);
+    -fx-border-width: 0 0 2px 0;
+    -fx-padding: 0 0 12px 0;
+}
+
+/* Tab button base style */
+.tab-button {
+    -fx-background-color: transparent;
+    -fx-font-size: 16px;
+    -fx-font-weight: 600;
+    -fx-padding: 10px 28px;
+    -fx-background-radius: 10px 10px 0 0;
+    -fx-border-width: 0;
+    cursor: hand;
+    -fx-effect: none;
+    -fx-scale-x: 1.0;
+    -fx-scale-y: 1.0;
+}
+
+.tab-button:hover {
+    -fx-background-color: rgba(222, 184, 135, 0.35);
+    -fx-text-fill: #8B4513;
+    -fx-scale-x: 1.0;
+    -fx-scale-y: 1.0;
+    -fx-effect: none;
+}
+
+/* Active tab button */
+.tab-button-active {
+    -fx-border-width: 0 0 3px 0;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, rgba(205, 133, 63, 0.4), 8, 0, 0, 2);
+}
+
+.tab-button-active:hover {
+    -fx-background-color: rgba(205, 133, 63, 0.5);
+}
+
+/* ==================== INPUT FIELDS ==================== */
+
+/* Glassmorphic text fields */
+.auth-text-field {
+    -fx-background-color: rgba(255, 255, 255, 0.85);
+    -fx-background-radius: 10px;
+    -fx-border-color: rgba(222, 184, 135, 0.5);
+    -fx-border-radius: 10px;
+    -fx-border-width: 1.5px;
+    -fx-padding: 14px 16px;
+    -fx-font-size: 15px;
+    -fx-text-fill: #5D4E37;
+    -fx-prompt-text-fill: rgba(139, 69, 19, 0.45);
+    -fx-effect: dropshadow(gaussian, rgba(139, 69, 19, 0.08), 4, 0, 0, 2);
+}
+
+.auth-text-field:focused {
+    -fx-border-color: #CD853F;
+    -fx-border-width: 2px;
+    -fx-background-color: rgba(255, 255, 255, 0.95);
+    -fx-effect: dropshadow(gaussian, rgba(205, 133, 63, 0.35), 12, 0, 0, 2);
+}
+
+/* ==================== BUTTONS ==================== */
+
+/* Base authentication button */
+.auth-button {
+    -fx-pref-height: 48px;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    cursor: hand;
+}
+
+/* In-card back button - subtle and minimal */
+.auth-back-button {
+    -fx-background-color: rgba(255,255,255,0.35);   /* faint surface */
+    -fx-text-fill: #5A3312;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-border-color: rgba(139,69,19,0.35);
+    -fx-border-width: 1px;
+    -fx-font-size: 15px;
+    -fx-font-weight: 700;
+    -fx-padding: 8px 16px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 6, 0, 0, 2);
+}
+
+.auth-back-button:hover {
+    -fx-background-color: rgba(255,255,255,0.55);
+    -fx-text-fill: #4B250C;
+    -fx-scale-x: 1.0;
+    -fx-scale-y: 1.0;
+}
+
+.auth-back-button:pressed {
+    -fx-background-color: rgba(205, 133, 63, 0.25);
+    -fx-text-fill: #654321;
+    -fx-scale-x: 1.0;
+    -fx-scale-y: 1.0;
+}
+
+/* Enhanced green button for auth screen */
+.button-green.auth-button {
+    -fx-text-fill: white;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-border-width: 1px;
+    -fx-effect: dropshadow(gaussian, rgba(139, 69, 19, 0.3), 12, 0, 0, 4);
+}
+
+.button-green.auth-button:hover {
+    -fx-background-color: linear-gradient(
+        from 0% 0% to 0% 100%,
+        #DAA520,
+        #CD853F
+    );
+    -fx-effect: dropshadow(gaussian, rgba(218, 165, 32, 0.5), 18, 0, 0, 5);
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
+}
+
+.button-green.auth-button:pressed {
+    -fx-background-color: linear-gradient(
+        from 0% 0% to 0% 100%,
+        #A0522D,
+        #8B4513
+    );
+    -fx-translate-y: 2px;
+    -fx-effect: dropshadow(gaussian, rgba(139, 69, 19, 0.5), 8, 0, 0, 2);
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
+}
+
+/* Gray back button styling */
+.button-gray {
+    -fx-background-color: linear-gradient(
+        from 0% 0% to 0% 100%,
+        rgba(139, 69, 19, 0.15),
+        rgba(101, 67, 33, 0.2)
+    );
+    -fx-text-fill: #654321;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-border-color: rgba(139, 69, 19, 0.25);
+    -fx-border-width: 1px;
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+    -fx-padding: 10px 24px;
+    cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 8, 0, 0, 2);
+}
+
+.button-gray:hover {
+    -fx-background-color: linear-gradient(
+        from 0% 0% to 0% 100%,
+        rgba(160, 82, 45, 0.25),
+        rgba(139, 69, 19, 0.3)
+    );
+    -fx-text-fill: #5D4E37;
+    -fx-effect: dropshadow(gaussian, rgba(139, 69, 19, 0.25), 12, 0, 0, 3);
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+.button-gray:pressed {
+    -fx-background-color: rgba(101, 67, 33, 0.3);
+    -fx-translate-y: 1px;
+    -fx-effect: innershadow(gaussian, rgba(0, 0, 0, 0.3), 6, 0, 0, 1);
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
+}
+
+/* ==================== ERROR HANDLING ==================== */
+
+/* General error message label */
+.error-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #C85A54;
+    -fx-font-weight: 600;
+    -fx-padding: 10px 14px;
+    -fx-background-color: rgba(220, 20, 60, 0.08);
+    -fx-background-radius: 8px;
+    -fx-border-color: rgba(220, 20, 60, 0.25);
+    -fx-border-radius: 8px;
+    -fx-border-width: 1px;
+    -fx-effect: dropshadow(gaussian, rgba(220, 20, 60, 0.15), 6, 0, 0, 2);
+}
+
+/* Field-specific inline error label (shown under each input) */
+.field-error-label {
+    -fx-font-size: 11px;
+    -fx-text-fill: #DC143C;
+    -fx-font-weight: 500;
+    -fx-padding: 4px 8px 0px 8px;
+    -fx-background-color: transparent;
+    -fx-wrap-text: true;
+}
+
+/* ==================== FORM CONTAINERS ==================== */
+
+/* Login and signup form containers */
+#loginForm, #signupForm {
+    -fx-spacing: 15px;
+}
+
+/* ==================== SCROLLBAR CUSTOMIZATION ==================== */
+
+.wc-scroll-pane .scroll-bar:vertical .track {
+    -fx-background-color: rgba(222, 184, 135, 0.2);
+    -fx-background-radius: 6px;
+}
+
+.wc-scroll-pane .scroll-bar:vertical .thumb {
+    -fx-background-color: rgba(205, 133, 63, 0.5);
+    -fx-background-radius: 6px;
+}
+
+.wc-scroll-pane .scroll-bar:vertical .thumb:hover {
+    -fx-background-color: rgba(205, 133, 63, 0.7);
+}
+
+.wc-scroll-pane .scroll-bar:vertical .increment-button,
+.wc-scroll-pane .scroll-bar:vertical .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}

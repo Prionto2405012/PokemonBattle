@@ -3,60 +3,141 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
 
 <!-- 
-  Welcome Screen
-  Collects player name before proceeding to main menu
+  Authentication Screen
+  Login and Signup functionality for players
 -->
-<VBox alignment="CENTER" minHeight="700" minWidth="1200" spacing="30.0" 
-      styleClass="welcome-container" 
-      stylesheets="@../css/style.css" 
-      xmlns="http://javafx.com/javafx/25" 
-      xmlns:fx="http://javafx.com/fxml/1" 
-      fx:controller="com.example.pokemonbattle.controller.WcController">
+<VBox alignment="CENTER" minHeight="700" minWidth="1200" spacing="30.0"
+  styleClass="welcome-container"
+  stylesheets="@../css/common.css,@../css/wc.css"
+  xmlns="http://javafx.com/javafx/25"
+  xmlns:fx="http://javafx.com/fxml/1"
+  fx:controller="com.example.pokemonbattle.controller.WcController">
   <children>
 
     <StackPane fx:id="rootPane" VBox.vgrow="ALWAYS">
 
-        <!-- Background image -->
-        <ImageView fx:id="bgImage"
-                   preserveRatio="false"
-                   pickOnBounds="true">
-            <image>
-                <Image url="@../assets/wc_bg.png"/>
-            </image>
-        </ImageView>
+      <!-- Background image -->
+      <ImageView fx:id="bgImage"
+        styleClass="wc-background"
+        preserveRatio="false"
+        pickOnBounds="true">
+        <image>
+          <Image url="@../assets/wc_bg.png" />
+        </image>
+      </ImageView>
 
-        <!-- Content overlay -->
-        <VBox alignment="CENTER" spacing="25.0">
-          <padding>
-            <Insets bottom="40.0" left="40.0" right="40.0" top="40.0"/>
-          </padding>
+      <!-- Scrollable content overlay so card never goes off-screen -->
+      <ScrollPane styleClass="wc-scroll-pane" fitToWidth="true" fitToHeight="false"
+        hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
+        pannable="true">
+        <content>
+          <VBox alignment="CENTER" spacing="35.0">
+            <padding>
+              <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
+            </padding>
 
-          <!-- Welcome Message -->
-          <Label text="Welcome, Trainer!" styleClass="title-label"/>
+            <!-- Authentication Card -->
+            <StackPane maxWidth="450" minWidth="320">
+              <Region styleClass="glass-blur-layer"/>
+              <VBox fx:id="authCard" styleClass="auth-card" spacing="20.0">
+                <padding>
+                  <Insets bottom="35.0" left="40.0" right="40.0" top="35.0" />
+                </padding>
 
-          <!-- Instructions -->
-          <Label text="Enter your name to begin your journey:" styleClass="subtitle-label"/>
+                <Label text="Welcome, Trainer!" styleClass="auth-title" />
 
-          <!-- Player Name Input -->
-          <TextField fx:id="playerNameField" promptText="Your Name" maxWidth="300"/>
+                <HBox spacing="10.0" alignment="CENTER" styleClass="auth-tabs">
+                  <Button fx:id="loginTabButton" text="Login" onAction="#onLoginTabClick"
+                    styleClass="tab-button, tab-button-active" />
+                  <Button fx:id="signupTabButton" text="Sign Up" onAction="#onSignupTabClick"
+                    styleClass="tab-button" />
+                </HBox>
 
-          <!-- Button Container -->
-          <HBox spacing="15.0" alignment="CENTER">
-            <Button text="Back" onAction="#onBackButtonClick" styleClass="button-gray"/>
-            <Button text="Continue" onAction="#onContinueButtonClick" styleClass="button-green"/>
-          </HBox>
-        </VBox>
+                <!-- Login Form -->
+                <VBox fx:id="loginForm" spacing="15.0">
+                  <Label text="Username or Email" styleClass="field-label" />
+                  <TextField fx:id="loginUsernameField" promptText="Enter your username or email"
+                    styleClass="auth-text-field" />
+                  <Label fx:id="loginUsernameError" styleClass="field-error-label" visible="false"
+                    managed="false" wrapText="true" />
+
+                  <Label text="Password" styleClass="field-label" />
+                  <PasswordField fx:id="loginPasswordField" promptText="Enter your password"
+                    styleClass="auth-text-field" />
+                  <Label fx:id="loginPasswordError" styleClass="field-error-label" visible="false"
+                    managed="false" wrapText="true" />
+
+                  <Label fx:id="loginErrorLabel" styleClass="error-label" visible="false"
+                    managed="false" wrapText="true" />
+
+                  <HBox spacing="10" alignment="CENTER">
+                    <Button text="Login"
+                      onAction="#onLoginButtonClick"
+                      styleClass="button-green, auth-button" />
+                    <Button text="← Back"
+                      onAction="#onBackButtonClick"
+                      styleClass="auth-back-button" />
+                  </HBox>
+                </VBox>
+
+                <!-- Signup Form (initially hidden) -->
+                <VBox fx:id="signupForm" spacing="15.0" visible="false" managed="false">
+                  <Label text="Username" styleClass="field-label" />
+                  <TextField fx:id="signupUsernameField" promptText="Choose a username (3-20 chars)"
+                    styleClass="auth-text-field" />
+                  <Label fx:id="signupUsernameError" styleClass="field-error-label" visible="false"
+                    managed="false" wrapText="true" />
+
+                  <Label text="Email" styleClass="field-label" />
+                  <TextField fx:id="signupEmailField" promptText="Enter your email"
+                    styleClass="auth-text-field" />
+                  <Label fx:id="signupEmailError" styleClass="field-error-label" visible="false"
+                    managed="false" wrapText="true" />
+
+                  <Label text="Password" styleClass="field-label" />
+                  <PasswordField fx:id="signupPasswordField" promptText="Choose a password (min 6 chars)"
+                    styleClass="auth-text-field" />
+                  <Label fx:id="signupPasswordError" styleClass="field-error-label" visible="false"
+                    managed="false" wrapText="true" />
+
+                  <Label text="Confirm Password" styleClass="field-label" />
+                  <PasswordField fx:id="signupConfirmPasswordField"
+                    promptText="Re-enter your password" styleClass="auth-text-field" />
+                  <Label fx:id="signupConfirmPasswordError" styleClass="field-error-label" visible="false"
+                    managed="false" wrapText="true" />
+
+                  <Label fx:id="signupErrorLabel" styleClass="error-label" visible="false"
+                    managed="false" wrapText="true" />
+
+                  <HBox spacing="10" alignment="CENTER">
+                    <Button text="Sign Up" onAction="#onSignupButtonClick"
+                      styleClass="button-green, auth-button" />
+                    <Button text="← Back"
+                      onAction="#onBackButtonClick"
+                      styleClass="auth-back-button" />
+
+                  </HBox>
+                </VBox>
+
+              </VBox>
+            </StackPane> 
+          </VBox>
+        </content>
+      </ScrollPane>
 
     </StackPane>
+
 
   </children>
 </VBox>
