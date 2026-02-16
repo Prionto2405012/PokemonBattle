@@ -4,8 +4,12 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.example.pokemonbattle.controller.LoadingScreenController;
+
+import javafx.concurrent.Task;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 /**
@@ -73,6 +77,113 @@ public class SceneManager {
         } 
         catch (IOException e) {
             throw new RuntimeException("Error loading FXML file: " + fxmlFile, e);
+        }
+    }
+
+    /**
+     * Switch to a new scene with loading screen animation.
+     * Shows the loading screen briefly while the target scene loads in the background.
+     * 
+     * @param fxmlFile the FXML file name (e.g., "battle.fxml")
+     * @param title the window title for the target scene
+     * @param width scene width
+     * @param height scene height
+     */
+    public static void switchSceneWithLoading(String fxmlFile, String title, int width, int height) {
+        switchSceneWithLoading(fxmlFile, title, width, height, null);
+    }
+
+    /**
+     * Switch to a new scene with loading screen animation and data.
+     * Shows the loading screen briefly while the target scene loads in the background.
+     * 
+     * @param fxmlFile the FXML file name (e.g., "battle.fxml")
+     * @param title the window title for the target scene
+     * @param width scene width
+     * @param height scene height
+     * @param data map of data to pass to the new scene
+     */
+    public static void switchSceneWithLoading(String fxmlFile, String title, int width, int height, Map<String, Object> data) {
+        try {
+            // Load loading screen
+            FXMLLoader loadingLoader = new FXMLLoader(
+                SceneManager.class.getResource(RESOURCE_PATH + "view/loading_screen.fxml")
+            );
+            StackPane loadingRoot = loadingLoader.load();
+            LoadingScreenController loadingController = loadingLoader.getController();
+            
+            // Show loading screen immediately
+            Scene loadingScene = new Scene(loadingRoot, 1200, 700);
+            primaryStage.setScene(loadingScene);
+            primaryStage.show();
+            
+            // Create background task to load target scene
+            Task<LoadedSceneData> loadingTask = new Task<>() {
+                @Override
+                protected LoadedSceneData call() throws Exception {
+                    // Update progress stages
+                    updateMessage("Loading scene...");
+                    updateProgress(0, 100);
+                    
+                    // Small delay to show the loading animation
+                    Thread.sleep(300);
+                    updateProgress(30, 100);
+                    
+                    // Clear old data and store new data
+                    sceneData.clear();
+                    if (data != null) {
+                        sceneData.putAll(data);
+                    }
+                    updateProgress(50, 100);
+                    
+                    // Verify FXML file exists
+                    var fxmlUrl = SceneManager.class.getResource(RESOURCE_PATH + "view/" + fxmlFile);
+                    if (fxmlUrl == null) {
+                        throw new RuntimeException("FXML file not found: " + RESOURCE_PATH + "view/" + fxmlFile);
+                    }
+                    updateProgress(70, 100);
+                    
+                    // Load the target FXML
+                    updateMessage("Preparing scene...");
+                    FXMLLoader loader = new FXMLLoader(fxmlUrl);
+                    Scene scene = new Scene(loader.load(), width, height);
+                    updateProgress(100, 100);
+                    
+                    return new LoadedSceneData(scene, title);
+                }
+            };
+            
+            // Bind task to loading controller
+            loadingController.bindToTask(loadingTask, () -> {
+                // Get the loaded scene
+                LoadedSceneData loadedScene = loadingTask.getValue();
+                
+                // Cleanup loading resources
+                loadingController.cleanup();
+                
+                // Switch to target scene
+                primaryStage.setTitle(loadedScene.title);
+                primaryStage.setScene(loadedScene.scene);
+            });
+            
+            // Start loading on background thread
+            new Thread(loadingTask).start();
+            
+        } catch (IOException e) {
+            throw new RuntimeException("Error loading scene with loading screen", e);
+        }
+    }
+
+    /**
+     * Internal class to hold loaded scene data
+     */
+    private static class LoadedSceneData {
+        final Scene scene;
+        final String title;
+        
+        LoadedSceneData(Scene scene, String title) {
+            this.scene = scene;
+            this.title = title;
         }
     }
 

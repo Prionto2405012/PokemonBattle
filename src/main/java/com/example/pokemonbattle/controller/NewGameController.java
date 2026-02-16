@@ -845,7 +845,7 @@ public class NewGameController {
         aiOpponent.getTeam().forEach(p -> System.out.println("  - " + p.getName() + " Lv." + p.getLevel()));
 
         // Navigate to battle scene and pass player and opponent data
-        SceneManager.switchSceneWithData("battle.fxml", "Pokemon Battle - Arena", 1200, 700, 
+        SceneManager.switchSceneWithLoading("battle.fxml", "Pokemon Battle - Arena", 1200, 700, 
             Map.of("player", player, "opponent", aiOpponent));
     }
 
@@ -981,7 +981,7 @@ public class NewGameController {
      * Go back to menu
      */
     private void onBack() {
-        SceneManager.switchScene("menu.fxml", "Pokemon Battle - Menu", 1200, 700);
+        SceneManager.switchSceneWithLoading("menu.fxml", "Pokemon Battle - Menu", 1200, 700);
     }
 
     /**

@@ -119,7 +119,7 @@ public class MenuController {
     @FXML
     void onNewGameButtonClick() {
         System.out.println("New Game clicked!");
-        SceneManager.switchScene("new_game.fxml", "New Game", 1200, 700);
+        SceneManager.switchSceneWithLoading("new_game.fxml", "New Game", 1200, 700);
     }
 
     @FXML
@@ -137,7 +137,7 @@ public class MenuController {
     @FXML
     void onBackButtonClick() {
         System.out.println("Back clicked!");
-        SceneManager.switchScene("wc.fxml", "Welcome", 1200, 700);
+        SceneManager.switchSceneWithLoading("wc.fxml", "Welcome", 1200, 700);
     }
 
     @FXML

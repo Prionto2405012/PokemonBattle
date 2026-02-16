@@ -226,7 +226,7 @@ public class WcController {
             System.out.println("Login successful - User: " + currentUser.getUsername());
             
             // Navigate to main menu
-            SceneManager.switchScene("menu.fxml", "Pokemon Battle - Menu", 1200, 700);
+            SceneManager.switchSceneWithLoading("menu.fxml", "Pokemon Battle - Menu", 1200, 700);
         } else {
             // Show error message - could be invalid credentials
             System.err.println("Login failed: " + result.getMessage());
@@ -305,7 +305,7 @@ public class WcController {
             System.out.println("Registration successful - User: " + currentUser.getUsername());
             
             // Navigate to main menu
-            SceneManager.switchScene("menu.fxml", "Pokemon Battle - Menu", 1200, 700);
+            SceneManager.switchSceneWithLoading("menu.fxml", "Pokemon Battle - Menu", 1200, 700);
         } else {
             // Show error message (e.g., username/email already exists)
             System.err.println("Registration failed: " + result.getMessage());
@@ -378,7 +378,7 @@ public class WcController {
      */
     @FXML
     protected void onBackButtonClick() {
-        SceneManager.switchScene("start.fxml", "Pokemon Battle - Start", 1200, 700);
+        SceneManager.switchSceneWithLoading("start.fxml", "Pokemon Battle - Start", 1200, 700);
     }
     
     /**

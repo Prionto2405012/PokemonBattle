@@ -341,7 +341,7 @@ public class BattleController implements Battle.BattleListener {
      */
     private void onBack() {
         SceneManager.clearData();
-        SceneManager.switchScene("new_game.fxml", "Pokemon Battle - Setup", 1200, 700);
+        SceneManager.switchSceneWithLoading("new_game.fxml", "Pokemon Battle - Setup", 1200, 700);
     }
     
     /**

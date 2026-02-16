@@ -48,6 +48,6 @@ public class StartController {
      * Navigate to the welcome screen.
      */
     private void goToWelcomeScreen() {
-        SceneManager.switchScene("wc.fxml", "Pokemon Battle - Welcome", 1200, 700);
+        SceneManager.switchSceneWithLoading("wc.fxml", "Pokemon Battle - Welcome", 1200, 700);
     }
 }
