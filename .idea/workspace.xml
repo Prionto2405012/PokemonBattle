@@ -7,9 +7,12 @@
     <list default="true" id="61af2b7f-9b75-4fca-be8c-30a663f2f0c8" name="Changes" comment="">
 <<<<<<< HEAD
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+<<<<<<< HEAD
 =======
       <change beforePath="$PROJECT_DIR$/src/main/resources/com/example/pokemonbattle/view/start.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/example/pokemonbattle/view/start.fxml" afterDir="false" />
 >>>>>>> abir
+=======
+>>>>>>> prionto
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -23,8 +26,24 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="McpProjectServerCommands">
-    <commands />
-    <urls />
+    <McpServerCommand sourceId="UserConfigurationSource">
+      <option name="allowedToolsNames" />
+      <option name="enabled" value="true" />
+      <option name="name" value="" />
+      <option name="programPath" value="" />
+      <option name="arguments" value="" />
+      <option name="workingDirectory" value="" />
+      <envs />
+    </McpServerCommand>
+    <McpServerCommand sourceId="UserConfigurationSource">
+      <option name="allowedToolsNames" />
+      <option name="enabled" value="true" />
+      <option name="name" value="" />
+      <option name="programPath" value="" />
+      <option name="arguments" value="" />
+      <option name="workingDirectory" value="" />
+      <envs />
+    </McpServerCommand>
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 5
@@ -37,11 +56,16 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "Application.HelloApplication.executor": "Run",
+<<<<<<< HEAD
+=======
+    "Maven.PokemonBattle [javafx:run].executor": "Run",
+>>>>>>> prionto
     "Maven.PokemonBattle [org.openjfx:javafx-maven-plugin:0.0.8:run].executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
+<<<<<<< HEAD
 <<<<<<< HEAD
     "git-widget-placeholder": "main",
 =======
@@ -50,6 +74,15 @@
     "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
     "node.js.selected.package.tslint": "(autodetect)",
+=======
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "kotlin-language-version-configured": "true",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
+>>>>>>> prionto
     "settings.editor.selected.configurable": "preferences.keymap"
   }
 }]]></component>
@@ -86,6 +119,9 @@
     </configuration>
   </component>
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> prionto
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -94,8 +130,11 @@
       </set>
     </attachedChunks>
   </component>
+<<<<<<< HEAD
 =======
 >>>>>>> abir
+=======
+>>>>>>> prionto
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="61af2b7f-9b75-4fca-be8c-30a663f2f0c8" name="Changes" comment="" />

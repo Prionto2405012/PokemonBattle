@@ -131,7 +131,7 @@ public class PokemonSelectionOverlayController {
         
         // Check if already selected
         boolean isSelected = selectedPokemon.stream()
-                .anyMatch(p -> p.getSpecies().getId() == species.getId());
+                .anyMatch(p -> p.getId() == species.getId());
         
         // Card styling
         updateCardStyle(card, isSelected);
@@ -231,11 +231,11 @@ public class PokemonSelectionOverlayController {
      */
     private void togglePokemonSelection(PokemonSpecies species) {
         boolean alreadySelected = selectedPokemon.stream()
-                .anyMatch(p -> p.getSpecies().getId() == species.getId());
+                .anyMatch(p -> p.getId() == species.getId());
 
         if (alreadySelected) {
             // Deselect
-            selectedPokemon.removeIf(p -> p.getSpecies().getId() == species.getId());
+            selectedPokemon.removeIf(p -> p.getId() == species.getId());
         } else {
             // Select (if not at max)
             if (selectedPokemon.size() >= MAX_TEAM_SIZE) {

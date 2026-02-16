@@ -1,7 +1,9 @@
 package com.example.pokemonbattle.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Represents a Pokémon species as defined in the JSON dataset.
@@ -13,6 +15,7 @@ public class PokemonSpecies {
     private List<String> types = new ArrayList<>();
     private Stats stats = new Stats();
     private List<Integer> moves = new ArrayList<>();
+    private List<Integer> selectedMoves = new ArrayList<>();
 
     public PokemonSpecies() {}
 
@@ -30,6 +33,38 @@ public class PokemonSpecies {
 
     public List<Integer> getMoves() { return moves; }
     public void setMoves(List<Integer> moves) { this.moves = moves; }
+
+    public List<Integer> getSelectedMoves() { return selectedMoves; }
+    public void setSelectedMoves(List<Integer> selectedMoves) { this.selectedMoves = selectedMoves; }
+
+    /**
+     * Randomly selects 4 moves from this Pokemon's available move list.
+     * Uses the provided moves map to ensure moves exist in the database.
+     * If Pokemon has fewer than 4 moves, all available moves are selected.
+     * 
+     * @param allMovesMap Map of all available moves (Move ID -> Move object)
+     */
+    public void selectRandomMoves(Map<Integer, Move> allMovesMap) {
+        selectedMoves.clear();
+        
+        // Filter available moves that exist in the moves database
+        List<Integer> availableMoveIds = new ArrayList<>();
+        for (Integer moveId : moves) {
+            if (allMovesMap.containsKey(moveId)) {
+                availableMoveIds.add(moveId);
+            }
+        }
+        
+        // If no valid moves found, select up to 4 from the moves list anyway
+        if (availableMoveIds.isEmpty()) {
+            availableMoveIds = new ArrayList<>(moves);
+        }
+        
+        // Shuffle and select up to 4 moves
+        Collections.shuffle(availableMoveIds);
+        int count = Math.min(4, availableMoveIds.size());
+        selectedMoves.addAll(availableMoveIds.subList(0, count));
+    }
 
     @Override
     public String toString() {
