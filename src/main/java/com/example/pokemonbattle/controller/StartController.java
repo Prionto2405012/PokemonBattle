@@ -6,48 +6,28 @@ import javafx.fxml.FXML;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 
-// import javafx.util.Duration;
-
 /**
- * Controller for the Start/Splash Screen.
- * Shows initial loading or splash content, then transitions to Welcome screen.
+ * Controller for the Start Screen.
+ * Background is start.gif (animated). Start button transitions to the Loading screen.
  */
-@SuppressWarnings("unused") // FXML fields and methods
+@SuppressWarnings("unused")
 public class StartController {
 
-    /**
-     * Called automatically by JavaFX after FXML is loaded.
-     */
-    @FXML
-    private StackPane rootPane; // Root container for potential background image
-    @FXML
-    private ImageView bgImage; // ImageView for background image (optional)
+    @FXML private StackPane rootPane;
+    @FXML private ImageView bgImage;
+
     @FXML
     public void initialize() {
-        // Auto-transition to welcome screen after 3 seconds (optional)
-        // PauseTransition delay = new PauseTransition(Duration.seconds(3));
-        // delay.setOnFinished(event -> goToWelcomeScreen());
-        // delay.play();
-        
-        // Bind background image to fill the container (with null check)
+        // Bind background GIF to fill the container
         if (bgImage != null && rootPane != null) {
             bgImage.fitWidthProperty().bind(rootPane.widthProperty());
             bgImage.fitHeightProperty().bind(rootPane.heightProperty());
         }
     }
 
-    /**
-     * Manual button click to skip splash screen.
-     */
+    /** Start button click handler — transitions to the loading screen. */
     @FXML
     protected void onStartButtonClick() {
-        goToWelcomeScreen();
-    }
-
-    /**
-     * Navigate to the welcome screen.
-     */
-    private void goToWelcomeScreen() {
-        SceneManager.switchSceneWithLoading("wc.fxml", "Pokemon Battle - Welcome", 1200, 700);
+        SceneManager.switchScene("loading_screen.fxml", "Pokemon Battle - Loading", 1200, 700);
     }
 }

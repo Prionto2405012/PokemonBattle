@@ -7,21 +7,21 @@ import javafx.stage.Stage;
 
 /**
  * Main JavaFX Application class for PokemonBattle.
- * This is the single entry point - do not create additional Application subclasses.
+ *
+ * Startup flow:
+ *   intro.fxml  →  start.fxml  →  loading_screen.fxml  →  menu.fxml
  */
 public class HelloApplication extends Application {
     @Override
     public void start(Stage stage) {
-        // Initialize the SceneManager with the primary stage
         stage.setResizable(true);
         SceneManager.initialize(stage);
-        
-        // Load the start/splash screen as the initial view
-        SceneManager.switchScene("start.fxml", "Pokemon Battle - Start", 1200, 700);
+
+        // Launch the cinematic intro video first
+        SceneManager.switchScene("intro.fxml", "Pokemon Battle", 1200, 700);
     }
 
     public static void main(String[] args) {
-        System.out.println("Hello");
         launch(args);
     }
 }

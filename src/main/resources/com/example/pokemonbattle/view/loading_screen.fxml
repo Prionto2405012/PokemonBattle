@@ -2,143 +2,44 @@
 
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.*?>
-<?import javafx.scene.text.*?>
 <?import javafx.scene.control.*?>
-
-<!--
-  Loading Screen with Animated Pokeball
-  - Rotating Pokeball during loading
-  - Opening animation at 100%
-  - Sparkle particle effects
-  - GPU-accelerated animations
--->
+<?import javafx.scene.media.*?>
 
 <StackPane fx:id="rootPane"
            fx:controller="com.example.pokemonbattle.controller.LoadingScreenController"
            xmlns:fx="http://javafx.com/fxml"
            prefWidth="1200" prefHeight="700"
-           styleClass="loading-root"
-           stylesheets="@../css/loading_screen.css">
+           style="-fx-background-color: black;">
 
-    <!-- Background Gradient Layer -->
-    <Region styleClass="background-gradient"/>
+    <!-- Pikachu looping video - fills entire screen -->
+    <MediaView fx:id="mediaView"
+               fitWidth="1200"
+               fitHeight="700"
+               preserveRatio="true"
+               mouseTransparent="true"/>
 
     <!-- Animated Background Particles (subtle) -->
-    <Pane fx:id="backgroundParticles" 
-          pickOnBounds="false" 
-          mouseTransparent="true"
-          styleClass="particle-layer"/>
+    <Pane fx:id="backgroundParticles" pickOnBounds="false" mouseTransparent="true" styleClass="particle-layer"/>
 
-    <!-- Main Content Container -->
-    <VBox alignment="CENTER" spacing="40">
+    <!-- Sparkle/Particle Burst Layer -->
+    <Pane fx:id="sparkleLayer" prefWidth="800" prefHeight="800" pickOnBounds="false" mouseTransparent="true" styleClass="sparkle-layer"/>
 
-        <!-- Shadow (positioned below ball) -->
-        <Pane prefHeight="20">
-            <Ellipse fx:id="shadow"
-                     layoutX="0" layoutY="0"
-                     radiusX="110"
-                     radiusY="25"
-                     styleClass="ball-shadow"/>
-        </Pane>
+    <!-- Loading Progress UI — positioned in lower portion of screen -->
+    <VBox alignment="CENTER" spacing="10" translateY="280" styleClass="progress-container">
 
-        <!-- Pokeball Assembly Container -->
-        <StackPane fx:id="ballContainer" 
-                   prefWidth="220" 
-                   prefHeight="220"
-                   styleClass="ball-container">
-
-            <!-- Glow Effect Layer (pulsing) -->
-            <Circle fx:id="glowCircle" 
-                    radius="120" 
-                    styleClass="ball-glow"
-                    opacity="0.0"/>
-
-            <!-- Outer Ball Base -->
-            <Circle fx:id="ballOuter" 
-                    radius="100" 
-                    styleClass="ball-outer"/>
-
-            <!-- Top Half (Red) - Opens on completion -->
-            <Arc fx:id="topHalf"
-                 type="ROUND"
-                 radiusX="100"
-                 radiusY="100"
-                 startAngle="0"
-                 length="180"
-                 styleClass="ball-top"/>
-
-            <!-- Bottom Half (White) -->
-            <Arc fx:id="bottomHalf"
-                 type="ROUND"
-                 radiusX="100"
-                 radiusY="100"
-                 startAngle="180"
-                 length="180"
-                 styleClass="ball-bottom"/>
-
-            <!-- Middle Black Line -->
-            <Line startX="-105" endX="105"
-                  styleClass="middle-line"/>
-
-            <!-- Center Button with Glow -->
-            <StackPane>
-                <Circle radius="32" styleClass="center-button-glow"/>
-                <Circle fx:id="centerButton" 
-                        radius="28" 
-                        styleClass="center-button"/>
-                <Circle radius="18" styleClass="center-button-inner"/>
+        <!-- Progress bar + percentage label on the same row -->
+        <HBox alignment="CENTER_LEFT" spacing="10">
+            <StackPane prefWidth="400" prefHeight="8">
+                <Rectangle width="400" height="8" styleClass="progress-track"/>
+                <Rectangle fx:id="progressFill" width="0" height="8" styleClass="progress-fill" translateX="-200"/>
             </StackPane>
+            <!-- Small percentage label to the right of the bar -->
+            <Label fx:id="loadingLabel" text="0%" styleClass="loading-percent-label"/>
+        </HBox>
 
-        </StackPane>
+        <!-- Status message below the bar -->
+        <Label fx:id="statusLabel" text="Initializing..." styleClass="status-text"/>
 
-    </VBox>
-
-    <!-- Sparkle/Particle Burst Layer - Centered over ball -->
-    <Pane fx:id="sparkleLayer"
-          prefWidth="800"
-          prefHeight="800"
-          pickOnBounds="false"
-          mouseTransparent="true"
-          styleClass="sparkle-layer"/>
-
-    <!-- Loading Progress UI (Bottom) -->
-    <VBox alignment="CENTER" 
-          spacing="15" 
-          translateY="250"
-          styleClass="progress-container">
-
-        <!-- Progress Bar Container -->
-        <StackPane prefWidth="400" prefHeight="8">
-            <!-- Background Track -->
-            <Rectangle width="400" height="8" 
-                      styleClass="progress-track"/>
-            <!-- Filled Progress -->
-            <Rectangle fx:id="progressFill" 
-                      width="0" height="8" 
-                      styleClass="progress-fill"
-                      translateX="-200"/>
-        </StackPane>
-
-        <!-- Loading Percentage Label -->
-        <Label fx:id="loadingLabel"
-               text="Loading 0%"
-               styleClass="loading-text"/>
-
-        <!-- Status Message -->
-        <Label fx:id="statusLabel"
-               text="Initializing..."
-               styleClass="status-text"/>
-
-    </VBox>
-
-    <!-- Pokemon Battle Logo/Title (Top) -->
-    <VBox alignment="CENTER" 
-          spacing="10" 
-          translateY="-250">
-        <Label text="POKEMON BATTLE" 
-               styleClass="title-text"/>
-        <Label text="Loading your adventure..." 
-               styleClass="subtitle-text"/>
     </VBox>
 
 </StackPane>

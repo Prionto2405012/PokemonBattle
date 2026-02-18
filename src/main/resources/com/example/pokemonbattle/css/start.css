@@ -117,3 +117,16 @@
     -fx-alignment: center;
     -fx-font-style: italic;
 }
+
+/* ===== Start Screen Layout ===== */
+
+.start-button-section {
+    -fx-padding: 0 0 30 0;
+}
+
+.press-start-label {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.8), 8, 0, 0, 2);
+}
