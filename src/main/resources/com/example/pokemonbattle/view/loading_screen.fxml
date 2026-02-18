@@ -24,22 +24,25 @@
     <!-- Sparkle/Particle Burst Layer -->
     <Pane fx:id="sparkleLayer" prefWidth="800" prefHeight="800" pickOnBounds="false" mouseTransparent="true" styleClass="sparkle-layer"/>
 
-    <!-- Loading Progress UI — positioned in lower portion of screen -->
-    <VBox alignment="CENTER" spacing="10" translateY="280" styleClass="progress-container">
+    <!-- Loading Progress UI — anchored to bottom of screen -->
+    <VBox alignment="BOTTOM_CENTER" prefWidth="1200" prefHeight="700" mouseTransparent="true">
+        <VBox alignment="CENTER" spacing="10" mouseTransparent="false" styleClass="progress-container"
+              style="-fx-padding: 0 0 40 0;">
 
-        <!-- Progress bar + percentage label on the same row -->
-        <HBox alignment="CENTER_LEFT" spacing="10">
-            <StackPane prefWidth="400" prefHeight="8">
-                <Rectangle width="400" height="8" styleClass="progress-track"/>
-                <Rectangle fx:id="progressFill" width="0" height="8" styleClass="progress-fill" translateX="-200"/>
-            </StackPane>
-            <!-- Small percentage label to the right of the bar -->
-            <Label fx:id="loadingLabel" text="0%" styleClass="loading-percent-label"/>
-        </HBox>
+            <!-- Progress bar + percentage label on the same row -->
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <StackPane prefWidth="400" prefHeight="8">
+                    <Rectangle width="400" height="8" styleClass="progress-track"/>
+                    <Rectangle fx:id="progressFill" width="0" height="8" styleClass="progress-fill" translateX="-50"/>
+                </StackPane>
+                <!-- Small percentage label to the right of the bar -->
+                <Label fx:id="loadingLabel" text="0%" styleClass="loading-percent-label"/>
+            </HBox>
 
-        <!-- Status message below the bar -->
-        <Label fx:id="statusLabel" text="Initializing..." styleClass="status-text"/>
+            <!-- Status message below the bar -->
+            <Label fx:id="statusLabel" text="Initializing..." styleClass="status-text"/>
 
+        </VBox>
     </VBox>
 
 </StackPane>
