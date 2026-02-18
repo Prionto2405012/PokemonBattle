@@ -12,26 +12,35 @@
            fx:controller="com.example.pokemonbattle.controller.StartController"
            xmlns:fx="http://javafx.com/fxml"
            prefWidth="1200" prefHeight="700"
+           style="-fx-background-color: black;"
            stylesheets="@../css/common.css,@../css/start.css">
 
-    <!-- Animated GIF background - fills entire scene -->
+    <!-- Animated GIF background - full width, slight black bars top/bottom -->
     <ImageView fx:id="bgImage" preserveRatio="false" pickOnBounds="false"
-               fitWidth="1200" fitHeight="700" mouseTransparent="true">
+               fitWidth="1200" fitHeight="700" mouseTransparent="true"
+               scaleX="1.0" scaleY="0.88">
         <image><Image url="@../assets/start.gif" backgroundLoading="true"/></image>
     </ImageView>
 
     <!--
         Layout: 4 equal vertical sections (each ~175px of 700px total).
-        Sections 1-3 are empty spacers.
-        Section 4 contains "Press Start" label + Start button, centered horizontally.
+        Section 1: spacer (top).
+        Section 2: pokemon_txt.jpg logo, centered, fills the section.
+        Section 3: spacer.
+        Section 4: "Press Start" label + Start button.
     -->
     <VBox alignment="TOP_CENTER" prefWidth="1200" prefHeight="700" mouseTransparent="false">
 
         <!-- Section 1 (top, spacer) -->
         <Region VBox.vgrow="ALWAYS"/>
 
-        <!-- Section 2 (spacer) -->
-        <Region VBox.vgrow="ALWAYS"/>
+        <!-- Section 2 — Pokémon logo image, centered, constrained to this quarter -->
+        <VBox alignment="CENTER" prefHeight="175" VBox.vgrow="NEVER" mouseTransparent="true">
+            <ImageView preserveRatio="true" pickOnBounds="false"
+                       fitWidth="520" fitHeight="140" mouseTransparent="true">
+                <image><Image url="@../assets/pokemon_txt.jpg" backgroundLoading="true"/></image>
+            </ImageView>
+        </VBox>
 
         <!-- Section 3 (spacer) -->
         <Region VBox.vgrow="ALWAYS"/>
