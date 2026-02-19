@@ -1,0 +1,102 @@
+/* ===== Settings Overlay Styles ===== */
+
+/* Full-screen translucent backdrop */
+.overlay-root {
+    -fx-background-color: rgba(0, 0, 0, 0.55);
+}
+
+/* Card */
+.overlay-container {
+    -fx-background-color: rgba(20, 30, 50, 0.92);
+    -fx-background-radius: 18;
+    -fx-border-color: rgba(120, 160, 220, 0.45);
+    -fx-border-width: 1.5;
+    -fx-border-radius: 18;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.6), 30, 0, 0, 8);
+}
+
+/* Title */
+.overlay-title {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #e8eaf6;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 6, 0, 0, 2);
+}
+
+/* Setting labels */
+.settings-label {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #b0bec5;
+}
+
+/* Combo boxes */
+.settings-combobox {
+    -fx-background-color: rgba(40, 55, 80, 0.9);
+    -fx-background-radius: 8;
+    -fx-border-color: rgba(100, 140, 200, 0.4);
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-text-fill: #e8eaf6;
+}
+
+/* Check box */
+.settings-checkbox {
+    -fx-text-fill: #b0bec5;
+    -fx-font-size: 13px;
+}
+
+/* =============================================
+   2.5D Close-X Button
+   Two background layers simulate a raised slab:
+     Layer 0 (painted first, deepest) = dark-red "depth" edge
+     Layer 1 (painted on top)         = gradient button face
+   The face has a 4px bottom inset so the depth edge peeks out below,
+   creating a physical 3-D raised look.
+   On press the insets flip so the face appears to sink INTO the button.
+   ============================================= */
+
+.close-x-button {
+    /* Layer 0: dark-red depth slab; Layer 1: light-to-dark red face */
+    -fx-background-color:
+        #6b0000,
+        linear-gradient(from 0% 0% to 0% 100%, #ff5c5c, #c0392b);
+    /* Face sits 4 px above bottom → depth rim shows underneath */
+    -fx-background-insets: 0, 0 0 4 0;
+    -fx-background-radius: 100em, 100em;
+
+    -fx-min-width:  34px;
+    -fx-min-height: 34px;
+    -fx-max-width:  34px;
+    -fx-max-height: 34px;
+    -fx-pref-width: 34px;
+    -fx-pref-height: 34px;
+
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+
+    /* Outer glow — reinforces the raised appearance */
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.55), 8, 0, 0, 4);
+}
+
+.close-x-button:hover {
+    -fx-background-color:
+        #6b0000,
+        linear-gradient(from 0% 0% to 0% 100%, #ff7c7c, #e74c3c);
+    -fx-background-insets: 0, 0 0 4 0;
+    /* Bigger glow on hover = button "comes forward" */
+    -fx-effect: dropshadow(gaussian, rgba(200, 0, 0, 0.5), 12, 0.2, 0, 5);
+}
+
+.close-x-button:pressed {
+    /* Face inset flips: now 4 px from TOP, 0 from bottom
+       The dark slab now peeks out on TOP → button looks pushed IN */
+    -fx-background-color:
+        #6b0000,
+        linear-gradient(from 0% 0% to 0% 100%, #8b1a1a, #a93226);
+    -fx-background-insets: 0, 4 0 0 0;
+    /* Shadow nearly gone when pressed flush */
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 3, 0, 0, 1);
+}

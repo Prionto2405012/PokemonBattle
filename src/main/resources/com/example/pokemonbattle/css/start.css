@@ -23,7 +23,7 @@
         linear-gradient(from 0% 0% to 100% 100%, #8ecfba, #65c29d);
     /* Layer 0 fills full bounds; Layer 1 inset 5px from right & bottom → depth visible there */
     -fx-background-insets: 0, 0 5px 5px 0;
-    -fx-background-radius: 10, 8;
+    -fx-background-radius: 22, 20;
 
     /* Neutralise the global .button hover/press effects */
     -fx-scale-x: 1;
@@ -51,7 +51,7 @@
     /* Collapse depth to a single darker face layer + physically push down-right */
     -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #5ea88c, #3d8b6a);
     -fx-background-insets: 0;
-    -fx-background-radius: 10;
+    -fx-background-radius: 22;
     -fx-translate-x: 5;
     -fx-translate-y: 5;
     -fx-scale-x: 1;

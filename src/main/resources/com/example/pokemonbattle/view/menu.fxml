@@ -5,8 +5,10 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 
 <!-- 
@@ -32,26 +34,38 @@
             </image>
         </ImageView>
 
-        <!-- Content overlay -->
-        <VBox fx:id="menuVBox" alignment="CENTER" spacing="20.0" 
-              onKeyPressed="#onKeyPressed"
-              focusTraversable="true">
-          <padding>
-            <Insets bottom="40.0" left="40.0" right="40.0" top="40.0"/>
-          </padding>
+        <!-- Dim overlay (animated during sidebar entrance) -->
+        <Rectangle fx:id="dimOverlay" fill="black" opacity="0"
+            mouseTransparent="true"
+            StackPane.alignment="CENTER" />
 
-          <!-- Title -->
-          <Label text="MAIN MENU" styleClass="menu-label"/>
+        <!-- Cinematic left sidebar -->
+        <StackPane fx:id="leftSidebar" id="leftSidebar"
+            StackPane.alignment="CENTER_LEFT"
+            focusTraversable="true"
+            minHeight="0" prefHeight="10000">
 
-          <!-- Spacer -->
-          <Label text=" "/>
+            <!-- Glass blur backdrop -->
+            <Pane fx:id="sidebarBlurLayer" mouseTransparent="true"
+                StackPane.alignment="TOP_LEFT" />
 
-          <!-- Menu Buttons -->
-          <Button fx:id="newGameButton" text="New Game" onAction="#onNewGameButtonClick" prefWidth="250" styleClass="button-red"/>
-          <Button fx:id="loadGameButton" text="Load Game" onAction="#onLoadGameButtonClick" prefWidth="250" styleClass="button-blue"/>
-          <Button fx:id="settingsButton" text="Settings" onAction="#onSettingsButtonClick" prefWidth="250" styleClass="button-purple"/>
-          <Button fx:id="backButton" text="Back" onAction="#onBackButtonClick" prefWidth="250" styleClass="button-gray"/>
-          <Button fx:id="exitButton" text="Exit" onAction="#onExitButtonClick" prefWidth="250" styleClass="button-dark"/>
+            <!-- Button content -->
+            <VBox alignment="CENTER" spacing="22">
+                <padding>
+                    <Insets left="15" right="15" />
+                </padding>
+                <Label text="MAIN MENU" styleClass="menu-label"/>
+                <Button fx:id="newGameButton" text="New Game" onAction="#onNewGameButtonClick" prefWidth="250" styleClass="button-red"/>
+                <Button fx:id="loadGameButton" text="Load Game" onAction="#onLoadGameButtonClick" prefWidth="250" styleClass="button-blue"/>
+                <Button fx:id="settingsButton" text="Settings" onAction="#onSettingsButtonClick" prefWidth="250" styleClass="button-purple"/>
+                <Button fx:id="backButton" text="Back" onAction="#onBackButtonClick" prefWidth="250" styleClass="button-gray"/>
+                <Button fx:id="exitButton" text="Exit" onAction="#onExitButtonClick" prefWidth="250" styleClass="button-dark"/>
+            </VBox>
+        </StackPane>
+
+        <!-- Focus-placeholder overlay -->
+        <VBox fx:id="menuVBox" alignment="CENTER" spacing="20.0"
+              focusTraversable="true" mouseTransparent="true">
         </VBox>
 
     </StackPane>

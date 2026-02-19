@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.CheckBox?>
+
+<StackPane fx:id="overlayRoot" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" 
+           fx:controller="com.example.pokemonbattle.controller.SettingsController"
+           styleClass="overlay-root" alignment="CENTER"
+           stylesheets="@../css/common.css,@../css/settings_overlay.css"
+           onMouseClicked="#onBackgroundClick">
+
+    <!-- Card wrapper: sizes to the card so the X button can be pinned to its top-right corner -->
+    <StackPane maxWidth="800" maxHeight="500" pickOnBounds="false">
+
+        <!-- Main card -->
+        <VBox alignment="TOP_CENTER" spacing="15" maxWidth="800" maxHeight="500"
+              styleClass="overlay-container" onMouseClicked="#onCardClick">
+            <padding>
+                <Insets top="20" bottom="20" left="25" right="25" />
+            </padding>
+
+            <!-- Title row: Settings label centered, X button floated right -->
+            <StackPane>
+                <Label text="Settings" styleClass="overlay-title" StackPane.alignment="CENTER">
+                    <font>
+                        <Font name="System Bold" size="28" />
+                    </font>
+                </Label>
+            </StackPane>
+
+            <GridPane hgap="20" vgap="15">
+                <Label text="Theme:"     GridPane.rowIndex="0" GridPane.columnIndex="0" styleClass="settings-label"/>
+                <ComboBox fx:id="themeComboBox"      GridPane.rowIndex="0" GridPane.columnIndex="1" prefWidth="150" styleClass="settings-combobox"/>
+
+                <Label text="Sound:"     GridPane.rowIndex="1" GridPane.columnIndex="0" styleClass="settings-label"/>
+                <CheckBox fx:id="soundCheckBox" text="Enable Sound" GridPane.rowIndex="1" GridPane.columnIndex="1" styleClass="settings-checkbox"/>
+
+                <Label text="Difficulty:" GridPane.rowIndex="2" GridPane.columnIndex="0" styleClass="settings-label"/>
+                <ComboBox fx:id="difficultyComboBox" GridPane.rowIndex="2" GridPane.columnIndex="1" prefWidth="150" styleClass="settings-combobox"/>
+            </GridPane>
+
+            <Button fx:id="closeButton" text="Close" onAction="#onCloseButtonClick" prefWidth="100" styleClass="button-blue"/>
+        </VBox>
+
+        <!-- X close button — pinned to the top-right corner of the card, slightly overhanging -->
+        <Button fx:id="closeXButton" text="✕"
+                onAction="#onCloseButtonClick"
+                styleClass="close-x-button"
+                StackPane.alignment="TOP_RIGHT"
+                translateX="14" translateY="-14"/>
+
+    </StackPane>
+
+</StackPane>

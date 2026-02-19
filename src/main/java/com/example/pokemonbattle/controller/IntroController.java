@@ -104,12 +104,12 @@ public class IntroController {
      * All runs on the FX thread.
      */
     private void startFlashTransition() {
-        Duration fadeDuration = Duration.millis(380);
+        Duration fadeDuration = Duration.millis(30);
 
         // Visual: fade black overlay from transparent to opaque
         FadeTransition fadeToBlack = new FadeTransition(fadeDuration, flashOverlay);
         fadeToBlack.setFromValue(0.0);
-        fadeToBlack.setToValue(1.0);
+        fadeToBlack.setToValue(0.9);
         fadeToBlack.setOnFinished(e -> {
             disposeMediaPlayer();
             goToStartScreen();

@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.shape.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.media.*?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.media.MediaView?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.control.Label?>
 
 <StackPane fx:id="rootPane"
            fx:controller="com.example.pokemonbattle.controller.LoadingScreenController"
@@ -11,38 +12,30 @@
            prefWidth="1200" prefHeight="700"
            style="-fx-background-color: black;">
 
-    <!-- Pikachu looping video - fills entire screen -->
-    <MediaView fx:id="mediaView"
-               fitWidth="1200"
-               fitHeight="700"
-               preserveRatio="true"
-               mouseTransparent="true"/>
+    <!-- Pikachu video background, looping -->
+    <MediaView fx:id="bgVideo" mouseTransparent="true"
+               fitWidth="1200" fitHeight="700"
+               preserveRatio="false"/>
 
-    <!-- Animated Background Particles (subtle) -->
-    <Pane fx:id="backgroundParticles" pickOnBounds="false" mouseTransparent="true" styleClass="particle-layer"/>
+    <!-- Progress UI anchored near bottom -->
+    <VBox alignment="CENTER" spacing="10" translateY="280">
 
-    <!-- Sparkle/Particle Burst Layer -->
-    <Pane fx:id="sparkleLayer" prefWidth="800" prefHeight="800" pickOnBounds="false" mouseTransparent="true" styleClass="sparkle-layer"/>
+        <!-- Track + Fill -->
+        <StackPane prefWidth="500" prefHeight="10">
+            <!-- Background track -->
+            <Rectangle width="500" height="10" arcWidth="10" arcHeight="10"
+                       style="-fx-fill: rgba(255,255,255,0.25);"/>
+            <!-- Animated fill -->
+            <Rectangle fx:id="progressFill" width="0" height="10"
+                       arcWidth="10" arcHeight="10"
+                       style="-fx-fill: #ffcb05;"/>
+        </StackPane>
 
-    <!-- Loading Progress UI — anchored to bottom of screen -->
-    <VBox alignment="BOTTOM_CENTER" prefWidth="1200" prefHeight="700" mouseTransparent="true">
-        <VBox alignment="CENTER" spacing="10" mouseTransparent="false" styleClass="progress-container"
-              style="-fx-padding: 0 0 40 0;">
+        <!-- Percentage label -->
+        <Label fx:id="loadingLabel" text="Loading... 0%"
+               style="-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;"/>
 
-            <!-- Progress bar + percentage label on the same row -->
-            <HBox alignment="CENTER_LEFT" spacing="10">
-                <StackPane prefWidth="400" prefHeight="8">
-                    <Rectangle width="400" height="8" styleClass="progress-track"/>
-                    <Rectangle fx:id="progressFill" width="0" height="8" styleClass="progress-fill" translateX="-50"/>
-                </StackPane>
-                <!-- Small percentage label to the right of the bar -->
-                <Label fx:id="loadingLabel" text="0%" styleClass="loading-percent-label"/>
-            </HBox>
-
-            <!-- Status message below the bar -->
-            <Label fx:id="statusLabel" text="Initializing..." styleClass="status-text"/>
-
-        </VBox>
     </VBox>
 
 </StackPane>
+

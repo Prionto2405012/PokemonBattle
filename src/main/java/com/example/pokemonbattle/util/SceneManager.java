@@ -121,23 +121,30 @@ public class SceneManager {
                     new javafx.concurrent.Task<>() {
                 @Override
                 protected LoadedSceneData call() throws Exception {
-                    updateMessage("Loading scene...");
+                    updateMessage("Loading...");
                     updateProgress(0, 100);
-                    Thread.sleep(200);
+                    Thread.sleep(100);
 
                     sceneData.clear();
                     if (data != null) sceneData.putAll(data);
-                    updateProgress(40, 100);
+                    updateProgress(20, 100);
 
                     var fxmlUrl = SceneManager.class.getResource(
                             RESOURCE_PATH + "view/" + fxmlFile);
                     if (fxmlUrl == null)
                         throw new RuntimeException("FXML not found: " + fxmlFile);
 
-                    updateMessage("Preparing scene...");
+                    updateMessage("Almost ready...");
                     FXMLLoader loader = new FXMLLoader(fxmlUrl);
                     Scene scene = new Scene(loader.load(), width, height);
-                    updateProgress(100, 100);
+                    updateProgress(80, 100);
+
+                    // Keep loading screen visible and fill bar smoothly to 100%
+                    for (int i = 81; i <= 100; i++) {
+                        Thread.sleep(40); // 20 steps × 40ms = 800ms
+                        updateProgress(i, 100);
+                    }
+                    updateMessage("Done!");
 
                     return new LoadedSceneData(scene, title);
                 }
@@ -145,7 +152,6 @@ public class SceneManager {
 
             lsc.bindToTask(loadingTask, () -> {
                 LoadedSceneData d = loadingTask.getValue();
-                lsc.cleanup();
                 primaryStage.setTitle(d.title);
                 primaryStage.setScene(d.scene);
             });

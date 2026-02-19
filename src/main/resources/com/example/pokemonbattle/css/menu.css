@@ -3,7 +3,7 @@
 .menu-label {
     -fx-font-size: 36px;
     -fx-font-weight: bold;
-    -fx-text-fill: #1c6964 !important; /* bright cyan */
+    -fx-text-fill: #83c4aa !important; /* bright cyan */
     -fx-effect: dropshadow(gaussian, rgba(0, 50, 45, 0.6), 10, 0, 0, 2);
 }
 
@@ -17,4 +17,48 @@
 .subtitle-label { 
     -fx-font-size: 18px; 
     -fx-text-fill: #0a5c50; 
+}
+
+/* ===== Cinematic Left Sidebar ===== */
+
+#leftSidebar {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent rgba(255, 255, 255, 0.14) transparent transparent;
+    -fx-border-width: 0 0.5 0 0;
+}
+/* ===== Menu Button Overrides ===== */
+
+/* All menu buttons: cursor hand, flat scale at rest */
+.menu-container .button {
+    -fx-cursor: hand;
+    -fx-scale-x: 1;
+    -fx-scale-y: 1;
+    -fx-translate-y: 0;
+}
+
+/* Keyboard-selected: highlight border only, NO scale bump */
+.menu-container .button-selected {
+    -fx-scale-x: 1;
+    -fx-scale-y: 1;
+    -fx-border-color: rgba(154, 198, 184, 0.8);
+    -fx-border-width: 1.5px;
+    -fx-border-insets: -3px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 100, 80, 0.45), 12, 0, 0, 2);
+}
+
+/* Hover: scale up + deep 3D drop shadow + slight upward lift */
+.menu-container .button:hover {
+    -fx-cursor: hand;
+    -fx-scale-x: 1.08;
+    -fx-scale-y: 1.08;
+    -fx-translate-y: -3px;
+    -fx-effect: dropshadow(gaussian, rgba(17, 66, 67, 0.6), 22, 0.3, 0, 8);
+}
+
+/* Pressed: push back down for tactile 3D feel */
+.menu-container .button:pressed {
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
+    -fx-translate-y: 2px;
+    -fx-effect: innershadow(gaussian, rgba(10, 70, 55, 0.7), 8, 0, 0, 1.5);
 }

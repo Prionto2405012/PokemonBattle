@@ -4,6 +4,8 @@ import com.example.pokemonbattle.model.User;
 import com.example.pokemonbattle.service.AuthService;
 import com.example.pokemonbattle.util.SceneManager;
 
+import javafx.animation.FadeTransition;
+import javafx.animation.Interpolator;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -14,6 +16,7 @@ import javafx.scene.image.PixelReader;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.util.Duration;
 
 /**
  * Controller for the Authentication Screen.
@@ -114,6 +117,28 @@ public class WcController {
      */
     @FXML
     public void initialize() {
+        // Phase 3: WC scene fades in from full black (completes the 3-phase transition)
+        if (rootPane != null) {
+            javafx.scene.shape.Rectangle overlay = new javafx.scene.shape.Rectangle();
+            overlay.setFill(javafx.scene.paint.Color.BLACK);
+            overlay.widthProperty().bind(rootPane.widthProperty());
+            overlay.heightProperty().bind(rootPane.heightProperty());
+            overlay.setManaged(false);
+            overlay.setOpacity(0.8);
+            rootPane.getChildren().add(overlay);
+
+            FadeTransition fadeIn = new FadeTransition(Duration.millis(60), overlay);
+            fadeIn.setFromValue(0.9);
+            fadeIn.setToValue(0.0);
+            fadeIn.setInterpolator(Interpolator.EASE_OUT);
+            fadeIn.setOnFinished(e -> {
+                overlay.widthProperty().unbind();
+                overlay.heightProperty().unbind();
+                rootPane.getChildren().remove(overlay);
+            });
+            fadeIn.play();
+        }
+
         // Bind background image to fill the container (with null check)
         if (bgImage != null && rootPane != null) {
             bgImage.fitWidthProperty().bind(rootPane.widthProperty());

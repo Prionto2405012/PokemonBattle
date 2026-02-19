@@ -30,29 +30,31 @@
 }
 
 
+/* ==================== PROGRESS BAR ==================== */
+
 .progress-container {
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 20, 0.4, 0, 5);
 }
 
 .progress-track {
-    -fx-fill: rgba(27, 99, 69, 0.1);
+    -fx-fill: rgba(255, 255, 255, 0.1);
     -fx-arc-width: 8;
     -fx-arc-height: 8;
-    -fx-stroke: rgba(8, 76, 69, 0.2);
+    -fx-stroke: rgba(255, 255, 255, 0.2);
     -fx-stroke-width: 1;
 }
 
 .progress-fill {
     -fx-fill: linear-gradient(
         to right,
-        #00534e 0%,
-        #007a70 30%,
-        #00a896 70%,
-        #00c9b1 100%
+        #8a2be2 0%,
+        #9d4edd 30%,
+        #c77dff 70%,
+        #e0aaff 100%
     );
     -fx-arc-width: 8;
     -fx-arc-height: 8;
-    -fx-effect: dropshadow(gaussian, rgba(0, 168, 150, 0.8), 15, 0.8, 0, 0);
+    -fx-effect: dropshadow(gaussian, rgba(138, 43, 226, 0.8), 15, 0.8, 0, 0);
 }
 
 /* ==================== TEXT STYLING ==================== */
@@ -84,43 +86,4 @@
     -fx-font-size: 14px;
     -fx-font-weight: 400;
     -fx-font-style: italic;
-}
-
-/* ==================== SPARKLE PARTICLES ==================== */
-
-.sparkle-layer {
-    /* Sparkles added dynamically by controller */
-}
-
-.sparkle {
-    -fx-fill: radial-gradient(
-        focus-angle 0deg,
-        focus-distance 0%,
-        center 50% 50%,
-        radius 50%,
-        #ffffff 0%,
-        #ffd700 40%,
-        #ff6b6b 100%
-    );
-    -fx-effect: dropshadow(gaussian, rgba(255, 215, 0, 0.9), 10, 0.8, 0, 0);
-}
-
-/* ==================== ANIMATIONS & MOTION BLUR ==================== */
-
-/* Applied via code for motion blur during rotation */
-.motion-blur {
-    -fx-effect: gaussianblur(8);
-}
-
-/* Applied during opening animation */
-.opening-glow {
-    -fx-effect: dropshadow(gaussian, rgba(255, 107, 107, 0.9), 40, 0.9, 0, 0);
-}
-
-/* Small percentage label to the right of the progress bar */
-.loading-percent-label {
-    -fx-font-size: 12px;
-    -fx-font-weight: bold;
-    -fx-text-fill: white;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.8), 4, 0, 0, 1);
 }
