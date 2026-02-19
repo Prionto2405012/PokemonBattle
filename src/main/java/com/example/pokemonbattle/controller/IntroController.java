@@ -1,5 +1,6 @@
 package com.example.pokemonbattle.controller;
 
+import com.example.pokemonbattle.util.MediaCache;
 import com.example.pokemonbattle.util.SceneManager;
 
 import javafx.animation.FadeTransition;
@@ -41,18 +42,14 @@ public class IntroController {
 
     @FXML
     public void initialize() {
-        // Resolve intro.mp4 from assets — must be on the classpath
-        var videoUrl = getClass().getResource(
-                "/com/example/pokemonbattle/assets/intro.mp4");
-
-        if (videoUrl == null) {
-            // Asset missing — skip straight to start screen
+        // Retrieve pre-loaded Media from cache (URL already resolved at startup)
+        Media media = MediaCache.getMedia("intro.mp4");
+        if (media == null) {
             System.err.println("IntroController: intro.mp4 not found, skipping intro.");
             goToStartScreen();
             return;
         }
 
-        Media media = new Media(videoUrl.toExternalForm());
         mediaPlayer = new MediaPlayer(media);
         mediaView.setMediaPlayer(mediaPlayer);
 

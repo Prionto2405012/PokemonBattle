@@ -3,7 +3,7 @@ module com.example.pokemonbattle {
     requires javafx.fxml;
     requires javafx.web;
     requires transitive javafx.graphics;
-    requires javafx.media;
+    requires transitive javafx.media;
     requires java.logging;
     requires java.sql;  // For SQLite database operations
     requires com.google.gson;

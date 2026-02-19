@@ -1,5 +1,22 @@
 /* ===== Start Screen Layout ===== */
 
+/*
+ * Vignette overlay: a radial gradient that is transparent at the centre
+ * and dims to near-black at the edges, giving the GIF cinematic depth.
+ * A second linear gradient darkens the bottom third so the START button
+ * always reads clearly regardless of the GIF content.
+ */
+.start-vignette {
+    -fx-background-color:
+        radial-gradient(center 50% 45%, radius 72%,
+            transparent 40%,
+            rgba(0,0,0,0.18) 65%,
+            rgba(0,0,0,0.58) 100%),
+        linear-gradient(from 0% 65% to 0% 100%,
+            transparent,
+            rgba(0,0,0,0.55));
+}
+
 .start-button-section {
     -fx-padding: 0 0 3 30;
 }

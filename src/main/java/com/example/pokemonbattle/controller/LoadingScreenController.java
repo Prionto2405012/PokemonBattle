@@ -45,12 +45,12 @@ public class LoadingScreenController {
     }
 
     private void setupVideo() {
-        var url = getClass().getResource("/com/example/pokemonbattle/assets/Pikachu.mp4");
-        if (url == null) {
-            System.err.println("LoadingScreenController: Pikachu.mp4 not found.");
+        Media media = com.example.pokemonbattle.util.MediaCache.getMedia("Pikachu.mp4");
+        if (media == null) {
+            System.err.println("LoadingScreenController: Pikachu.mp4 not found in cache.");
             return;
         }
-        mediaPlayer = new MediaPlayer(new Media(url.toExternalForm()));
+        mediaPlayer = new MediaPlayer(media);
         mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
         mediaPlayer.setAutoPlay(true);
         bgVideo.setMediaPlayer(mediaPlayer);
