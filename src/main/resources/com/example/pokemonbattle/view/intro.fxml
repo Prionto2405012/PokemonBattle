@@ -17,11 +17,11 @@
                preserveRatio="false"
                mouseTransparent="true"/>
 
-    <!-- White flash overlay (starts invisible, fades in at video end) -->
+    <!-- Black fade overlay (starts invisible, fades in smoothly before video ends) -->
     <Rectangle fx:id="flashOverlay"
                width="1200"
                height="700"
-               fill="white"
+               fill="black"
                opacity="0"
                mouseTransparent="true"/>
 

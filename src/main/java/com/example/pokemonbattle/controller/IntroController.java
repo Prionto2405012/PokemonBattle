@@ -3,7 +3,9 @@ package com.example.pokemonbattle.controller;
 import com.example.pokemonbattle.util.SceneManager;
 
 import javafx.animation.FadeTransition;
-import javafx.animation.SequentialTransition;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.scene.layout.StackPane;
 import javafx.scene.media.Media;
@@ -17,9 +19,9 @@ import javafx.util.Duration;
  *
  * Flow:
  *   1. Video auto-plays on initialize().
- *   2. currentTimeProperty listener detects the 0.1s-before-end moment.
- *   3. White flash overlay fades in (100ms), then fades out (300ms).
- *   4. After fade-out completes: MediaPlayer disposed → start.fxml loaded.
+ *   2. currentTimeProperty listener detects the 0.4s-before-end moment.
+ *   3. Black overlay fades in smoothly over 380ms (soft fade-to-black).
+ *   4. After fade completes: MediaPlayer disposed → start.fxml loaded.
  *
  * No FX-thread blocking at any point.
  */
@@ -31,8 +33,8 @@ public class IntroController {
 
     private MediaPlayer mediaPlayer;
 
-    // How many milliseconds before end to trigger flash
-    private static final double TRIGGER_BEFORE_END_MS = 100.0;
+    // How many milliseconds before end to start the fade-to-black
+    private static final double TRIGGER_BEFORE_END_MS = 400.0;
 
     // Guard so the transition fires exactly once
     private volatile boolean transitionTriggered = false;
@@ -97,26 +99,32 @@ public class IntroController {
     }
 
     /**
-     * Fades white overlay in quickly, then out smoothly, then switches scene.
+     * Smoothly fades visual to black AND audio to silence over 380ms in parallel,
+     * then switches scene. Starts 0.4s before the video ends.
      * All runs on the FX thread.
      */
     private void startFlashTransition() {
-        // Fade IN  — 100ms (quick flash)
-        FadeTransition fadeIn = new FadeTransition(Duration.millis(100), flashOverlay);
-        fadeIn.setFromValue(0.0);
-        fadeIn.setToValue(1.0);
+        Duration fadeDuration = Duration.millis(380);
 
-        // Fade OUT — 300ms (smooth reveal of next scene beneath)
-        FadeTransition fadeOut = new FadeTransition(Duration.millis(300), flashOverlay);
-        fadeOut.setFromValue(1.0);
-        fadeOut.setToValue(0.0);
-
-        SequentialTransition flash = new SequentialTransition(fadeIn, fadeOut);
-        flash.setOnFinished(e -> {
+        // Visual: fade black overlay from transparent to opaque
+        FadeTransition fadeToBlack = new FadeTransition(fadeDuration, flashOverlay);
+        fadeToBlack.setFromValue(0.0);
+        fadeToBlack.setToValue(1.0);
+        fadeToBlack.setOnFinished(e -> {
             disposeMediaPlayer();
             goToStartScreen();
         });
-        flash.play();
+
+        // Audio: fade volume from current level to silence in parallel
+        if (mediaPlayer != null) {
+            Timeline volumeFade = new Timeline(
+                new KeyFrame(Duration.ZERO,    new KeyValue(mediaPlayer.volumeProperty(), mediaPlayer.getVolume())),
+                new KeyFrame(fadeDuration,     new KeyValue(mediaPlayer.volumeProperty(), 0.0))
+            );
+            volumeFade.play();
+        }
+
+        fadeToBlack.play();
     }
 
     /**

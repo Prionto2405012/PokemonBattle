@@ -1,9 +1,4 @@
-/* ===== Welcome Screen Styles ===== */
-/* Professional Glassmorphism Authentication UI */
-/* Color Palette: Warm tones (peach, cherry, maroon, coffee) */
-
 /* ==================== CONTAINER STYLES ==================== */
-
 /* Main welcome container */
 .welcome-container {
     -fx-background-color: transparent;
@@ -83,7 +78,7 @@
     -fx-padding: 10px 28px;
     -fx-background-radius: 10px 10px 0 0;
     -fx-border-width: 0;
-    cursor: hand;
+    -fx-cursor: hand;
     -fx-effect: none;
     -fx-scale-x: 1.0;
     -fx-scale-y: 1.0;
@@ -138,7 +133,7 @@
     -fx-pref-height: 48px;
     -fx-font-size: 16px;
     -fx-font-weight: bold;
-    cursor: hand;
+    -fx-cursor: hand;
 }
 
 /* In-card back button - subtle and minimal */
@@ -216,7 +211,7 @@
     -fx-font-size: 14px;
     -fx-font-weight: 600;
     -fx-padding: 10px 24px;
-    cursor: hand;
+    -fx-cursor: hand;
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 8, 0, 0, 2);
 }
 

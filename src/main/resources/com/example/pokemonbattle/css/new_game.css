@@ -14,7 +14,7 @@
     -fx-border-radius: 12px;
     -fx-padding: 10px 30px;
     -fx-effect: dropshadow(gaussian, rgba(30, 120, 100, 0.35), 10, 0, 0, 2.5);
-    cursor: hand;
+    -fx-cursor: hand;
 }
 
 .toggle-button:hover {
@@ -42,7 +42,7 @@
     -fx-border-width: 2;
     -fx-border-radius: 12;
     -fx-effect: dropshadow(gaussian, rgba(0, 80, 70, 0.3), 8, 0, 0, 2);
-    cursor: hand;
+    -fx-cursor: hand;
 }
 
 .pokemon-card:hover {
@@ -72,7 +72,7 @@
     -fx-border-radius: 7;
     -fx-padding: 10px 12px;
     -fx-effect: dropshadow(gaussian, rgba(0, 80, 70, 0.25), 6, 0, 0, 2);
-    cursor: hand;
+    -fx-cursor: hand;
 }
 
 .team-entry:hover {
