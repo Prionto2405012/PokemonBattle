@@ -54,7 +54,7 @@ public class StartController {
             overlay.setOpacity(1.0);
             rootPane.getChildren().add(overlay);
 
-            FadeTransition fadeIn = new FadeTransition(Duration.millis(200), overlay);
+            FadeTransition fadeIn = new FadeTransition(Duration.millis(150), overlay);
             fadeIn.setFromValue(1.0);
             fadeIn.setToValue(0.0);
             fadeIn.setInterpolator(Interpolator.EASE_OUT);
@@ -88,12 +88,12 @@ public class StartController {
         // Phase 1: start scene slowly darkens
         FadeTransition phase1 = new FadeTransition(Duration.millis(60), overlay);
         phase1.setFromValue(0.0);
-        phase1.setToValue(0.8);
+        phase1.setToValue(0.7);
         phase1.setInterpolator(Interpolator.EASE_IN);
 
         // Phase 2: screen goes fully black
         FadeTransition phase2 = new FadeTransition(Duration.millis(40), overlay);
-        phase2.setFromValue(0.8);
+        phase2.setFromValue(0.7);
         phase2.setToValue(0.9);
         phase2.setInterpolator(Interpolator.EASE_OUT);
         phase2.setOnFinished(e -> {

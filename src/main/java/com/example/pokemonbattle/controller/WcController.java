@@ -127,7 +127,7 @@ public class WcController {
             overlay.setOpacity(0.8);
             rootPane.getChildren().add(overlay);
 
-            FadeTransition fadeIn = new FadeTransition(Duration.millis(60), overlay);
+            FadeTransition fadeIn = new FadeTransition(Duration.millis(70), overlay);
             fadeIn.setFromValue(0.9);
             fadeIn.setToValue(0.0);
             fadeIn.setInterpolator(Interpolator.EASE_OUT);

@@ -84,7 +84,7 @@
                   <HBox spacing="10" alignment="CENTER">
                     <Button text="Login"
                       onAction="#onLoginButtonClick"
-                      styleClass="button-green, auth-button" />
+                      styleClass="login-btn, auth-button" />
                     <Button text="← Back"
                       onAction="#onBackButtonClick"
                       styleClass="auth-back-button" />
@@ -122,7 +122,7 @@
 
                   <HBox spacing="10" alignment="CENTER">
                     <Button text="Sign Up" onAction="#onSignupButtonClick"
-                      styleClass="button-green, auth-button" />
+                      styleClass="signup-btn, auth-button" />
                     <Button text="← Back"
                       onAction="#onBackButtonClick"
                       styleClass="auth-back-button" />

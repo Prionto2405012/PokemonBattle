@@ -34,7 +34,7 @@ public class IntroController {
     private MediaPlayer mediaPlayer;
 
     // How many milliseconds before end to start the fade-to-black
-    private static final double TRIGGER_BEFORE_END_MS = 400.0;
+    private static final double TRIGGER_BEFORE_END_MS = 300.0;
 
     // Guard so the transition fires exactly once
     private volatile boolean transitionTriggered = false;
@@ -104,7 +104,7 @@ public class IntroController {
      * All runs on the FX thread.
      */
     private void startFlashTransition() {
-        Duration fadeDuration = Duration.millis(30);
+        Duration fadeDuration = Duration.millis(200);
 
         // Visual: fade black overlay from transparent to opaque
         FadeTransition fadeToBlack = new FadeTransition(fadeDuration, flashOverlay);
