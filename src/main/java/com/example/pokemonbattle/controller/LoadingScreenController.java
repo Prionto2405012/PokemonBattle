@@ -10,7 +10,6 @@ import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
-import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.scene.shape.Rectangle;
@@ -45,18 +44,26 @@ public class LoadingScreenController {
     }
 
     private void setupVideo() {
-        Media media = com.example.pokemonbattle.util.MediaCache.getMedia("Pikachu.mp4");
-        if (media == null) {
-            System.err.println("LoadingScreenController: Pikachu.mp4 not found in cache.");
+        // (b/c) Claim the pre-built, autoPlay=false player
+        mediaPlayer = com.example.pokemonbattle.util.MediaCache.claimMediaPlayer("Pikachu.mp4");
+
+        if (mediaPlayer == null) {
+            System.err.println("LoadingScreenController: Pikachu.mp4 player unavailable.");
             return;
         }
-        mediaPlayer = new MediaPlayer(media);
         mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
-        mediaPlayer.setAutoPlay(true);
         bgVideo.setMediaPlayer(mediaPlayer);
         bgVideo.fitWidthProperty().bind(rootPane.widthProperty());
         bgVideo.fitHeightProperty().bind(rootPane.heightProperty());
         bgVideo.setPreserveRatio(false);
+
+        // (b) Play only once the scene is shown and the player is ready,
+        //     so the first frame is never a blank white flash.
+        mediaPlayer.setOnReady(() -> {
+            if (mediaPlayer.getStatus() != MediaPlayer.Status.PLAYING) {
+                mediaPlayer.play();
+            }
+        });
     }
 
     private void setupProgressBar() {

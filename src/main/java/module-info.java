@@ -5,16 +5,10 @@ module com.example.pokemonbattle {
     requires transitive javafx.graphics;
     requires transitive javafx.media;
     requires java.logging;
-    requires java.sql;  // For SQLite database operations
+    requires java.sql;          // For SQLite database operations
+    requires java.desktop;      // javax.imageio — GIF frame decoding
+    requires javafx.swing;      // SwingFXUtils — BufferedImage → WritableImage
     requires com.google.gson;
-
-    requires org.controlsfx.controls;
-    requires com.dlsc.formsfx;
-    requires net.synedra.validatorfx;
-    requires org.kordamp.ikonli.javafx;
-    requires org.kordamp.bootstrapfx.core;
-    requires eu.hansolo.tilesfx;
-    requires com.almasb.fxgl.all;
 
     opens com.example.pokemonbattle to javafx.fxml;
     opens com.example.pokemonbattle.controller to javafx.fxml;

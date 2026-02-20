@@ -2,10 +2,10 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.layout.Region?>
+<?import javafx.scene.media.MediaView?>
 
 <StackPane fx:id="rootPane"
            fx:controller="com.example.pokemonbattle.controller.StartController"
@@ -14,10 +14,10 @@
            style="-fx-background-color: black;"
            stylesheets="@../css/common.css,@../css/start.css">
 
-    <!-- GIF background - fills the entire pane, bound in controller -->
-    <ImageView fx:id="bgImage" mouseTransparent="true"
+    <!-- MP4 video background - fills the entire pane, looped via controller -->
+    <MediaView fx:id="bgVideo" mouseTransparent="true"
                fitWidth="1200" fitHeight="700"
-               preserveRatio="false" smooth="true"/>
+               preserveRatio="false"/>
 
     <!-- Vignette overlay: darkens edges and adds depth to the GIF -->
     <Region fx:id="vignetteOverlay" mouseTransparent="true"

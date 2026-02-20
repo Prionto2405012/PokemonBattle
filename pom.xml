@@ -109,6 +109,13 @@
       <scope>test</scope>
     </dependency>
     
+    <!-- Silence the SLF4J "no binding" warning from transitive deps (fxgl, tilesfx) -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-nop</artifactId>
+      <version>1.7.36</version>
+    </dependency>
+
     <!-- SQLite JDBC Driver for database operations -->
     <dependency>
       <groupId>org.xerial</groupId>
