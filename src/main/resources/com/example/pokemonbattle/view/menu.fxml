@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
@@ -12,10 +11,6 @@
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.shape.Circle?>
-<!-- 
-  Main Menu Screen
-  Provides access to all game features
--->
 <VBox alignment="CENTER" minHeight="700" minWidth="1200" spacing="30.0" 
       styleClass="menu-container" 
       stylesheets="@../css/common.css,@../css/menu.css" 
@@ -23,10 +18,7 @@
       xmlns:fx="http://javafx.com/fxml/1" 
       fx:controller="com.example.pokemonbattle.controller.MenuController">
   <children>
-
     <StackPane fx:id="rootPane" VBox.vgrow="ALWAYS">
-
-        <!-- Background image -->
         <ImageView fx:id="bgImage"
                    preserveRatio="false"
                    pickOnBounds="true">
@@ -34,57 +26,16 @@
                 <Image url="@../assets/menu1.png"/>
             </image>
         </ImageView>
-
-        <!-- Semi-transparent overlay covering the left quarter of the screen -->
-        <Region fx:id="menuOverlay"
-                mouseTransparent="true"
-                opacity="0"
-                styleClass="menu-left-overlay"
-                StackPane.alignment="CENTER_LEFT"/>
-
-        <VBox fx:id="buttonContainer" alignment="CENTER_LEFT" spacing="25" StackPane.alignment="CENTER_LEFT">
+        <Region fx:id="menuOverlay" mouseTransparent="true" opacity="0" styleClass="menu-left-overlay" StackPane.alignment="CENTER_LEFT"/>
+        <StackPane fx:id="selectBall" styleClass="pokeball" visible="false" mouseTransparent="true"/>
+        <VBox fx:id="buttonContainer" alignment="CENTER_LEFT" spacing="10" StackPane.alignment="CENTER_LEFT">
             <padding><Insets left="80"/></padding>
-            <Button fx:id="newGameButton" styleClass="menu-btn">
-                <graphic>
-                    <StackPane fx:id="pokeballNewGame" styleClass="pokeball" visible="false"/>
-                </graphic>
-                <contentDisplay>RIGHT</contentDisplay>
-                <text>New Game</text>
-            </Button>
-            <Button fx:id="loadGameButton" styleClass="menu-btn">
-                <graphic>
-                    <StackPane fx:id="pokeballLoadGame" styleClass="pokeball" visible="false">
-                        <Rectangle width="16" height="1.5" fill="black"/>
-                        <Circle radius="3" fill="white" stroke="black" strokeWidth="1.2"/>
-                    </StackPane>
-                </graphic>
-                <contentDisplay>RIGHT</contentDisplay>
-                <text>Load Game</text>
-            </Button>
-            <Button fx:id="settingsButton" styleClass="menu-btn">
-                <graphic>
-                    <StackPane fx:id="pokeballSettings" styleClass="pokeball" visible="false"/>
-                </graphic>
-                <contentDisplay>RIGHT</contentDisplay>
-                <text>Settings</text>
-            </Button>
-            <Button fx:id="backButton" styleClass="menu-btn">
-                <graphic>
-                    <StackPane fx:id="pokeballBack" styleClass="pokeball" visible="false"/>
-                </graphic>
-                <contentDisplay>RIGHT</contentDisplay>
-                <text>Back</text>
-            </Button>
-            <Button fx:id="exitButton" styleClass="menu-btn">
-                <graphic>
-                    <StackPane fx:id="pokeballExit" styleClass="pokeball" visible="false"/>
-                </graphic>
-                <contentDisplay>RIGHT</contentDisplay>
-                <text>Exit</text>
-            </Button>
+            <Button fx:id="newGameButton" styleClass="menu-btn" text="New Game"/>
+            <Button fx:id="loadGameButton" styleClass="menu-btn" text="Load Game"/>
+            <Button fx:id="settingsButton" styleClass="menu-btn" text="Settings"/>
+            <Button fx:id="backButton" styleClass="menu-btn" text="Go Back"/>
+            <Button fx:id="exitButton" styleClass="menu-btn" text="Exit Game"/>
         </VBox>
-
     </StackPane>
-
   </children>
 </VBox>

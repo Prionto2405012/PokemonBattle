@@ -1,8 +1,8 @@
 package com.example.pokemonbattle.controller;
 
-import com.example.pokemonbattle.util.CurtainTransitionManager;
 import com.example.pokemonbattle.util.SceneManager;
 
+import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
@@ -10,6 +10,8 @@ import javafx.fxml.FXML;
 import javafx.scene.layout.StackPane;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
 public class IntroController {
@@ -17,7 +19,7 @@ public class IntroController {
     @FXML private StackPane rootPane;
     @FXML private MediaView mediaView;
     private MediaPlayer mediaPlayer;
-    private static final double TRIGGER_BEFORE_END_MS = 800.0;
+    private static final double TRIGGER_BEFORE_END_MS = 1000.0;
     private volatile boolean transitionTriggered = false;
 
     @FXML
@@ -65,33 +67,32 @@ public class IntroController {
         }
     }
     private void startFlashTransition() {
+        // Black overlay fades in over 700 ms
+        Rectangle overlay = new Rectangle();
+        overlay.setFill(Color.BLACK);
+        overlay.widthProperty().bind(rootPane.widthProperty());
+        overlay.heightProperty().bind(rootPane.heightProperty());
+        overlay.setOpacity(0);
+        overlay.setManaged(false);
+        rootPane.getChildren().add(overlay);
+
+        // Fade audio out in parallel with the visual fade
         if (mediaPlayer != null) {
-            Duration audioFadeDuration = Duration.millis(80);
             Timeline volumeFade = new Timeline(
-                new KeyFrame(Duration.ZERO,        new KeyValue(mediaPlayer.volumeProperty(), mediaPlayer.getVolume())),
-                new KeyFrame(audioFadeDuration,    new KeyValue(mediaPlayer.volumeProperty(), 0.0))
+                new KeyFrame(Duration.ZERO,         new KeyValue(mediaPlayer.volumeProperty(), mediaPlayer.getVolume())),
+                new KeyFrame(Duration.millis(700),  new KeyValue(mediaPlayer.volumeProperty(), 0.0))
             );
-            volumeFade.setOnFinished(e -> {
-                disposeMediaPlayer();
-                launchTransition();
-            });
             volumeFade.play();
-        } else {
-            launchTransition();
         }
-    }
-    private void launchTransition() {
-        CurtainTransitionManager.executeCurtainTransition(rootPane, () -> {
-            // Switch scene while screen is fully black
-            goToStartScreen();
-            // Platform.runLater ensures the new scene has completed its first layout
-            // pass before we read rootPane.getHeight() for the rise animation
-            javafx.application.Platform.runLater(() -> {
-                javafx.scene.layout.Pane newRoot =
-                    (javafx.scene.layout.Pane) SceneManager.getPrimaryStage().getScene().getRoot();
-                CurtainTransitionManager.riseOn(newRoot);
-            });
+
+        FadeTransition fadeToBlack = new FadeTransition(Duration.millis(700), overlay);
+        fadeToBlack.setFromValue(0.0);
+        fadeToBlack.setToValue(1.0);
+        fadeToBlack.setOnFinished(e -> {
+            disposeMediaPlayer();
+            goToStartScreen(); // switch while screen is fully black
         });
+        fadeToBlack.play();
     }
     private void disposeMediaPlayer() {
         if (mediaPlayer != null) {

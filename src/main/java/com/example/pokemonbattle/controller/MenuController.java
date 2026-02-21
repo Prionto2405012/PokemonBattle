@@ -33,14 +33,10 @@ public class MenuController {
     @FXML private Button settingsButton;
     @FXML private Button backButton;
     @FXML private Button exitButton;
-    @FXML private StackPane pokeballNewGame;
-    @FXML private StackPane pokeballLoadGame;
-    @FXML private StackPane pokeballSettings;
-    @FXML private StackPane pokeballBack;
-    @FXML private StackPane pokeballExit;
+    @FXML private StackPane selectBall;
     private List<Button> menuButtons;
     private int selectedIndex = -1;
-    private boolean keyboardMode = false;  // tracks which input mode is active
+    private boolean keyboardMode = false;  
     private void playCLickGlow(Button btn){
         javafx.scene.effect.DropShadow glow = new javafx.scene.effect.DropShadow();
         glow.setRadius(0);
@@ -55,64 +51,46 @@ public class MenuController {
         pulse.setOnFinished(e->btn.setEffect(null));
         pulse.play();
     }
-    private void setupPokeballVisibility() {
-        List<StackPane> balls = List.of(pokeballNewGame, pokeballLoadGame, pokeballSettings, pokeballBack, pokeballExit);
-        for(int i=0;i<menuButtons.size();i++) {
-            Button btn = menuButtons.get(i);
-            StackPane ball = balls.get(i);
-            ball.setOpacity(0);
-            FadeTransition fadeIn=new FadeTransition(Duration.millis(100), ball);
-            fadeIn.setToValue(1);
-            FadeTransition fadeOut=new FadeTransition(Duration.millis(100), ball);
-            fadeOut.setToValue(0);
-            Runnable updateVisibility=()->{
-                boolean hovered=btn.isHover();
-                boolean selected=btn.getStyleClass().contains("button-selected");
-                if(hovered || selected) {
-                    fadeOut.stop();
-                    fadeIn.playFromStart();
-                } else {
-                    fadeIn.stop();
-                    fadeOut.playFromStart();
-                }
-            };
-            btn.hoverProperty().addListener((obs, oldVal, newVal) -> updateVisibility.run());
-            btn.getStyleClass().addListener((javafx.collections.ListChangeListener<String>) change ->{
-                updateVisibility.run();
-            });
-            updateVisibility.run();
-        }
+    private void moveSelector(Button btn){
+        if(btn==null) return;
+        selectBall.setVisible(true);
+        javafx.geometry.Bounds bounds=btn.localToScene(btn.getBoundsInLocal());
+        javafx.geometry.Bounds rootBounds=rootPane.localToScene(rootPane.getBoundsInLocal());
+        double y=bounds.getMinY() - rootBounds.getMinY() + bounds.getHeight()/2 - selectBall.getHeight()/2;
+        double x=btn.getLayoutX() -25;
+        TranslateTransition move=new TranslateTransition(Duration.millis(150), selectBall);
+        move.setToX(x);
+        move.setToY(y);
+        move.setInterpolator(Interpolator.EASE_OUT);
+        move.play();
     }
     private void playButtonEntrance() {
-        // Fade in the left-quarter overlay together with the first button
-        if (menuOverlay != null && rootPane != null) {
-            menuOverlay.prefWidthProperty().bind(rootPane.widthProperty().multiply(0.25));
-            menuOverlay.prefHeightProperty().bind(rootPane.heightProperty());
-            FadeTransition overlayFade = new FadeTransition(Duration.millis(500), menuOverlay);
-            overlayFade.setFromValue(0);
-            overlayFade.setToValue(1);
-            overlayFade.setDelay(Duration.millis(150));
-            overlayFade.play();
-        }
-
-        Button[] ordered = {newGameButton, loadGameButton, settingsButton, backButton, exitButton};
-        for (int i = 0; i < ordered.length; i++) {
-            Button btn = ordered[i];
+        double initialDelay=400;
+        double stagger=90;
+        double slideDist=-60;
+        Button[] ordered={newGameButton, loadGameButton, settingsButton, backButton, exitButton};
+        for(int i=0;i<ordered.length;i++){
+            Button btn=ordered[i];
             btn.setOpacity(0);
-            btn.setTranslateX(-200);
-
-            FadeTransition fade = new FadeTransition(Duration.millis(300), btn);
+            btn.setTranslateX(slideDist);
+            FadeTransition fade=new FadeTransition(Duration.millis(175),btn);
             fade.setFromValue(0);
             fade.setToValue(1);
-
-            TranslateTransition slide = new TranslateTransition(Duration.millis(400), btn);
-            slide.setFromX(-200);
-            slide.setToX(0);  // rests at natural position inside already-positioned container
-            slide.setInterpolator(Interpolator.EASE_OUT);
-
-            ParallelTransition entrance = new ParallelTransition(slide, fade);
-            entrance.setDelay(Duration.millis(150 + i * 120));
+            TranslateTransition slide=new TranslateTransition(Duration.millis(300),btn);
+            slide.setFromX(slideDist);
+            slide.setToX(0);
+            slide.setInterpolator(Interpolator.SPLINE(0.2,0.8,0.2,1));
+            ParallelTransition entrance=new ParallelTransition(slide, fade);
+            entrance.setDelay(Duration.millis(initialDelay + i * stagger));
             entrance.play();
+        }
+        if(menuOverlay!=null){
+            menuOverlay.setOpacity(0);
+            FadeTransition overlayFade= new FadeTransition(Duration.millis(300), menuOverlay);
+            overlayFade.setFromValue(0);
+            overlayFade.setToValue(1);
+            overlayFade.setDelay(Duration.millis(300));
+            overlayFade.play();
         }
     }
     @FXML
@@ -122,8 +100,7 @@ public class MenuController {
             bgImage.fitHeightProperty().bind(rootPane.heightProperty());
         }
         menuButtons = List.of(newGameButton, loadGameButton, settingsButton, backButton, exitButton);
-        selectedIndex = -1;      // no button selected at start — do NOT call updateSelection() here
-        setupPokeballVisibility();
+        selectedIndex = -1;
         setupButtonHover();
         playButtonEntrance();
     }
@@ -142,13 +119,13 @@ public class MenuController {
             Button btn = menuButtons.get(i);
 
             btn.setOnMouseEntered(e -> {
-                keyboardMode = false;           // mouse takes over
+                keyboardMode = false;   
                 selectedIndex = index;
                 updateSelection();
             });
 
             btn.setOnMouseExited(e -> {
-                if (!keyboardMode) {            // only clear if still in mouse mode
+                if (!keyboardMode) {      
                     selectedIndex = -1;
                     updateSelection();
                 }
@@ -156,8 +133,7 @@ public class MenuController {
         }
     }
     void onKeyPressed(KeyEvent event) {
-        keyboardMode = true;                    // keyboard takes over
-        // clear any mouse hover visual first
+        keyboardMode = true;         
         if (event.getCode() == KeyCode.UP) {
             selectedIndex = (selectedIndex <= 0) ? menuButtons.size() - 1 : selectedIndex - 1;
             updateSelection();

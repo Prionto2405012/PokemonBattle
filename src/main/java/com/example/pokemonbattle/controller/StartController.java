@@ -13,6 +13,8 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
 @SuppressWarnings("unused")
@@ -56,8 +58,27 @@ public class StartController {
             vignetteOverlay.prefWidthProperty().bind(rootPane.widthProperty());
             vignetteOverlay.prefHeightProperty().bind(rootPane.heightProperty());
         }
-        // Reveal handled by CurtainTransitionManager.riseOn() in IntroController
+
+        // Fade out from black over 500ms to complete the intro→start transition
+        Rectangle blackOverlay = new Rectangle();
+        blackOverlay.setFill(Color.BLACK);
+        blackOverlay.widthProperty().bind(rootPane.widthProperty());
+        blackOverlay.heightProperty().bind(rootPane.heightProperty());
+        blackOverlay.setOpacity(1.0);
+        blackOverlay.setManaged(false);
+        rootPane.getChildren().add(blackOverlay);
+
+        FadeTransition fadeOut = new FadeTransition(Duration.millis(500), blackOverlay);
+        fadeOut.setFromValue(1.0);
+        fadeOut.setToValue(0.0);
+        fadeOut.setOnFinished(e -> {
+            rootPane.getChildren().remove(blackOverlay);
+            blackOverlay.widthProperty().unbind();
+            blackOverlay.heightProperty().unbind();
+        });
+        fadeOut.play();
     }
+
     @FXML
     protected void onStartButtonClick() {
         javafx.scene.shape.Rectangle overlay = new javafx.scene.shape.Rectangle();

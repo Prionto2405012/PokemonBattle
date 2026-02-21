@@ -51,7 +51,11 @@
     -fx-text-fill: #073622;
 }
 .menu-left-overlay {
-    -fx-background-color: rgba(0, 15, 8, 0.52);
+    -fx-background-color: rgba(15, 39, 34, 0.55);
+    -fx-background-radius: 0 20 20 0;
+    -fx-border-radius: 0 20 20 0;
+    -fx-border-color: rgba(255,255,255,0.15);
+    -fx-border-width: 0 1 0 0;
 }
 
 .pokeball{
