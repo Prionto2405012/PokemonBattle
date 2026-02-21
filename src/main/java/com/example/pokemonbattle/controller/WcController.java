@@ -2,6 +2,7 @@ package com.example.pokemonbattle.controller;
 
 import com.example.pokemonbattle.model.User;
 import com.example.pokemonbattle.service.AuthService;
+import com.example.pokemonbattle.util.PokeballOverlay;
 import com.example.pokemonbattle.util.SceneManager;
 
 import javafx.animation.FadeTransition;
@@ -17,27 +18,18 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
-
-/**
- * Controller for the Authentication Screen.
- * Handles login and signup functionality for players.
- */
-@SuppressWarnings("unused") // Methods are called by FXML
+@SuppressWarnings("unused") 
 public class WcController {
     @FXML
-    private StackPane rootPane; // Root container for background image
+    private StackPane rootPane; 
     @FXML
-    private ImageView bgImage; // Background image
+    private ImageView bgImage; 
     @FXML
     private VBox authCard;
-
-    // Tab buttons
     @FXML
     private Button loginTabButton;
     @FXML
     private Button signupTabButton;
-
-    // Login form fields
     @FXML
     private VBox loginForm;
     @FXML
@@ -50,8 +42,6 @@ public class WcController {
     private Label loginUsernameError;
     @FXML
     private Label loginPasswordError;
-
-    // Signup form fields
     @FXML
     private VBox signupForm;
     @FXML
@@ -72,11 +62,7 @@ public class WcController {
     private Label signupPasswordError;
     @FXML
     private Label signupConfirmPasswordError;
-    
-    // Authentication service
     private final AuthService authService;
-    
-    // Store currently authenticated user
     private static User currentUser;
 
     public WcController() {
@@ -111,13 +97,17 @@ public class WcController {
                 (int) (c.getBlue() * 255),
                 alpha);
     }
-
-    /**
-     * Initialize the controller - bind background image to fill the container.
-     */
+    
     @FXML
     public void initialize() {
-        // Phase 3: WC scene fades in from full black (completes the 3-phase transition)
+        PokeballOverlay pokeball = (PokeballOverlay) SceneManager.getData("pokeballOverlay");
+        if (pokeball != null) {
+            SceneManager.setData("pokeballOverlay", null);
+            rootPane.getChildren().add(pokeball);
+            javafx.animation.PauseTransition pause = new javafx.animation.PauseTransition(Duration.millis(400));
+            pause.setOnFinished(e -> PokeballOverlay.hideFrom(rootPane, pokeball, null));
+            pause.play();
+        }
         if (rootPane != null) {
             javafx.scene.shape.Rectangle overlay = new javafx.scene.shape.Rectangle();
             overlay.setFill(javafx.scene.paint.Color.BLACK);
@@ -138,8 +128,6 @@ public class WcController {
             });
             fadeIn.play();
         }
-
-        // Bind background image to fill the container (with null check)
         if (bgImage != null && rootPane != null) {
             bgImage.fitWidthProperty().bind(rootPane.widthProperty());
             bgImage.fitHeightProperty().bind(rootPane.heightProperty());
@@ -161,121 +149,72 @@ public class WcController {
                 "-fx-background-color: " + toRGBA(darker,0.6)
             );
         }
-        
-        // Focus on the first field in login form
         if (loginUsernameField != null) {
             loginUsernameField.requestFocus();
         }
     }
-
-    /**
-     * Handle "Login" tab click.
-     */
     @FXML
     protected void onLoginTabClick() {
-        // Show login form, hide signup form
         loginForm.setVisible(true);
         loginForm.setManaged(true);
         signupForm.setVisible(false);
         signupForm.setManaged(false);
-
-        // Update tab button styles
         loginTabButton.getStyleClass().add("tab-button-active");
         signupTabButton.getStyleClass().remove("tab-button-active");
-
-        // Clear any error messages
         clearAllLoginErrors();
         clearAllSignupErrors();
-
-        // Focus on login username field
         loginUsernameField.requestFocus();
     }
-
-    /**
-     * Handle "Sign Up" tab click.
-     */
     @FXML
     protected void onSignupTabClick() {
-        // Show signup form, hide login form
         signupForm.setVisible(true);
         signupForm.setManaged(true);
         loginForm.setVisible(false);
         loginForm.setManaged(false);
-
-        // Update tab button styles
         signupTabButton.getStyleClass().add("tab-button-active");
         loginTabButton.getStyleClass().remove("tab-button-active");
-
-        // Clear any error messages
         clearAllLoginErrors();
         clearAllSignupErrors();
-
-        // Focus on signup username field
         signupUsernameField.requestFocus();
     }
-
-    /**
-     * Handle "Login" button click.
-     */
     @FXML
     protected void onLoginButtonClick() {
-        // Clear previous errors
         clearAllLoginErrors();
         
         String username = loginUsernameField.getText().trim();
         String password = loginPasswordField.getText();
-
-        // Validate input - show field-specific errors
         boolean hasErrors = false;
         
         if (username.isEmpty()) {
             showFieldError(loginUsernameError, "Username or email is required");
             hasErrors = true;
         }
-
         if (password.isEmpty()) {
             showFieldError(loginPasswordError, "Password is required");
             hasErrors = true;
         }
         
-        if (hasErrors) {
-            return;
-        }
-
-        // Attempt authentication
+        if (hasErrors) return;
         AuthService.AuthResult result = authService.login(username, password);
         
         if (result.isSuccess()) {
-            // Store authenticated user
             currentUser = result.getUser();
             System.out.println("Login successful - User: " + currentUser.getUsername());
-            
-            // Navigate to main menu
             SceneManager.switchSceneWithLoading("menu.fxml", "Pokemon Battle - Menu", 1200, 700);
         } else {
-            // Show error message - could be invalid credentials
             System.err.println("Login failed: " + result.getMessage());
             showLoginError(result.getMessage());
         }
     }
-
-    /**
-     * Handle "Sign Up" button click.
-     */
     @FXML
     protected void onSignupButtonClick() {
-        // Clear previous errors
         clearAllSignupErrors();
         
         String username = signupUsernameField.getText().trim();
         String email = signupEmailField.getText().trim();
         String password = signupPasswordField.getText();
         String confirmPassword = signupConfirmPasswordField.getText();
-
-        // Validate all fields with field-specific errors
         boolean hasErrors = false;
-        
-        // Username validation
         if (username.isEmpty()) {
             showFieldError(signupUsernameError, "Username is required");
             hasErrors = true;
@@ -289,8 +228,6 @@ public class WcController {
             showFieldError(signupUsernameError, "Username can only contain letters, numbers, and underscores");
             hasErrors = true;
         }
-        
-        // Email validation
         if (email.isEmpty()) {
             showFieldError(signupEmailError, "Email is required");
             hasErrors = true;
@@ -298,8 +235,6 @@ public class WcController {
             showFieldError(signupEmailError, "Please enter a valid email address");
             hasErrors = true;
         }
-        
-        // Password validation
         if (password.isEmpty()) {
             showFieldError(signupPasswordError, "Password is required");
             hasErrors = true;
@@ -307,8 +242,6 @@ public class WcController {
             showFieldError(signupPasswordError, "Password must be at least 6 characters");
             hasErrors = true;
         }
-        
-        // Confirm password validation
         if (confirmPassword.isEmpty()) {
             showFieldError(signupConfirmPasswordError, "Please confirm your password");
             hasErrors = true;
@@ -320,45 +253,27 @@ public class WcController {
         if (hasErrors) {
             return;
         }
-
-        // Attempt registration
         AuthService.AuthResult result = authService.register(username, email, password);
         
         if (result.isSuccess()) {
-            // Store authenticated user
             currentUser = result.getUser();
             System.out.println("Registration successful - User: " + currentUser.getUsername());
-            
-            // Navigate to main menu
             SceneManager.switchSceneWithLoading("menu.fxml", "Pokemon Battle - Menu", 1200, 700);
         } else {
-            // Show error message (e.g., username/email already exists)
             System.err.println("Registration failed: " + result.getMessage());
             showSignupError(result.getMessage());
         }
     }
-
-    /**
-     * Show error message on login form.
-     */
     private void showLoginError(String message) {
         loginErrorLabel.setText(message);
         loginErrorLabel.setVisible(true);
         loginErrorLabel.setManaged(true);
     }
-
-    /**
-     * Show error message on signup form.
-     */
     private void showSignupError(String message) {
         signupErrorLabel.setText(message);
         signupErrorLabel.setVisible(true);
         signupErrorLabel.setManaged(true);
     }
-    
-    /**
-     * Show error message for a specific field.
-     */
     private void showFieldError(Label errorLabel, String message) {
         if (errorLabel != null) {
             errorLabel.setText(message);
@@ -366,19 +281,11 @@ public class WcController {
             errorLabel.setManaged(true);
         }
     }
-    
-    /**
-     * Clear all login form errors.
-     */
     private void clearAllLoginErrors() {
         hideError(loginErrorLabel);
         hideError(loginUsernameError);
         hideError(loginPasswordError);
     }
-    
-    /**
-     * Clear all signup form errors.
-     */
     private void clearAllSignupErrors() {
         hideError(signupErrorLabel);
         hideError(signupUsernameError);
@@ -386,10 +293,6 @@ public class WcController {
         hideError(signupPasswordError);
         hideError(signupConfirmPasswordError);
     }
-    
-    /**
-     * Hide an error label.
-     */
     private void hideError(Label errorLabel) {
         if (errorLabel != null) {
             errorLabel.setVisible(false);
@@ -397,26 +300,13 @@ public class WcController {
             errorLabel.setText("");
         }
     }
-
-    /**
-     * Handle "Back" button click.
-     */
     @FXML
     protected void onBackButtonClick() {
         SceneManager.switchSceneWithLoading("start.fxml", "Pokemon Battle - Start", 1200, 700);
     }
-    
-    /**
-     * Get the currently authenticated user.
-     * @return The current user, or null if no user is authenticated
-     */
     public static User getCurrentUser() {
         return currentUser;
     }
-    
-    /**
-     * Clear the current user session (logout).
-     */
     public static void logout() {
         currentUser = null;
     }

@@ -45,16 +45,9 @@ public class SceneManager {
             com.example.pokemonbattle.controller.LoadingScreenController lsc = loadingLoader.getController();
             primaryStage.setScene(loadingScene);
             primaryStage.show();
-
-            // Verify the target FXML exists before starting the task (safe off-thread too,
-            // but doing it here gives an early, clear error on the FX thread).
             var fxmlUrl = SceneManager.class.getResource(RESOURCE_PATH + "view/" + fxmlFile);
             if (fxmlUrl == null)
                 throw new RuntimeException("FXML not found: " + RESOURCE_PATH + "view/" + fxmlFile);
-
-            // The Task only does non-JavaFX work (sleeps / progress updates).
-            // FXMLLoader.load() and new Scene() MUST run on the JavaFX Application
-            // Thread — doing them inside call() causes an IllegalStateException.
             javafx.concurrent.Task<Void> loadingTask = new javafx.concurrent.Task<>() {
                 @Override
                 protected Void call() throws Exception {
@@ -74,8 +67,6 @@ public class SceneManager {
                     return null;
                 }
             };
-
-            // onSuccess runs on the JavaFX Application Thread — safe to build the Scene here.
             lsc.bindToTask(loadingTask, () -> {
                 try {
                     FXMLLoader loader = new FXMLLoader(fxmlUrl);

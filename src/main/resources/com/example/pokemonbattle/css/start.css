@@ -30,6 +30,7 @@
  */
 .start-btn {
     -fx-cursor: hand;
+    -fx-font-family: "menu";
     -fx-font-size: 18px;
     -fx-font-weight: bold;
     -fx-text-fill: #063b2f;

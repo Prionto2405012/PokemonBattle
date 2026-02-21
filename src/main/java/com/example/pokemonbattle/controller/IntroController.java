@@ -1,5 +1,6 @@
 package com.example.pokemonbattle.controller;
 
+import com.example.pokemonbattle.util.PokeballOverlay;
 import com.example.pokemonbattle.util.SceneManager;
 
 import javafx.animation.FadeTransition;
@@ -15,7 +16,6 @@ import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
 public class IntroController {
-
     @FXML private StackPane rootPane;
     @FXML private MediaView mediaView;
     private MediaPlayer mediaPlayer;
@@ -24,10 +24,7 @@ public class IntroController {
 
     @FXML
     public void initialize() {
-        // (b/c) Claim the pre-built, autoPlay=false player instead of
-        //       constructing one on the FX thread every time.
         mediaPlayer = com.example.pokemonbattle.util.MediaCache.claimMediaPlayer("intro.mp4");
-
         if (mediaPlayer == null) {
             System.err.println("IntroController: intro.mp4 player unavailable, skipping intro.");
             goToStartScreen();
@@ -40,10 +37,8 @@ public class IntroController {
 
         mediaPlayer.currentTimeProperty().addListener((obs, oldTime, newTime) -> {
             if (transitionTriggered) return;
-
             Duration total = mediaPlayer.getTotalDuration();
             if (total == null || total.isUnknown() || total.isIndefinite()) return;
-
             double remainingMs = total.subtract(newTime).toMillis();
             if (remainingMs <= TRIGGER_BEFORE_END_MS) {
                 transitionTriggered = true;
@@ -56,44 +51,62 @@ public class IntroController {
             System.err.println("IntroController: MediaPlayer error — " + (error != null ? error.getMessage() : "Unknown error"));
             goToStartScreen();
         });
-
-        // (b) Play only once the player signals it is ready to render
         mediaPlayer.setOnReady(mediaPlayer::play);
     }
+
     private void handleEndOfMedia() {
         if (!transitionTriggered) {
             transitionTriggered = true;
             startFlashTransition();
         }
     }
+
     private void startFlashTransition() {
-        // Black overlay fades in over 700 ms
+        // 1. Black overlay behind the pokeball
         Rectangle overlay = new Rectangle();
         overlay.setFill(Color.BLACK);
         overlay.widthProperty().bind(rootPane.widthProperty());
         overlay.heightProperty().bind(rootPane.heightProperty());
         overlay.setOpacity(0);
         overlay.setManaged(false);
-        rootPane.getChildren().add(overlay);
 
-        // Fade audio out in parallel with the visual fade
+        // 2. Pokeball on top
+        PokeballOverlay pokeball = new PokeballOverlay();
+        pokeball.setOpacity(0);
+        // do NOT setManaged(false) — layout must be active for centering to work
+
+        rootPane.getChildren().addAll(overlay, pokeball);
+        pokeball.play();
+
+        // 3. Fade in black + pokeball together
+        FadeTransition fadeBg = new FadeTransition(Duration.millis(700), overlay);
+        fadeBg.setFromValue(0.0);
+        fadeBg.setToValue(1.0);
+
+        FadeTransition fadeBall = new FadeTransition(Duration.millis(400), pokeball);
+        fadeBall.setFromValue(0.0);
+        fadeBall.setToValue(1.0);
+
+        // 4. Volume fade
         if (mediaPlayer != null) {
-            Timeline volumeFade = new Timeline(
-                new KeyFrame(Duration.ZERO,         new KeyValue(mediaPlayer.volumeProperty(), mediaPlayer.getVolume())),
+            new Timeline(
+                new KeyFrame(Duration.ZERO,        new KeyValue(mediaPlayer.volumeProperty(), mediaPlayer.getVolume())),
                 new KeyFrame(Duration.millis(700),  new KeyValue(mediaPlayer.volumeProperty(), 0.0))
-            );
-            volumeFade.play();
+            ).play();
         }
 
-        FadeTransition fadeToBlack = new FadeTransition(Duration.millis(700), overlay);
-        fadeToBlack.setFromValue(0.0);
-        fadeToBlack.setToValue(1.0);
-        fadeToBlack.setOnFinished(e -> {
+        fadeBg.setOnFinished(e -> {
             disposeMediaPlayer();
-            goToStartScreen(); // switch while screen is fully black
+            // Keep pokeball spinning while start scene loads and reveals
+            // Pass pokeball reference to StartController via SceneManager data
+            SceneManager.setData("pokeballOverlay", pokeball);
+            goToStartScreen();
         });
-        fadeToBlack.play();
+
+        fadeBg.play();
+        fadeBall.play();
     }
+
     private void disposeMediaPlayer() {
         if (mediaPlayer != null) {
             try {
@@ -106,6 +119,7 @@ public class IntroController {
             }
         }
     }
+
     private void goToStartScreen() {
         SceneManager.switchScene("start.fxml", "Pokemon Battle", 1200, 700);
     }

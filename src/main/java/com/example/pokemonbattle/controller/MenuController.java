@@ -20,6 +20,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.util.Duration;
 @SuppressWarnings("unused") 
 public class MenuController {
@@ -28,8 +29,7 @@ public class MenuController {
     @FXML private Region menuOverlay;
     @FXML private VBox menuVBox;
     @FXML private VBox buttonContainer;
-    @FXML private Button newGameButton;
-    @FXML private Button loadGameButton;
+    @FXML private Button playGameButton;
     @FXML private Button settingsButton;
     @FXML private Button backButton;
     @FXML private Button exitButton;
@@ -37,6 +37,7 @@ public class MenuController {
     private List<Button> menuButtons;
     private int selectedIndex = -1;
     private boolean keyboardMode = false;  
+
     private void playCLickGlow(Button btn){
         javafx.scene.effect.DropShadow glow = new javafx.scene.effect.DropShadow();
         glow.setRadius(0);
@@ -58,17 +59,31 @@ public class MenuController {
         javafx.geometry.Bounds rootBounds=rootPane.localToScene(rootPane.getBoundsInLocal());
         double y=bounds.getMinY() - rootBounds.getMinY() + bounds.getHeight()/2 - selectBall.getHeight()/2;
         double x=btn.getLayoutX() -25;
-        TranslateTransition move=new TranslateTransition(Duration.millis(150), selectBall);
+        if(!selectBall.isVisible()){
+            selectBall.setOpacity(0);
+            selectBall.setVisible(true);
+            FadeTransition fade=new FadeTransition(Duration.millis(150), selectBall);
+            fade.setToValue(1);
+            fade.play();
+        }
+        TranslateTransition move=new TranslateTransition(Duration.millis(190), selectBall);
         move.setToX(x);
         move.setToY(y);
-        move.setInterpolator(Interpolator.EASE_OUT);
+        move.setInterpolator(Interpolator.SPLINE(0.34,0.97,0.64,1));
+        Timeline scalePop= new Timeline(
+            new KeyFrame(Duration.ZERO, new KeyValue(selectBall.scaleXProperty(), 1), new KeyValue(selectBall.scaleYProperty(), 1)),
+            new KeyFrame(Duration.millis(80), new KeyValue(selectBall.scaleXProperty(), 0.85), new KeyValue(selectBall.scaleYProperty(), 0.85)),
+            new KeyFrame(Duration.millis(190), new KeyValue(selectBall.scaleXProperty(), 1.05), new KeyValue(selectBall.scaleYProperty(), 1.05)),
+            new KeyFrame(Duration.millis(250), new KeyValue(selectBall.scaleXProperty(), 1), new KeyValue(selectBall.scaleYProperty(), 1))
+        );
         move.play();
+        scalePop.play();
     }
     private void playButtonEntrance() {
         double initialDelay=400;
         double stagger=90;
-        double slideDist=-60;
-        Button[] ordered={newGameButton, loadGameButton, settingsButton, backButton, exitButton};
+        double slideDist=-50;
+        Button[] ordered={playGameButton, settingsButton, backButton, exitButton};
         for(int i=0;i<ordered.length;i++){
             Button btn=ordered[i];
             btn.setOpacity(0);
@@ -95,23 +110,36 @@ public class MenuController {
     }
     @FXML
     public void initialize() {
+        Font.loadFont(getClass().getResourceAsStream("/com/example/pokemonbattle/fonts/menu.ttf"), 24);
+        Font loaded = Font.loadFont(getClass().getResourceAsStream("/com/example/pokemonbattle/fonts/SpaceNova-6Rpd1.otf"), 24);
+        if (loaded != null) System.out.println("[MenuController] Loaded font family: " + loaded.getFamily());
+        else System.err.println("[MenuController] Font failed to load — stream was null or corrupt");
         if (bgImage != null && rootPane != null) {
             bgImage.fitWidthProperty().bind(rootPane.widthProperty());
             bgImage.fitHeightProperty().bind(rootPane.heightProperty());
         }
-        menuButtons = List.of(newGameButton, loadGameButton, settingsButton, backButton, exitButton);
+        menuButtons = List.of(playGameButton, settingsButton, backButton, exitButton);
         selectedIndex = -1;
+        selectBall.setVisible(false);
+        selectBall.setManaged(false);
         setupButtonHover();
         playButtonEntrance();
     }
     private void updateSelection() {
-        for (int i = 0; i < menuButtons.size(); i++) {
-            if (i == selectedIndex) {
-                menuButtons.get(i).getStyleClass().add("menu-selected");
-            } else {
-                menuButtons.get(i).getStyleClass().remove("menu-selected");
+        for(int i = 0; i < menuButtons.size(); i++){
+            Button btn = menuButtons.get(i);
+            if(i == selectedIndex){
+                btn.getStyleClass().remove("menu-hovered");
+                btn.getStyleClass().add("menu-selected");
+                moveSelector(btn);
+            }
+            else{
+                btn.getStyleClass().remove("menu-selected");
             }
         }
+        if(selectedIndex >= 0 && selectedIndex < menuButtons.size()) selectBall.setVisible(true);
+        else selectBall.setVisible(false);
+            
     }
     private void setupButtonHover() {
         for (int i = 0; i < menuButtons.size(); i++) {
@@ -119,16 +147,18 @@ public class MenuController {
             Button btn = menuButtons.get(i);
 
             btn.setOnMouseEntered(e -> {
-                keyboardMode = false;   
-                selectedIndex = index;
-                updateSelection();
-            });
-
-            btn.setOnMouseExited(e -> {
-                if (!keyboardMode) {      
-                    selectedIndex = -1;
-                    updateSelection();
+                if (index != selectedIndex) {    
+                    btn.getStyleClass().add("menu-hovered");
                 }
+            });
+            btn.setOnMouseExited(e -> {
+                btn.getStyleClass().remove("menu-hovered"); 
+            });
+            btn.setOnMouseClicked(e -> {
+                btn.getStyleClass().remove("menu-hovered"); 
+                selectedIndex = index;
+                keyboardMode = false;
+                updateSelection();          
             });
         }
     }
@@ -148,12 +178,12 @@ public class MenuController {
         }
     }
     @FXML
-    void onNewGameButtonClick() {
+    void onplayGameButtonClick() {
         System.out.println("New Game clicked!");
         SceneManager.switchSceneWithLoading("new_game.fxml", "New Game", 1200, 700);
     }
     @FXML
-    void onLoadGameButtonClick() {
+    void onClick() {
         System.out.println("Load Game clicked!");
     }
     @FXML

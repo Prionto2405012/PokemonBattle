@@ -4,6 +4,7 @@ import com.example.pokemonbattle.util.MediaCache;
 import com.example.pokemonbattle.util.SceneManager;
 
 import javafx.application.Application;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 /**
@@ -17,6 +18,12 @@ public class HelloApplication extends Application {
     public void start(Stage stage) {
         stage.setResizable(true);
         SceneManager.initialize(stage);
+
+        // Load custom fonts globally so all scenes can use them via CSS
+        Font menuFont = Font.loadFont(
+            HelloApplication.class.getResourceAsStream("/com/example/pokemonbattle/fonts/menu.ttf"), 18);
+        if (menuFont != null) System.out.println("[App] menu.ttf family: " + menuFont.getFamily());
+        else System.err.println("[App] Failed to load menu.ttf");
 
         // Kick off background pre-loading of all media assets immediately.
         // By the time the intro video finishes the GIFs / PNGs / MP4 URLs

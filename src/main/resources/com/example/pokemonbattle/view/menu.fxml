@@ -26,15 +26,14 @@
                 <Image url="@../assets/menu1.png"/>
             </image>
         </ImageView>
-        <Region fx:id="menuOverlay" mouseTransparent="true" opacity="0" styleClass="menu-left-overlay" StackPane.alignment="CENTER_LEFT"/>
+        <Region fx:id="menuOverlay" mouseTransparent="true" opacity="0" styleClass="menu-left-overlay" maxWidth="350" StackPane.alignment="CENTER_LEFT"/>
         <StackPane fx:id="selectBall" styleClass="pokeball" visible="false" mouseTransparent="true"/>
         <VBox fx:id="buttonContainer" alignment="CENTER_LEFT" spacing="10" StackPane.alignment="CENTER_LEFT">
-            <padding><Insets left="80"/></padding>
-            <Button fx:id="newGameButton" styleClass="menu-btn" text="New Game"/>
-            <Button fx:id="loadGameButton" styleClass="menu-btn" text="Load Game"/>
-            <Button fx:id="settingsButton" styleClass="menu-btn" text="Settings"/>
-            <Button fx:id="backButton" styleClass="menu-btn" text="Go Back"/>
-            <Button fx:id="exitButton" styleClass="menu-btn" text="Exit Game"/>
+            <padding><Insets left="50"/></padding>
+            <Button fx:id="playGameButton" styleClass="menu-btn" text="Play Game" onAction="#onplayGameButtonClick"/>
+            <Button fx:id="settingsButton" styleClass="menu-btn" text="Settings" onAction="#onSettingsButtonClick"/>
+            <Button fx:id="backButton" styleClass="menu-btn" text="Go Back" onAction="#onBackButtonClick"/>
+            <Button fx:id="exitButton" styleClass="menu-btn" text="Exit Game" onAction="#onExitButtonClick"/>
         </VBox>
     </StackPane>
   </children>

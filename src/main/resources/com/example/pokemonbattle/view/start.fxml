@@ -13,29 +13,14 @@
            prefWidth="1200" prefHeight="700"
            style="-fx-background-color: black;"
            stylesheets="@../css/common.css,@../css/start.css">
-
-    <!-- MP4 video background - fills the entire pane, looped via controller -->
     <MediaView fx:id="bgVideo" mouseTransparent="true"
                fitWidth="1200" fitHeight="700"
                preserveRatio="false"/>
-
-    <!-- Vignette overlay: darkens edges and adds depth to the GIF -->
     <Region fx:id="vignetteOverlay" mouseTransparent="true"
             prefWidth="1200" prefHeight="700"
             styleClass="start-vignette"/>
-
-    <!--
-        Layout: 4 equal vertical sections (each ~175px of 700px total).
-        Section 1: spacer (top).
-        Section 3: spacer.
-        Section 4: "Press Start" label + Start button.
-    -->
     <VBox alignment="TOP_CENTER" prefWidth="1200" prefHeight="700" mouseTransparent="false">
-
-        <!-- Single spacer pushes the button section to the bottom -->
         <Region VBox.vgrow="ALWAYS"/>
-
-        <!-- Section 4 — button area -->
         <VBox alignment="CENTER" spacing="12" prefHeight="175" VBox.vgrow="NEVER" styleClass="start-button-section">
             <Button text="START"
                     onAction="#onStartButtonClick"
