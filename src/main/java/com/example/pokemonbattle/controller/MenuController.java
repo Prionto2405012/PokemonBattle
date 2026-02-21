@@ -17,6 +17,7 @@ import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
@@ -24,6 +25,7 @@ import javafx.util.Duration;
 public class MenuController {
     @FXML private StackPane rootPane; 
     @FXML private ImageView bgImage;
+    @FXML private Region menuOverlay;
     @FXML private VBox menuVBox;
     @FXML private VBox buttonContainer;
     @FXML private Button newGameButton;
@@ -82,6 +84,17 @@ public class MenuController {
         }
     }
     private void playButtonEntrance() {
+        // Fade in the left-quarter overlay together with the first button
+        if (menuOverlay != null && rootPane != null) {
+            menuOverlay.prefWidthProperty().bind(rootPane.widthProperty().multiply(0.25));
+            menuOverlay.prefHeightProperty().bind(rootPane.heightProperty());
+            FadeTransition overlayFade = new FadeTransition(Duration.millis(500), menuOverlay);
+            overlayFade.setFromValue(0);
+            overlayFade.setToValue(1);
+            overlayFade.setDelay(Duration.millis(150));
+            overlayFade.play();
+        }
+
         Button[] ordered = {newGameButton, loadGameButton, settingsButton, backButton, exitButton};
         for (int i = 0; i < ordered.length; i++) {
             Button btn = ordered[i];

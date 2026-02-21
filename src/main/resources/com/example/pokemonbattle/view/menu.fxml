@@ -6,6 +6,7 @@
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.Rectangle?>
@@ -33,6 +34,14 @@
                 <Image url="@../assets/menu1.png"/>
             </image>
         </ImageView>
+
+        <!-- Semi-transparent overlay covering the left quarter of the screen -->
+        <Region fx:id="menuOverlay"
+                mouseTransparent="true"
+                opacity="0"
+                styleClass="menu-left-overlay"
+                StackPane.alignment="CENTER_LEFT"/>
+
         <VBox fx:id="buttonContainer" alignment="CENTER_LEFT" spacing="25" StackPane.alignment="CENTER_LEFT">
             <padding><Insets left="80"/></padding>
             <Button fx:id="newGameButton" styleClass="menu-btn">

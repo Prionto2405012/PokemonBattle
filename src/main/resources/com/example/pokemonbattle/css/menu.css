@@ -50,6 +50,10 @@
     -fx-border-width: 2;
     -fx-text-fill: #073622;
 }
+.menu-left-overlay {
+    -fx-background-color: rgba(0, 15, 8, 0.52);
+}
+
 .pokeball{
     -fx-pref-width:14px;
     -fx-pref-height:14px;

@@ -36,12 +36,18 @@ public class StartController {
             bgVideo.fitHeightProperty().bind(rootPane.heightProperty());
             bgVideo.setPreserveRatio(false);
 
-            // Play only once the player signals it is ready to render
+            // Play only once the player signals it is ready to render.
+            // Also check immediately — pre-warmed players are already READY
+            // and setOnReady() won't fire again after the transition has passed.
             mediaPlayer.setOnReady(() -> {
                 if (mediaPlayer.getStatus() != MediaPlayer.Status.PLAYING) {
                     mediaPlayer.play();
                 }
             });
+            if (mediaPlayer.getStatus() == MediaPlayer.Status.READY
+                    || mediaPlayer.getStatus() == MediaPlayer.Status.PAUSED) {
+                mediaPlayer.play();
+            }
         } else {
             System.err.println("StartController: start.mp4 player unavailable.");
         }
