@@ -46,6 +46,7 @@
                                 onAction="#onGameGenSelect" userData="3"/>
                     </HBox>
                 </VBox>
+                <VBox fx:id="gameSoundVolume" styleClass="volume"></VBox>
             </VBox>
             <StackPane styleClass="section-divider"><VBox.margin><Insets top="14" bottom="14"/></VBox.margin></StackPane>
             <VBox styleClass="settings-section" spacing="10">
