@@ -1,83 +1,238 @@
-/* ===== Settings Overlay Styles ===== */
+/* ════════════════════════════════════════════════════════════════════════════
+   Settings Overlay — Full stylesheet
+   Architecture:
+     • Overlay chrome  (.overlay-root, .overlay-container, .overlay-title)
+     • Section layout  (.settings-section, .section-row, .section-divider …)
+     • Toggle switch   (.toggle-switch, .toggle-track, .toggle-knob, .toggle-on)
+     • Option buttons  (.option-btn, .option-selected)
+     • State modifiers (.section-disabled)
+     • Close ✕ button  (.close-x-button)
+   ════════════════════════════════════════════════════════════════════════════ */
+
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   OVERLAY CHROME
+   ───────────────────────────────────────────────────────────────────────────── */
 
 /* Full-screen translucent backdrop */
 .overlay-root {
-    -fx-background-color: rgba(0, 0, 0, 0.55);
+    -fx-background-color: rgba(0, 0, 0, 0.58);
 }
 
-/* Card */
+/* Card panel */
 .overlay-container {
-    -fx-background-color: rgba(20, 30, 50, 0.92);
-    -fx-background-radius: 18;
-    -fx-border-color: rgba(120, 160, 220, 0.45);
+    -fx-background-color: rgba(14, 22, 40, 0.95);
+    -fx-background-radius: 20;
+    -fx-border-color: rgba(100, 145, 210, 0.40);
     -fx-border-width: 1.5;
-    -fx-border-radius: 18;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.6), 30, 0, 0, 8);
+    -fx-border-radius: 20;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.70), 36, 0, 0, 10);
 }
 
-/* Title */
+/* Panel title */
 .overlay-title {
-    -fx-font-size: 26px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #e8eaf6;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 6, 0, 0, 2);
-}
-
-/* Setting labels */
-.settings-label {
-    -fx-font-size: 14px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #b0bec5;
-}
-
-/* Combo boxes */
-.settings-combobox {
-    -fx-background-color: rgba(40, 55, 80, 0.9);
-    -fx-background-radius: 8;
-    -fx-border-color: rgba(100, 140, 200, 0.4);
-    -fx-border-width: 1;
-    -fx-border-radius: 8;
-    -fx-text-fill: #e8eaf6;
-}
-
-/* Check box */
-.settings-checkbox {
-    -fx-text-fill: #b0bec5;
     -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: rgba(160, 185, 230, 0.75);
+    -fx-letter-spacing: 3px;
 }
 
-/* =============================================
-   2.5D Close-X Button
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   SCROLL PANE — strips default chrome
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.settings-scroll {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+}
+.settings-scroll > .viewport {
+    -fx-background-color: transparent;
+}
+.settings-scroll .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-pref-width: 6px;
+}
+.settings-scroll .scroll-bar:vertical .thumb {
+    -fx-background-color: rgba(100, 140, 200, 0.35);
+    -fx-background-radius: 3;
+}
+.settings-scroll .scroll-bar:vertical .track,
+.settings-scroll .scroll-bar:vertical .increment-button,
+.settings-scroll .scroll-bar:vertical .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+.settings-scroll .corner { -fx-background-color: transparent; }
+
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   SECTIONS CONTAINER
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.sections-container {
+    -fx-background-color: transparent;
+    -fx-padding: 0 4 0 4;
+}
+
+/* Individual section wrapper */
+.settings-section {
+    -fx-padding: 14 0 14 0;
+}
+
+/* Label + control row inside a section */
+.section-row {
+    -fx-alignment: CENTER_LEFT;
+    -fx-min-height: 32;
+}
+
+/* Section heading */
+.section-title {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #cdd8f0;
+}
+
+/* Horizontal rule between sections */
+.section-divider {
+    -fx-background-color: rgba(100, 130, 190, 0.22);
+    -fx-pref-height: 1;
+    -fx-max-height: 1;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   SUB-SECTION  ("Choose Sound" row)
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.sub-section {
+    -fx-padding: 8 0 0 2;
+}
+
+.sub-section-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: rgba(160, 180, 220, 0.65);
+    -fx-font-weight: bold;
+    -fx-letter-spacing: 1px;
+}
+
+/* Dimmed + non-interactive when its parent sound is OFF */
+.section-disabled {
+    -fx-opacity: 0.35;
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   TOGGLE SWITCH
+   Anatomy: outer StackPane (.toggle-switch)
+              └─ Region track  (.toggle-track)
+              └─ Region knob   (.toggle-knob)   ← translated by Java code
+   The track changes colour via the .toggle-on modifier on the parent.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.toggle-switch {
+    -fx-cursor: hand;
+}
+
+/* OFF: dark slate track */
+.toggle-track {
+    -fx-background-color: rgba(50, 65, 95, 0.90);
+    -fx-background-radius: 13;
+    -fx-border-color: rgba(80, 105, 155, 0.50);
+    -fx-border-width: 1;
+    -fx-border-radius: 13;
+}
+
+/* ON: vibrant teal/blue track */
+.toggle-on .toggle-track {
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 0%, #1a7a6a, #2a9d8f);
+    -fx-border-color: rgba(42, 157, 143, 0.7);
+}
+
+/* Sliding knob (circle) */
+.toggle-knob {
+    -fx-background-color: linear-gradient(from 0% 0% to 0% 100%, #e8eaf6, #b0bec5);
+    -fx-background-radius: 10;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.45), 5, 0, 0, 1);
+}
+
+/* When ON, knob brightens slightly */
+.toggle-on .toggle-knob {
+    -fx-background-color: linear-gradient(from 0% 0% to 0% 100%, #ffffff, #cfd8dc);
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.35), 6, 0, 0, 2);
+}
+
+/* Hover lift */
+.toggle-switch:hover .toggle-track {
+    -fx-border-color: rgba(120, 160, 220, 0.75);
+}
+.toggle-switch:hover .toggle-knob {
+    -fx-effect: dropshadow(gaussian, rgba(40, 160, 200, 0.55), 9, 0.1, 0, 2);
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   OPTION BUTTONS  (Gen 1 / Gen 2 / Gen 3 / English / Japanese)
+   ───────────────────────────────────────────────────────────────────────────── */
+
+.option-btn {
+    -fx-background-color: rgba(35, 50, 80, 0.80);
+    -fx-background-radius: 20;
+    -fx-border-color: rgba(90, 125, 185, 0.40);
+    -fx-border-width: 1;
+    -fx-border-radius: 20;
+    -fx-text-fill: #a8b8d8;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 5 14 5 14;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.30), 4, 0, 0, 1);
+}
+
+/* Hover — pill lifts */
+.option-btn:hover {
+    -fx-background-color: rgba(55, 80, 125, 0.90);
+    -fx-border-color: rgba(120, 165, 230, 0.65);
+    -fx-text-fill: #d0dcf4;
+    -fx-effect: dropshadow(gaussian, rgba(60, 120, 220, 0.45), 8, 0.1, 0, 2);
+}
+
+/* Selected state — filled accent pill */
+.option-selected {
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #1d5c9e, #2a9d8f);
+    -fx-border-color: rgba(42, 157, 200, 0.80);
+    -fx-text-fill: #ffffff;
+    -fx-effect: dropshadow(gaussian, rgba(30, 120, 200, 0.55), 10, 0.15, 0, 2);
+}
+.option-selected:hover {
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #2470c2, #34b8a8);
+    -fx-border-color: rgba(60, 175, 220, 0.90);
+}
+
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   2.5D CLOSE-X BUTTON
    Two background layers simulate a raised slab:
-     Layer 0 (painted first, deepest) = dark-red "depth" edge
-     Layer 1 (painted on top)         = gradient button face
-   The face has a 4px bottom inset so the depth edge peeks out below,
-   creating a physical 3-D raised look.
-   On press the insets flip so the face appears to sink INTO the button.
-   ============================================= */
+     Layer 0 = dark-red depth edge
+     Layer 1 = gradient face
+   On press insets flip → face sinks into slab.
+   ───────────────────────────────────────────────────────────────────────────── */
 
 .close-x-button {
-    /* Layer 0: dark-red depth slab; Layer 1: light-to-dark red face */
     -fx-background-color:
         #6b0000,
         linear-gradient(from 0% 0% to 0% 100%, #ff5c5c, #c0392b);
-    /* Face sits 4 px above bottom → depth rim shows underneath */
     -fx-background-insets: 0, 0 0 4 0;
     -fx-background-radius: 100em, 100em;
 
-    -fx-min-width:  34px;
-    -fx-min-height: 34px;
-    -fx-max-width:  34px;
-    -fx-max-height: 34px;
-    -fx-pref-width: 34px;
-    -fx-pref-height: 34px;
+    -fx-min-width:  34px;   -fx-max-width:  34px;   -fx-pref-width:  34px;
+    -fx-min-height: 34px;   -fx-max-height: 34px;   -fx-pref-height: 34px;
 
     -fx-text-fill: white;
     -fx-font-size: 14px;
     -fx-font-weight: bold;
     -fx-cursor: hand;
-
-    /* Outer glow — reinforces the raised appearance */
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.55), 8, 0, 0, 4);
 }
 
@@ -86,17 +241,13 @@
         #6b0000,
         linear-gradient(from 0% 0% to 0% 100%, #ff7c7c, #e74c3c);
     -fx-background-insets: 0, 0 0 4 0;
-    /* Bigger glow on hover = button "comes forward" */
-    -fx-effect: dropshadow(gaussian, rgba(200, 0, 0, 0.5), 12, 0.2, 0, 5);
+    -fx-effect: dropshadow(gaussian, rgba(200, 0, 0, 0.50), 12, 0.2, 0, 5);
 }
 
 .close-x-button:pressed {
-    /* Face inset flips: now 4 px from TOP, 0 from bottom
-       The dark slab now peeks out on TOP → button looks pushed IN */
     -fx-background-color:
         #6b0000,
         linear-gradient(from 0% 0% to 0% 100%, #8b1a1a, #a93226);
     -fx-background-insets: 0, 4 0 0 0;
-    /* Shadow nearly gone when pressed flush */
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 3, 0, 0, 1);
 }
