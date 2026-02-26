@@ -1,239 +1,186 @@
-/* ════════════════════════════════════════════════════════════════════════════
-   Settings Overlay — Full stylesheet
-   Architecture:
-     • Overlay chrome  (.overlay-root, .overlay-container, .overlay-title)
-     • Section layout  (.settings-section, .section-row, .section-divider …)
-     • Toggle switch   (.toggle-switch, .toggle-track, .toggle-knob, .toggle-on)
-     • Option buttons  (.option-btn, .option-selected)
-     • State modifiers (.section-disabled)
-     • Close ✕ button  (.close-x-button)
-   ════════════════════════════════════════════════════════════════════════════ */
 
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   OVERLAY CHROME
-   ───────────────────────────────────────────────────────────────────────────── */
-
-/* Full-screen translucent backdrop */
 .overlay-root {
-    -fx-background-color: rgba(0, 0, 0, 0.58);
+    -fx-background-color: rgba(0, 0, 0, 0.55);
 }
 
-/* Card panel */
 .overlay-container {
-    -fx-background-color: rgba(14, 22, 40, 0.95);
-    -fx-background-radius: 20;
-    -fx-border-color: rgba(100, 145, 210, 0.40);
+    -fx-background-color: rgba(20, 50, 47, 0.95);
+    -fx-background-radius: 18;
+    -fx-border-color: rgba(120, 220, 220, 0.45);
     -fx-border-width: 1.5;
-    -fx-border-radius: 20;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.70), 36, 0, 0, 10);
+    -fx-border-radius: 18;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.6), 30, 0, 0, 8);
 }
-
-/* Panel title */
 .overlay-title {
-    -fx-font-size: 13px;
+    -fx-font-size: 26px;
     -fx-font-weight: bold;
-    -fx-text-fill: rgba(160, 185, 230, 0.75);
-    -fx-letter-spacing: 3px;
+    -fx-text-fill: #e8eaf6;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 6, 0, 0, 2);
+    -fx-alignment: CENTER;
 }
-
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   SCROLL PANE — strips default chrome
-   ───────────────────────────────────────────────────────────────────────────── */
-
-.settings-scroll {
-    -fx-background-color: transparent;
-    -fx-border-color: transparent;
-    -fx-padding: 0;
-}
-.settings-scroll > .viewport {
-    -fx-background-color: transparent;
-}
-.settings-scroll .scroll-bar:vertical {
-    -fx-background-color: transparent;
-    -fx-pref-width: 6px;
-}
-.settings-scroll .scroll-bar:vertical .thumb {
-    -fx-background-color: rgba(100, 140, 200, 0.35);
-    -fx-background-radius: 3;
-}
-.settings-scroll .scroll-bar:vertical .track,
-.settings-scroll .scroll-bar:vertical .increment-button,
-.settings-scroll .scroll-bar:vertical .decrement-button {
-    -fx-background-color: transparent;
-    -fx-padding: 0;
-}
-.settings-scroll .corner { -fx-background-color: transparent; }
-
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   SECTIONS CONTAINER
-   ───────────────────────────────────────────────────────────────────────────── */
-
-.sections-container {
-    -fx-background-color: transparent;
-    -fx-padding: 0 4 0 4;
-}
-
-/* Individual section wrapper */
-.settings-section {
-    -fx-padding: 14 0 14 0;
-}
-
-/* Label + control row inside a section */
-.section-row {
-    -fx-alignment: CENTER_LEFT;
-    -fx-min-height: 32;
-}
-
-/* Section heading */
-.section-title {
-    -fx-font-size: 15px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #cdd8f0;
-}
-
-/* Horizontal rule between sections */
 .section-divider {
-    -fx-background-color: rgba(100, 130, 190, 0.22);
-    -fx-pref-height: 1;
+    -fx-background-color: rgba(120, 220, 213, 0.18);
+    -fx-min-height: 1;
     -fx-max-height: 1;
+    -fx-pref-height: 1;
+}
+.settings-section {
+    /* breathing room */
 }
 
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   SUB-SECTION  ("Choose Sound" row)
-   ───────────────────────────────────────────────────────────────────────────── */
+.section-label {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #cfdcd9;
+    -fx-min-width: 180px;
+}
 
 .sub-section {
-    -fx-padding: 8 0 0 2;
+    -fx-padding: 0 0 0 4;
+    -fx-opacity: 1;
+    transition: opacity 200ms ease;
 }
 
-.sub-section-label {
+.sub-label {
     -fx-font-size: 12px;
-    -fx-text-fill: rgba(160, 180, 220, 0.65);
-    -fx-font-weight: bold;
-    -fx-letter-spacing: 1px;
+    -fx-text-fill: #90aea1;
 }
 
-/* Dimmed + non-interactive when its parent sound is OFF */
 .section-disabled {
     -fx-opacity: 0.35;
 }
 
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   TOGGLE SWITCH
-   Anatomy: outer StackPane (.toggle-switch)
-              └─ Region track  (.toggle-track)
-              └─ Region knob   (.toggle-knob)   ← translated by Java code
-   The track changes colour via the .toggle-on modifier on the parent.
-   ───────────────────────────────────────────────────────────────────────────── */
-
 .toggle-switch {
+    -fx-pref-width: 48px;
+    -fx-pref-height: 24px;
+    -fx-min-width: 48px;
+    -fx-min-height: 24px;
+    -fx-max-width: 48px;
+    -fx-max-height: 24px;
+    -fx-background-radius: 100em;
     -fx-cursor: hand;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 3;
 }
 
-/* OFF: dark slate track */
-.toggle-track {
-    -fx-background-color: rgba(50, 65, 95, 0.90);
-    -fx-background-radius: 13;
-    -fx-border-color: rgba(80, 105, 155, 0.50);
+.toggle-off {
+    -fx-background-color: rgba(80, 130, 119, 0.6);
+    -fx-border-color: rgba(100, 170, 148, 0.4);
     -fx-border-width: 1;
-    -fx-border-radius: 13;
+    -fx-border-radius: 100em;
 }
 
-/* ON: vibrant teal/blue track */
-.toggle-on .toggle-track {
-    -fx-background-color: linear-gradient(from 0% 0% to 100% 0%, #1a7a6a, #2a9d8f);
-    -fx-border-color: rgba(42, 157, 143, 0.7);
+.toggle-on {
+    -fx-background-color: linear-gradient(to right, #15c0af, #42f5ef);
+    -fx-border-color: rgba(66, 245, 206, 0.5);
+    -fx-border-width: 1;
+    -fx-border-radius: 100em;
+    -fx-effect: dropshadow(gaussian, rgba(66, 245, 215, 0.4), 8, 0, 0, 0);
 }
 
-/* Sliding knob (circle) */
 .toggle-knob {
-    -fx-background-color: linear-gradient(from 0% 0% to 0% 100%, #e8eaf6, #b0bec5);
-    -fx-background-radius: 10;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.45), 5, 0, 0, 1);
+    -fx-pref-width: 18px;
+    -fx-pref-height: 18px;
+    -fx-min-width: 18px;
+    -fx-min-height: 18px;
+    -fx-max-width: 18px;
+    -fx-max-height: 18px;
+    -fx-background-radius: 100em;
+    -fx-background-color: white;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 4, 0, 0, 1);
 }
-
-/* When ON, knob brightens slightly */
-.toggle-on .toggle-knob {
-    -fx-background-color: linear-gradient(from 0% 0% to 0% 100%, #ffffff, #cfd8dc);
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.35), 6, 0, 0, 2);
-}
-
-/* Hover lift */
-.toggle-switch:hover .toggle-track {
-    -fx-border-color: rgba(120, 160, 220, 0.75);
-}
-.toggle-switch:hover .toggle-knob {
-    -fx-effect: dropshadow(gaussian, rgba(40, 160, 200, 0.55), 9, 0.1, 0, 2);
-}
-
-
-/* ─────────────────────────────────────────────────────────────────────────────
-   OPTION BUTTONS  (Gen 1 / Gen 2 / Gen 3 / English / Japanese)
-   ───────────────────────────────────────────────────────────────────────────── */
 
 .option-btn {
-    -fx-background-color: rgba(35, 50, 80, 0.80);
-    -fx-background-radius: 20;
-    -fx-border-color: rgba(90, 125, 185, 0.40);
+    -fx-background-color: rgba(40, 80, 71, 0.8);
+    -fx-background-radius: 8;
+    -fx-border-color: rgba(100, 200, 177, 0.35);
     -fx-border-width: 1;
-    -fx-border-radius: 20;
-    -fx-text-fill: #a8b8d8;
+    -fx-border-radius: 8;
+    -fx-text-fill: #90aea6;
     -fx-font-size: 12px;
     -fx-font-weight: bold;
-    -fx-padding: 5 14 5 14;
+    -fx-pref-width: 72px;
+    -fx-pref-height: 30px;
     -fx-cursor: hand;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.30), 4, 0, 0, 1);
 }
 
-/* Hover — pill lifts */
 .option-btn:hover {
-    -fx-background-color: rgba(55, 80, 125, 0.90);
-    -fx-border-color: rgba(120, 165, 230, 0.65);
-    -fx-text-fill: #d0dcf4;
-    -fx-effect: dropshadow(gaussian, rgba(60, 120, 220, 0.45), 8, 0.1, 0, 2);
+    -fx-background-color: rgba(60, 115, 103, 0.9);
+    -fx-border-color: rgba(130, 230, 227, 0.6);
+    -fx-text-fill: #cfd8dc;
 }
 
-/* Selected state — filled accent pill */
-.option-selected {
-    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #1d5c9e, #2a9d8f);
-    -fx-border-color: rgba(42, 157, 200, 0.80);
-    -fx-text-fill: #ffffff;
-    -fx-effect: dropshadow(gaussian, rgba(30, 120, 200, 0.55), 10, 0.15, 0, 2);
-}
-.option-selected:hover {
-    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #2470c2, #34b8a8);
-    -fx-border-color: rgba(60, 175, 220, 0.90);
+.option-btn:disabled {
+    -fx-opacity: 1; 
+    -fx-cursor: default;
 }
 
+.option-btn.option-selected {
+    -fx-background-color: linear-gradient(to bottom, #10985f, #50b997);
+    -fx-border-color: #42f5c2;
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(gaussian, rgba(66, 245, 173, 0.45), 6, 0, 0, 2);
+}
+.segmented-group {
+    -fx-background-color: rgba(30, 65, 53, 0.8);
+    -fx-background-radius: 8;
+    -fx-border-color: rgba(100, 200, 158, 0.35);
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+}
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   2.5D CLOSE-X BUTTON
-   Two background layers simulate a raised slab:
-     Layer 0 = dark-red depth edge
-     Layer 1 = gradient face
-   On press insets flip → face sinks into slab.
-   ───────────────────────────────────────────────────────────────────────────── */
+.seg-btn {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-border-width: 0;
+    -fx-text-fill: #789c94;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-pref-width: 90px;
+    -fx-pref-height: 30px;
+    -fx-cursor: hand;
+}
 
+.seg-btn:hover {
+    -fx-background-color: rgba(66, 245, 179, 0.12);
+    -fx-text-fill: #cfdcd4;
+}
+
+.seg-left {
+    -fx-background-radius: 7 0 0 7;
+}
+
+.seg-right {
+    -fx-background-radius: 0 7 7 0;
+}
+
+.seg-btn.option-selected {
+    -fx-background-color: linear-gradient(to bottom, #19d2b6, #4bcaa2);
+    -fx-text-fill: white;
+    -fx-effect: none;
+}
 .close-x-button {
     -fx-background-color:
         #6b0000,
         linear-gradient(from 0% 0% to 0% 100%, #ff5c5c, #c0392b);
     -fx-background-insets: 0, 0 0 4 0;
     -fx-background-radius: 100em, 100em;
-
-    -fx-min-width:  34px;   -fx-max-width:  34px;   -fx-pref-width:  34px;
-    -fx-min-height: 34px;   -fx-max-height: 34px;   -fx-pref-height: 34px;
-
+    -fx-min-width: 34px;  -fx-pref-width: 34px;  -fx-max-width: 34px;
+    -fx-min-height: 34px; -fx-pref-height: 34px; -fx-max-height: 34px;
     -fx-text-fill: white;
     -fx-font-size: 14px;
     -fx-font-weight: bold;
     -fx-cursor: hand;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.55), 8, 0, 0, 4);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.55), 8, 0, 0, 4);
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+.close-x-button:focused {
+    -fx-background-color:
+        #6b0000,
+        linear-gradient(from 0% 0% to 0% 100%, #ff5c5c, #c0392b);
+    -fx-background-insets: 0, 0 0 4 0;
+    -fx-text-fill: white;
 }
 
 .close-x-button:hover {
@@ -241,7 +188,7 @@
         #6b0000,
         linear-gradient(from 0% 0% to 0% 100%, #ff7c7c, #e74c3c);
     -fx-background-insets: 0, 0 0 4 0;
-    -fx-effect: dropshadow(gaussian, rgba(200, 0, 0, 0.50), 12, 0.2, 0, 5);
+    -fx-effect: dropshadow(gaussian, rgba(200,0,0,0.5), 12, 0.2, 0, 5);
 }
 
 .close-x-button:pressed {
@@ -249,5 +196,23 @@
         #6b0000,
         linear-gradient(from 0% 0% to 0% 100%, #8b1a1a, #a93226);
     -fx-background-insets: 0, 4 0 0 0;
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 3, 0, 0, 1);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 3, 0, 0, 1);
+}
+.button-blue {
+    -fx-background-color: linear-gradient(to bottom, #19d29e, #54b79b);
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-text-fill: white;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(21, 192, 146, 0.5), 8, 0, 0, 3);
+}
+
+.button-blue:hover {
+    -fx-background-color: linear-gradient(to bottom, #1ee59c, #10a985);
+}
+
+.button-blue:pressed {
+    -fx-background-color: linear-gradient(to bottom, #0da175, #15c09e);
 }

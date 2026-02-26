@@ -3,9 +3,9 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
@@ -18,152 +18,85 @@
            alignment="CENTER"
            stylesheets="@../css/common.css,@../css/settings_overlay.css"
            onMouseClicked="#onBackgroundClick">
-
-    <!-- Card wrapper: constrained so X button can overhang the corner -->
-    <StackPane maxWidth="640" pickOnBounds="false">
-
-        <!-- ═══════════════ MAIN CARD ═══════════════ -->
-        <VBox styleClass="overlay-container" spacing="0"
+    <StackPane maxWidth="540" maxHeight="600" pickOnBounds="false">
+        <VBox alignment="TOP_CENTER" spacing="0" styleClass="overlay-container"
               onMouseClicked="#onCardClick">
             <padding>
-                <Insets top="22" bottom="22" left="28" right="28"/>
+                <Insets top="28" bottom="28" left="32" right="32"/>
             </padding>
-
-            <!-- ── Title ── -->
-            <Label text="SETTINGS" styleClass="overlay-title">
-                <font><Font name="System Bold" size="26"/></font>
-                <VBox.margin><Insets bottom="18"/></VBox.margin>
+            <Label text="Settings" styleClass="overlay-title">
+                <VBox.margin><Insets bottom="20"/></VBox.margin>
             </Label>
-
-            <!-- ────────────── ScrollPane for all sections ────────────── -->
-            <ScrollPane styleClass="settings-scroll" fitToWidth="true"
-                        prefHeight="380" maxHeight="400" hbarPolicy="NEVER">
-                <VBox styleClass="sections-container" spacing="0">
-
-                    <!-- ══════════ SECTION: Game Sound ══════════ -->
-                    <VBox styleClass="settings-section" spacing="10">
-                        <!-- Row 1: label + toggle -->
-                        <HBox alignment="CENTER_LEFT" spacing="0" styleClass="section-row">
-                            <Label text="Game Sound" styleClass="section-title" HBox.hgrow="ALWAYS"/>
-                            <Region HBox.hgrow="ALWAYS"/>
-                            <!-- Toggle switch -->
-                            <StackPane fx:id="gameSoundToggle"
-                                       styleClass="toggle-switch"
-                                       onMouseClicked="#onGameSoundToggle"
-                                       prefWidth="48" prefHeight="26"
-                                       minWidth="48" minHeight="26">
-                                <Region fx:id="gameSoundTrack" styleClass="toggle-track"
-                                        prefWidth="48" prefHeight="26"/>
-                                <Region fx:id="gameSoundKnob" styleClass="toggle-knob"
-                                        prefWidth="20" prefHeight="20"
-                                        StackPane.alignment="CENTER_LEFT"
-                                        translateX="3"/>
-                            </StackPane>
-                        </HBox>
-
-                        <!-- Row 2: sound picker (disabled when off) -->
-                        <VBox fx:id="gameSoundSubSection" styleClass="sub-section" spacing="6">
-                            <Label text="Choose Sound" styleClass="sub-section-label"/>
-                            <HBox spacing="8" alignment="CENTER_LEFT">
-                                <Label fx:id="gameSoundGen1" text="Gen 1" styleClass="option-btn"
-                                       onMouseClicked="#onGameSoundGen1"/>
-                                <Label fx:id="gameSoundGen2" text="Gen 2" styleClass="option-btn"
-                                       onMouseClicked="#onGameSoundGen2"/>
-                                <Label fx:id="gameSoundGen3" text="Gen 3" styleClass="option-btn"
-                                       onMouseClicked="#onGameSoundGen3"/>
-                            </HBox>
-                        </VBox>
-                    </VBox>
-
-                    <!-- section divider -->
-                    <Region styleClass="section-divider"/>
-
-                    <!-- ══════════ SECTION: Battle Sound ══════════ -->
-                    <VBox styleClass="settings-section" spacing="10">
-                        <HBox alignment="CENTER_LEFT" spacing="0" styleClass="section-row">
-                            <Label text="Battle Sound" styleClass="section-title" HBox.hgrow="ALWAYS"/>
-                            <Region HBox.hgrow="ALWAYS"/>
-                            <StackPane fx:id="battleSoundToggle"
-                                       styleClass="toggle-switch"
-                                       onMouseClicked="#onBattleSoundToggle"
-                                       prefWidth="48" prefHeight="26"
-                                       minWidth="48" minHeight="26">
-                                <Region fx:id="battleSoundTrack" styleClass="toggle-track"
-                                        prefWidth="48" prefHeight="26"/>
-                                <Region fx:id="battleSoundKnob" styleClass="toggle-knob"
-                                        prefWidth="20" prefHeight="20"
-                                        StackPane.alignment="CENTER_LEFT"
-                                        translateX="3"/>
-                            </StackPane>
-                        </HBox>
-
-                        <VBox fx:id="battleSoundSubSection" styleClass="sub-section" spacing="6">
-                            <Label text="Choose Sound" styleClass="sub-section-label"/>
-                            <HBox spacing="8" alignment="CENTER_LEFT">
-                                <Label fx:id="battleSoundGen1" text="Gen 1" styleClass="option-btn"
-                                       onMouseClicked="#onBattleSoundGen1"/>
-                                <Label fx:id="battleSoundGen2" text="Gen 2" styleClass="option-btn"
-                                       onMouseClicked="#onBattleSoundGen2"/>
-                                <Label fx:id="battleSoundGen3" text="Gen 3" styleClass="option-btn"
-                                       onMouseClicked="#onBattleSoundGen3"/>
-                            </HBox>
-                        </VBox>
-                    </VBox>
-
-                    <!-- section divider -->
-                    <Region styleClass="section-divider"/>
-
-                    <!-- ══════════ SECTION: Show Move Animation ══════════ -->
-                    <VBox styleClass="settings-section" spacing="10">
-                        <HBox alignment="CENTER_LEFT" spacing="0" styleClass="section-row">
-                            <Label text="Show Move Animation" styleClass="section-title"/>
-                            <Region HBox.hgrow="ALWAYS"/>
-                            <StackPane fx:id="animationToggle"
-                                       styleClass="toggle-switch"
-                                       onMouseClicked="#onAnimationToggle"
-                                       prefWidth="48" prefHeight="26"
-                                       minWidth="48" minHeight="26">
-                                <Region fx:id="animationTrack" styleClass="toggle-track"
-                                        prefWidth="48" prefHeight="26"/>
-                                <Region fx:id="animationKnob" styleClass="toggle-knob"
-                                        prefWidth="20" prefHeight="20"
-                                        StackPane.alignment="CENTER_LEFT"
-                                        translateX="3"/>
-                            </StackPane>
-                        </HBox>
-                    </VBox>
-
-                    <!-- section divider -->
-                    <Region styleClass="section-divider"/>
-
-                    <!-- ══════════ SECTION: Language ══════════ -->
-                    <VBox styleClass="settings-section" spacing="10">
-                        <HBox alignment="CENTER_LEFT" spacing="0" styleClass="section-row">
-                            <Label text="Language" styleClass="section-title"/>
-                            <Region HBox.hgrow="ALWAYS"/>
-                            <HBox spacing="8" alignment="CENTER_RIGHT">
-                                <Label fx:id="langEnglish" text="English" styleClass="option-btn"
-                                       onMouseClicked="#onLangEnglish"/>
-                                <Label fx:id="langJapanese" text="日本語" styleClass="option-btn"
-                                       onMouseClicked="#onLangJapanese"/>
-                            </HBox>
-                        </HBox>
-                    </VBox>
-
+            <VBox styleClass="settings-section" spacing="10">
+                <HBox alignment="CENTER_LEFT" spacing="12">
+                    <Label text="Game Sound" styleClass="section-label"/>
+                    <StackPane fx:id="gameSoundToggle" styleClass="toggle-switch,toggle-off"
+                               onMouseClicked="#onGameSoundToggle">
+                        <StackPane fx:id="gameSoundKnob" styleClass="toggle-knob"/>
+                    </StackPane>
+                </HBox>
+                <VBox fx:id="gameSoundSubSection" styleClass="sub-section" spacing="6">
+                    <Label text="Choose Sound" styleClass="sub-label"/>
+                    <HBox spacing="8">
+                        <Button fx:id="gameGen1Btn" text="Gen 1" styleClass="option-btn"
+                                onAction="#onGameGenSelect" userData="1"/>
+                        <Button fx:id="gameGen2Btn" text="Gen 2" styleClass="option-btn"
+                                onAction="#onGameGenSelect" userData="2"/>
+                        <Button fx:id="gameGen3Btn" text="Gen 3" styleClass="option-btn"
+                                onAction="#onGameGenSelect" userData="3"/>
+                    </HBox>
                 </VBox>
-            </ScrollPane>
+            </VBox>
+            <StackPane styleClass="section-divider"><VBox.margin><Insets top="14" bottom="14"/></VBox.margin></StackPane>
+            <VBox styleClass="settings-section" spacing="10">
+                <HBox alignment="CENTER_LEFT" spacing="12">
+                    <Label text="Battle Sound" styleClass="section-label"/>
+                    <StackPane fx:id="battleSoundToggle" styleClass="toggle-switch,toggle-off"
+                               onMouseClicked="#onBattleSoundToggle">
+                        <StackPane fx:id="battleSoundKnob" styleClass="toggle-knob"/>
+                    </StackPane>
+                </HBox>
+                <VBox fx:id="battleSoundSubSection" styleClass="sub-section" spacing="6">
+                    <Label text="Choose Sound" styleClass="sub-label"/>
+                    <HBox spacing="8">
+                        <Button fx:id="battleGen1Btn" text="Gen 1" styleClass="option-btn"
+                                onAction="#onBattleGenSelect" userData="1"/>
+                        <Button fx:id="battleGen2Btn" text="Gen 2" styleClass="option-btn"
+                                onAction="#onBattleGenSelect" userData="2"/>
+                        <Button fx:id="battleGen3Btn" text="Gen 3" styleClass="option-btn"
+                                onAction="#onBattleGenSelect" userData="3"/>
+                    </HBox>
+                </VBox>
+            </VBox>
+            <StackPane styleClass="section-divider"><VBox.margin><Insets top="14" bottom="14"/></VBox.margin></StackPane>
+            <VBox styleClass="settings-section" spacing="0">
+                <HBox alignment="CENTER_LEFT" spacing="12">
+                    <Label text="Show Move Animation" styleClass="section-label"/>
+                    <StackPane fx:id="animationToggle" styleClass="toggle-switch,toggle-off"
+                               onMouseClicked="#onAnimationToggle">
+                        <StackPane fx:id="animationKnob" styleClass="toggle-knob"/>
+                    </StackPane>
+                </HBox>
+            </VBox>
 
-            <!-- ── Close button ── -->
-            <HBox alignment="CENTER">
-                <VBox.margin><Insets top="16"/></VBox.margin>
-                <Button fx:id="closeButton" text="Close"
-                        onAction="#onCloseButtonClick"
-                        prefWidth="110"
-                        styleClass="button-blue"/>
-            </HBox>
+            <StackPane styleClass="section-divider"><VBox.margin><Insets top="14" bottom="14"/></VBox.margin></StackPane>
+            <VBox styleClass="settings-section" spacing="10">
+                <HBox alignment="CENTER_LEFT" spacing="12">
+                    <Label text="Language" styleClass="section-label"/>
+                    <HBox spacing="0" styleClass="segmented-group">
+                        <Button fx:id="langEnBtn" text="English" styleClass="seg-btn,seg-left,option-selected"
+                                onAction="#onLanguageSelect" userData="en"/>
+                        <Button fx:id="langJpBtn" text="日本語" styleClass="seg-btn,seg-right"
+                                onAction="#onLanguageSelect" userData="jp"/>
+                    </HBox>
+                </HBox>
+            </VBox>
+            <Button fx:id="closeButton" text="Close"
+                    onAction="#onCloseButtonClick"
+                    prefWidth="110" styleClass="button-blue">
+                <VBox.margin><Insets top="22"/></VBox.margin>
+            </Button>
         </VBox>
-
-        <!-- X close button — pinned to the top-right corner of the card -->
         <Button fx:id="closeXButton" text="✕"
                 onAction="#onCloseButtonClick"
                 styleClass="close-x-button"
