@@ -112,10 +112,13 @@ public class PokemonInstance extends PokemonSpecies {
 
     /**
      * Factory helper - creates a `PokemonInstance` and attaches up to 4 moves.
+     * If chosenMoves is non-null and non-empty the species' pre-selected moves
+     * are replaced with the explicitly provided ones.
      */
     public static PokemonInstance fromSpeciesWithMoves(PokemonSpecies species, int level, List<Move> chosenMoves) {
         PokemonInstance inst = new PokemonInstance(species, level);
-        if (chosenMoves != null) {
+        if (chosenMoves != null && !chosenMoves.isEmpty()) {
+            inst.moves.clear(); // discard moves populated by the constructor
             for (int i = 0; i < chosenMoves.size() && i < 4; i++) {
                 inst.addMove(chosenMoves.get(i));
             }

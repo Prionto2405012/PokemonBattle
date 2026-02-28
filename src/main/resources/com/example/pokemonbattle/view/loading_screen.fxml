@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.media.MediaView?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.control.Label?>
+
+<StackPane fx:id="rootPane"
+           fx:controller="com.example.pokemonbattle.controller.LoadingScreenController"
+           xmlns:fx="http://javafx.com/fxml"
+           prefWidth="1200" prefHeight="700"
+           style="-fx-background-color: black;">
+
+    <!-- Pikachu video background, looping -->
+    <MediaView fx:id="bgVideo" mouseTransparent="true"
+               fitWidth="1200" fitHeight="700"
+               preserveRatio="false"/>
+
+    <!-- Progress UI anchored near bottom -->
+    <VBox alignment="CENTER" spacing="10" translateY="280">
+
+        <!-- Track + Fill -->
+        <StackPane prefWidth="500" prefHeight="10">
+            <!-- Background track -->
+            <Rectangle width="500" height="10" arcWidth="10" arcHeight="10"
+                       style="-fx-fill: rgba(255,255,255,0.25);"/>
+            <!-- Animated fill -->
+            <Rectangle fx:id="progressFill" width="0" height="10"
+                       arcWidth="10" arcHeight="10"
+                       style="-fx-fill: #ffcb05;"/>
+        </StackPane>
+
+        <!-- Percentage label -->
+        <Label fx:id="loadingLabel" text="Loading... 0%"
+               style="-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+
+    </VBox>
+
+</StackPane>
+

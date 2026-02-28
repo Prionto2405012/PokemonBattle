@@ -1,0 +1,89 @@
+/* ============================================================
+   POKEMON BATTLE - LOADING SCREEN
+   AAA-Quality Animated Loading Screen with Pokeball
+   ============================================================ */
+
+/* ==================== ROOT & BACKGROUND ==================== */
+
+.loading-root {
+    -fx-background-image: url('../assets/menu3.png');
+    -fx-background-size: cover;
+    -fx-background-position: center;
+    -fx-background-repeat: no-repeat;
+}
+
+.background-gradient {
+    /* Additional overlay gradient over background image */
+    -fx-background-color: radial-gradient(
+        focus-angle 0deg,
+        focus-distance 0%,
+        center 50% 50%,
+        radius 70%,
+        rgba(0, 0, 0, 0.3) 0%,
+        rgba(0, 0, 0, 0.5) 50%,
+        rgba(0, 0, 0, 0.7) 100%
+    );
+}
+
+.particle-layer {
+    /* JavaScript will add animated particles here */
+}
+
+
+/* ==================== PROGRESS BAR ==================== */
+
+.progress-container {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 20, 0.4, 0, 5);
+}
+
+.progress-track {
+    -fx-fill: rgba(255, 255, 255, 0.1);
+    -fx-arc-width: 8;
+    -fx-arc-height: 8;
+    -fx-stroke: rgba(255, 255, 255, 0.2);
+    -fx-stroke-width: 1;
+}
+
+.progress-fill {
+    -fx-fill: linear-gradient(
+        to right,
+        #8a2be2 0%,
+        #9d4edd 30%,
+        #c77dff 70%,
+        #e0aaff 100%
+    );
+    -fx-arc-width: 8;
+    -fx-arc-height: 8;
+    -fx-effect: dropshadow(gaussian, rgba(138, 43, 226, 0.8), 15, 0.8, 0, 0);
+}
+
+/* ==================== TEXT STYLING ==================== */
+
+.title-text {
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 48px;
+    -fx-font-weight: 900;
+    -fx-font-family: "Arial Black", sans-serif;
+    -fx-effect: dropshadow(gaussian, rgba(138, 43, 226, 0.8), 20, 0.8, 0, 0);
+}
+
+.subtitle-text {
+    -fx-text-fill: rgba(224, 170, 255, 0.8);
+    -fx-font-size: 16px;
+    -fx-font-weight: 400;
+    -fx-font-style: italic;
+}
+
+.loading-text {
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 28px;
+    -fx-font-weight: 700;
+    -fx-effect: dropshadow(gaussian, rgba(138, 43, 226, 0.6), 10, 0.6, 0, 0);
+}
+
+.status-text {
+    -fx-text-fill: rgba(255, 255, 255, 0.7);
+    -fx-font-size: 14px;
+    -fx-font-weight: 400;
+    -fx-font-style: italic;
+}

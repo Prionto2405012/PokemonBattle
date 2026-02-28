@@ -37,18 +37,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
-/**
- * Controller for the Battle Setup Screen.
- * Handles game mode selection, opponent matching, and team building.
- * 
- * FIXED ISSUES:
- * - Toggle buttons now only show borders after user interaction
- * - Start button properly enabled/disabled based on team validity
- * - AI team generation ensures no duplicates and matches player team size
- * - Custom team selection enforces max 6 Pokemon and no duplicates
- * - Scene transitions properly pass player and opponent data
- * - Improved UX with proper spacing, fonts, and feedback
- */
 @SuppressWarnings("unused")
 public class NewGameController {
 
@@ -295,8 +283,6 @@ public class NewGameController {
             for (PokemonSpecies pokemon : allPokemon) {
                 pokemon.selectRandomMoves(allMoves);
             }
-            
-            // Set the static reference for PokemonInstance to use
             PokemonInstance.setAllPokemonSpecies(allPokemon);
             PokemonInstance.setAllMoves(allMoves);
             
@@ -304,15 +290,10 @@ public class NewGameController {
         } catch (Exception e) {
             System.err.println("Error loading game data from JSON: " + e.getMessage());
             e.printStackTrace();
-            // Fallback to empty lists to prevent crashes
             allMoves = new HashMap<>();
             allPokemon = new ArrayList<>();
         }
     }
-    
-    /**
-     * Load a JSON file from resources
-     */
     private String loadJsonFromResource(String resourcePath) throws IOException {
         try (InputStream inputStream = getClass().getResourceAsStream(resourcePath)) {
             if (inputStream == null) {
@@ -322,12 +303,7 @@ public class NewGameController {
             return new String(bytes, StandardCharsets.UTF_8);
         }
     }
-
-    /**
-     * Setup initial UI state
-     */
     private void setupUI() {
-        // Setup team count label
         updateTeamCountLabel();
 
         // Setup start button
@@ -341,30 +317,17 @@ public class NewGameController {
             editTeamButton.setOnAction(e -> showPokemonSelectionOverlay());
         }
     }
-
-    /**
-     * Set default selections (no buttons selected, all states null)
-     */
     private void setDefaultSelections() {
-        // No buttons selected initially
         soloModeButton.setSelected(false);
         aiOpponentButton.setSelected(false);
         randomTeamButton.setSelected(false);
-
-        // All states remain null until user interaction
         selectedMode = null;
         selectedOpponent = null;
         selectedTeamType = null;
-
-        // Update UI based on null states
         updateUIForMode();
         updateOpponentStatus();
         updateTeamSelectionUI();
     }
-
-    /**
-     * Update UI based on selected game mode
-     */
     private void updateUIForMode() {
         if (selectedMode == null) {
             matchingStatusLabel.setText("Please select a game mode");
@@ -377,10 +340,6 @@ public class NewGameController {
         }
         updateStartButtonState();
     }
-
-    /**
-     * Update opponent status message
-     */
     private void updateOpponentStatus() {
         if (selectedOpponent == null) {
             matchingStatusLabel.setText("Please select an opponent type");
@@ -394,16 +353,11 @@ public class NewGameController {
         }
         updateStartButtonState();
     }
-
-    /**
-     * Update team selection UI based on random/custom choice
-     */
     private void updateTeamSelectionUI() {
         if (pokemonScrollPane == null || selectedTeamBox == null)
             return;
 
         if (selectedTeamType == null) {
-            // Hide both UIs when nothing selected
             pokemonScrollPane.setVisible(false);
             pokemonScrollPane.setManaged(false);
             selectedTeamBox.setVisible(false);
@@ -845,7 +799,7 @@ public class NewGameController {
         aiOpponent.getTeam().forEach(p -> System.out.println("  - " + p.getName() + " Lv." + p.getLevel()));
 
         // Navigate to battle scene and pass player and opponent data
-        SceneManager.switchSceneWithData("battle.fxml", "Pokemon Battle - Arena", 1200, 700, 
+        SceneManager.switchSceneWithLoading("battle.fxml", "Pokemon Battle - Arena", 1200, 700, 
             Map.of("player", player, "opponent", aiOpponent));
     }
 
@@ -981,7 +935,7 @@ public class NewGameController {
      * Go back to menu
      */
     private void onBack() {
-        SceneManager.switchScene("menu.fxml", "Pokemon Battle - Menu", 1200, 700);
+        SceneManager.switchSceneWithLoading("menu.fxml", "Pokemon Battle - Menu", 1200, 700);
     }
 
     /**

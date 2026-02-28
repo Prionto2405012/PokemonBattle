@@ -1,119 +1,78 @@
-/* ===== Authentication Screen Styles ===== */
+/* ===== Start Screen Layout ===== */
 
-/* Auth Card Container */
-.auth-card {
-    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, 
-                                         rgba(231, 169, 201, 0.482), 
-                                         rgba(188, 165, 178, 0.571));
-    -fx-background-radius: 20px;
-    -fx-border-color: #eddce9;
-    -fx-border-width: 0.5px;
-    -fx-border-radius: 10px;
-    -fx-effect: dropshadow(gaussian, rgba(0, 50, 45, 0.386), 20, 0, 0, 4);
+/*
+ * Vignette overlay: a radial gradient that is transparent at the centre
+ * and dims to near-black at the edges, giving the GIF cinematic depth.
+ * A second linear gradient darkens the bottom third so the START button
+ * always reads clearly regardless of the GIF content.
+ */
+.start-vignette {
+    -fx-background-color:
+        radial-gradient(center 50% 45%, radius 72%,
+            transparent 40%,
+            rgba(0, 0, 0, 0.1) 35%,
+            rgba(0, 0, 0, 0.326) 80%),
+        linear-gradient(from 0% 65% to 0% 100%,
+            transparent,
+            rgba(0, 0, 0, 0.384));
 }
 
-/* Auth Title */
-.auth-title {
-    -fx-font-size: 42px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #06847c;
-    -fx-alignment: center;
-    -fx-effect: dropshadow(gaussian, rgba(0, 50, 45, 0.6), 10, 0, 0, 2);
+.start-button-section {
+    -fx-padding: 0 0 3 30;
 }
 
-/* Auth Subtitle */
-.auth-subtitle {
-    -fx-font-size: 16px;
-    -fx-text-fill: #0a5c50;
-    -fx-alignment: center;
-    -fx-font-style: italic;
-}
-
-/* Field Label */
-.field-label {
-    -fx-font-size: 14px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #03403a;
-}
-
-/* Auth Text Field */
-.auth-text-field {
-    -fx-background-color: rgba(255, 255, 255, 0.9);
-    -fx-background-radius: 8px;
-    -fx-border-color: #8aa69e;
-    -fx-border-radius: 8px;
-    -fx-border-width: 2px;
-    -fx-padding: 12px 15px;
-    -fx-font-size: 16px;
-    -fx-pref-height: 45px;
-    -fx-effect: dropshadow(gaussian, rgba(0, 100, 80, 0.15), 4, 0, 0, 1);
-}
-
-.auth-text-field:focused {
-    -fx-border-color: #33d3bf;
-    -fx-border-width: 2.5px;
-    -fx-effect: dropshadow(gaussian, rgba(0, 150, 120, 0.4), 8, 0, 0, 2);
-}
-
-/* Tab Buttons Container */
-.auth-tabs {
-    -fx-border-color: #4c897c;
-    -fx-border-width: 0 0 2px 0;
-    -fx-padding: 0 0 10px 0;
-}
-
-/* Tab Button */
-.tab-button {
-    -fx-background-color: transparent;
-    -fx-text-fill: #485f5b;
+/*
+ * 2.5D button effect:
+ *   - Two background layers: dark "depth" edge (full size) + lighter face (inset from bottom & right).
+ *   - The dark layer peeks out 5px on the bottom and right, mimicking a physical depth edge.
+ *   - On press: depth collapses (single layer) + button translates +5px down-right to "sink in".
+ *   - Overrides the scale/shadow from the global .button class.
+ */
+.start-btn {
+    -fx-cursor: hand;
+    -fx-font-family: "menu";
     -fx-font-size: 18px;
     -fx-font-weight: bold;
-    -fx-padding: 8px 30px;
-    -fx-background-radius: 8px 8px 0 0;
+    -fx-text-fill: #063b2f;
+
+    /* Layer 0 = depth edge (dark), Layer 1 = face (lighter gradient) */
+    -fx-background-color:
+        #042a20,
+        linear-gradient(from 0% 0% to 100% 100%, #8ecfba, #65c29d);
+    /* Layer 0 fills full bounds; Layer 1 inset 5px from right & bottom → depth visible there */
+    -fx-background-insets: 0, 0 5px 5px 0;
+    -fx-background-radius: 22, 20;
+
+    /* Neutralise the global .button hover/press effects */
+    -fx-scale-x: 1;
+    -fx-scale-y: 1;
+    -fx-translate-x: 0;
+    -fx-translate-y: 0;
+    -fx-effect: null;
+    -fx-border-color: transparent;
     -fx-border-width: 0;
-    -fx-effect: none;
 }
 
-.tab-button:hover {
-    -fx-background-color: rgba(76, 137, 124, 0.2);
-    -fx-text-fill: #146758;
-    -fx-scale-x: 1.0;
-    -fx-scale-y: 1.0;
-    -fx-effect: none;
+.start-btn:hover {
+    -fx-background-color:
+        #042a20,
+        linear-gradient(from 0% 0% to 100% 100%, #9fdac6, #74d3af);
+    /* Keep depth visible on hover, no scale */
+    -fx-scale-x: 1;
+    -fx-scale-y: 1;
+    -fx-translate-x: 0;
+    -fx-translate-y: 0;
+    -fx-effect: null;
 }
 
-.tab-button-active {
-    -fx-background-color: rgba(76, 137, 124, 0.4);
-    -fx-text-fill: #06847c;
-    -fx-border-color: #33d3bf;
-    -fx-border-width: 0 0 3px 0;
-    -fx-effect: none;
-}
-
-/* Auth Button */
-.auth-button {
-    -fx-pref-height: 50px;
-    -fx-font-size: 18px;
-    -fx-font-weight: bold;
-}
-
-/* Error Label */
-.error-label {
-    -fx-font-size: 13px;
-    -fx-text-fill: #d32f2f;
-    -fx-font-weight: bold;
-    -fx-padding: 5px 10px;
-    -fx-background-color: rgba(211, 47, 47, 0.1);
-    -fx-background-radius: 6px;
-    -fx-border-color: rgba(211, 47, 47, 0.3);
-    -fx-border-radius: 6px;
-    -fx-border-width: 1px;
-}
-
-/* Hint Label */
-.hint-label {
-    -fx-font-size: 13px;
-    -fx-text-fill: #485f5b;
-    -fx-alignment: center;
-    -fx-font-style: italic;
+.start-btn:pressed {
+    /* Collapse depth to a single darker face layer + physically push down-right */
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, #5ea88c, #3d8b6a);
+    -fx-background-insets: 0;
+    -fx-background-radius: 22;
+    -fx-translate-x: 5;
+    -fx-translate-y: 5;
+    -fx-scale-x: 1;
+    -fx-scale-y: 1;
+    -fx-effect: null;
 }
