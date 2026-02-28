@@ -100,7 +100,12 @@
     -fx-font-size: 12px;
     -fx-font-weight: bold;
     -fx-pref-width: 72px;
+    -fx-min-width: 72px;
     -fx-pref-height: 30px;
+    -fx-min-height: 30px;
+    /* Override .button's huge 14/36px padding that causes "..." truncation */
+    -fx-padding: 4 10 4 10;
+    -fx-text-overrun: clip;
     -fx-cursor: hand;
 }
 
@@ -108,6 +113,10 @@
     -fx-background-color: rgba(60, 115, 103, 0.9);
     -fx-border-color: rgba(130, 230, 227, 0.6);
     -fx-text-fill: #cfd8dc;
+    /* Override base .button:hover scale of 1.12 with gentler game-style scale */
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+    -fx-effect: dropshadow(gaussian, rgba(66, 245, 200, 0.25), 6, 0, 0, 0);
 }
 
 .option-btn:disabled {
@@ -119,7 +128,9 @@
     -fx-background-color: linear-gradient(to bottom, #10985f, #50b997);
     -fx-border-color: #42f5c2;
     -fx-text-fill: white;
-    -fx-effect: dropshadow(gaussian, rgba(66, 245, 173, 0.45), 6, 0, 0, 2);
+    -fx-effect: dropshadow(gaussian, rgba(66, 245, 173, 0.55), 8, 0.1, 0, 2);
+    -fx-scale-x: 1.0;
+    -fx-scale-y: 1.0;
 }
 .segmented-group {
     -fx-background-color: rgba(30, 65, 53, 0.8);
@@ -137,13 +148,20 @@
     -fx-font-size: 12px;
     -fx-font-weight: bold;
     -fx-pref-width: 90px;
+    -fx-min-width: 80px;
     -fx-pref-height: 30px;
+    /* Override .button's huge 14/36px padding that causes "..." truncation */
+    -fx-padding: 4 8 4 8;
+    -fx-text-overrun: clip;
     -fx-cursor: hand;
 }
 
 .seg-btn:hover {
     -fx-background-color: rgba(66, 245, 179, 0.12);
     -fx-text-fill: #cfdcd4;
+    /* Keep hover scale neutral for segmented buttons */
+    -fx-scale-x: 1.0;
+    -fx-scale-y: 1.0;
 }
 
 .seg-left {
@@ -170,10 +188,16 @@
     -fx-text-fill: white;
     -fx-font-size: 14px;
     -fx-font-weight: bold;
+    /* Override .button's huge 14/36px padding that causes "..." truncation */
+    -fx-padding: 0 2 4 2;
+    -fx-text-overrun: clip;
     -fx-cursor: hand;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.55), 8, 0, 0, 4);
     -fx-focus-color: transparent;
     -fx-faint-focus-color: transparent;
+    /* Override base .button:hover scale – handled per-state below */
+    -fx-scale-x: 1.0;
+    -fx-scale-y: 1.0;
 }
 .close-x-button:focused {
     -fx-background-color:
@@ -181,6 +205,8 @@
         linear-gradient(from 0% 0% to 0% 100%, #ff5c5c, #c0392b);
     -fx-background-insets: 0, 0 0 4 0;
     -fx-text-fill: white;
+    -fx-scale-x: 1.0;
+    -fx-scale-y: 1.0;
 }
 
 .close-x-button:hover {
@@ -189,6 +215,8 @@
         linear-gradient(from 0% 0% to 0% 100%, #ff7c7c, #e74c3c);
     -fx-background-insets: 0, 0 0 4 0;
     -fx-effect: dropshadow(gaussian, rgba(200,0,0,0.5), 12, 0.2, 0, 5);
+    -fx-scale-x: 1.0;
+    -fx-scale-y: 1.0;
 }
 
 .close-x-button:pressed {
@@ -197,6 +225,8 @@
         linear-gradient(from 0% 0% to 0% 100%, #8b1a1a, #a93226);
     -fx-background-insets: 0, 4 0 0 0;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 3, 0, 0, 1);
+    -fx-scale-x: 1.0;
+    -fx-scale-y: 1.0;
 }
 .button-blue {
     -fx-background-color: linear-gradient(to bottom, #19d29e, #54b79b);
@@ -205,14 +235,90 @@
     -fx-text-fill: white;
     -fx-font-size: 13px;
     -fx-font-weight: bold;
+    /* Override .button base padding to prevent "..." truncation on Close button */
+    -fx-padding: 8 20 8 20;
+    -fx-text-overrun: clip;
     -fx-cursor: hand;
     -fx-effect: dropshadow(gaussian, rgba(21, 192, 146, 0.5), 8, 0, 0, 3);
+    -fx-scale-x: 1.0;
+    -fx-scale-y: 1.0;
 }
 
 .button-blue:hover {
     -fx-background-color: linear-gradient(to bottom, #1ee59c, #10a985);
+    -fx-scale-x: 1.04;
+    -fx-scale-y: 1.04;
 }
 
 .button-blue:pressed {
     -fx-background-color: linear-gradient(to bottom, #0da175, #15c09e);
+    -fx-scale-x: 0.97;
+    -fx-scale-y: 0.97;
+}
+
+/* ── Volume row ──────────────────────────────────────────────────────────── */
+
+.volume-row {
+    -fx-padding: 2 0 0 0;
+}
+
+.volume-percent-label {
+    -fx-font-size: 11px;
+    -fx-text-fill: #90aea6;
+    -fx-min-width: 34px;
+    -fx-alignment: CENTER_RIGHT;
+}
+
+/* ── Volume slider ───────────────────────────────────────────────────────── */
+
+.volume-slider {
+    -fx-pref-width: 150px;
+    -fx-min-width: 80px;
+}
+
+/* Track */
+.volume-slider .track {
+    -fx-background-color: rgba(30, 70, 60, 0.9);
+    -fx-background-radius: 4;
+    -fx-pref-height: 5px;
+    -fx-border-color: rgba(80, 160, 140, 0.3);
+    -fx-border-radius: 4;
+    -fx-border-width: 1;
+}
+
+/* Filled portion of track (progress) */
+.volume-slider .track:filled {
+    -fx-background-color: linear-gradient(to right, #15c0af, #42f5ef);
+    -fx-background-radius: 4 0 0 4;
+}
+
+/* Thumb */
+.volume-slider .thumb {
+    -fx-background-color: linear-gradient(to bottom, #42f5ef, #15c0af);
+    -fx-background-radius: 100em;
+    -fx-pref-width: 16px;
+    -fx-pref-height: 16px;
+    -fx-min-width: 16px;
+    -fx-min-height: 16px;
+    -fx-effect: dropshadow(gaussian, rgba(66, 245, 215, 0.5), 6, 0, 0, 0);
+    -fx-cursor: hand;
+}
+
+.volume-slider .thumb:hover {
+    -fx-background-color: linear-gradient(to bottom, #5af8f3, #20e8d6);
+    -fx-effect: dropshadow(gaussian, rgba(66, 245, 215, 0.8), 10, 0, 0, 0);
+    -fx-scale-x: 1.18;
+    -fx-scale-y: 1.18;
+}
+
+.volume-slider .thumb:pressed {
+    -fx-background-color: linear-gradient(to bottom, #15c0af, #0fa898);
+    -fx-scale-x: 0.95;
+    -fx-scale-y: 0.95;
+}
+
+/* Dim + lock the whole slider when game sound is disabled */
+.volume-slider:disabled {
+    -fx-opacity: 0.38;
+    -fx-cursor: default;
 }
