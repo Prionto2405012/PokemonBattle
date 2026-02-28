@@ -7,6 +7,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
@@ -16,6 +17,7 @@ import javax.imageio.stream.ImageInputStream;
 
 import org.w3c.dom.NodeList;
 
+import javafx.application.Platform;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
@@ -46,8 +48,6 @@ public final class MediaCache {
         t.setDaemon(true);
         return t;
     });
-
-    /** Single-threaded: JavaFX media pipeline is not safe for concurrent MediaPlayer construction. */
     private static final ExecutorService MEDIA_POOL = Executors.newSingleThreadExecutor(r -> {
         Thread t = new Thread(r, "MediaCache-MediaBuilder");
         t.setDaemon(true);
@@ -199,6 +199,37 @@ public final class MediaCache {
         System.err.println("[MediaCache] MediaPlayer cache miss — building now: " + assetName);
         return buildMediaPlayer(assetName);
     }
+    public static void buildVideoPlayer(String assetName, Consumer<MediaPlayer> onReady) {
+    String url = MEDIA_URLS.get(assetName); 
+    if (url != null) {
+        constructAndWait(url, onReady);
+    } else {
+        CompletableFuture.supplyAsync(() -> {
+            URL resource = MediaCache.class.getResource(BASE + assetName);
+            if (resource == null) {
+                System.err.println("[MediaCache] Video not found: " + assetName);
+                return null;
+            }
+            String ext = resource.toExternalForm();
+            MEDIA_URLS.put(assetName, ext);
+            return ext;
+        }, POOL).thenAcceptAsync(resolvedUrl -> {
+            if (resolvedUrl != null) constructAndWait(resolvedUrl, onReady);
+        }, Platform::runLater);
+    }
+}
+private static void constructAndWait(String url, Consumer<MediaPlayer> onReady) {
+    MediaPlayer player = new MediaPlayer(new Media(url));
+    player.setAutoPlay(false);
+    player.setOnReady(() -> {
+        System.out.println("[MediaCache] Video READY: " + url);
+        onReady.accept(player);
+    });
+    player.setOnError(() ->
+        System.err.println("[MediaCache] Video error: " +
+            (player.getError() != null ? player.getError().getMessage() : "unknown"))
+    );
+}
     private static void scheduleMediaPlayerBuild(String name) {
         CompletableFuture<MediaPlayer> future = CompletableFuture
                 .supplyAsync(() -> buildMediaPlayer(name), MEDIA_POOL)

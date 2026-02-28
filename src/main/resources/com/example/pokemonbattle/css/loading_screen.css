@@ -1,9 +1,3 @@
-/* ============================================================
-   POKEMON BATTLE - LOADING SCREEN
-   AAA-Quality Animated Loading Screen with Pokeball
-   ============================================================ */
-
-/* ==================== ROOT & BACKGROUND ==================== */
 
 .loading-root {
     -fx-background-image: url('../assets/menu3.png');
@@ -13,7 +7,6 @@
 }
 
 .background-gradient {
-    /* Additional overlay gradient over background image */
     -fx-background-color: radial-gradient(
         focus-angle 0deg,
         focus-distance 0%,
@@ -28,9 +21,6 @@
 .particle-layer {
     /* JavaScript will add animated particles here */
 }
-
-
-/* ==================== PROGRESS BAR ==================== */
 
 .progress-container {
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.5), 20, 0.4, 0, 5);
@@ -56,9 +46,6 @@
     -fx-arc-height: 8;
     -fx-effect: dropshadow(gaussian, rgba(138, 43, 226, 0.8), 15, 0.8, 0, 0);
 }
-
-/* ==================== TEXT STYLING ==================== */
-
 .title-text {
     -fx-text-fill: #ffffff;
     -fx-font-size: 48px;

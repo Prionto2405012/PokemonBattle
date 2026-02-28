@@ -15,12 +15,6 @@ import javafx.scene.media.MediaView;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
-/**
- * Loading Screen Controller.
- *
- * Plays Pikachu.mp4 on loop as background.
- * Animates a progress bar from 0 → 100% over ~3 seconds, then navigates to menu.
- */
 public class LoadingScreenController {
 
     @FXML private StackPane rootPane;
@@ -44,7 +38,6 @@ public class LoadingScreenController {
     }
 
     private void setupVideo() {
-        // (b/c) Claim the pre-built, autoPlay=false player
         mediaPlayer = com.example.pokemonbattle.util.MediaCache.claimMediaPlayer("Pikachu.mp4");
 
         if (mediaPlayer == null) {
@@ -56,9 +49,6 @@ public class LoadingScreenController {
         bgVideo.fitWidthProperty().bind(rootPane.widthProperty());
         bgVideo.fitHeightProperty().bind(rootPane.heightProperty());
         bgVideo.setPreserveRatio(false);
-
-        // (b) Play only once the scene is shown and the player is ready,
-        //     so the first frame is never a blank white flash.
         mediaPlayer.setOnReady(() -> {
             if (mediaPlayer.getStatus() != MediaPlayer.Status.PLAYING) {
                 mediaPlayer.play();
@@ -107,33 +97,19 @@ public class LoadingScreenController {
     }
 
     public void bindToTask(Task<?> task, Runnable onSuccess) {
-        // Stop the auto-play timeline first so it no longer animates the
-        // same properties we are about to bind — otherwise JavaFX throws
-        // "A bound value cannot be set" on every animation pulse.
         if (progressTimeline != null) {
             progressTimeline.stop();
             progressTimeline = null;
         }
-
-        // Reset bar visuals
         progressFill.setWidth(0);
         progressFill.setTranslateX(-(BAR_WIDTH / 2.0));
-
-        // Bind progress bar width to task progress
         progressFill.widthProperty().bind(task.progressProperty().multiply(BAR_WIDTH));
-
-        // Keep translateX in sync so bar grows from left
         task.progressProperty().addListener((obs, oldP, newP) -> {
             double w = Math.max(0, newP.doubleValue()) * BAR_WIDTH;
             progressFill.setTranslateX(-(BAR_WIDTH - w) / 2.0);
         });
-
-        // Bind label text to task message
         loadingLabel.textProperty().bind(task.messageProperty());
-
-        // Success callback (runs on JavaFX Application Thread)
         task.setOnSucceeded(event -> {
-            // Dispose video BEFORE switching scene, or audio leaks into the next scene
             if (mediaPlayer != null) {
                 mediaPlayer.stop();
                 mediaPlayer.dispose();
@@ -143,8 +119,6 @@ public class LoadingScreenController {
                 onSuccess.run();
             }
         });
-
-        // Optional: show failure in UI
         task.setOnFailed(event -> {
             Throwable ex = task.getException();
             loadingLabel.textProperty().unbind();

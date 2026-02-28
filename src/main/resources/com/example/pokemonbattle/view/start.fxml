@@ -24,8 +24,8 @@
         <VBox alignment="CENTER" spacing="12" prefHeight="175" VBox.vgrow="NEVER" styleClass="start-button-section">
             <Button text="START"
                     onAction="#onStartButtonClick"
-                    prefWidth="160"
-                    prefHeight="50"
+                    prefWidth="220"
+                    prefHeight="56"
                     styleClass="start-btn"/>
         </VBox>
 

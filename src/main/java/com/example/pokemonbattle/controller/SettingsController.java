@@ -192,7 +192,7 @@ public class SettingsController {
     private String genPath(int gen) {
         return switch (gen) {
             case 2 -> "/com/example/pokemonbattle/audio/gen2.mp3";
-            case 3 -> "/com/example/pokemonbattle/audio/gen3_1.mp3";
+            case 3 -> "/com/example/pokemonbattle/audio/gen3.mp3";
             default -> "/com/example/pokemonbattle/audio/gen1.mp3";
         };
     }

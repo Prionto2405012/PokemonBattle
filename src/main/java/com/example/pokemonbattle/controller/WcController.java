@@ -9,103 +9,199 @@ import com.example.pokemonbattle.util.SceneManager;
 import javafx.animation.FadeTransition;
 import javafx.animation.Interpolator;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
-@SuppressWarnings("unused") 
+
+@SuppressWarnings("unused")
 public class WcController {
-    @FXML
-    private StackPane rootPane; 
-    @FXML
-    private ImageView bgImage; 
-    @FXML
-    private VBox authCard;
-    @FXML
-    private Button loginTabButton;
-    @FXML
-    private Button signupTabButton;
-    @FXML
-    private VBox loginForm;
-    @FXML
-    private TextField loginUsernameField;
-    @FXML
-    private PasswordField loginPasswordField;
-    @FXML
-    private Label loginErrorLabel;
-    @FXML
-    private Label loginUsernameError;
-    @FXML
-    private Label loginPasswordError;
-    @FXML
-    private VBox signupForm;
-    @FXML
-    private TextField signupUsernameField;
-    @FXML
-    private TextField signupEmailField;
-    @FXML
-    private PasswordField signupPasswordField;
-    @FXML
-    private PasswordField signupConfirmPasswordField;
-    @FXML
-    private Label signupErrorLabel;
-    @FXML
-    private Label signupUsernameError;
-    @FXML
-    private Label signupEmailError;
-    @FXML
-    private Label signupPasswordError;
-    @FXML
-    private Label signupConfirmPasswordError;
+    @FXML private StackPane rootPane;
+    @FXML private ImageView bgImage;
+    @FXML private Region glassBlurLayer;
+    @FXML private VBox authCard;
+    @FXML private HBox authTabsBox;
+    @FXML private Button loginTabButton;
+    @FXML private Button signupTabButton;
+    @FXML private VBox loginForm;
+    @FXML private TextField loginUsernameField;
+    @FXML private PasswordField loginPasswordField;
+    @FXML private Label loginErrorLabel;
+    @FXML private Label loginUsernameError;
+    @FXML private Label loginPasswordError;
+    @FXML private VBox signupForm;
+    @FXML private TextField signupUsernameField;
+    @FXML private TextField signupEmailField;
+    @FXML private PasswordField signupPasswordField;
+    @FXML private PasswordField signupConfirmPasswordField;
+    @FXML private Label signupErrorLabel;
+    @FXML private Label signupUsernameError;
+    @FXML private Label signupEmailError;
+    @FXML private Label signupPasswordError;
+    @FXML private Label signupConfirmPasswordError;
     private final AuthService authService;
     private static User currentUser;
+
+    private Color base, lighter, darker, darkest, textPrimary, textSecondary;
 
     public WcController() {
         this.authService = new AuthService();
     }
 
-
     private Color getAverageColor(javafx.scene.image.Image image) {
         PixelReader reader = image.getPixelReader();
         int w = (int) image.getWidth();
         int h = (int) image.getHeight();
-
         double r = 0, g = 0, b = 0;
         int count = 0;
-
         for (int x = 0; x < w; x += 10) {
             for (int y = 0; y < h; y += 10) {
                 Color c = reader.getColor(x, y);
-                r += c.getRed();
-                g += c.getGreen();
-                b += c.getBlue();
+                r += c.getRed(); g += c.getGreen(); b += c.getBlue();
                 count++;
             }
         }
         return new Color(r / count, g / count, b / count, 1.0);
     }
 
-    private String toRGBA(Color c, double alpha) {
+    private String rgba(Color c, double a) {
         return String.format("rgba(%d,%d,%d,%.2f)",
-                (int) (c.getRed() * 255),
-                (int) (c.getGreen() * 255),
-                (int) (c.getBlue() * 255),
-                alpha);
+                (int)(c.getRed()*255), (int)(c.getGreen()*255), (int)(c.getBlue()*255), a);
     }
-    
+
+    private String hex(Color c) {
+        return String.format("#%02x%02x%02x",
+                (int)(c.getRed()*255), (int)(c.getGreen()*255), (int)(c.getBlue()*255));
+    }
+
+    private double luminance(Color c) {
+        return 0.299 * c.getRed() + 0.587 * c.getGreen() + 0.114 * c.getBlue();
+    }
+
+    private void buildPalette() {
+        if (bgImage == null || bgImage.getImage() == null) return;
+        base = getAverageColor(bgImage.getImage());
+        lighter = base.interpolate(Color.WHITE, 0.4);
+        darker  = base.interpolate(Color.BLACK, 0.45);
+        darkest = base.interpolate(Color.BLACK, 0.7);
+        boolean bright = luminance(base) > 0.45;
+        textPrimary   = bright ? darkest : lighter.interpolate(Color.WHITE, 0.5);
+        textSecondary = bright ? darker  : lighter;
+    }
+
+    private void applyDynamicTheme() {
+        if (base == null) return;
+
+        // Glass blur layer
+        if (glassBlurLayer != null) {
+            glassBlurLayer.setStyle(
+                "-fx-background-color: " + rgba(base, 0.18) + ";" +
+                "-fx-background-radius: 18px;" +
+                "-fx-border-radius: 18px;" +
+                "-fx-border-color: " + rgba(lighter, 0.35) + ";" +
+                "-fx-border-width: 1px;" +
+                "-fx-effect: dropshadow(gaussian, " + rgba(darkest, 0.25) + ", 30, 0.2, 0, 10);"
+            );
+        }
+
+        // Auth card
+        authCard.setStyle(
+            "-fx-background-color: " + rgba(base, 0.55) + ";" +
+            "-fx-border-color: " + rgba(lighter, 0.45) + ";" +
+            "-fx-border-width: 1.5px;" +
+            "-fx-border-radius: 16px;" +
+            "-fx-background-radius: 16px;" +
+            "-fx-effect: dropshadow(gaussian, " + rgba(darkest, 0.25) + ", 24, 0.15, 0, 6);"
+        );
+
+        // Title
+        for (Node n : authCard.lookupAll(".auth-title")) {
+            ((Label) n).setStyle(
+                "-fx-text-fill: " + hex(textPrimary) + ";" +
+                "-fx-effect: dropshadow(gaussian, " + rgba(lighter, 0.7) + ", 2, 0, 0, 1);"
+            );
+        }
+
+        // Tabs divider
+        if (authTabsBox != null) {
+            authTabsBox.setStyle("-fx-border-color: " + rgba(darker, 0.3) + ";" +
+                "-fx-border-width: 0 0 2px 0; -fx-padding: 0 0 12px 0;");
+        }
+
+        // Tab buttons
+        String tabBase =
+            "-fx-background-color: " + rgba(darker, 0.45) + ";" +
+            "-fx-text-fill: " + hex(textPrimary) + ";";
+        loginTabButton.setStyle(tabBase);
+        signupTabButton.setStyle(tabBase);
+
+        // Field labels ("Username or Email", "Password", etc.)
+        for (Node n : authCard.lookupAll(".field-label")) {
+            ((Label) n).setStyle("-fx-text-fill: " + hex(textPrimary) + ";");
+        }
+
+        // Text fields
+        String fieldStyle =
+            "-fx-background-color: " + rgba(Color.WHITE, 0.75) + ";" +
+            "-fx-border-color: " + rgba(lighter, 0.5) + ";" +
+            "-fx-text-fill: " + hex(darkest) + ";" +
+            "-fx-prompt-text-fill: " + rgba(darker, 0.55) + ";" +
+            "-fx-effect: dropshadow(gaussian, " + rgba(darkest, 0.08) + ", 4, 0, 0, 2);";
+        for (Node n : authCard.lookupAll(".auth-text-field")) {
+            n.setStyle(fieldStyle);
+        }
+
+        // Login / Sign Up action buttons
+        String actionBtnStyle =
+            "-fx-background-color: linear-gradient(from 0% 0% to 0% 100%, " +
+                hex(darker) + ", " + hex(darkest) + ");" +
+            "-fx-text-fill: " + hex(lighter.interpolate(Color.WHITE, 0.6)) + ";" +
+            "-fx-effect: dropshadow(gaussian, " + rgba(darkest, 0.3) + ", 12, 0, 0, 4);";
+        for (Node n : authCard.lookupAll(".login-btn")) n.setStyle(actionBtnStyle);
+        for (Node n : authCard.lookupAll(".signup-btn")) n.setStyle(actionBtnStyle);
+
+        // Back buttons
+        String backStyle =
+            "-fx-background-color: " + rgba(Color.WHITE, 0.30) + ";" +
+            "-fx-text-fill: " + hex(textPrimary) + ";" +
+            "-fx-border-color: " + rgba(darker, 0.35) + ";" +
+            "-fx-effect: dropshadow(gaussian, " + rgba(Color.BLACK, 0.12) + ", 6, 0, 0, 2);";
+        for (Node n : authCard.lookupAll(".auth-back-button")) n.setStyle(backStyle);
+
+        // Error labels
+        for (Node n : authCard.lookupAll(".error-label")) {
+            n.setStyle(
+                "-fx-background-color: " + rgba(Color.rgb(220, 20, 60), 0.08) + ";" +
+                "-fx-border-color: " + rgba(Color.rgb(220, 20, 60), 0.25) + ";" +
+                "-fx-effect: dropshadow(gaussian, " + rgba(Color.rgb(220, 20, 60), 0.15) + ", 6, 0, 0, 2);"
+            );
+        }
+
+        // Scrollbar (lookup may be null until CSS is applied)
+        rootPane.applyCss();
+        for (Node track : rootPane.lookupAll(".scroll-bar .track")) {
+            track.setStyle("-fx-background-color: " + rgba(lighter, 0.2) + "; -fx-background-radius: 6px;");
+        }
+        for (Node thumb : rootPane.lookupAll(".scroll-bar .thumb")) {
+            thumb.setStyle("-fx-background-color: " + rgba(darker, 0.5) + "; -fx-background-radius: 6px;");
+        }
+    }
+
     @FXML
     public void initialize() {
         MusicManager mm = MusicManager.getInstance();
         if (mm.getCurrentTrack() == null) {
             mm.playRandomBGM();
         }
-        mm.attachClickSounds(rootPane);
         PokeballOverlay pokeball = (PokeballOverlay) SceneManager.getData("pokeballOverlay");
         if (pokeball != null) {
             SceneManager.setData("pokeballOverlay", null);
@@ -138,23 +234,10 @@ public class WcController {
             bgImage.fitWidthProperty().bind(rootPane.widthProperty());
             bgImage.fitHeightProperty().bind(rootPane.heightProperty());
         }
-        if (bgImage.getImage() != null) {
-            Color avg = getAverageColor(bgImage.getImage());
-            Color lighter = avg.brighter();
-            Color darker  = avg.darker();
-            authCard.setStyle(
-                "-fx-background-color: " + toRGBA(avg,0.7) + ";" +
-                "-fx-border-color: " + toRGBA(lighter,0.55) + ";" +
-                "-fx-border-radius:16;" +
-                "-fx-background-radius:16;"
-            );
-            loginTabButton.setStyle(
-                "-fx-background-color: " + toRGBA(darker,0.6)
-            );
-            signupTabButton.setStyle(
-                "-fx-background-color: " + toRGBA(darker,0.6)
-            );
-        }
+
+        buildPalette();
+        applyDynamicTheme();
+
         if (loginUsernameField != null) {
             loginUsernameField.requestFocus();
         }

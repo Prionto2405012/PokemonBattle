@@ -13,10 +13,6 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<!-- 
-  Authentication Screen
-  Login and Signup functionality for players
--->
 <VBox alignment="CENTER" minHeight="700" minWidth="1200" spacing="30.0"
   styleClass="welcome-container"
   stylesheets="@../css/common.css,@../css/wc.css"
@@ -26,8 +22,6 @@
   <children>
 
     <StackPane fx:id="rootPane" VBox.vgrow="ALWAYS">
-
-      <!-- Background image -->
       <ImageView fx:id="bgImage"
         styleClass="wc-background"
         preserveRatio="false"
@@ -36,8 +30,6 @@
           <Image url="@../assets/wc_bg.png" />
         </image>
       </ImageView>
-
-      <!-- Scrollable content overlay so card never goes off-screen -->
       <ScrollPane styleClass="wc-scroll-pane" fitToWidth="true" fitToHeight="false"
         hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
         pannable="true">
@@ -46,10 +38,8 @@
             <padding>
               <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
             </padding>
-
-            <!-- Authentication Card -->
             <StackPane maxWidth="450" minWidth="320">
-              <Region styleClass="glass-blur-layer"/>
+              <Region fx:id="glassBlurLayer" styleClass="glass-blur-layer"/>
               <VBox fx:id="authCard" styleClass="auth-card" spacing="20.0">
                 <padding>
                   <Insets bottom="35.0" left="40.0" right="40.0" top="35.0" />
@@ -57,14 +47,12 @@
 
                 <Label text="Welcome, Trainer!" styleClass="auth-title" />
 
-                <HBox spacing="10.0" alignment="CENTER" styleClass="auth-tabs">
+                <HBox fx:id="authTabsBox" spacing="10.0" alignment="CENTER" styleClass="auth-tabs">
                   <Button fx:id="loginTabButton" text="Login" onAction="#onLoginTabClick"
                     styleClass="tab-button, tab-button-active" />
                   <Button fx:id="signupTabButton" text="Sign Up" onAction="#onSignupTabClick"
                     styleClass="tab-button" />
                 </HBox>
-
-                <!-- Login Form -->
                 <VBox fx:id="loginForm" spacing="15.0">
                   <Label text="Username or Email" styleClass="field-label" />
                   <TextField fx:id="loginUsernameField" promptText="Enter your username or email"
@@ -90,8 +78,6 @@
                       styleClass="auth-back-button" />
                   </HBox>
                 </VBox>
-
-                <!-- Signup Form (initially hidden) -->
                 <VBox fx:id="signupForm" spacing="15.0" visible="false" managed="false">
                   <Label text="Username" styleClass="field-label" />
                   <TextField fx:id="signupUsernameField" promptText="Choose a username (3-20 chars)"
