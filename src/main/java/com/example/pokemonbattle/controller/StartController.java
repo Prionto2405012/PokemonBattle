@@ -60,8 +60,10 @@ public class StartController {
             fadeOutBall.setFromValue(1.0);
             fadeOutBall.setToValue(0.0);
             fadeOutBall.setOnFinished(e -> {
-                pb.stop();
-                rootPane.getChildren().remove(pb);
+                if (pb != null) {
+                    pb.stop();
+                    rootPane.getChildren().remove(pb);
+                }
             });
         }
         javafx.animation.PauseTransition timeout = new javafx.animation.PauseTransition(Duration.seconds(1.5));

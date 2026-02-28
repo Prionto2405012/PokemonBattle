@@ -18,16 +18,10 @@ public class MusicManager {
     private static final String[] BGM_TRACKS = {
         "/com/example/pokemonbattle/audio/gen1.mp3",
         "/com/example/pokemonbattle/audio/gen2.mp3",
-        "/com/example/pokemonbattle/audio/gen3_1.mp3"
+        "/com/example/pokemonbattle/audio/gen3.mp3"
     };
     private static final String CLICK   = "/com/example/pokemonbattle/audio/click.mp3";
     private static final String VICTORY = "/com/example/pokemonbattle/audio/victory.mp3";
-
-    /**
-     * Single-threaded background executor — all MediaPlayer construction and
-     * disposal runs here, never on the JavaFX Application Thread.
-     * Mirrors the pattern used by MediaCache.MEDIA_POOL.
-     */
     private static final ExecutorService MEDIA_OP = Executors.newSingleThreadExecutor(r -> {
         Thread t = new Thread(r, "MusicManager-MediaThread");
         t.setDaemon(true);
@@ -62,8 +56,6 @@ public class MusicManager {
     }
 
     public void playBGM(String resourcePath) { switchBGM(resourcePath); }
-
-    /** Submits BGM construction + disposal entirely to the media thread. */
     private void startBGM(String path) {
         MEDIA_OP.execute(() -> {
             MediaPlayer old = bgmRef.getAndSet(null);
@@ -120,8 +112,6 @@ public class MusicManager {
         if (p != null) p.setVolume(this.masterVolume);
     }
     public void setBGMVolume(double v) { setMasterVolume(v); }
-
-    /** Non-click SFX (victory etc.) — constructed on the media thread. */
     public void playSFX(String resourcePath) {
         if (!soundEnabled) return;
         MEDIA_OP.execute(() -> {
@@ -133,11 +123,6 @@ public class MusicManager {
             sfx.setOnEndOfMedia(sfx::dispose);
         });
     }
-
-    /**
-     * Click SFX — uses a pre-warmed, reused player for zero latency.
-     * seek+play are thread-safe and instant; construction is off-thread.
-     */
     public void playClickSFX() {
         if (!soundEnabled) return;
         MediaPlayer p = clickRef.get();
@@ -163,11 +148,8 @@ public class MusicManager {
         clickRef.set(p);
         System.out.println("[MusicManager] Click player pre-warmed on media thread.");
     }
-
     public void playVictorySFX() { playSFX(VICTORY); }
-
     public void attachClickSounds(Parent root) { walkButtons(root); }
-
     private void walkButtons(Parent parent) {
         for (Node child : parent.getChildrenUnmodifiable()) {
             if (child instanceof Button btn && !"click-wired".equals(btn.getUserData())) {
@@ -181,9 +163,8 @@ public class MusicManager {
             if (child instanceof Parent p) walkButtons(p);
         }
     }
-
-    public boolean isSoundEnabled()  { return soundEnabled;      }
-    public double  getMasterVolume() { return masterVolume;      }
-    public double  getBGMVolume()    { return masterVolume;      }
-    public String  getCurrentTrack() { return currentTrackPath;  }
+    public boolean isSoundEnabled(){ return soundEnabled;}
+    public double getMasterVolume(){ return masterVolume;}
+    public double getBGMVolume(){ return masterVolume;}
+    public String getCurrentTrack(){ return currentTrackPath;}
 }
