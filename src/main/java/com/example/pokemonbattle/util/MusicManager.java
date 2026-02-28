@@ -64,8 +64,7 @@ public class MusicManager {
 
     public void resumeBGM() {
         if (bgmPlayer != null && soundEnabled) bgmPlayer.play();
-    }
-
+    }   
     public void setBGMVolume(double volume) {
         this.bgmVolume = volume;
         if (bgmPlayer != null) bgmPlayer.setVolume(volume);
