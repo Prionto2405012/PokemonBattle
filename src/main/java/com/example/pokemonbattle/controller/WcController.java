@@ -2,6 +2,7 @@ package com.example.pokemonbattle.controller;
 
 import com.example.pokemonbattle.model.User;
 import com.example.pokemonbattle.service.AuthService;
+import com.example.pokemonbattle.util.MusicManager;
 import com.example.pokemonbattle.util.PokeballOverlay;
 import com.example.pokemonbattle.util.SceneManager;
 
@@ -100,6 +101,11 @@ public class WcController {
     
     @FXML
     public void initialize() {
+        MusicManager mm = MusicManager.getInstance();
+        if (mm.getCurrentTrack() == null) {
+            mm.playRandomBGM();
+        }
+        mm.attachClickSounds(rootPane);
         PokeballOverlay pokeball = (PokeballOverlay) SceneManager.getData("pokeballOverlay");
         if (pokeball != null) {
             SceneManager.setData("pokeballOverlay", null);

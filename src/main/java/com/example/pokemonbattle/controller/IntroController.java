@@ -1,5 +1,6 @@
 package com.example.pokemonbattle.controller;
 
+import com.example.pokemonbattle.util.MusicManager;
 import com.example.pokemonbattle.util.PokeballOverlay;
 import com.example.pokemonbattle.util.SceneManager;
 
@@ -105,6 +106,7 @@ public class IntroController {
 
         fadeBg.play();
         fadeBall.play();
+        MusicManager.getInstance().playRandomBGM();
     }
 
     private void disposeMediaPlayer() {
