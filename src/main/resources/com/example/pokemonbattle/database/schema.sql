@@ -1,9 +1,3 @@
--- =====================================================
--- Pokemon Battle Authentication Database Schema
--- SQLite Database Schema for User Authentication
--- =====================================================
-
--- Users table
 CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT UNIQUE NOT NULL,
@@ -15,14 +9,8 @@ CREATE TABLE IF NOT EXISTS users (
     CHECK(length(username) >= 3),
     CHECK(length(email) >= 5)
 );
-
--- Index for faster username lookups
 CREATE INDEX IF NOT EXISTS idx_username ON users(username);
-
--- Index for faster email lookups
 CREATE INDEX IF NOT EXISTS idx_email ON users(email);
-
--- Optional: Game-specific user data (for future use)
 CREATE TABLE IF NOT EXISTS user_profiles (
     user_id INTEGER PRIMARY KEY,
     display_name TEXT,
