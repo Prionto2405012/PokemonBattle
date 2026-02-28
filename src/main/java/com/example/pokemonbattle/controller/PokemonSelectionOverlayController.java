@@ -8,6 +8,7 @@ import java.util.function.Consumer;
 import com.example.pokemonbattle.model.Move;
 import com.example.pokemonbattle.model.PokemonInstance;
 import com.example.pokemonbattle.model.PokemonSpecies;
+import com.example.pokemonbattle.util.MusicManager;
 
 import javafx.animation.FadeTransition;
 import javafx.animation.ScaleTransition;
@@ -93,6 +94,8 @@ public class PokemonSelectionOverlayController {
         
         // Animate in
         animateIn();
+
+        MusicManager.getInstance().attachClickSounds(overlayRoot);
     }
 
     /**

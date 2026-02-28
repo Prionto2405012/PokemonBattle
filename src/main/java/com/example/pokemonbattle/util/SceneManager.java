@@ -14,6 +14,20 @@ public class SceneManager {
     public static void initialize(Stage stage) {
         primaryStage = stage;
     }
+    public static void enableCoordDebug(javafx.scene.Parent root) {
+        root.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_CLICKED, e -> {
+            javafx.scene.Node target = (javafx.scene.Node) e.getTarget();
+            String id         = target.getId() != null ? target.getId() : "-";
+            String styleClass = target.getStyleClass().isEmpty() ? "-" : target.getStyleClass().get(0);
+            System.out.printf(
+                "[Click] Scene(%.1f, %.1f)  Local(%.1f, %.1f)  >> %s  id=%s  class=%s%n",
+                e.getSceneX(), e.getSceneY(),
+                e.getX(),      e.getY(),
+                target.getClass().getSimpleName(), id, styleClass
+            );
+        });
+        System.out.println("[CoordDebug] Click anywhere on the scene to print coordinates.");
+    }
     public static void switchScene(String fxmlFile, String title, int width, int height) {
         switchSceneWithData(fxmlFile, title, width, height, null);
     }

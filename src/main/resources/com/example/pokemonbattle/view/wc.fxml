@@ -38,7 +38,7 @@
             <padding>
               <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
             </padding>
-            <StackPane maxWidth="450" minWidth="320">
+            <StackPane maxWidth="500" minWidth="320">
               <Region fx:id="glassBlurLayer" styleClass="glass-blur-layer"/>
               <VBox fx:id="authCard" styleClass="auth-card" spacing="20.0">
                 <padding>

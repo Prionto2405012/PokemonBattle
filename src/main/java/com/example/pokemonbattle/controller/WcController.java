@@ -14,6 +14,9 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.effect.BlurType;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.effect.InnerShadow;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;
 import javafx.scene.layout.HBox;
@@ -52,6 +55,7 @@ public class WcController {
     private static User currentUser;
 
     private Color base, lighter, darker, darkest, textPrimary, textSecondary;
+    private Color neuBase, neuLight, neuDark;
 
     public WcController() {
         this.authService = new AuthService();
@@ -96,103 +100,139 @@ public class WcController {
         boolean bright = luminance(base) > 0.45;
         textPrimary   = bright ? darkest : lighter.interpolate(Color.WHITE, 0.5);
         textSecondary = bright ? darker  : lighter;
+        neuBase = base.desaturate();
+        neuLight = neuBase.interpolate(Color.WHITE, 0.6);
+        neuDark = neuBase.interpolate(Color.BLACK, 0.3);
     }
 
     private void applyDynamicTheme() {
         if (base == null) return;
 
-        // Glass blur layer
+        // Glass blur layer — frosted neumorphic card container
         if (glassBlurLayer != null) {
             glassBlurLayer.setStyle(
-                "-fx-background-color: " + rgba(base, 0.18) + ";" +
-                "-fx-background-radius: 18px;" +
-                "-fx-border-radius: 18px;" +
-                "-fx-border-color: " + rgba(lighter, 0.35) + ";" +
-                "-fx-border-width: 1px;" +
-                "-fx-effect: dropshadow(gaussian, " + rgba(darkest, 0.25) + ", 30, 0.2, 0, 10);"
+                "-fx-background-color: " + rgba(base, 0.45) + ";" +
+                "-fx-background-radius: 30;" +
+                "-fx-border-radius: 30;" +
+                "-fx-border-color: " + rgba(neuLight, 0.2) + ";" +
+                "-fx-border-width: 1;"
             );
+            DropShadow lightSh = new DropShadow(BlurType.GAUSSIAN,
+                Color.color(neuLight.getRed(), neuLight.getGreen(), neuLight.getBlue(), 0.5),
+                20, 0.05, -8, -8);
+            DropShadow darkSh = new DropShadow(BlurType.GAUSSIAN,
+                Color.color(neuDark.getRed(), neuDark.getGreen(), neuDark.getBlue(), 0.35),
+                20, 0.05, 8, 8);
+            darkSh.setInput(lightSh);
+            glassBlurLayer.setEffect(darkSh);
         }
 
-        // Auth card
+        // Auth card — semi-transparent content surface
         authCard.setStyle(
             "-fx-background-color: " + rgba(base, 0.55) + ";" +
-            "-fx-border-color: " + rgba(lighter, 0.45) + ";" +
-            "-fx-border-width: 1.5px;" +
-            "-fx-border-radius: 16px;" +
-            "-fx-background-radius: 16px;" +
-            "-fx-effect: dropshadow(gaussian, " + rgba(darkest, 0.25) + ", 24, 0.15, 0, 6);"
+            "-fx-background-radius: 28;" +
+            "-fx-border-color: transparent;"
         );
 
         // Title
         for (Node n : authCard.lookupAll(".auth-title")) {
-            ((Label) n).setStyle(
-                "-fx-text-fill: " + hex(textPrimary) + ";" +
-                "-fx-effect: dropshadow(gaussian, " + rgba(lighter, 0.7) + ", 2, 0, 0, 1);"
-            );
+            n.setStyle("-fx-text-fill: " + hex(textPrimary) + ";");
         }
 
         // Tabs divider
         if (authTabsBox != null) {
-            authTabsBox.setStyle("-fx-border-color: " + rgba(darker, 0.3) + ";" +
-                "-fx-border-width: 0 0 2px 0; -fx-padding: 0 0 12px 0;");
+            authTabsBox.setStyle(
+                "-fx-border-color: " + rgba(neuDark, 0.12) + ";" +
+                "-fx-border-width: 0 0 2 0;" +
+                "-fx-padding: 0 0 12 0;"
+            );
         }
 
-        // Tab buttons
-        String tabBase =
-            "-fx-background-color: " + rgba(darker, 0.45) + ";" +
+        // Tab buttons — subtle raised neumorphic
+        String tabStyle =
+            "-fx-background-color: " + rgba(neuLight, 0.2) + ", " +
+                rgba(neuDark, 0.08) + ", " + rgba(base, 0.35) + ";" +
+            "-fx-background-insets: -2 2 2 -2, 2 -2 -2 2, 0;" +
+            "-fx-background-radius: 12 12 0 0, 12 12 0 0, 12 12 0 0;" +
             "-fx-text-fill: " + hex(textPrimary) + ";";
-        loginTabButton.setStyle(tabBase);
-        signupTabButton.setStyle(tabBase);
+        loginTabButton.setStyle(tabStyle);
+        signupTabButton.setStyle(tabStyle);
 
-        // Field labels ("Username or Email", "Password", etc.)
+        // Field labels
         for (Node n : authCard.lookupAll(".field-label")) {
-            ((Label) n).setStyle("-fx-text-fill: " + hex(textPrimary) + ";");
+            n.setStyle("-fx-text-fill: " + hex(textPrimary) + ";");
         }
 
-        // Text fields
+        // Text fields — inset neumorphic with compound inner shadow
         String fieldStyle =
-            "-fx-background-color: " + rgba(Color.WHITE, 0.75) + ";" +
-            "-fx-border-color: " + rgba(lighter, 0.5) + ";" +
-            "-fx-text-fill: " + hex(darkest) + ";" +
-            "-fx-prompt-text-fill: " + rgba(darker, 0.55) + ";" +
-            "-fx-effect: dropshadow(gaussian, " + rgba(darkest, 0.08) + ", 4, 0, 0, 2);";
+            "-fx-font-family: 'menu';" +
+            "-fx-background-color: " + rgba(neuDark, 0.12) + ", " +
+                rgba(neuLight, 0.3) + ", " + rgba(base, 0.25) + ";" +
+            "-fx-background-insets: 0 2 2 0, 2 0 0 2, 2;" +
+            "-fx-background-radius: 15, 15, 13;" +
+            "-fx-text-fill: " + hex(textPrimary) + ";" +
+            "-fx-prompt-text-fill: " + rgba(textSecondary, 0.4) + ";" +
+            "-fx-border-color: transparent;";
+
+        InnerShadow fieldDark = new InnerShadow(BlurType.GAUSSIAN,
+            Color.color(neuDark.getRed(), neuDark.getGreen(), neuDark.getBlue(), 0.2),
+            6, 0, 2, 2);
+        InnerShadow fieldLight = new InnerShadow(BlurType.GAUSSIAN,
+            Color.color(neuLight.getRed(), neuLight.getGreen(), neuLight.getBlue(), 0.4),
+            6, 0, -2, -2);
+        fieldLight.setInput(fieldDark);
+
+        DropShadow focusGlow = new DropShadow(BlurType.GAUSSIAN,
+            Color.color(neuLight.getRed(), neuLight.getGreen(), neuLight.getBlue(), 0.6),
+            12, 0.15, 0, 0);
+        focusGlow.setInput(fieldLight);
+
         for (Node n : authCard.lookupAll(".auth-text-field")) {
             n.setStyle(fieldStyle);
+            n.setEffect(fieldLight);
+            n.focusedProperty().addListener((obs, old, focused) ->
+                n.setEffect(focused ? focusGlow : fieldLight));
         }
 
-        // Login / Sign Up action buttons
+        // Action buttons — raised neumorphic
         String actionBtnStyle =
-            "-fx-background-color: linear-gradient(from 0% 0% to 0% 100%, " +
-                hex(darker) + ", " + hex(darkest) + ");" +
+            "-fx-background-color: " + rgba(neuLight, 0.35) + ", " +
+                rgba(neuDark, 0.12) + ", " + rgba(darker, 0.5) + ";" +
+            "-fx-background-insets: -3 3 3 -3, 3 -3 -3 3, 0;" +
+            "-fx-background-radius: 15, 15, 15;" +
             "-fx-text-fill: " + hex(lighter.interpolate(Color.WHITE, 0.6)) + ";" +
-            "-fx-effect: dropshadow(gaussian, " + rgba(darkest, 0.3) + ", 12, 0, 0, 4);";
+            "-fx-border-color: transparent;";
         for (Node n : authCard.lookupAll(".login-btn")) n.setStyle(actionBtnStyle);
         for (Node n : authCard.lookupAll(".signup-btn")) n.setStyle(actionBtnStyle);
 
-        // Back buttons
+        // Back buttons — subtle raised neumorphic
         String backStyle =
-            "-fx-background-color: " + rgba(Color.WHITE, 0.30) + ";" +
+            "-fx-background-color: " + rgba(neuLight, 0.2) + ", " +
+                rgba(neuDark, 0.08) + ", " + rgba(base, 0.25) + ";" +
+            "-fx-background-insets: -2 2 2 -2, 2 -2 -2 2, 0;" +
+            "-fx-background-radius: 10, 10, 10;" +
             "-fx-text-fill: " + hex(textPrimary) + ";" +
-            "-fx-border-color: " + rgba(darker, 0.35) + ";" +
-            "-fx-effect: dropshadow(gaussian, " + rgba(Color.BLACK, 0.12) + ", 6, 0, 0, 2);";
+            "-fx-border-color: transparent;";
         for (Node n : authCard.lookupAll(".auth-back-button")) n.setStyle(backStyle);
 
         // Error labels
         for (Node n : authCard.lookupAll(".error-label")) {
             n.setStyle(
-                "-fx-background-color: " + rgba(Color.rgb(220, 20, 60), 0.08) + ";" +
-                "-fx-border-color: " + rgba(Color.rgb(220, 20, 60), 0.25) + ";" +
-                "-fx-effect: dropshadow(gaussian, " + rgba(Color.rgb(220, 20, 60), 0.15) + ", 6, 0, 0, 2);"
+                "-fx-background-color: rgba(255,59,92,0.08);" +
+                "-fx-border-color: rgba(255,59,92,0.2);" +
+                "-fx-text-fill: #ff3b5c;"
             );
         }
 
-        // Scrollbar (lookup may be null until CSS is applied)
+        // Scrollbar
         rootPane.applyCss();
         for (Node track : rootPane.lookupAll(".scroll-bar .track")) {
-            track.setStyle("-fx-background-color: " + rgba(lighter, 0.2) + "; -fx-background-radius: 6px;");
+            track.setStyle("-fx-background-color: " + rgba(neuBase, 0.15) + ";" +
+                "-fx-background-radius: 6;");
         }
         for (Node thumb : rootPane.lookupAll(".scroll-bar .thumb")) {
-            thumb.setStyle("-fx-background-color: " + rgba(darker, 0.5) + "; -fx-background-radius: 6px;");
+            thumb.setStyle("-fx-background-color: " + rgba(neuDark, 0.3) + ";" +
+                "-fx-background-radius: 6;");
         }
     }
 
@@ -241,6 +281,8 @@ public class WcController {
         if (loginUsernameField != null) {
             loginUsernameField.requestFocus();
         }
+
+        MusicManager.getInstance().attachClickSounds(rootPane);
     }
     @FXML
     protected void onLoginTabClick() {

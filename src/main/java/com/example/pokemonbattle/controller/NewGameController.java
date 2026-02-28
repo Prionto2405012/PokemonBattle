@@ -16,6 +16,7 @@ import com.example.pokemonbattle.model.Move;
 import com.example.pokemonbattle.model.Player;
 import com.example.pokemonbattle.model.PokemonInstance;
 import com.example.pokemonbattle.model.PokemonSpecies;
+import com.example.pokemonbattle.util.MusicManager;
 import com.example.pokemonbattle.util.SceneManager;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -137,6 +138,8 @@ public class NewGameController {
 
         // Set default selections (without showing borders)
         setDefaultSelections();
+
+        MusicManager.getInstance().attachClickSounds(rootPane);
     }
 
     /**

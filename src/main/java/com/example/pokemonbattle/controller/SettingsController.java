@@ -75,6 +75,8 @@ public class SettingsController {
         if (mm.getCurrentTrack() == null && gameSoundOn.get()) {
             mm.playRandomBGM();
         }
+
+        mm.attachClickSounds(overlayRoot);
     }
     @FXML
     void onGameSoundToggle(MouseEvent e) {

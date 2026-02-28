@@ -13,8 +13,14 @@
 .wc-scroll-pane .viewport { -fx-background-color: transparent; }
 .wc-scroll-pane .content  { -fx-background-color: transparent; }
 
+.glass-blur-layer {
+    -fx-background-radius: 30;
+    -fx-border-radius: 30;
+}
+
 .auth-card {
-    -fx-padding: 60px 40px;
+    -fx-padding: 50 40;
+    -fx-background-radius: 28;
 }
 
 .auth-title {
@@ -22,6 +28,8 @@
     -fx-font-size: 30px;
     -fx-font-weight: bold;
     -fx-alignment: center;
+    -fx-wrap-text: true;
+    -fx-min-height: USE_PREF_SIZE;
 }
 
 .field-label {
@@ -35,20 +43,14 @@
     -fx-font-family: "SPACE NOVA";
     -fx-font-size: 16px;
     -fx-font-weight: 600;
-    -fx-padding: 10px 28px;
-    -fx-background-radius: 10px 10px 0 0;
-    -fx-border-width: 0;
+    -fx-padding: 10 28;
     -fx-cursor: hand;
-    -fx-effect: none;
-    -fx-scale-x: 1.0;
-    -fx-scale-y: 1.0;
 }
 
 .tab-button:hover {
     -fx-opacity: 0.85;
-    -fx-scale-x: 1.0;
-    -fx-scale-y: 1.0;
-    -fx-effect: none;
+    -fx-scale-x: 1.02;
+    -fx-scale-y: 1.02;
 }
 
 .tab-button-active {
@@ -58,64 +60,50 @@
 
 .auth-text-field {
     -fx-font-family: "menu";
-    -fx-background-radius: 10px;
-    -fx-border-radius: 10px;
-    -fx-border-width: 1.5px;
-    -fx-padding: 14px 16px;
+    -fx-padding: 16 20;
     -fx-font-size: 15px;
-}
-
-.auth-text-field:focused {
-    -fx-border-width: 2px;
-    -fx-background-color: rgba(255, 255, 255, 0.95);
 }
 
 .auth-button {
     -fx-font-family: "SPACE NOVA";
-    -fx-pref-height: 48px;
+    -fx-pref-height: 48;
     -fx-font-size: 16px;
     -fx-font-weight: bold;
     -fx-cursor: hand;
-    -fx-background-radius: 10px;
-    -fx-border-radius: 10px;
-    -fx-border-width: 1px;
 }
 
 .login-btn.auth-button:hover,
 .signup-btn.auth-button:hover {
-    -fx-opacity: 0.85;
-    -fx-scale-x: 1.02;
-    -fx-scale-y: 1.02;
+    -fx-scale-x: 1.03;
+    -fx-scale-y: 1.03;
+    -fx-translate-y: -2;
 }
 
 .login-btn.auth-button:pressed,
 .signup-btn.auth-button:pressed {
-    -fx-translate-y: 2px;
-    -fx-scale-x: 0.98;
-    -fx-scale-y: 0.98;
+    -fx-translate-y: 1;
+    -fx-scale-x: 0.97;
+    -fx-scale-y: 0.97;
 }
 
 .auth-back-button {
     -fx-font-family: "SPACE NOVA";
-    -fx-background-radius: 8px;
-    -fx-border-radius: 8px;
-    -fx-border-width: 1px;
     -fx-font-size: 15px;
     -fx-font-weight: 700;
-    -fx-padding: 8px 16px;
+    -fx-padding: 10 18;
     -fx-cursor: hand;
 }
 
 .auth-back-button:hover {
-    -fx-opacity: 0.85;
-    -fx-scale-x: 1.0;
-    -fx-scale-y: 1.0;
+    -fx-scale-x: 1.03;
+    -fx-scale-y: 1.03;
+    -fx-translate-y: -1;
 }
 
 .auth-back-button:pressed {
-    -fx-opacity: 0.75;
-    -fx-scale-x: 1.0;
-    -fx-scale-y: 1.0;
+    -fx-scale-x: 0.97;
+    -fx-scale-y: 0.97;
+    -fx-translate-y: 1;
 }
 
 .error-label {

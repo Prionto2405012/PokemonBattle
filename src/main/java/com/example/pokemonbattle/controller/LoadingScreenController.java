@@ -1,5 +1,6 @@
 package com.example.pokemonbattle.controller;
 
+import com.example.pokemonbattle.util.MusicManager;
 import com.example.pokemonbattle.util.SceneManager;
 
 import javafx.animation.Interpolator;
@@ -35,6 +36,8 @@ public class LoadingScreenController {
         setupVideo();
         setupProgressBar();
         startLoading();
+
+        MusicManager.getInstance().attachClickSounds(rootPane);
     }
 
     private void setupVideo() {
