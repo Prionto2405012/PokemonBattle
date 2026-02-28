@@ -241,6 +241,18 @@ public class DatabaseManager {
             } else {
                 System.out.println("! Table 'user_profiles' not found (optional)");
             }
+
+            // Check game data tables
+            for (String table : new String[]{"moves", "pokemon_species", "pokemon_moves", "battle_items", "game_data_meta"}) {
+                rs = stmt.executeQuery(
+                    "SELECT name FROM sqlite_master WHERE type='table' AND name='" + table + "'"
+                );
+                if (rs.next()) {
+                    System.out.println("✓ Table '" + table + "' verified");
+                } else {
+                    System.out.println("! Table '" + table + "' not found (will be created on next schema run)");
+                }
+            }
         }
     }
     

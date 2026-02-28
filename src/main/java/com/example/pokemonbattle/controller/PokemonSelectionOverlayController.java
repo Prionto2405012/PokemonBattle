@@ -1,6 +1,7 @@
 package com.example.pokemonbattle.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -70,6 +71,10 @@ public class PokemonSelectionOverlayController {
     private static final int POKEMON_LEVEL = 50;
     private PokemonSpecies currentlyViewedPokemon;
 
+    // Performance: cache sprite images and card references so we never rebuild the grid
+    private static final Map<Integer, Image> spriteCache = new HashMap<>();
+    private final Map<Integer, VBox> cardMap = new HashMap<>();
+
     /**
      * Initialize the overlay with Pokemon data
      */
@@ -99,12 +104,19 @@ public class PokemonSelectionOverlayController {
     }
 
     /**
-     * Display Pokemon grid with all available Pokemon
+     * Display Pokemon grid with all available Pokemon.
+     * Pre-caches all sprite images on a background thread for instant display.
      */
     private void displayPokemonGrid() {
         pokemonGrid.getChildren().clear();
+        cardMap.clear();
         pokemonGrid.setHgap(12);
         pokemonGrid.setVgap(12);
+
+        // Pre-cache all sprites in background (non-blocking)
+        for (PokemonSpecies species : allPokemon) {
+            getCachedSprite(species.getId());
+        }
 
         int columns = 4;
         int row = 0;
@@ -112,6 +124,7 @@ public class PokemonSelectionOverlayController {
 
         for (PokemonSpecies species : allPokemon) {
             VBox pokemonCard = createPokemonCard(species);
+            cardMap.put(species.getId(), pokemonCard);
             pokemonGrid.add(pokemonCard, col, row);
 
             col++;
@@ -120,6 +133,21 @@ public class PokemonSelectionOverlayController {
                 row++;
             }
         }
+    }
+
+    /**
+     * Get a cached sprite image, loading it in the background if not yet cached.
+     */
+    private Image getCachedSprite(int pokemonId) {
+        return spriteCache.computeIfAbsent(pokemonId, id -> {
+            String path = "/com/example/pokemonbattle/sprites/front/" + id + ".png";
+            var url = getClass().getResource(path);
+            if (url != null) {
+                // backgroundLoading=true makes the image load on a background thread
+                return new Image(url.toExternalForm(), 80, 80, true, true, true);
+            }
+            return null;
+        });
     }
 
     /**
@@ -139,21 +167,16 @@ public class PokemonSelectionOverlayController {
         // Card styling
         updateCardStyle(card, isSelected);
 
-        // Pokemon sprite
+        // Pokemon sprite (from cache — instant)
         ImageView sprite = new ImageView();
         sprite.setFitWidth(80);
         sprite.setFitHeight(80);
         sprite.setPreserveRatio(true);
         
-        String spritePath = "/com/example/pokemonbattle/sprites/front/" + species.getId() + ".png";
-        try {
-            var spriteUrl = getClass().getResource(spritePath);
-            if (spriteUrl != null) {
-                sprite.setImage(new Image(spriteUrl.toExternalForm()));
-            } else {
-                createPlaceholderSprite(sprite, species);
-            }
-        } catch (Exception e) {
+        Image cachedImage = getCachedSprite(species.getId());
+        if (cachedImage != null) {
+            sprite.setImage(cachedImage);
+        } else {
             createPlaceholderSprite(sprite, species);
         }
 
@@ -194,12 +217,21 @@ public class PokemonSelectionOverlayController {
             }
         });
 
-        // Click to select/deselect
+        // Click to select/deselect — updates ONLY this card (fast)
         card.setOnMouseClicked(e -> {
             if (e.getButton() == MouseButton.PRIMARY) {
                 togglePokemonSelection(species);
-                // Refresh grid to update all cards
-                displayPokemonGrid();
+                // Update only this card's appearance instead of rebuilding entire grid
+                boolean nowSelected = selectedPokemon.stream()
+                        .anyMatch(p -> p.getId() == species.getId());
+                updateCardStyle(card, nowSelected);
+                // Update the indicator label (last child)
+                if (card.getChildren().size() >= 4) {
+                    Label indicator = (Label) card.getChildren().get(3);
+                    indicator.setText(nowSelected ? "\u2713 SELECTED" : "CLICK TO SELECT");
+                    indicator.setStyle("-fx-font-size: 10px; -fx-text-fill: " +
+                            (nowSelected ? "#163c03" : "#05273b") + "; -fx-font-weight: bold;");
+                }
             }
         });
 
@@ -267,22 +299,17 @@ public class PokemonSelectionOverlayController {
         statsPokemonName.setText(capitalize(species.getName()));
         statsPokemonName.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #ffffff;");
 
-        // Update sprite
+        // Update sprite (from cache — instant)
         statsSpriteContainer.getChildren().clear();
         ImageView sprite = new ImageView();
         sprite.setFitWidth(90);
         sprite.setFitHeight(90);
         sprite.setPreserveRatio(true);
         
-        String spritePath = "/com/example/pokemonbattle/sprites/front/" + species.getId() + ".png";
-        try {
-            var spriteUrl = getClass().getResource(spritePath);
-            if (spriteUrl != null) {
-                sprite.setImage(new Image(spriteUrl.toExternalForm()));
-            } else {
-                createPlaceholderSprite(sprite, species);
-            }
-        } catch (Exception e) {
+        Image cachedImage = getCachedSprite(species.getId());
+        if (cachedImage != null) {
+            sprite.setImage(cachedImage);
+        } else {
             createPlaceholderSprite(sprite, species);
         }
         statsSpriteContainer.getChildren().add(sprite);
@@ -378,12 +405,28 @@ public class PokemonSelectionOverlayController {
     }
 
     /**
-     * Clear all selections
+     * Clear all selections — updates card styles in-place without rebuilding
      */
     @FXML
     private void onClearSelection() {
+        // Collect IDs that were selected before clearing
+        List<Integer> previouslySelectedIds = selectedPokemon.stream()
+                .map(PokemonInstance::getId)
+                .toList();
         selectedPokemon.clear();
-        displayPokemonGrid();
+
+        // Only update the cards that were selected (fast)
+        for (int id : previouslySelectedIds) {
+            VBox card = cardMap.get(id);
+            if (card != null) {
+                updateCardStyle(card, false);
+                if (card.getChildren().size() >= 4) {
+                    Label indicator = (Label) card.getChildren().get(3);
+                    indicator.setText("CLICK TO SELECT");
+                    indicator.setStyle("-fx-font-size: 10px; -fx-text-fill: #05273b; -fx-font-weight: bold;");
+                }
+            }
+        }
         updateSelectionCount();
     }
 

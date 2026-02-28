@@ -20,3 +20,49 @@ CREATE TABLE IF NOT EXISTS user_profiles (
     favorite_pokemon TEXT,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
+
+-- ===== Game data tables (populated from JSON on first launch) =====
+
+CREATE TABLE IF NOT EXISTS moves (
+    id          INTEGER PRIMARY KEY,
+    name        TEXT    NOT NULL,
+    power       INTEGER,
+    accuracy    INTEGER,
+    pp          INTEGER NOT NULL,
+    type        TEXT    NOT NULL,
+    damage_class TEXT   NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS pokemon_species (
+    id              INTEGER PRIMARY KEY,
+    name            TEXT    NOT NULL,
+    types           TEXT    NOT NULL,   -- comma-separated, e.g. "grass,poison"
+    hp              INTEGER NOT NULL,
+    attack          INTEGER NOT NULL,
+    defense         INTEGER NOT NULL,
+    special_attack  INTEGER NOT NULL,
+    special_defense INTEGER NOT NULL,
+    speed           INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS pokemon_moves (
+    pokemon_id  INTEGER NOT NULL,
+    move_id     INTEGER NOT NULL,
+    PRIMARY KEY (pokemon_id, move_id),
+    FOREIGN KEY (pokemon_id) REFERENCES pokemon_species(id),
+    FOREIGN KEY (move_id)    REFERENCES moves(id)
+);
+CREATE INDEX IF NOT EXISTS idx_pokemon_moves_pokemon ON pokemon_moves(pokemon_id);
+
+CREATE TABLE IF NOT EXISTS battle_items (
+    id       INTEGER PRIMARY KEY,
+    name     TEXT NOT NULL,
+    category TEXT NOT NULL,
+    effect   TEXT
+);
+
+-- Metadata table to track whether JSON import has been done
+CREATE TABLE IF NOT EXISTS game_data_meta (
+    key   TEXT PRIMARY KEY,
+    value TEXT
+);

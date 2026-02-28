@@ -1,8 +1,6 @@
 package com.example.pokemonbattle.controller;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -12,14 +10,13 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+import com.example.pokemonbattle.database.GameDataDAO;
 import com.example.pokemonbattle.model.Move;
 import com.example.pokemonbattle.model.Player;
 import com.example.pokemonbattle.model.PokemonInstance;
 import com.example.pokemonbattle.model.PokemonSpecies;
 import com.example.pokemonbattle.util.MusicManager;
 import com.example.pokemonbattle.util.SceneManager;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -262,48 +259,34 @@ public class NewGameController {
     }
 
     /**
-     * Load Pokemon and Move data from JSON files using Gson
+     * Load Pokemon and Move data from SQLite database.
+     * On first launch the DAO imports JSON → SQL automatically;
+     * on subsequent launches it reads straight from the DB (fast).
      */
     private void loadGameData() {
         try {
-            Gson gson = new Gson();
-            
-            // Load moves from moves_gen4.json
-            allMoves = new HashMap<>();
-            String movesJson = loadJsonFromResource("/com/example/pokemonbattle/database/moves_gen4.json");
-            List<Move> movesList = gson.fromJson(movesJson, new TypeToken<List<Move>>(){}.getType());
-            for (Move move : movesList) {
-                allMoves.put(move.getId(), move);
-            }
-            System.out.println("Loaded " + allMoves.size() + " moves from JSON");
-            
-            // Load Pokemon from pokemon_gen4.json
-            String pokemonJson = loadJsonFromResource("/com/example/pokemonbattle/database/pokemon_gen4.json");
-            List<PokemonSpecies> pokemonList = gson.fromJson(pokemonJson, new TypeToken<List<PokemonSpecies>>(){}.getType());
-            allPokemon = new ArrayList<>(pokemonList);
-            
+            GameDataDAO dao = new GameDataDAO();
+            dao.ensureDataLoaded();
+
+            // Load moves from DB
+            allMoves = dao.loadAllMoves();
+
+            // Load pokemon from DB
+            allPokemon = dao.loadAllPokemon();
+
             // Select random 4 moves for each Pokemon
             for (PokemonSpecies pokemon : allPokemon) {
                 pokemon.selectRandomMoves(allMoves);
             }
             PokemonInstance.setAllPokemonSpecies(allPokemon);
             PokemonInstance.setAllMoves(allMoves);
-            
-            System.out.println("Loaded " + allPokemon.size() + " Pokemon species from JSON");
+
+            System.out.println("Loaded " + allPokemon.size() + " Pokemon + " + allMoves.size() + " moves from DB");
         } catch (Exception e) {
-            System.err.println("Error loading game data from JSON: " + e.getMessage());
+            System.err.println("Error loading game data: " + e.getMessage());
             e.printStackTrace();
             allMoves = new HashMap<>();
             allPokemon = new ArrayList<>();
-        }
-    }
-    private String loadJsonFromResource(String resourcePath) throws IOException {
-        try (InputStream inputStream = getClass().getResourceAsStream(resourcePath)) {
-            if (inputStream == null) {
-                throw new IOException("Resource not found: " + resourcePath);
-            }
-            byte[] bytes = inputStream.readAllBytes();
-            return new String(bytes, StandardCharsets.UTF_8);
         }
     }
     private void setupUI() {
