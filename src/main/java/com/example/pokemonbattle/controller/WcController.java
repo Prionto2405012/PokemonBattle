@@ -3,6 +3,7 @@ package com.example.pokemonbattle.controller;
 import com.example.pokemonbattle.model.User;
 import com.example.pokemonbattle.service.AuthService;
 import com.example.pokemonbattle.util.MusicManager;
+import com.example.pokemonbattle.util.PlayerSession;
 import com.example.pokemonbattle.util.PokeballOverlay;
 import com.example.pokemonbattle.util.SceneManager;
 
@@ -330,6 +331,7 @@ public class WcController {
         
         if (result.isSuccess()) {
             currentUser = result.getUser();
+            PlayerSession.getInstance().setCurrentUser(currentUser);
             System.out.println("Login successful - User: " + currentUser.getUsername());
             SceneManager.switchSceneWithLoading("menu.fxml", "Pokemon Battle - Menu", 1200, 700);
         } else {
@@ -388,6 +390,7 @@ public class WcController {
         
         if (result.isSuccess()) {
             currentUser = result.getUser();
+            PlayerSession.getInstance().setCurrentUser(currentUser);
             System.out.println("Registration successful - User: " + currentUser.getUsername());
             SceneManager.switchSceneWithLoading("menu.fxml", "Pokemon Battle - Menu", 1200, 700);
         } else {

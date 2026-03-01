@@ -1,6 +1,7 @@
 package com.example.pokemonbattle.controller;
 
 import java.io.IOException;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -11,17 +12,27 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 import com.example.pokemonbattle.database.GameDataDAO;
+import com.example.pokemonbattle.model.BattleRecord;
 import com.example.pokemonbattle.model.Move;
 import com.example.pokemonbattle.model.Player;
 import com.example.pokemonbattle.model.PokemonInstance;
 import com.example.pokemonbattle.model.PokemonSpecies;
+import com.example.pokemonbattle.model.User;
+import com.example.pokemonbattle.service.BattleHistoryManager;
 import com.example.pokemonbattle.util.MusicManager;
+import com.example.pokemonbattle.util.PlayerSession;
 import com.example.pokemonbattle.util.SceneManager;
 
+import javafx.animation.FadeTransition;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.ScaleTransition;
+import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -32,8 +43,10 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 
 @SuppressWarnings("unused")
 public class NewGameController {
@@ -44,7 +57,19 @@ public class NewGameController {
     @FXML
     private ImageView bgImage;
     @FXML
+    private Region dashboardOverlay;
+    @FXML
     private VBox contentVBox;
+
+    // Dashboard — Avatar Panel
+    @FXML private VBox avatarPanel;
+    @FXML private ImageView avatarDisplay;
+    @FXML private Label playerNameLabel;
+    @FXML private Label winsLabel;
+    @FXML private Label lossesLabel;
+    @FXML private Button battleHistoryButton;
+    @FXML private Button changeAvatarButton;
+    @FXML private Button viewSelectedPokemonButton;
 
     // Mode Selection
     @FXML
@@ -136,7 +161,18 @@ public class NewGameController {
         // Set default selections (without showing borders)
         setDefaultSelections();
 
+        // ── Dashboard: load avatar + stats ──
+        loadDashboardData();
+
+        // Start subtle avatar idle animation
+        startAvatarIdleAnimation();
+
         MusicManager.getInstance().attachClickSounds(rootPane);
+
+        // ── First-time user: show avatar selection overlay ──
+        if (PlayerSession.getInstance().isFirstTime()) {
+            javafx.application.Platform.runLater(this::showAvatarSelectionOverlay);
+        }
     }
 
     /**
@@ -895,6 +931,9 @@ public class NewGameController {
             selectedTeamBox.setVisible(true);
             selectedTeamBox.setManaged(true);
         }
+
+        // Show "View Selected Pokémon" button on dashboard
+        showViewPokemonButton();
     }
     
     /**
@@ -958,5 +997,384 @@ public class NewGameController {
             case "steel" -> "#B8B8D0";
             default -> "#68A090";
         };
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    //  DASHBOARD FEATURES — Avatar, Battle History, View Pokemon
+    // ═══════════════════════════════════════════════════════════════
+
+    /**
+     * Load avatar, player name, and battle stats from PlayerSession + BattleHistoryManager.
+     */
+    private void loadDashboardData() {
+        PlayerSession session = PlayerSession.getInstance();
+        User user = session.getCurrentUser();
+
+        // Player name
+        if (user != null && playerNameLabel != null) {
+            playerNameLabel.setText(user.getUsername());
+        }
+
+        // Avatar
+        if (session.getAvatarPath() != null && avatarDisplay != null) {
+            try {
+                var url = getClass().getResource(session.getAvatarPath());
+                if (url != null) {
+                    avatarDisplay.setImage(new Image(url.toExternalForm(), 180, 180, true, true));
+                }
+            } catch (Exception e) {
+                System.err.println("[Dashboard] Failed to load avatar: " + e.getMessage());
+            }
+        }
+
+        // Battle stats
+        if (user != null && user.getId() != null) {
+            try {
+                BattleHistoryManager history = BattleHistoryManager.getInstance();
+                int wins = history.getWinCount(user.getId());
+                int losses = history.getLossCount(user.getId());
+                if (winsLabel != null) winsLabel.setText(String.valueOf(wins));
+                if (lossesLabel != null) lossesLabel.setText(String.valueOf(losses));
+            } catch (Exception e) {
+                System.err.println("[Dashboard] Failed to load stats: " + e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * Subtle idle float animation on avatar display.
+     */
+    private void startAvatarIdleAnimation() {
+        if (avatarDisplay == null) return;
+        Timeline idle = new Timeline(
+            new KeyFrame(Duration.ZERO,
+                new KeyValue(avatarDisplay.translateYProperty(), 0)),
+            new KeyFrame(Duration.millis(1500),
+                new KeyValue(avatarDisplay.translateYProperty(), -6)),
+            new KeyFrame(Duration.millis(3000),
+                new KeyValue(avatarDisplay.translateYProperty(), 0))
+        );
+        idle.setCycleCount(Timeline.INDEFINITE);
+        idle.play();
+    }
+
+    // ── Change Avatar ───────────────────────────────────────────
+
+    @FXML
+    void onChangeAvatarClick() {
+        showAvatarSelectionOverlay();
+    }
+
+    private void showAvatarSelectionOverlay() {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/com/example/pokemonbattle/view/avatar_selection.fxml"));
+            Node overlay = loader.load();
+            AvatarSelectionController ctrl = loader.getController();
+
+            ctrl.setOnAvatarSelected(args -> {
+                // args[0] = path, args[1] = gender
+                loadDashboardData(); // Refresh avatar display
+            });
+
+            overlay.setOpacity(0.0);
+            rootPane.getChildren().add(overlay);
+            MusicManager.getInstance().attachClickSounds((Parent) overlay);
+
+            FadeTransition ft = new FadeTransition(Duration.millis(200), overlay);
+            ft.setFromValue(0.0);
+            ft.setToValue(1.0);
+            ft.play();
+        } catch (IOException e) {
+            System.err.println("[Dashboard] Error loading avatar selection: " + e.getMessage());
+        }
+    }
+
+    // ── Battle History Overlay ──────────────────────────────────
+
+    @FXML
+    void onBattleHistoryClick() {
+        showBattleHistoryOverlay();
+    }
+
+    private void showBattleHistoryOverlay() {
+        PlayerSession session = PlayerSession.getInstance();
+        User user = session.getCurrentUser();
+        if (user == null || user.getId() == null) {
+            matchingStatusLabel.setText("Please log in to view battle history");
+            matchingStatusLabel.setStyle("-fx-font-size:12px; -fx-text-fill:#F08030; -fx-font-style:italic;");
+            return;
+        }
+
+        BattleHistoryManager historyMgr = BattleHistoryManager.getInstance();
+        List<BattleRecord> records = historyMgr.getBattleHistory(user.getId());
+        int wins = historyMgr.getWinCount(user.getId());
+        int losses = historyMgr.getLossCount(user.getId());
+
+        // Build overlay programmatically (consistent overlay pattern)
+        StackPane overlayRoot = new StackPane();
+        overlayRoot.getStyleClass().add("history-overlay-root");
+        overlayRoot.setAlignment(Pos.CENTER);
+
+        VBox container = new VBox(15);
+        container.getStyleClass().add("history-container");
+        container.setAlignment(Pos.TOP_CENTER);
+        container.setMaxWidth(560);
+        container.setMaxHeight(500);
+        container.setPadding(new Insets(24, 28, 24, 28));
+
+        // Title
+        Label title = new Label("Battle History");
+        title.getStyleClass().add("history-title");
+
+        // Summary
+        HBox summary = new HBox(30);
+        summary.setAlignment(Pos.CENTER);
+        Label winSummary = new Label("Wins: " + wins);
+        winSummary.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #78C850;");
+        Label lossSummary = new Label("Losses: " + losses);
+        lossSummary.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #F08030;");
+        Label totalSummary = new Label("Total: " + (wins + losses));
+        totalSummary.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #b0eedf;");
+        summary.getChildren().addAll(winSummary, lossSummary, totalSummary);
+
+        // Records list
+        VBox recordsList = new VBox(8);
+        recordsList.setPadding(new Insets(8));
+
+        if (records.isEmpty()) {
+            Label empty = new Label("No battles yet. Start your first battle!");
+            empty.setStyle("-fx-font-size: 14px; -fx-text-fill: #90aea6; -fx-font-style: italic;");
+            recordsList.getChildren().add(empty);
+        } else {
+            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("MMM dd, yyyy HH:mm");
+            for (BattleRecord record : records) {
+                HBox card = new HBox(12);
+                card.getStyleClass().add("history-record-card");
+                card.setAlignment(Pos.CENTER_LEFT);
+
+                // Result badge
+                Label resultBadge = new Label(record.getResult());
+                resultBadge.setStyle("-fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 4 10; " +
+                    "-fx-background-radius: 6; -fx-min-width: 50; -fx-alignment: CENTER; " +
+                    "-fx-background-color: " + ("WIN".equals(record.getResult()) ? "rgba(120,200,80,0.3)" : "rgba(240,128,48,0.3)") + "; " +
+                    "-fx-text-fill: " + ("WIN".equals(record.getResult()) ? "#78C850" : "#F08030") + ";");
+
+                // Info
+                VBox info = new VBox(2);
+                Label opponent = new Label("vs " + (record.getOpponentName() != null ? record.getOpponentName() : "Unknown")
+                    + " (" + record.getOpponentType() + ")");
+                opponent.setStyle("-fx-font-size: 13px; -fx-text-fill: #e0f0ec; -fx-font-weight: bold;");
+                Label pokemon = new Label("Team: " + String.join(", ", record.getPokemonUsed()));
+                pokemon.setStyle("-fx-font-size: 11px; -fx-text-fill: #90aea6;");
+                pokemon.setWrapText(true);
+                Label time = new Label(record.getTimestamp() != null ? record.getTimestamp().format(fmt) : "");
+                time.setStyle("-fx-font-size: 10px; -fx-text-fill: #6b8f85;");
+                info.getChildren().addAll(opponent, pokemon, time);
+                HBox.setHgrow(info, javafx.scene.layout.Priority.ALWAYS);
+
+                card.getChildren().addAll(resultBadge, info);
+                recordsList.getChildren().add(card);
+            }
+        }
+
+        ScrollPane scroll = new ScrollPane(recordsList);
+        scroll.setFitToWidth(true);
+        scroll.setPrefHeight(320);
+        scroll.setStyle("-fx-background: transparent; -fx-background-color: transparent;");
+
+        // Close button
+        Button closeBtn = new Button("Close");
+        closeBtn.getStyleClass().add("button-blue");
+        closeBtn.setPrefWidth(120);
+        closeBtn.setOnAction(e -> {
+            FadeTransition ft = new FadeTransition(Duration.millis(180), overlayRoot);
+            ft.setToValue(0.0);
+            ft.setOnFinished(ev -> rootPane.getChildren().remove(overlayRoot));
+            ft.play();
+        });
+
+        container.getChildren().addAll(title, summary, scroll, closeBtn);
+        overlayRoot.getChildren().add(container);
+
+        // Click outside to close
+        overlayRoot.setOnMouseClicked(e -> {
+            if (e.getTarget() == overlayRoot) {
+                FadeTransition ft = new FadeTransition(Duration.millis(180), overlayRoot);
+                ft.setToValue(0.0);
+                ft.setOnFinished(ev -> rootPane.getChildren().remove(overlayRoot));
+                ft.play();
+            }
+        });
+        container.setOnMouseClicked(e -> e.consume());
+
+        // Animate in
+        overlayRoot.setOpacity(0.0);
+        rootPane.getChildren().add(overlayRoot);
+        MusicManager.getInstance().attachClickSounds(overlayRoot);
+        FadeTransition fadeIn = new FadeTransition(Duration.millis(200), overlayRoot);
+        fadeIn.setToValue(1.0);
+        fadeIn.play();
+    }
+
+    // ── View Selected Pokémon Overlay ───────────────────────────
+
+    @FXML
+    void onViewSelectedPokemonClick() {
+        if (playerTeam.isEmpty()) return;
+        showViewSelectedPokemonOverlay();
+    }
+
+    /**
+     * Show the "View Selected Pokémon" button after team selection.
+     */
+    private void showViewPokemonButton() {
+        if (viewSelectedPokemonButton != null && !playerTeam.isEmpty()) {
+            viewSelectedPokemonButton.setVisible(true);
+            viewSelectedPokemonButton.setManaged(true);
+
+            // Fade in
+            viewSelectedPokemonButton.setOpacity(0);
+            FadeTransition ft = new FadeTransition(Duration.millis(250), viewSelectedPokemonButton);
+            ft.setToValue(1.0);
+            ft.play();
+        }
+    }
+
+    private void hideViewPokemonButton() {
+        if (viewSelectedPokemonButton != null) {
+            viewSelectedPokemonButton.setVisible(false);
+            viewSelectedPokemonButton.setManaged(false);
+        }
+    }
+
+    private void showViewSelectedPokemonOverlay() {
+        StackPane overlayRoot = new StackPane();
+        overlayRoot.getStyleClass().add("view-pokemon-overlay-root");
+        overlayRoot.setAlignment(Pos.CENTER);
+
+        VBox container = new VBox(15);
+        container.getStyleClass().add("view-pokemon-container");
+        container.setAlignment(Pos.TOP_CENTER);
+        container.setMaxWidth(720);
+        container.setMaxHeight(520);
+        container.setPadding(new Insets(20, 25, 20, 25));
+
+        Label title = new Label("Your Selected Team");
+        title.setStyle("-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #155c56; " +
+                       "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 4, 0, 0, 1);");
+
+        // Pokemon cards in a grid
+        GridPane grid = new GridPane();
+        grid.setHgap(14);
+        grid.setVgap(14);
+        grid.setAlignment(Pos.CENTER);
+        grid.setPadding(new Insets(10));
+
+        int col = 0;
+        int row = 0;
+        for (PokemonInstance pokemon : playerTeam) {
+            VBox card = createPokemonPreviewCard(pokemon);
+            grid.add(card, col, row);
+            col++;
+            if (col >= 3) { col = 0; row++; }
+        }
+
+        ScrollPane scroll = new ScrollPane(grid);
+        scroll.setFitToWidth(true);
+        scroll.setPrefHeight(380);
+        scroll.setStyle("-fx-background: transparent; -fx-background-color: transparent;");
+
+        Button closeBtn = new Button("Close");
+        closeBtn.getStyleClass().add("button-gray");
+        closeBtn.setPrefWidth(120);
+        closeBtn.setOnAction(e -> {
+            FadeTransition ft = new FadeTransition(Duration.millis(200), overlayRoot);
+            ft.setToValue(0.0);
+            ft.setOnFinished(ev -> rootPane.getChildren().remove(overlayRoot));
+            ft.play();
+        });
+
+        container.getChildren().addAll(title, scroll, closeBtn);
+        overlayRoot.getChildren().add(container);
+
+        overlayRoot.setOnMouseClicked(e -> {
+            if (e.getTarget() == overlayRoot) {
+                FadeTransition ft = new FadeTransition(Duration.millis(200), overlayRoot);
+                ft.setToValue(0.0);
+                ft.setOnFinished(ev -> rootPane.getChildren().remove(overlayRoot));
+                ft.play();
+            }
+        });
+        container.setOnMouseClicked(e -> e.consume());
+
+        // Animate in with scale + fade
+        overlayRoot.setOpacity(0);
+        overlayRoot.setScaleX(0.92);
+        overlayRoot.setScaleY(0.92);
+        rootPane.getChildren().add(overlayRoot);
+        MusicManager.getInstance().attachClickSounds(overlayRoot);
+
+        FadeTransition fadeIn = new FadeTransition(Duration.millis(250), overlayRoot);
+        fadeIn.setToValue(1.0);
+        ScaleTransition scaleIn = new ScaleTransition(Duration.millis(250), overlayRoot);
+        scaleIn.setToX(1.0);
+        scaleIn.setToY(1.0);
+        fadeIn.play();
+        scaleIn.play();
+    }
+
+    /**
+     * Create a styled card for the View Selected Pokemon overlay.
+     */
+    private VBox createPokemonPreviewCard(PokemonInstance pokemon) {
+        VBox card = new VBox(6);
+        card.setAlignment(Pos.CENTER);
+        card.getStyleClass().add("pokemon-preview-card");
+        card.setPrefWidth(200);
+        card.setPrefHeight(220);
+
+        // Sprite
+        ImageView sprite = new ImageView();
+        sprite.setFitWidth(80);
+        sprite.setFitHeight(80);
+        sprite.setPreserveRatio(true);
+        String spritePath = "/com/example/pokemonbattle/sprites/front/" + pokemon.getId() + ".png";
+        try {
+            var url = getClass().getResource(spritePath);
+            if (url != null) sprite.setImage(new Image(url.toExternalForm(), 80, 80, true, true));
+        } catch (Exception ignored) {}
+
+        // Name
+        Label name = new Label(capitalize(pokemon.getName()));
+        name.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #155c56;");
+
+        // Level
+        Label level = new Label("Lv." + pokemon.getLevel());
+        level.setStyle("-fx-font-size: 12px; -fx-text-fill: #f8d030; -fx-font-weight: bold;");
+
+        // HP
+        Label hp = new Label("HP: " + pokemon.getMaxHp());
+        hp.setStyle("-fx-font-size: 12px; -fx-text-fill: #78C850;");
+
+        // Types
+        HBox types = new HBox(4);
+        types.setAlignment(Pos.CENTER);
+        if (pokemon.getTypes() != null) {
+            for (String type : pokemon.getTypes()) {
+                Label typeLbl = new Label(type.substring(0, Math.min(3, type.length())).toUpperCase());
+                typeLbl.setStyle("-fx-font-size: 9px; -fx-padding: 2 5; -fx-background-color: " +
+                        getTypeColor(type) + "; -fx-text-fill: white; -fx-background-radius: 3; -fx-font-weight: bold;");
+                types.getChildren().add(typeLbl);
+            }
+        }
+
+        card.getChildren().addAll(sprite, name, level, hp, types);
+
+        // Hover scale
+        card.setOnMouseEntered(e -> { card.setScaleX(1.04); card.setScaleY(1.04); });
+        card.setOnMouseExited(e -> { card.setScaleX(1.0); card.setScaleY(1.0); });
+
+        return card;
     }
 }

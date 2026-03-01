@@ -6,6 +6,7 @@ module com.example.pokemonbattle {
     requires transitive javafx.media;
     requires java.logging;
     requires java.sql;          // For SQLite database operations
+    requires java.prefs;         // For PlayerSession avatar persistence
     requires java.desktop;      // javax.imageio — GIF frame decoding
     requires javafx.swing;      // SwingFXUtils — BufferedImage → WritableImage
     requires com.google.gson;
@@ -14,8 +15,12 @@ module com.example.pokemonbattle {
     opens com.example.pokemonbattle.controller to javafx.fxml;
     opens com.example.pokemonbattle.util to javafx.fxml;
     opens com.example.pokemonbattle.model to javafx.fxml, com.google.gson;
+    opens com.example.pokemonbattle.service to javafx.fxml;
+    opens com.example.pokemonbattle.security to javafx.fxml;
     exports com.example.pokemonbattle;
     exports com.example.pokemonbattle.controller;
     exports com.example.pokemonbattle.model;
+    exports com.example.pokemonbattle.service;
+    exports com.example.pokemonbattle.security;
     exports com.example.pokemonbattle.util;
 }

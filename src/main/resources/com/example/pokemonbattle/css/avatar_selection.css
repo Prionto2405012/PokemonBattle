@@ -1,0 +1,173 @@
+/* Overlay background */
+.overlay-root {
+    -fx-background-color: rgba(0, 0, 0, 0.6);
+}
+
+/* Glassmorphism container */
+.overlay-container {
+    -fx-background-color: rgba(20, 50, 47, 0.95);
+    -fx-background-radius: 20;
+    -fx-border-color: rgba(120, 220, 220, 0.40);
+    -fx-border-width: 1.5;
+    -fx-border-radius: 20;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.6), 30, 0, 0, 8);
+}
+
+/* Title */
+.overlay-title {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #e8eaf6;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 6, 0, 0, 2);
+    -fx-alignment: CENTER;
+}
+
+/* ── Filter buttons ──────────────────────────────────────────── */
+
+.filter-btn {
+    -fx-background-color: rgba(40, 80, 71, 0.8);
+    -fx-background-radius: 8;
+    -fx-border-color: rgba(100, 200, 177, 0.35);
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-text-fill: #90aea6;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-pref-width: 72px;
+    -fx-min-width: 72px;
+    -fx-pref-height: 30px;
+    -fx-padding: 4 10 4 10;
+    -fx-cursor: hand;
+}
+
+.filter-btn:hover {
+    -fx-background-color: rgba(60, 115, 103, 0.9);
+    -fx-border-color: rgba(130, 230, 227, 0.6);
+    -fx-text-fill: #cfd8dc;
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+.filter-btn.filter-active {
+    -fx-background-color: linear-gradient(to bottom, #10985f, #50b997);
+    -fx-border-color: #42f5c2;
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(gaussian, rgba(66, 245, 173, 0.55), 8, 0.1, 0, 2);
+}
+
+/* ── Carousel area ───────────────────────────────────────────── */
+
+.carousel-area {
+    -fx-background-color: rgba(10, 30, 28, 0.35);
+    -fx-background-radius: 14;
+    -fx-border-color: rgba(100, 200, 177, 0.15);
+    -fx-border-width: 1;
+    -fx-border-radius: 14;
+}
+
+/* ── Carousel arrows ─────────────────────────────────────────── */
+
+.carousel-arrow {
+    -fx-background-color: rgba(30, 70, 60, 0.85);
+    -fx-background-radius: 100em;
+    -fx-border-color: rgba(120, 220, 200, 0.4);
+    -fx-border-width: 1;
+    -fx-border-radius: 100em;
+    -fx-min-width: 40px;
+    -fx-min-height: 40px;
+    -fx-pref-width: 40px;
+    -fx-pref-height: 40px;
+    -fx-max-width: 40px;
+    -fx-max-height: 40px;
+    -fx-text-fill: #c0eedf;
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-padding: 0 2 4 2;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 8, 0, 0, 2);
+}
+
+.carousel-arrow:hover {
+    -fx-background-color: rgba(50, 110, 95, 0.95);
+    -fx-border-color: rgba(66, 245, 200, 0.6);
+    -fx-text-fill: #ffffff;
+    -fx-scale-x: 1.1;
+    -fx-scale-y: 1.1;
+    -fx-effect: dropshadow(gaussian, rgba(66, 245, 200, 0.4), 12, 0, 0, 2);
+}
+
+.carousel-arrow:pressed {
+    -fx-background-color: rgba(20, 60, 50, 0.95);
+    -fx-scale-x: 0.95;
+    -fx-scale-y: 0.95;
+}
+
+/* ── Avatar card (built programmatically) ────────────────────── */
+
+.avatar-card {
+    -fx-background-color: rgba(180, 230, 215, 0.15);
+    -fx-background-radius: 16;
+    -fx-border-color: rgba(120, 220, 200, 0.3);
+    -fx-border-width: 1.5;
+    -fx-border-radius: 16;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 3);
+    -fx-padding: 12;
+    -fx-alignment: CENTER;
+}
+
+.avatar-card-center {
+    -fx-background-color: rgba(66, 245, 173, 0.12);
+    -fx-border-color: rgba(66, 245, 200, 0.6);
+    -fx-border-width: 2;
+    -fx-effect: dropshadow(gaussian, rgba(66, 245, 200, 0.35), 18, 0, 0, 4);
+}
+
+/* ── Avatar info label ───────────────────────────────────────── */
+
+.avatar-info-label {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #b0eedf;
+    -fx-alignment: CENTER;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 4, 0, 0, 1);
+}
+
+/* ── Close X button (reuse settings pattern) ─────────────────── */
+
+.close-x-button {
+    -fx-background-color:
+        #6b0000,
+        linear-gradient(from 0% 0% to 0% 100%, #ff5c5c, #c0392b);
+    -fx-background-insets: 0, 0 0 4 0;
+    -fx-background-radius: 100em, 100em;
+    -fx-min-width: 34px;  -fx-pref-width: 34px;  -fx-max-width: 34px;
+    -fx-min-height: 34px; -fx-pref-height: 34px; -fx-max-height: 34px;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 0 2 4 2;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.55), 8, 0, 0, 4);
+    -fx-scale-x: 1.0;
+    -fx-scale-y: 1.0;
+}
+
+.close-x-button:hover {
+    -fx-background-color:
+        #6b0000,
+        linear-gradient(from 0% 0% to 0% 100%, #ff7c7c, #e74c3c);
+    -fx-background-insets: 0, 0 0 4 0;
+    -fx-effect: dropshadow(gaussian, rgba(200,0,0,0.5), 12, 0.2, 0, 5);
+    -fx-scale-x: 1.0;
+    -fx-scale-y: 1.0;
+}
+
+.close-x-button:pressed {
+    -fx-background-color:
+        #6b0000,
+        linear-gradient(from 0% 0% to 0% 100%, #8b1a1a, #a93226);
+    -fx-background-insets: 0, 4 0 0 0;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 3, 0, 0, 1);
+    -fx-scale-x: 1.0;
+    -fx-scale-y: 1.0;
+}

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<StackPane fx:id="overlayRoot"
+           xmlns="http://javafx.com/javafx/25"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.example.pokemonbattle.controller.AvatarSelectionController"
+           styleClass="overlay-root"
+           alignment="CENTER"
+           stylesheets="@../css/common.css,@../css/avatar_selection.css"
+           onMouseClicked="#onBackgroundClick">
+
+    <!-- Main Card -->
+    <StackPane maxWidth="720" maxHeight="520" pickOnBounds="false">
+
+        <VBox alignment="TOP_CENTER" spacing="10" styleClass="overlay-container"
+              onMouseClicked="#onCardClick">
+            <padding>
+                <Insets top="24" bottom="24" left="32" right="32"/>
+            </padding>
+
+            <!-- Title -->
+            <Label text="Choose Your Avatar" styleClass="overlay-title">
+                <font><Font name="System Bold" size="26"/></font>
+            </Label>
+
+            <!-- Filter Buttons (top-right feel, centered in header row) -->
+            <HBox fx:id="filterBox" alignment="CENTER_RIGHT" spacing="8">
+                <padding><Insets top="4" bottom="4"/></padding>
+                <Button fx:id="filterAllBtn"    text="All"    styleClass="filter-btn,filter-active"
+                        onAction="#onFilterAll"/>
+                <Button fx:id="filterMaleBtn"   text="Male"   styleClass="filter-btn"
+                        onAction="#onFilterMale"/>
+                <Button fx:id="filterFemaleBtn" text="Female" styleClass="filter-btn"
+                        onAction="#onFilterFemale"/>
+            </HBox>
+
+            <!-- Carousel Area -->
+            <StackPane fx:id="carouselPane" prefHeight="280" minHeight="280"
+                       styleClass="carousel-area">
+                <!-- Avatar items are built programmatically -->
+
+                <!-- Navigation Arrows -->
+                <Button fx:id="leftArrowBtn"  text="‹" styleClass="carousel-arrow,arrow-left"
+                        onAction="#onCarouselLeft"  StackPane.alignment="CENTER_LEFT">
+                    <StackPane.margin><Insets left="8"/></StackPane.margin>
+                </Button>
+                <Button fx:id="rightArrowBtn" text="›" styleClass="carousel-arrow,arrow-right"
+                        onAction="#onCarouselRight" StackPane.alignment="CENTER_RIGHT">
+                    <StackPane.margin><Insets right="8"/></StackPane.margin>
+                </Button>
+            </StackPane>
+
+            <!-- Avatar name / gender label -->
+            <Label fx:id="avatarInfoLabel" text="" styleClass="avatar-info-label">
+                <font><Font size="16"/></font>
+            </Label>
+
+            <!-- Select Button -->
+            <Button fx:id="selectButton" text="Select Avatar" styleClass="button-green"
+                    onAction="#onSelectAvatar" prefWidth="200" prefHeight="40">
+                <font><Font size="16"/></font>
+                <VBox.margin><Insets top="6"/></VBox.margin>
+            </Button>
+        </VBox>
+
+        <!-- Close X -->
+        <Button fx:id="closeXButton" text="✕"
+                onAction="#onCloseButtonClick"
+                styleClass="close-x-button"
+                StackPane.alignment="TOP_RIGHT"
+                translateX="14" translateY="-14"
+                mnemonicParsing="false"/>
+    </StackPane>
+</StackPane>

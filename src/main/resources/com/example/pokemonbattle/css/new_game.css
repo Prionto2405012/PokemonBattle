@@ -80,3 +80,147 @@
     -fx-effect: dropshadow(gaussian, rgba(0, 120, 100, 0.45), 10, 0, 0, 2);
     -fx-border-color: rgba(95, 169, 149, 0.8);
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   Dashboard Layout — Avatar Panel + Stats + Battle History
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Dark focus overlay behind dashboard content */
+.dashboard-dark-overlay {
+    -fx-background-color: rgba(5, 15, 12, 0.45);
+}
+
+/* ── Left Avatar Panel ───────────────────────────────────────── */
+
+.avatar-panel {
+    -fx-background-color: rgba(15, 40, 35, 0.75);
+    -fx-background-radius: 18;
+    -fx-border-color: rgba(120, 220, 200, 0.25);
+    -fx-border-width: 1.5;
+    -fx-border-radius: 18;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 16, 0, 0, 4);
+}
+
+.avatar-display-frame {
+    -fx-background-color: rgba(30, 70, 60, 0.5);
+    -fx-background-radius: 16;
+    -fx-border-color: rgba(66, 245, 200, 0.35);
+    -fx-border-width: 2;
+    -fx-border-radius: 16;
+    -fx-effect: dropshadow(gaussian, rgba(66, 245, 200, 0.2), 14, 0, 0, 3);
+}
+
+.player-name-label {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #e8f5e9;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 4, 0, 0, 1);
+}
+
+/* Stats boxes */
+.stat-box {
+    -fx-background-color: rgba(20, 55, 48, 0.7);
+    -fx-background-radius: 10;
+    -fx-border-color: rgba(100, 200, 177, 0.2);
+    -fx-border-width: 1;
+    -fx-border-radius: 10;
+    -fx-padding: 8 16;
+    -fx-min-width: 80;
+}
+
+.stat-label {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #90aea6;
+}
+
+.stat-value-win {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #78C850;
+    -fx-effect: dropshadow(gaussian, rgba(120, 200, 80, 0.4), 6, 0, 0, 1);
+}
+
+.stat-value-loss {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #F08030;
+    -fx-effect: dropshadow(gaussian, rgba(240, 128, 48, 0.4), 6, 0, 0, 1);
+}
+
+/* ── Battle Setup Sections (right panel) ─────────────────────── */
+
+.setup-section {
+    -fx-background-color: rgba(255,255,255,0.08);
+    -fx-background-radius: 12;
+    -fx-border-color: rgba(255,255,255,0.2);
+    -fx-border-width: 1;
+    -fx-border-radius: 12;
+}
+
+/* ── Battle History Overlay ──────────────────────────────────── */
+
+.history-overlay-root {
+    -fx-background-color: rgba(0, 0, 0, 0.55);
+}
+
+.history-container {
+    -fx-background-color: rgba(20, 50, 47, 0.95);
+    -fx-background-radius: 18;
+    -fx-border-color: rgba(120, 220, 220, 0.45);
+    -fx-border-width: 1.5;
+    -fx-border-radius: 18;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.6), 30, 0, 0, 8);
+}
+
+.history-title {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #e8eaf6;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 6, 0, 0, 2);
+}
+
+.history-record-card {
+    -fx-background-color: rgba(30, 70, 60, 0.7);
+    -fx-background-radius: 10;
+    -fx-border-color: rgba(100, 200, 177, 0.25);
+    -fx-border-width: 1;
+    -fx-border-radius: 10;
+    -fx-padding: 10 15;
+}
+
+.history-record-card:hover {
+    -fx-background-color: rgba(40, 85, 75, 0.8);
+    -fx-border-color: rgba(100, 200, 177, 0.5);
+}
+
+/* ── View Selected Pokémon Overlay ───────────────────────────── */
+
+.view-pokemon-overlay-root {
+    -fx-background-color: rgba(0, 0, 0, 0.5);
+}
+
+.view-pokemon-container {
+    -fx-background-color: rgba(176, 229, 199, 0.88);
+    -fx-background-radius: 18;
+    -fx-border-color: rgba(21, 92, 86, 0.55);
+    -fx-border-width: 2;
+    -fx-border-radius: 18;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 25, 0, 0, 5);
+}
+
+.pokemon-preview-card {
+    -fx-background-color: rgba(255,255,255,0.2);
+    -fx-background-radius: 12;
+    -fx-border-color: rgba(120, 200, 160, 0.5);
+    -fx-border-width: 1.5;
+    -fx-border-radius: 12;
+    -fx-padding: 12;
+    -fx-effect: dropshadow(gaussian, rgba(0, 80, 70, 0.2), 6, 0, 0, 2);
+}
+
+.pokemon-preview-card:hover {
+    -fx-scale-x: 1.04;
+    -fx-scale-y: 1.04;
+    -fx-effect: dropshadow(gaussian, rgba(0, 150, 150, 0.5), 14, 0, 0, 3);
+}
