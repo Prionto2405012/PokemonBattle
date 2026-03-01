@@ -70,14 +70,8 @@ public class PokemonSelectionOverlayController {
     private static final int MAX_TEAM_SIZE = 6;
     private static final int POKEMON_LEVEL = 50;
     private PokemonSpecies currentlyViewedPokemon;
-
-    // Performance: cache sprite images and card references so we never rebuild the grid
     private static final Map<Integer, Image> spriteCache = new HashMap<>();
     private final Map<Integer, VBox> cardMap = new HashMap<>();
-
-    /**
-     * Initialize the overlay with Pokemon data
-     */
     public void initializeData(List<PokemonSpecies> allPokemon, Map<Integer, Move> allMoves, 
                                 List<PokemonInstance> existingTeam, Consumer<List<PokemonInstance>> onDoneCallback) {
         this.allPokemon = allPokemon;
@@ -221,11 +215,9 @@ public class PokemonSelectionOverlayController {
         card.setOnMouseClicked(e -> {
             if (e.getButton() == MouseButton.PRIMARY) {
                 togglePokemonSelection(species);
-                // Update only this card's appearance instead of rebuilding entire grid
                 boolean nowSelected = selectedPokemon.stream()
                         .anyMatch(p -> p.getId() == species.getId());
                 updateCardStyle(card, nowSelected);
-                // Update the indicator label (last child)
                 if (card.getChildren().size() >= 4) {
                     Label indicator = (Label) card.getChildren().get(3);
                     indicator.setText(nowSelected ? "\u2713 SELECTED" : "CLICK TO SELECT");
@@ -238,9 +230,6 @@ public class PokemonSelectionOverlayController {
         return card;
     }
 
-    /**
-     * Update card visual style based on selection state
-     */
     private void updateCardStyle(VBox card, boolean isSelected) {
         if (isSelected) {
             card.setStyle("-fx-background-color: linear-gradient(from 0% 0% to 100% 100%, rgba(126, 189, 185, 0.92), rgba(106, 173, 140, 0.95)); " +
@@ -261,18 +250,13 @@ public class PokemonSelectionOverlayController {
         }
     }
 
-    /**
-     * Toggle Pokemon selection
-     */
     private void togglePokemonSelection(PokemonSpecies species) {
         boolean alreadySelected = selectedPokemon.stream()
                 .anyMatch(p -> p.getId() == species.getId());
 
         if (alreadySelected) {
-            // Deselect
             selectedPokemon.removeIf(p -> p.getId() == species.getId());
         } else {
-            // Select (if not at max)
             if (selectedPokemon.size() >= MAX_TEAM_SIZE) {
                 // Show error feedback
                 selectionCountLabel.setText("Team Full! (Max " + MAX_TEAM_SIZE + ")");
@@ -280,7 +264,6 @@ public class PokemonSelectionOverlayController {
                 return;
             }
             
-            // Create Pokemon instance with random moves
             List<Move> moves = getRandomMovesForPokemon(species, 4);
             PokemonInstance pokemon = PokemonInstance.fromSpeciesWithMoves(species, POKEMON_LEVEL, moves);
             selectedPokemon.add(pokemon);
@@ -288,10 +271,6 @@ public class PokemonSelectionOverlayController {
 
         updateSelectionCount();
     }
-
-    /**
-     * Show Pokemon stats in the side panel
-     */
     private void showPokemonStats(PokemonSpecies species) {
         currentlyViewedPokemon = species;
         
@@ -351,9 +330,6 @@ public class PokemonSelectionOverlayController {
         }
     }
 
-    /**
-     * Add a stat row to the stats panel
-     */
     private void addStatRow(String statName, int value, String color) {
         HBox statRow = new HBox(8);
         statRow.setAlignment(Pos.CENTER_LEFT);
@@ -368,9 +344,6 @@ public class PokemonSelectionOverlayController {
         statsDetailsBox.getChildren().add(statRow);
     }
 
-    /**
-     * Update selection count label
-     */
     private void updateSelectionCount() {
         selectionCountLabel.setText("Selected: " + selectedPokemon.size() + " / " + MAX_TEAM_SIZE);
         
