@@ -22,7 +22,7 @@ public class SceneManager {
             System.out.printf(
                 "[Click] Scene(%.1f, %.1f)  Local(%.1f, %.1f)  >> %s  id=%s  class=%s%n",
                 e.getSceneX(), e.getSceneY(),
-                e.getX(),      e.getY(),
+                e.getX(), e.getY(),
                 target.getClass().getSimpleName(), id, styleClass
             );
         });

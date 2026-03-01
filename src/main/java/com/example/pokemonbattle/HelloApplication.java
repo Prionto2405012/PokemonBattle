@@ -22,9 +22,8 @@ public class HelloApplication extends Application {
         if (spaceNova != null) System.out.println("[App] SpaceNova family: " + spaceNova.getFamily());
         else System.err.println("[App] Failed to load SpaceNova");
         MediaCache.preload();
-        SceneManager.switchScene("intro.fxml", "Pokemon Battle", 1200, 700);
+        SceneManager.switchScene("start.fxml", "Pokemon Battle", 1200, 700);
     }
-
     public static void main(String[] args) {
         launch(args);
     }

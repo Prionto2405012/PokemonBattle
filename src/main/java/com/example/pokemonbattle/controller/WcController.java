@@ -331,7 +331,7 @@ public class WcController {
         if (result.isSuccess()) {
             currentUser = result.getUser();
             System.out.println("Login successful - User: " + currentUser.getUsername());
-            SceneManager.switchSceneWithLoading("menu.fxml", "Pokemon Battle - Menu", 1200, 700);
+            SceneManager.switchSceneWithLoading("new_game.fxml", "Pokemon Battle - Menu", 1200, 700);
         } else {
             System.err.println("Login failed: " + result.getMessage());
             showLoginError(result.getMessage());
@@ -389,7 +389,7 @@ public class WcController {
         if (result.isSuccess()) {
             currentUser = result.getUser();
             System.out.println("Registration successful - User: " + currentUser.getUsername());
-            SceneManager.switchSceneWithLoading("menu.fxml", "Pokemon Battle - Menu", 1200, 700);
+            SceneManager.switchSceneWithLoading("new_game.fxml", "Pokemon Battle - New Game", 1200, 700);
         } else {
             System.err.println("Registration failed: " + result.getMessage());
             showSignupError(result.getMessage());

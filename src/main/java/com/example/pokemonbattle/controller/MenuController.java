@@ -112,9 +112,6 @@ public class MenuController {
             ft.play();
         }
     }
-
-    // ── Initialize ───────────────────────────────────────────────
-
     @FXML
     public void initialize() {
         Font.loadFont(getClass().getResourceAsStream("/com/example/pokemonbattle/fonts/menu.ttf"), 24);
@@ -145,9 +142,6 @@ public class MenuController {
         // Wire click sound to all buttons in this scene
         mm.attachClickSounds(rootPane);
     }
-
-    // ── Selection / hover (unchanged) ────────────────────────────
-
     private void updateSelection() {
         for (int i = 0; i < menuButtons.size(); i++) {
             Button btn = menuButtons.get(i);
@@ -189,9 +183,6 @@ public class MenuController {
             menuButtons.get(selectedIndex).fire(); event.consume();
         }
     }
-
-    // ── Button handlers ──────────────────────────────────────────
-
     @FXML void onplayGameButtonClick() {
         SceneManager.switchSceneWithLoading("new_game.fxml", "New Game", 1200, 700);
     }
