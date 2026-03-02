@@ -1,5 +1,6 @@
 .welcome-container {
     -fx-background-color: transparent;
+    -fx-font-family: "SPACE NOVA";
 }
 
 .wc-background {
@@ -14,19 +15,23 @@
 .wc-scroll-pane .content  { -fx-background-color: transparent; }
 
 .glass-blur-layer {
-    -fx-background-radius: 30;
-    -fx-border-radius: 30;
+    -fx-background-radius: 24;
+    -fx-border-radius: 24;
+}
+.auth-card-outer {
+    -fx-background-radius: 24;
 }
 
 .auth-card {
-    -fx-padding: 50 40;
-    -fx-background-radius: 28;
+    -fx-padding: 35 30;
+    -fx-background-radius: 0;
 }
 
 .auth-title {
     -fx-font-family: "SPACE NOVA";
-    -fx-font-size: 30px;
+    -fx-font-size: 28px;
     -fx-font-weight: bold;
+    -fx-text-fill: #b8f0f5;
     -fx-alignment: center;
     -fx-wrap-text: true;
     -fx-min-height: USE_PREF_SIZE;
@@ -35,102 +40,212 @@
 .field-label {
     -fx-font-family: "SPACE NOVA";
     -fx-font-size: 13px;
+    -fx-text-fill: #b8f0f5;
     -fx-font-weight: 600;
-    -fx-padding: 0 0 4 0;
+    -fx-padding: 0 0 2 2;
 }
 
+/* ── Tab wrapper (hosts button + Line decorations) ──────────────────────── */
+.tab-button-wrap {
+    -fx-background-color: transparent;
+    -fx-padding: 4 0;
+}
+
+/* Dim lines for inactive tab */
+.tab-button-wrap .tab-line {
+    -fx-stroke: rgba(90,220,220,0.45);
+    -fx-stroke-width: 1.8;
+}
+
+/* Bright lines for the active tab */
+.tab-button-wrap-active .tab-line {
+    -fx-stroke: #40eef0;
+    -fx-stroke-width: 2.2;
+}
+
+/* ── Tab button text ─────────────────────────────────────────────────────── */
 .tab-button {
     -fx-font-family: "SPACE NOVA";
-    -fx-font-size: 16px;
+    -fx-font-size: 15px;
     -fx-font-weight: 600;
-    -fx-padding: 10 28;
+    -fx-padding: 8 20;
     -fx-cursor: hand;
+    -fx-text-fill: rgba(168,232,236,0.70);
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
 }
 
 .tab-button:hover {
-    -fx-opacity: 0.85;
+    -fx-text-fill: #c8f8ff;
     -fx-scale-x: 1.02;
     -fx-scale-y: 1.02;
 }
 
 .tab-button-active {
-    -fx-border-width: 0 0 3px 0;
+    -fx-text-fill: #d0feff;
     -fx-font-weight: bold;
 }
 
 .auth-text-field {
-    -fx-font-family: "menu";
-    -fx-padding: 16 20;
-    -fx-font-size: 15px;
+    -fx-font-family: "SPACE NOVA";
+    -fx-padding: 12 4 10 4;
+    -fx-font-size: 14px;
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent rgba(180,180,180,0.35) transparent;
+    -fx-border-width: 0 0 1.5 0;
+    -fx-border-radius: 0;
+    -fx-background-radius: 0;
 }
 
+.auth-text-field:focused {
+    -fx-border-color: transparent transparent rgba(130,210,255,0.8) transparent;
+}
+
+/* ── Lower action buttons base ───────────────────────────────────────── */
 .auth-button {
     -fx-font-family: "SPACE NOVA";
-    -fx-pref-height: 48;
-    -fx-font-size: 16px;
+    -fx-pref-height: 44;
+    -fx-pref-width: 155;
+    -fx-font-size: 13px;
     -fx-font-weight: bold;
     -fx-cursor: hand;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+    -fx-border-color: rgba(126,232,232,0.35);
+    -fx-text-fill: #e8fafa;
+}
+
+/* ── Dark teal gradient — Login & Sign Up buttons ─────────────────────── */
+.login-btn.auth-button,
+.signup-btn.auth-button {
+    /*
+     * Two background layers:
+     *   1. Subtle top-edge highlight for depth
+     *   2. Main left-to-right dark-teal gradient
+     *      right edge transitions to #1aa0a0 so it blends
+     *      seamlessly into the Back button's left edge.
+     */
+    -fx-background-color:
+        linear-gradient(to bottom, rgba(255,255,255,0.10) 0%, transparent 55%),
+        linear-gradient(to right, #093f55 0%, #0d7070 50%, #1aa0a0 100%);
+    -fx-background-insets: 0, 0;
+    -fx-background-radius: 8, 8;
 }
 
 .login-btn.auth-button:hover,
 .signup-btn.auth-button:hover {
+    -fx-background-color:
+        linear-gradient(to bottom, rgba(255,255,255,0.16) 0%, transparent 55%),
+        linear-gradient(to right, #0b4e68 0%, #118888 50%, #22b8b8 100%);
+    -fx-background-insets: 0, 0;
+    -fx-background-radius: 8, 8;
     -fx-scale-x: 1.03;
     -fx-scale-y: 1.03;
     -fx-translate-y: -2;
+    -fx-border-color: rgba(126,232,232,0.65);
 }
 
 .login-btn.auth-button:pressed,
 .signup-btn.auth-button:pressed {
+    -fx-background-color:
+        linear-gradient(to bottom, rgba(0,0,0,0.08) 0%, transparent 55%),
+        linear-gradient(to right, #072e3d 0%, #0b5e5e 50%, #148888 100%);
+    -fx-background-insets: 0, 0;
+    -fx-background-radius: 8, 8;
     -fx-translate-y: 1;
     -fx-scale-x: 0.97;
     -fx-scale-y: 0.97;
 }
 
+/* ── Light teal gradient — Back button ────────────────────────────────── */
 .auth-back-button {
     -fx-font-family: "SPACE NOVA";
-    -fx-font-size: 15px;
+    -fx-font-size: 12px;
     -fx-font-weight: 700;
-    -fx-padding: 10 18;
+    -fx-pref-height: 44;
+    -fx-pref-width: 130;
+    -fx-padding: 8 16;
     -fx-cursor: hand;
+    -fx-text-fill: #e8fafa;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+    -fx-border-color: rgba(126,232,232,0.35);
+    /*
+     * Left edge starts at #1aa0a0 — matches the right edge of the
+     * dark-teal buttons, creating a seamless colour-blend illusion.
+     */
+    -fx-background-color:
+        linear-gradient(to bottom, rgba(255,255,255,0.10) 0%, transparent 55%),
+        linear-gradient(to right, #1aa0a0 0%, #28c4c4 50%, #3cd8d8 100%);
+    -fx-background-insets: 0, 0;
+    -fx-background-radius: 8, 8;
 }
 
 .auth-back-button:hover {
+    -fx-background-color:
+        linear-gradient(to bottom, rgba(255,255,255,0.16) 0%, transparent 55%),
+        linear-gradient(to right, #22b8b8 0%, #34d8d8 50%, #50f0ee 100%);
+    -fx-background-insets: 0, 0;
+    -fx-background-radius: 8, 8;
     -fx-scale-x: 1.03;
     -fx-scale-y: 1.03;
     -fx-translate-y: -1;
+    -fx-border-color: rgba(126,232,232,0.65);
 }
 
 .auth-back-button:pressed {
+    -fx-background-color:
+        linear-gradient(to bottom, rgba(0,0,0,0.08) 0%, transparent 55%),
+        linear-gradient(to right, #148888 0%, #1eaaaa 50%, #2cbcbc 100%);
+    -fx-background-insets: 0, 0;
+    -fx-background-radius: 8, 8;
     -fx-scale-x: 0.97;
     -fx-scale-y: 0.97;
     -fx-translate-y: 1;
 }
 
 .error-label {
-    -fx-font-size: 13px;
+    -fx-font-family: "SPACE NOVA";
+    -fx-font-size: 12px;
     -fx-text-fill: #C85A54;
     -fx-font-weight: 600;
-    -fx-padding: 10px 14px;
-    -fx-background-radius: 8px;
-    -fx-border-radius: 8px;
+    -fx-padding: 8px 12px;
+    -fx-background-radius: 6px;
+    -fx-border-radius: 6px;
     -fx-border-width: 1px;
 }
 
 .field-error-label {
+    -fx-font-family: "SPACE NOVA";
     -fx-font-size: 11px;
     -fx-text-fill: #DC143C;
     -fx-font-weight: 500;
-    -fx-padding: 4px 8px 0px 8px;
+    -fx-padding: 2px 4px 0px 4px;
     -fx-background-color: transparent;
     -fx-wrap-text: true;
 }
 
 #loginForm, #signupForm {
-    -fx-spacing: 15px;
+    -fx-spacing: 12px;
+}
+
+.image-panel {
+    -fx-background-radius: 24 0 0 24;
+}
+
+.seam-strip {
+    -fx-background-color: rgba(0,0,0,0.25);
 }
 
 .wc-scroll-pane .scroll-bar:vertical .increment-button,
 .wc-scroll-pane .scroll-bar:vertical .decrement-button {
     -fx-background-color: transparent;
     -fx-padding: 0;
+}
+.card-wrapper-clip {
+    -fx-background-radius: 24;
 }

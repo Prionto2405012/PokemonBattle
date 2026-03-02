@@ -24,10 +24,7 @@ import com.example.pokemonbattle.util.PlayerSession;
 import com.example.pokemonbattle.util.SceneManager;
 
 import javafx.animation.FadeTransition;
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
 import javafx.animation.ScaleTransition;
-import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
@@ -39,6 +36,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
@@ -165,7 +163,7 @@ public class NewGameController {
         loadDashboardData();
 
         // Start subtle avatar idle animation
-        startAvatarIdleAnimation();
+        // startAvatarIdleAnimation();
 
         MusicManager.getInstance().attachClickSounds(rootPane);
 
@@ -294,11 +292,6 @@ public class NewGameController {
         }
     }
 
-    /**
-     * Load Pokemon and Move data from SQLite database.
-     * On first launch the DAO imports JSON → SQL automatically;
-     * on subsequent launches it reads straight from the DB (fast).
-     */
     private void loadGameData() {
         try {
             GameDataDAO dao = new GameDataDAO();
@@ -414,9 +407,7 @@ public class NewGameController {
         updateStartButtonState();
     }
 
-    /**
-     * Generate a random team of 6 Pokemon (no duplicates)
-     */
+    
     private void generateRandomTeam() {
         playerTeam.clear();
 
@@ -998,11 +989,6 @@ public class NewGameController {
             default -> "#68A090";
         };
     }
-
-    // ═══════════════════════════════════════════════════════════════
-    //  DASHBOARD FEATURES — Avatar, Battle History, View Pokemon
-    // ═══════════════════════════════════════════════════════════════
-
     /**
      * Load avatar, player name, and battle stats from PlayerSession + BattleHistoryManager.
      */
@@ -1040,24 +1026,6 @@ public class NewGameController {
             }
         }
     }
-
-    /**
-     * Subtle idle float animation on avatar display.
-     */
-    private void startAvatarIdleAnimation() {
-        if (avatarDisplay == null) return;
-        Timeline idle = new Timeline(
-            new KeyFrame(Duration.ZERO,
-                new KeyValue(avatarDisplay.translateYProperty(), 0)),
-            new KeyFrame(Duration.millis(1500),
-                new KeyValue(avatarDisplay.translateYProperty(), -6)),
-            new KeyFrame(Duration.millis(3000),
-                new KeyValue(avatarDisplay.translateYProperty(), 0))
-        );
-        idle.setCycleCount(Timeline.INDEFINITE);
-        idle.play();
-    }
-
     // ── Change Avatar ───────────────────────────────────────────
 
     @FXML
@@ -1076,6 +1044,12 @@ public class NewGameController {
                 // args[0] = path, args[1] = gender
                 loadDashboardData(); // Refresh avatar display
             });
+
+            // Blur everything currently in rootPane before the overlay is added
+            GaussianBlur blur = new GaussianBlur(9);
+            for (Node n : rootPane.getChildren()) {
+                n.setEffect(blur);
+            }
 
             overlay.setOpacity(0.0);
             rootPane.getChildren().add(overlay);

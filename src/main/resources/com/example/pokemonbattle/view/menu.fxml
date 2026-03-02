@@ -11,30 +11,70 @@
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.shape.Circle?>
-<VBox alignment="CENTER" minHeight="700" minWidth="1200" spacing="30.0" 
-      styleClass="menu-container" 
-      stylesheets="@../css/common.css,@../css/menu.css" 
-      xmlns="http://javafx.com/javafx/25" 
-      xmlns:fx="http://javafx.com/fxml/1" 
-      fx:controller="com.example.pokemonbattle.controller.MenuController">
-  <children>
-    <StackPane fx:id="rootPane" VBox.vgrow="ALWAYS">
-        <ImageView fx:id="bgImage"
-                   preserveRatio="false"
-                   pickOnBounds="true">
-            <image>
-                <Image url="@../assets/menu1.png"/>
-            </image>
-        </ImageView>
-        <Region fx:id="menuOverlay" mouseTransparent="true" opacity="0" styleClass="menu-left-overlay" maxWidth="350" StackPane.alignment="CENTER_LEFT"/>
-        <StackPane fx:id="selectBall" styleClass="pokeball" visible="false" mouseTransparent="true"/>
-        <VBox fx:id="buttonContainer" alignment="CENTER_LEFT" spacing="10" StackPane.alignment="CENTER_LEFT">
-            <padding><Insets left="50"/></padding>
-            <Button fx:id="playGameButton" styleClass="menu-btn" text="Play Game" onAction="#onplayGameButtonClick"/>
-            <Button fx:id="settingsButton" styleClass="menu-btn" text="Settings" onAction="#onSettingsButtonClick"/>
-            <Button fx:id="backButton" styleClass="menu-btn" text="Go Back" onAction="#onBackButtonClick"/>
-            <Button fx:id="exitButton" styleClass="menu-btn" text="Exit Game" onAction="#onExitButtonClick"/>
-        </VBox>
-    </StackPane>
-  </children>
+<?import javafx.scene.layout.HBox?>
+<VBox alignment="CENTER" minHeight="700" minWidth="1200" spacing="30.0"
+    styleClass="menu-container"
+    stylesheets="@../css/common.css,@../css/menu.css"
+    xmlns="http://javafx.com/javafx/25"
+    xmlns:fx="http://javafx.com/fxml/1"
+    fx:controller="com.example.pokemonbattle.controller.MenuController">
+    <children>
+        <StackPane fx:id="rootPane" VBox.vgrow="ALWAYS">
+            <ImageView fx:id="bgImage"
+                preserveRatio="false"
+                pickOnBounds="true">
+                <image>
+                    <Image url="@../assets/menu1.png" />
+                </image>
+            </ImageView>
+            <Region fx:id="menuOverlay" mouseTransparent="true" opacity="0"
+                styleClass="menu-left-overlay" maxWidth="350" StackPane.alignment="CENTER_LEFT" />
+            <StackPane fx:id="selectBall" styleClass="pokeball" visible="false"
+                mouseTransparent="true" />
+            <VBox fx:id="buttonContainer" alignment="CENTER_LEFT" spacing="10"
+                StackPane.alignment="CENTER_LEFT">
+                <padding>
+                    <Insets left="50" />
+                </padding>
+                <Button fx:id="playGameButton" styleClass="menu-btn" text="Play Game"
+                    onAction="#onplayGameButtonClick" />
+                <Button fx:id="settingsButton" styleClass="menu-btn" text="Settings"
+                    onAction="#onSettingsButtonClick" />
+                <Button fx:id="backButton" styleClass="menu-btn" text="Go Back"
+                    onAction="#onBackButtonClick" />
+                <Button fx:id="exitButton" styleClass="menu-btn" text="Exit Game"
+                    onAction="#onExitButtonClick" />
+            </VBox>
+            <!-- Exit confirmation overlay -->
+            <StackPane fx:id="exitOverlay" visible="false" managed="false"
+                mouseTransparent="false"
+                StackPane.alignment="CENTER">
+                <!-- Dim backdrop -->
+                <Region fx:id="exitBackdrop" styleClass="exit-backdrop"
+                    mouseTransparent="false" />
+
+                <!-- Dialog card -->
+                <VBox fx:id="exitDialog" styleClass="exit-dialog"
+                    alignment="CENTER" spacing="24"
+                    maxWidth="400" maxHeight="220"
+                    StackPane.alignment="CENTER">
+                    <padding>
+                        <Insets top="36" bottom="32" left="36" right="36" />
+                    </padding>
+
+                    <Label text="Exit Game?" styleClass="exit-dialog-title" />
+                    <Label text="Are you sure you want to quit?" styleClass="exit-dialog-body" />
+
+                    <HBox spacing="16" alignment="CENTER">
+                        <Button fx:id="exitYesButton" text="Yes"
+                            styleClass="exit-btn-yes"
+                            onAction="#onExitConfirmed" />
+                        <Button fx:id="exitNoButton" text="No"
+                            styleClass="exit-btn-no"
+                            onAction="#onExitCancelled" />
+                    </HBox>
+                </VBox>
+            </StackPane>
+        </StackPane>
+    </children>
 </VBox>

@@ -81,16 +81,10 @@
     -fx-border-color: rgba(95, 169, 149, 0.8);
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   Dashboard Layout — Avatar Panel + Stats + Battle History
-   ═══════════════════════════════════════════════════════════════ */
-
 /* Dark focus overlay behind dashboard content */
 .dashboard-dark-overlay {
     -fx-background-color: rgba(5, 15, 12, 0.45);
 }
-
-/* ── Left Avatar Panel ───────────────────────────────────────── */
 
 .avatar-panel {
     -fx-background-color: rgba(15, 40, 35, 0.75);
@@ -102,7 +96,7 @@
 }
 
 .avatar-display-frame {
-    -fx-background-color: rgba(30, 70, 60, 0.5);
+    -fx-background-color: rgb(255, 255, 255);
     -fx-background-radius: 16;
     -fx-border-color: rgba(66, 245, 200, 0.35);
     -fx-border-width: 2;

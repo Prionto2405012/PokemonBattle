@@ -12,6 +12,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Line?>
 
 <VBox alignment="CENTER" minHeight="700" minWidth="1200" spacing="30.0"
   styleClass="welcome-container"
@@ -38,92 +39,121 @@
             <padding>
               <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
             </padding>
-            <StackPane maxWidth="500" minWidth="320">
-              <Region fx:id="glassBlurLayer" styleClass="glass-blur-layer"/>
-              <VBox fx:id="authCard" styleClass="auth-card" spacing="20.0">
-                <padding>
-                  <Insets bottom="35.0" left="40.0" right="40.0" top="35.0" />
-                </padding>
 
-                <Label text="Welcome, Trainer!" styleClass="auth-title" />
+            <!-- Card wrapper -->
+            <StackPane fx:id="cardWrapper" maxWidth="820" minWidth="600" maxHeight="520">
+                <Region fx:id="glassBlurLayer" styleClass="glass-blur-layer"/>
 
-                <HBox fx:id="authTabsBox" spacing="10.0" alignment="CENTER" styleClass="auth-tabs">
-                  <Button fx:id="loginTabButton" text="Login" onAction="#onLoginTabClick"
-                    styleClass="tab-button, tab-button-active" />
-                  <Button fx:id="signupTabButton" text="Sign Up" onAction="#onSignupTabClick"
-                    styleClass="tab-button" />
+                <HBox fx:id="splitContainer" alignment="CENTER" spacing="0">
+
+                  <StackPane fx:id="imagePanel" styleClass="image-panel" minWidth="300" prefWidth="340" maxWidth="340">
+                    <ImageView fx:id="formImage" preserveRatio="false" smooth="true">
+                      <image>
+                        <Image url="@../assets/form.jpg" />
+                      </image>
+                    </ImageView>
+                  </StackPane>
+
+                  <Region fx:id="seamStrip" styleClass="seam-strip" minWidth="2" maxWidth="2" prefHeight="400"/>
+
+                  <VBox fx:id="authCard" styleClass="auth-card" spacing="22.0" alignment="TOP_CENTER"
+                        HBox.hgrow="ALWAYS">
+                    <padding>
+                      <Insets bottom="30.0" left="35.0" right="35.0" top="30.0" />
+                    </padding>
+
+                    <Label text="Welcome, Trainer!" styleClass="auth-title" />
+
+                    <HBox fx:id="authTabsBox" spacing="16.0" alignment="CENTER" styleClass="auth-tabs">
+
+                      <!-- Login tab -->
+                      <StackPane fx:id="loginTabWrap" styleClass="tab-button-wrap, tab-button-wrap-active"
+                                 minWidth="110" minHeight="44" pickOnBounds="false">
+                        <Button fx:id="loginTabButton" text="Login" onAction="#onLoginTabClick"
+                          styleClass="tab-button, tab-button-active" />
+                        <Line fx:id="loginBorderBottom"   styleClass="tab-line" mouseTransparent="true"/>
+                        <Line fx:id="loginBorderTopLeft"  styleClass="tab-line" mouseTransparent="true"/>
+                        <Line fx:id="loginBorderTopRight" styleClass="tab-line" mouseTransparent="true"/>
+                        <Line fx:id="loginBorderLeftTop"  styleClass="tab-line" mouseTransparent="true"/>
+                        <Line fx:id="loginBorderRightTop" styleClass="tab-line" mouseTransparent="true"/>
+                      </StackPane>
+
+                      <!-- Sign Up tab -->
+                      <StackPane fx:id="signupTabWrap" styleClass="tab-button-wrap"
+                                 minWidth="110" minHeight="44" pickOnBounds="false">
+                        <Button fx:id="signupTabButton" text="Sign Up" onAction="#onSignupTabClick"
+                          styleClass="tab-button" />
+                        <Line fx:id="signupBorderBottom"   styleClass="tab-line" mouseTransparent="true"/>
+                        <Line fx:id="signupBorderTopLeft"  styleClass="tab-line" mouseTransparent="true"/>
+                        <Line fx:id="signupBorderTopRight" styleClass="tab-line" mouseTransparent="true"/>
+                        <Line fx:id="signupBorderLeftTop"  styleClass="tab-line" mouseTransparent="true"/>
+                        <Line fx:id="signupBorderRightTop" styleClass="tab-line" mouseTransparent="true"/>
+                      </StackPane>
+
+                    </HBox>
+
+                    <VBox fx:id="loginForm" spacing="22.0">
+                      <padding>
+                        <Insets top="18.0" />
+                      </padding>
+                      <Label text="Username or Email" styleClass="field-label" />
+                      <TextField fx:id="loginUsernameField" promptText="Enter your username or email"
+                        styleClass="auth-text-field" />
+                      <Label fx:id="loginUsernameError" styleClass="field-error-label" visible="false"
+                        managed="false" wrapText="true" />
+                      <Label text="Password" styleClass="field-label" />
+                      <PasswordField fx:id="loginPasswordField" promptText="Enter your password"
+                        styleClass="auth-text-field" />
+                      <Label fx:id="loginPasswordError" styleClass="field-error-label" visible="false"
+                        managed="false" wrapText="true" />
+                      <Label fx:id="loginErrorLabel" styleClass="error-label" visible="false"
+                        managed="false" wrapText="true" />
+                      <HBox spacing="10" alignment="CENTER">
+                        <Button text="Login" onAction="#onLoginButtonClick"
+                          styleClass="login-btn, auth-button" />
+                        <Button text="&#x2190; Back" onAction="#onBackButtonClick"
+                          styleClass="auth-back-button" />
+                      </HBox>
+                    </VBox>
+
+                    <VBox fx:id="signupForm" spacing="18.0" visible="false" managed="false">
+                      <Label text="Username" styleClass="field-label" />
+                      <TextField fx:id="signupUsernameField" promptText="Choose a username (3-20 chars)"
+                        styleClass="auth-text-field" />
+                      <Label fx:id="signupUsernameError" styleClass="field-error-label" visible="false"
+                        managed="false" wrapText="true" />
+                      <Label text="Email" styleClass="field-label" />
+                      <TextField fx:id="signupEmailField" promptText="Enter your email"
+                        styleClass="auth-text-field" />
+                      <Label fx:id="signupEmailError" styleClass="field-error-label" visible="false"
+                        managed="false" wrapText="true" />
+                      <Label text="Password" styleClass="field-label" />
+                      <PasswordField fx:id="signupPasswordField" promptText="Choose a password (min 6 chars)"
+                        styleClass="auth-text-field" />
+                      <Label fx:id="signupPasswordError" styleClass="field-error-label" visible="false"
+                        managed="false" wrapText="true" />
+                      <Label text="Confirm Password" styleClass="field-label" />
+                      <PasswordField fx:id="signupConfirmPasswordField"
+                        promptText="Re-enter your password" styleClass="auth-text-field" />
+                      <Label fx:id="signupConfirmPasswordError" styleClass="field-error-label" visible="false"
+                        managed="false" wrapText="true" />
+                      <Label fx:id="signupErrorLabel" styleClass="error-label" visible="false"
+                        managed="false" wrapText="true" />
+                      <HBox spacing="10" alignment="CENTER">
+                        <Button text="Sign Up" onAction="#onSignupButtonClick"
+                          styleClass="signup-btn, auth-button" />
+                        <Button text="&#x2190; Back" onAction="#onBackButtonClick"
+                          styleClass="auth-back-button" />
+                      </HBox>
+                    </VBox>
+
+                  </VBox>
                 </HBox>
-                <VBox fx:id="loginForm" spacing="15.0">
-                  <Label text="Username or Email" styleClass="field-label" />
-                  <TextField fx:id="loginUsernameField" promptText="Enter your username or email"
-                    styleClass="auth-text-field" />
-                  <Label fx:id="loginUsernameError" styleClass="field-error-label" visible="false"
-                    managed="false" wrapText="true" />
+            </StackPane>
 
-                  <Label text="Password" styleClass="field-label" />
-                  <PasswordField fx:id="loginPasswordField" promptText="Enter your password"
-                    styleClass="auth-text-field" />
-                  <Label fx:id="loginPasswordError" styleClass="field-error-label" visible="false"
-                    managed="false" wrapText="true" />
-
-                  <Label fx:id="loginErrorLabel" styleClass="error-label" visible="false"
-                    managed="false" wrapText="true" />
-
-                  <HBox spacing="10" alignment="CENTER">
-                    <Button text="Login"
-                      onAction="#onLoginButtonClick"
-                      styleClass="login-btn, auth-button" />
-                    <Button text="← Back"
-                      onAction="#onBackButtonClick"
-                      styleClass="auth-back-button" />
-                  </HBox>
-                </VBox>
-                <VBox fx:id="signupForm" spacing="15.0" visible="false" managed="false">
-                  <Label text="Username" styleClass="field-label" />
-                  <TextField fx:id="signupUsernameField" promptText="Choose a username (3-20 chars)"
-                    styleClass="auth-text-field" />
-                  <Label fx:id="signupUsernameError" styleClass="field-error-label" visible="false"
-                    managed="false" wrapText="true" />
-
-                  <Label text="Email" styleClass="field-label" />
-                  <TextField fx:id="signupEmailField" promptText="Enter your email"
-                    styleClass="auth-text-field" />
-                  <Label fx:id="signupEmailError" styleClass="field-error-label" visible="false"
-                    managed="false" wrapText="true" />
-
-                  <Label text="Password" styleClass="field-label" />
-                  <PasswordField fx:id="signupPasswordField" promptText="Choose a password (min 6 chars)"
-                    styleClass="auth-text-field" />
-                  <Label fx:id="signupPasswordError" styleClass="field-error-label" visible="false"
-                    managed="false" wrapText="true" />
-
-                  <Label text="Confirm Password" styleClass="field-label" />
-                  <PasswordField fx:id="signupConfirmPasswordField"
-                    promptText="Re-enter your password" styleClass="auth-text-field" />
-                  <Label fx:id="signupConfirmPasswordError" styleClass="field-error-label" visible="false"
-                    managed="false" wrapText="true" />
-
-                  <Label fx:id="signupErrorLabel" styleClass="error-label" visible="false"
-                    managed="false" wrapText="true" />
-
-                  <HBox spacing="10" alignment="CENTER">
-                    <Button text="Sign Up" onAction="#onSignupButtonClick"
-                      styleClass="signup-btn, auth-button" />
-                    <Button text="← Back"
-                      onAction="#onBackButtonClick"
-                      styleClass="auth-back-button" />
-
-                  </HBox>
-                </VBox>
-
-              </VBox>
-            </StackPane> 
           </VBox>
         </content>
       </ScrollPane>
-
     </StackPane>
-
-
   </children>
 </VBox>
