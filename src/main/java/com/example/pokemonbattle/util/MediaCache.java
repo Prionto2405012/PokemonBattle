@@ -254,6 +254,10 @@ private static void constructAndWait(String url, Consumer<MediaPlayer> onReady) 
         }
         MediaPlayer player = new MediaPlayer(new Media(url));
         player.setAutoPlay(false);
+        player.setOnError(() ->
+            System.err.println("[MediaCache] Pre-built player error for " + name + ": "
+                + (player.getError() != null ? player.getError().getMessage() : "unknown"))
+        );
         System.out.println("[MediaCache] Pre-built MediaPlayer: " + name);
         return player;
     }

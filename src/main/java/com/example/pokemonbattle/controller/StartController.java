@@ -77,13 +77,18 @@ public class StartController {
                 if (fadeOutBall != null) fadeOutBall.play();
             }
         });
-        MediaCache.buildVideoPlayer("start.mp4", player -> {
-            mediaPlayer = player;     
+        mediaPlayer = MediaCache.claimMediaPlayer("start.mp4");
+        if (mediaPlayer != null) {
             mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
             bgVideo.setMediaPlayer(mediaPlayer);
             bgVideo.fitWidthProperty().bind(rootPane.widthProperty());
             bgVideo.fitHeightProperty().bind(rootPane.heightProperty());
             bgVideo.setPreserveRatio(false);
+
+            mediaPlayer.setOnError(() ->
+                System.err.println("StartController: MediaPlayer error — "
+                    + (mediaPlayer.getError() != null ? mediaPlayer.getError().getMessage() : "unknown"))
+            );
 
             final FadeTransition ballFade = fadeOutBall;
             javafx.beans.value.ChangeListener<Duration> firstFrameListener =
@@ -100,10 +105,19 @@ public class StartController {
                     }
                 };
             mediaPlayer.currentTimeProperty().addListener(firstFrameListener);
-            mediaPlayer.seek(Duration.ZERO);
-            mediaPlayer.play();
+            mediaPlayer.setOnReady(() -> {
+                mediaPlayer.seek(Duration.ZERO);
+                mediaPlayer.play();
+            });
+            if (mediaPlayer.getStatus() == MediaPlayer.Status.READY) {
+                mediaPlayer.seek(Duration.ZERO);
+                mediaPlayer.play();
+            }
             timeout.play();
-        });
+        } else {
+            System.err.println("StartController: start.mp4 player unavailable.");
+            timeout.play();
+        }
         timeout.play();
         MusicManager.getInstance().attachClickSounds(rootPane);
         Button startBtn = (Button) rootPane.lookup(".start-btn");
