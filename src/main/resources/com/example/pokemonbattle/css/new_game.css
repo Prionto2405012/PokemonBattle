@@ -96,7 +96,7 @@
 }
 
 .avatar-display-frame {
-    -fx-background-color: rgb(255, 255, 255);
+    -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, rgb(40, 87, 77), rgb(117, 169, 157));
     -fx-background-radius: 16;
     -fx-border-color: rgba(66, 245, 200, 0.35);
     -fx-border-width: 2;

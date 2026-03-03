@@ -24,7 +24,6 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.effect.DropShadow;
-import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -115,10 +114,10 @@ public class AvatarSelectionController {
         allAvatars.clear();
         String base = "/com/example/pokemonbattle/sprites/trainer/";
         for (int i = 1; i <= 4; i++) {
-            allAvatars.add(new AvatarInfo(base + "male/" + i + ".jpg", "male", i));
+            allAvatars.add(new AvatarInfo(base + "male/" + i + ".png", "male", i));
         }
         for (int i = 1; i <= 4; i++) {
-            allAvatars.add(new AvatarInfo(base + "female/" + i + ".jpg", "female", i));
+            allAvatars.add(new AvatarInfo(base + "female/" + i + ".png", "female", i));
         }
     }
 
