@@ -1,4 +1,4 @@
-﻿package com.example.pokemonbattle.controller;
+package com.example.pokemonbattle.controller;
 
 import java.util.ArrayList;
 import java.util.List;

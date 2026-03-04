@@ -743,12 +743,17 @@ public class NewGameController {
     private void updateStartButtonState() {
         if (startBattleButton == null) return;
         
-        boolean canStart = selectedMode != null &&
-                          selectedOpponent != null &&
-                          selectedTeamType != null &&
-                          !playerTeam.isEmpty() && 
-                          "AI".equals(selectedOpponent) && 
-                          "SOLO".equals(selectedMode);
+        // LOCAL online battles don't need a mode selection (server handles it)
+        boolean isLocalReady = "LOCAL".equals(selectedOpponent) &&
+                               selectedTeamType != null &&
+                               !playerTeam.isEmpty();
+
+        boolean isAiReady = "AI".equals(selectedOpponent) &&
+                            selectedTeamType != null &&
+                            !playerTeam.isEmpty() &&
+                            "SOLO".equals(selectedMode);
+
+        boolean canStart = isLocalReady || isAiReady;
         
         startBattleButton.setDisable(!canStart);
         
@@ -764,12 +769,13 @@ public class NewGameController {
      */
     private void onStartBattle() {
         // Validate all selections are made
-        if (selectedMode == null) {
+        // (mode is optional for LOCAL online battles — server handles pairing)
+        if (selectedMode == null && !"LOCAL".equals(selectedOpponent)) {
             matchingStatusLabel.setText("Please select a game mode first!");
             matchingStatusLabel.setStyle("-fx-font-size:13px; -fx-text-fill:#F08030; -fx-font-weight:bold;");
             return;
         }
-        
+
         if (selectedOpponent == null) {
             matchingStatusLabel.setText("Please select an opponent type first!");
             matchingStatusLabel.setStyle("-fx-font-size:13px; -fx-text-fill:#F08030; -fx-font-weight:bold;");
@@ -788,19 +794,33 @@ public class NewGameController {
             return;
         }
         
-        if (!"SOLO".equals(selectedMode)) {
-            matchingStatusLabel.setText("Only SOLO mode is currently available!");
-            matchingStatusLabel.setStyle("-fx-font-size:13px; -fx-text-fill:#F08030; -fx-font-weight:bold;");
+        // Determine player name from session (fall back to "Player 1")
+        User sessionUser = PlayerSession.getInstance().getCurrentUser();
+        String playerName = (sessionUser != null && sessionUser.getUsername() != null)
+                ? sessionUser.getUsername() : "Player 1";
+
+        // Build the Player object with the selected team
+        Player player = new Player(playerName);
+        playerTeam.forEach(player::addToTeam);
+
+        // ── ONLINE battle (LOCAL opponent → TCP server) ──────────────────────
+        if ("LOCAL".equals(selectedOpponent)) {
+            System.out.println("\n=== ONLINE BATTLE — Connecting to server ===");
+            System.out.println("Player: " + playerName);
+            playerTeam.forEach(p -> System.out.println("  - " + p.getName() + " Lv." + p.getLevel()));
+
+            SceneManager.switchSceneWithData("waiting_online.fxml",
+                    "Pokemon Battle - Matchmaking", 1200, 700,
+                    Map.of("player", player));
             return;
         }
 
-        matchingStatusLabel.setText("Preparing battle...");
-        matchingStatusLabel.setStyle("-fx-font-size:13px; -fx-text-fill:#f8d030; -fx-font-weight:bold;");
-
-        // Create player
-        Player player = new Player("Player 1");
-        playerTeam.forEach(player::addToTeam);
-
+        // ── LOCAL AI battle ──────────────────────────────────────────────────
+        if (!"SOLO".equals(selectedMode)) {
+            matchingStatusLabel.setText("Please select SOLO mode for AI battles!");
+            matchingStatusLabel.setStyle("-fx-font-size:13px; -fx-text-fill:#F08030; -fx-font-weight:bold;");
+            return;
+        }
         // Generate AI opponent team
         aiOpponent = generateAIOpponent();
 

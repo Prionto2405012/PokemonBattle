@@ -47,6 +47,13 @@ public class PokemonInstance extends PokemonSpecies {
     }
 
     /**
+     * Look up a move by ID from the global moves map.
+     */
+    public static Move getMoveById(int moveId) {
+        return allMoves.get(moveId);
+    }
+
+    /**
      * Constructor by Pokemon ID (1-493)
      */
     public PokemonInstance(int pokemonId, int level) {
@@ -157,6 +164,11 @@ public class PokemonInstance extends PokemonSpecies {
         moves.add(new MoveSlot(move));
     }
 
+    /** Remove all current moves so they can be replaced. */
+    public void clearMoves() {
+        moves.clear();
+    }
+
     public boolean isFainted() { return fainted; }
 
     public void setFainted(boolean fainted) { this.fainted = fainted; }
@@ -167,6 +179,12 @@ public class PokemonInstance extends PokemonSpecies {
         if (currentHp <= 0) {
             fainted = true;
         }
+    }
+
+    /** Directly set current HP (used in online mode to sync server-authoritative HP). */
+    public void setCurrentHp(int hp) {
+        currentHp = Math.max(0, Math.min(hp, maxHp));
+        fainted = (currentHp <= 0);
     }
 
     public void heal(int amt) {

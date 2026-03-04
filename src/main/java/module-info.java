@@ -17,10 +17,12 @@ module com.example.pokemonbattle {
     opens com.example.pokemonbattle.model to javafx.fxml, com.google.gson;
     opens com.example.pokemonbattle.service to javafx.fxml;
     opens com.example.pokemonbattle.security to javafx.fxml;
+    opens com.example.pokemonbattle.server to javafx.fxml;
     exports com.example.pokemonbattle;
     exports com.example.pokemonbattle.controller;
     exports com.example.pokemonbattle.model;
     exports com.example.pokemonbattle.service;
     exports com.example.pokemonbattle.security;
     exports com.example.pokemonbattle.util;
+    exports com.example.pokemonbattle.server;
 }

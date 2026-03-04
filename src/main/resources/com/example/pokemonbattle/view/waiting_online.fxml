@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<StackPane fx:id="rootPane" minHeight="700" minWidth="1200"
+    style="-fx-background-color: #1a1a2e;"
+    xmlns="http://javafx.com/javafx/25"
+    xmlns:fx="http://javafx.com/fxml/1"
+    fx:controller="com.example.pokemonbattle.controller.WaitingController">
+
+    <VBox alignment="CENTER" spacing="28" maxWidth="480">
+
+        <!-- Pokeball animated GIF -->
+        <ImageView fx:id="pokeballImage" fitWidth="130" fitHeight="130" preserveRatio="true" smooth="true">
+            <image>
+                <Image url="@../assets/pokeball.gif" />
+            </image>
+        </ImageView>
+
+        <!-- Main status text -->
+        <Label fx:id="statusLabel" text="Connecting to server..."
+               style="-fx-font-size: 26px; -fx-text-fill: white; -fx-font-weight: bold; -fx-text-alignment: center;">
+            <font><Font name="System Bold" size="26"/></font>
+        </Label>
+
+        <!-- Sub-status -->
+        <Label fx:id="subStatusLabel" text="Please wait..."
+               style="-fx-font-size: 15px; -fx-text-fill: #aaaacc; -fx-text-alignment: center;"/>
+
+        <!-- Animated ellipsis dots -->
+        <Label fx:id="dotsLabel" text="..."
+               style="-fx-font-size: 30px; -fx-text-fill: #f8d030; -fx-font-weight: bold;"/>
+
+        <!-- Cancel button -->
+        <Button fx:id="cancelButton" text="Cancel"
+                prefWidth="180" prefHeight="48"
+                style="-fx-background-color: #c0392b; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold; -fx-background-radius: 8; -fx-cursor: hand;">
+            <VBox.margin><Insets top="12"/></VBox.margin>
+            <font><Font name="System Bold" size="15"/></font>
+        </Button>
+    </VBox>
+</StackPane>

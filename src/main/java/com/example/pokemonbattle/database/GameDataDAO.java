@@ -91,6 +91,12 @@ public class GameDataDAO {
         return cachedMoves;
     }
 
+    /** Get a specific move by ID. */
+    public Move getMove(Integer moveId) {
+        ensureDataLoaded();
+        return cachedMoves.get(moveId);
+    }
+
     /**
      * Returns a fresh shallow copy of the cached pokemon list.
      * The list itself is mutable so callers can reorder / filter freely,
