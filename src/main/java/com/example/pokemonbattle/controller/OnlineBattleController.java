@@ -1,8 +1,14 @@
 package com.example.pokemonbattle.controller;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.util.stream.Collectors;
+
+import com.example.pokemonbattle.database.DatabaseManager;
 import com.example.pokemonbattle.model.Move;
 import com.example.pokemonbattle.model.Player;
 import com.example.pokemonbattle.model.PokemonInstance;
+import com.example.pokemonbattle.model.User;
 import com.example.pokemonbattle.server.ActionMessage;
 import com.example.pokemonbattle.server.BattleEndMessage;
 import com.example.pokemonbattle.server.BattleUpdateMessage;
@@ -13,6 +19,7 @@ import com.example.pokemonbattle.server.ServerConnection;
 import com.example.pokemonbattle.server.SwitchNotifyMessage;
 import com.example.pokemonbattle.server.TurnReadyMessage;
 import com.example.pokemonbattle.util.MusicManager;
+import com.example.pokemonbattle.util.PlayerSession;
 import com.example.pokemonbattle.util.SceneManager;
 
 import javafx.application.Platform;
@@ -69,7 +76,7 @@ public class OnlineBattleController {
     @FXML private Button changePokemonMainButton;
     @FXML private Button itemsButton;
     @FXML private Button backButton;
-    @FXML private Label  waitingLabel;          // shown while waiting for opponent's move
+    @FXML private Label  waitingLabel;
 
     // Move selection panel
     @FXML private VBox   moveSelectionBox;
@@ -89,7 +96,7 @@ public class OnlineBattleController {
     private Integer          battleId;
     private int              turnCount = 0;
     private boolean          battleEnded = false;
-    private boolean          moveSent    = false;   // true after client submitted move this turn
+    private boolean          moveSent    = false;
 
     private static final double HP_BAR_MAX_WIDTH = 180.0;
 
@@ -97,13 +104,11 @@ public class OnlineBattleController {
 
     @FXML
     public void initialize() {
-        // Bind background to window size
         if (bgImage != null && rootPane != null) {
             bgImage.fitWidthProperty().bind(rootPane.widthProperty());
             bgImage.fitHeightProperty().bind(rootPane.heightProperty());
         }
 
-        // Load data from SceneManager
         player           = (Player)           SceneManager.getData("player");
         opponent         = (Player)           SceneManager.getData("opponent");
         serverConnection = (ServerConnection) SceneManager.getData("serverConnection");
@@ -115,23 +120,16 @@ public class OnlineBattleController {
             return;
         }
 
-        // Register message listener — runs on background thread; we use Platform.runLater for UI
         serverConnection.setMessageListener(this::handleServerMessage);
 
-        // Wire buttons
         attackButton.setOnAction(e -> onFightClicked());
         changePokemonMainButton.setOnAction(e -> onChangePokemonClicked());
         backButton.setOnAction(e -> onRunClicked());
         if (itemsButton != null) itemsButton.setOnAction(e ->
                 battleStatusLabel.setText("No items in online battle."));
 
-        // Hide waiting label initially
         setVisible(waitingLabel, false);
-
-        // Draw cosmetic panel pattern
         drawOptionsPanelPattern();
-
-        // Display initial pokemon state
         updateBattleDisplay();
 
         battleStatusLabel.setText("Online Battle! " + cap(player.getCurrentPokemon().getName()) +
@@ -143,7 +141,6 @@ public class OnlineBattleController {
 
     // Server message handler
 
-    /** Dispatches all incoming server messages on the JavaFX thread. */
     private void handleServerMessage(GameMessage msg) {
         Platform.runLater(() -> {
             switch (msg.getMessageType()) {
@@ -157,7 +154,6 @@ public class OnlineBattleController {
         });
     }
 
-    /** Apply server-calculated damage to the correct side. */
     private void applyDamage(DamageMessage msg) {
         boolean targetIsMe = player.getName().equals(msg.getTargetName());
         Player  target     = targetIsMe ? player : opponent;
@@ -165,10 +161,7 @@ public class OnlineBattleController {
         PokemonInstance targetPokemon = target.getCurrentPokemon();
         if (targetPokemon == null) return;
 
-        // Sync HP from server (authoritative)
         targetPokemon.setCurrentHp(msg.getTargetCurrentHp());
-
-        // Update UI
         updateBattleDisplay();
 
         String effText = "";
@@ -181,7 +174,6 @@ public class OnlineBattleController {
                 cap(msg.getMoveUsed()) + "! " + msg.getDamageDealt() + " dmg" + effText);
 
         if (msg.isTargetFainted()) {
-            // Sync fainted state and advance current pokemon
             targetPokemon.setFainted(true);
             PokemonInstance next = target.getFirstAvailablePokemon();
             if (next != null) {
@@ -193,25 +185,18 @@ public class OnlineBattleController {
         }
     }
 
-    /** Update status label on general battle update messages. */
     private void applyBattleUpdate(BattleUpdateMessage msg) {
         battleStatusLabel.setText(msg.getMessage());
         updateBattleDisplay();
     }
 
-    /**
-     * Apply a switch notification from the server.
-     * Updates the correct player's currentPokemon on this client.
-     */
     private void applySwitchNotify(SwitchNotifyMessage msg) {
         boolean isMe = player.getName().equals(msg.getPlayerName());
         Player  side = isMe ? player : opponent;
 
-        // Find the pokemon in the team by ID and set it as current
         for (PokemonInstance p : side.getTeam()) {
             if (p.getId() == msg.getNewPokemonId()) {
                 side.setCurrentPokemon(p);
-                // Sync HP from server
                 p.setCurrentHp(msg.getNewPokemonHp());
                 break;
             }
@@ -220,39 +205,34 @@ public class OnlineBattleController {
         String who = isMe ? "You" : cap(msg.getPlayerName());
         battleStatusLabel.setText(who + " switched to " + cap(msg.getNewPokemonName()) + "!");
         updateBattleDisplay();
-
-        System.out.println("[OnlineBattle] " + msg.getPlayerName() + " switched to " + msg.getNewPokemonName());
     }
 
-    /** Called when the server says the full turn is resolved — re-enable player input. */
     private void onTurnReady(TurnReadyMessage msg) {
         turnCount = msg.getTurnNumber();
         moveSent  = false;
 
-        // Re-enable battle controls
         setVisible(waitingLabel, false);
         showActionButtons();
         attackButton.setDisable(false);
         changePokemonMainButton.setDisable(false);
-
-        System.out.println("[OnlineBattle] Turn " + turnCount + " ready — awaiting player input.");
     }
 
-    /** Handle battle end. */
+    /** Handle battle end: save result to DB, then update UI. */
     private void applyBattleEnd(BattleEndMessage msg) {
         battleEnded = true;
 
-        String resultText;
-        if (player.getName().equals(msg.getWinnerName())) {
-            resultText = "🏆 You WIN! " + cap(msg.getWinnerName()) + " is victorious!";
-        } else {
-            resultText = "❌ You lost. " + cap(msg.getWinnerName()) + " wins!";
-        }
+        boolean playerWon = player.getName().equals(msg.getWinnerName());
+
+        // Persist result (same logic as BattleController)
+        saveBattleResult(playerWon, msg.getWinnerName());
+
+        String resultText = playerWon
+                ? "🏆 You WIN! " + cap(msg.getWinnerName()) + " is victorious!"
+                : "❌ You lost. " + cap(msg.getWinnerName()) + " wins!";
         battleStatusLabel.setText(resultText);
 
         disableAllButtons();
 
-        // Show a "Back to Menu" button
         backButton.setText("Back to Menu");
         backButton.setDisable(false);
         backButton.setOnAction(e -> onRunClicked());
@@ -260,6 +240,65 @@ public class OnlineBattleController {
         setVisible(waitingLabel, false);
 
         System.out.println("[OnlineBattle] Battle ended — winner: " + msg.getWinnerName());
+    }
+
+    // Battle result persistence
+
+    /**
+     * Saves the online battle result to battle_history and user_profiles tables.
+     * Runs on a daemon thread so it never blocks the FX thread.
+     */
+    private void saveBattleResult(boolean playerWon, String winnerName) {
+        User user = PlayerSession.getInstance().getCurrentUser();
+        if (user == null) return; // not logged in — skip
+
+        // Build comma-separated list of pokemon used
+        String pokemonUsed = player.getTeam().stream()
+                .map(p -> p.getName().toLowerCase())
+                .collect(Collectors.joining(","));
+
+        String result = playerWon ? "WIN" : "LOSS";
+
+        Thread t = new Thread(() -> {
+            try (Connection conn = DatabaseManager.getInstance().getConnection()) {
+
+                // Insert battle record
+                String sql = "INSERT INTO battle_history "
+                        + "(user_id, result, pokemon_used, opponent_type, opponent_name) "
+                        + "VALUES (?, ?, ?, ?, ?)";
+                try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                    ps.setInt(1, user.getId());
+                    ps.setString(2, result);
+                    ps.setString(3, pokemonUsed);
+                    ps.setString(4, "ONLINE");          // distinguish from AI battles
+                    ps.setString(5, opponent.getName()); // real opponent username
+                    ps.executeUpdate();
+                }
+
+                // Upsert win/loss counters
+                String upsert = "INSERT INTO user_profiles "
+                        + "(user_id, wins, losses, total_battles) VALUES (?,?,?,1) "
+                        + "ON CONFLICT(user_id) DO UPDATE SET "
+                        + "wins=wins+?, losses=losses+?, total_battles=total_battles+1";
+                try (PreparedStatement ups = conn.prepareStatement(upsert)) {
+                    int w = playerWon ? 1 : 0, l = playerWon ? 0 : 1;
+                    ups.setInt(1, user.getId());
+                    ups.setInt(2, w);
+                    ups.setInt(3, l);
+                    ups.setInt(4, w);
+                    ups.setInt(5, l);
+                    ups.executeUpdate();
+                }
+
+                System.out.println("[OnlineBattle] Battle result saved: " + result
+                        + " vs " + opponent.getName());
+
+            } catch (Exception e) {
+                System.err.println("[OnlineBattle] Failed to save battle result: " + e.getMessage());
+            }
+        });
+        t.setDaemon(true);
+        t.start();
     }
 
     // Button handlers
@@ -278,10 +317,8 @@ public class OnlineBattleController {
         updatePokemonButtons();
     }
 
-    /** RUN = forfeit the battle (opponent wins) and return to setup screen. */
     private void onRunClicked() {
         if (serverConnection != null) {
-            // If battle is still going, send a forfeit message so the opponent wins
             if (!battleEnded && battleId != null) {
                 try {
                     serverConnection.sendMessage(new ForfeitMessage(battleId));
@@ -300,12 +337,10 @@ public class OnlineBattleController {
         showActionButtons();
     }
 
-    /** Called when a move button is clicked. Sends ActionMessage (ATTACK) to server. */
     private void onMoveSelected(Move move) {
         if (moveSent || battleEnded) return;
         moveSent = true;
 
-        // Show waiting state
         disableMoveButtons();
         showActionButtons();
         setVisible(waitingLabel, true);
@@ -315,11 +350,9 @@ public class OnlineBattleController {
 
         battleStatusLabel.setText("You chose " + cap(move.getName()) + "! Waiting for opponent...");
 
-        // Send ATTACK action to server
         ActionMessage msg = ActionMessage.attack(battleId, move.getId(), move.getName(), turnCount);
         try {
             serverConnection.sendMessage(msg);
-            System.out.println("[OnlineBattle] Attack action sent: " + move.getName());
         } catch (Exception e) {
             System.err.println("[OnlineBattle] Failed to send action: " + e.getMessage());
             battleStatusLabel.setText("Error sending move: " + e.getMessage());
@@ -332,26 +365,20 @@ public class OnlineBattleController {
         if (moveSent || battleEnded) return;
         moveSent = true;
 
-        // Find the team index for this pokemon
         int teamIndex = player.getTeam().indexOf(pokemon);
-
-        // Immediately update local display (server will also send SwitchNotifyMessage)
         player.setCurrentPokemon(pokemon);
         battleStatusLabel.setText("Switching to " + cap(pokemon.getName()) + "! Waiting for opponent...");
         updateBattleDisplay();
 
-        // Lock UI — wait for opponent
         showActionButtons();
         setVisible(waitingLabel, true);
         waitingLabel.setText("⏳ Waiting for opponent's move...");
         attackButton.setDisable(true);
         changePokemonMainButton.setDisable(true);
 
-        // Send SWITCH action to server
         ActionMessage msg = ActionMessage.switchPokemon(battleId, teamIndex, turnCount);
         try {
             serverConnection.sendMessage(msg);
-            System.out.println("[OnlineBattle] Switch action sent: index " + teamIndex + " (" + pokemon.getName() + ")");
         } catch (Exception e) {
             System.err.println("[OnlineBattle] Failed to send switch action: " + e.getMessage());
             battleStatusLabel.setText("Error sending switch: " + e.getMessage());
@@ -372,18 +399,10 @@ public class OnlineBattleController {
         PokemonInstance pok = p.getCurrentPokemon();
         if (pok == null) return;
 
-        // Sprite
-        String basePath = isPlayer
-                ? "/com/example/pokemonbattle/sprites/back/%d.png"
-                : "/com/example/pokemonbattle/sprites/front/%d.png";
-        try {
-            Image img = new Image(getClass().getResourceAsStream(String.format(basePath, pok.getId())));
-            if (!img.isError()) {
-                (isPlayer ? playerSpriteImage : opponentSpriteImage).setImage(img);
-            }
-        } catch (Exception ignored) {}
+        String direction = isPlayer ? "back" : "front";
+        ImageView target = isPlayer ? playerSpriteImage : opponentSpriteImage;
+        loadSpriteWithFallback(target, pok.getId(), direction);
 
-        // Name + HP text
         String nameHp = cap(pok.getName()) + "  Lv." + pok.getLevel();
         if (isPlayer) {
             playerPokemonNameLabel.setText(nameHp);
@@ -393,6 +412,40 @@ public class OnlineBattleController {
             opponentPokemonNameLabel.setText(nameHp);
             opponentPokemonHpLabel.setText(pok.getCurrentHp() + " / " + pok.getMaxHp());
             updateHpBar(opponentHpBar, pok.getCurrentHp(), pok.getMaxHp());
+        }
+    }
+
+    private void loadSpriteWithFallback(ImageView target, int pokemonId, String direction) {
+        String gifPath = String.format(
+                "/com/example/pokemonbattle/sprites/%s/gif/%d.gif", direction, pokemonId);
+        var gifUrl = getClass().getResource(gifPath);
+        if (gifUrl != null) {
+            try {
+                Image gifImage = new Image(gifUrl.toExternalForm(),
+                        target.getFitWidth() > 0 ? target.getFitWidth() : 0,
+                        target.getFitHeight() > 0 ? target.getFitHeight() : 0,
+                        true, true, true);
+                if (!gifImage.isError()) {
+                    target.setImage(gifImage);
+                    return;
+                }
+            } catch (Exception e) {
+                System.err.println("GIF load error (" + gifPath + "): " + e.getMessage());
+            }
+        }
+
+        // PNG fallback
+        String pngPath = String.format(
+                "/com/example/pokemonbattle/sprites/%s/%d.png", direction, pokemonId);
+        try {
+            var pngStream = getClass().getResourceAsStream(pngPath);
+            if (pngStream != null) {
+                Image pngImage = new Image(pngStream);
+                if (!pngImage.isError())
+                    target.setImage(pngImage);
+            }
+        } catch (Exception e) {
+            System.err.println("PNG fallback error (" + pngPath + "): " + e.getMessage());
         }
     }
 
@@ -406,9 +459,9 @@ public class OnlineBattleController {
     }
 
     private void updateMoveButtons() {
-        PokemonInstance cur    = player.getCurrentPokemon();
-        var             moves  = cur.getBattleMoves();
-        Button[]        btns   = {moveButton1, moveButton2, moveButton3, moveButton4};
+        PokemonInstance cur   = player.getCurrentPokemon();
+        var             moves = cur.getBattleMoves();
+        Button[]        btns  = {moveButton1, moveButton2, moveButton3, moveButton4};
 
         for (int i = 0; i < btns.length; i++) {
             if (i < moves.size()) {
@@ -486,7 +539,6 @@ public class OnlineBattleController {
         disableMoveButtons();
     }
 
-    /** True when we should ignore further player input (move already sent or battle ended). */
     private boolean battlingOrWaiting() {
         if (battleEnded) {
             battleStatusLabel.setText("The battle has ended.");
@@ -499,7 +551,7 @@ public class OnlineBattleController {
         return false;
     }
 
-    // Cosmetic canvas pattern (same as BattleController)
+    // Cosmetic canvas pattern
 
     private void drawOptionsPanelPattern() {
         if (optionsSection == null) return;
