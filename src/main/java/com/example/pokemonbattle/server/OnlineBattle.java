@@ -7,6 +7,7 @@ import com.example.pokemonbattle.model.Move;
 import com.example.pokemonbattle.database.GameDataDAO;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,8 +32,8 @@ public class OnlineBattle {
     private final Battle battleEngine;
     private final GameDataDAO gameDataDAO;
     
-    // Track moves from both players for the current turn
-    private Map<Integer, MoveMessage> pendingMoves = new HashMap<>();
+    // Track actions from both players for the current turn
+    private Map<Integer, ActionMessage> pendingActions = new HashMap<>();
     
     private boolean battleActive = true;
     private int turnCount = 0;
@@ -126,54 +127,64 @@ public class OnlineBattle {
     }
     
     /**
-     * Receive a move from a player.
-     * When both players submit moves, process the turn.
+     * Receive an action (ATTACK or SWITCH) from a player.
+     * When both players submit actions, process the turn.
      */
-    public synchronized void submitMove(Integer playerId, MoveMessage moveMessage) throws IOException {
-        // Track which player submitted the move
+    public synchronized void submitAction(Integer playerId, ActionMessage action) throws IOException {
         if (playerId.equals(player1Id)) {
-            pendingMoves.put(player1Id, moveMessage);
-            System.out.println("[Battle #" + battleId + "] Player 1 (" + player1Name + ") submitted move: " + moveMessage.getMoveName());
+            pendingActions.put(player1Id, action);
+            System.out.println("[Battle #" + battleId + "] Player 1 (" + player1Name + ") submitted action: " + action.getActionType()
+                    + (action.isAttack() ? " — " + action.getMoveName() : " — switch to index " + action.getSwitchPokemonIndex()));
         } else if (playerId.equals(player2Id)) {
-            pendingMoves.put(player2Id, moveMessage);
-            System.out.println("[Battle #" + battleId + "] Player 2 (" + player2Name + ") submitted move: " + moveMessage.getMoveName());
+            pendingActions.put(player2Id, action);
+            System.out.println("[Battle #" + battleId + "] Player 2 (" + player2Name + ") submitted action: " + action.getActionType()
+                    + (action.isAttack() ? " — " + action.getMoveName() : " — switch to index " + action.getSwitchPokemonIndex()));
         }
-        
-        // If both players have submitted moves, process the turn
-        if (pendingMoves.size() == 2) {
+
+        // If both players have submitted actions, process the turn
+        if (pendingActions.size() == 2) {
             processTurn();
         }
     }
     
     /**
-     * Process a complete turn with both players' moves.
+     * Process a complete turn with both players' actions.
+     * Order: switches always happen first, then attacks (ordered by speed).
      */
     private void processTurn() throws IOException {
         turnCount++;
         System.out.println("[Battle #" + battleId + "] Processing turn " + turnCount);
         
-        MoveMessage move1 = pendingMoves.get(player1Id);
-        MoveMessage move2 = pendingMoves.get(player2Id);
+        ActionMessage action1 = pendingActions.get(player1Id);
+        ActionMessage action2 = pendingActions.get(player2Id);
         
-        if (move1 == null || move2 == null) {
-            return;
-        }
+        if (action1 == null || action2 == null) return;
         
-        // Determine turn order based on speed
         Player player1 = battleEngine.getPlayer1();
         Player player2 = battleEngine.getPlayer2();
         
-        boolean player1First = player1.getCurrentPokemon().getSpeed() >= player2.getCurrentPokemon().getSpeed();
-        
         try {
-            if (player1First) {
-                executeMove(move1, player1, player2, player1Name, player2Name);
-                if (!battleActive) return;
-                executeMove(move2, player2, player1, player2Name, player1Name);
-            } else {
-                executeMove(move2, player2, player1, player2Name, player1Name);
-                if (!battleActive) return;
-                executeMove(move1, player1, player2, player1Name, player2Name);
+            // ── Phase 1: Process SWITCH actions first (switches always go first in Pokemon) ──
+            if (action1.isSwitch()) {
+                executeSwitch(action1, player1, player1Name);
+            }
+            if (action2.isSwitch()) {
+                executeSwitch(action2, player2, player2Name);
+            }
+            
+            // ── Phase 2: Process ATTACK actions (ordered by speed) ──
+            List<AttackEntry> attacks = new ArrayList<>();
+            if (action1.isAttack()) attacks.add(new AttackEntry(action1, player1, player2, player1Name, player2Name));
+            if (action2.isAttack()) attacks.add(new AttackEntry(action2, player2, player1, player2Name, player1Name));
+            
+            // Sort by attacker speed (descending)
+            attacks.sort((a, b) -> Integer.compare(
+                    b.attacker.getCurrentPokemon().getSpeed(),
+                    a.attacker.getCurrentPokemon().getSpeed()));
+            
+            for (AttackEntry atk : attacks) {
+                if (!battleActive) break;
+                executeMove(atk.action, atk.attacker, atk.defender, atk.attackerName, atk.defenderName);
             }
         } catch (Exception e) {
             System.err.println("[Battle #" + battleId + "] Error processing turn: " + e.getMessage());
@@ -185,26 +196,74 @@ public class OnlineBattle {
             endBattle();
         }
         
-        pendingMoves.clear();
+        pendingActions.clear();
         
-        // Signal both clients that the turn is complete and they may submit next move
+        // Signal both clients that the turn is complete and they may submit next action
         if (battleActive) {
             TurnReadyMessage turnReady = new TurnReadyMessage(battleId, turnCount);
             player1Handler.sendMessage(turnReady);
             player2Handler.sendMessage(turnReady);
-            System.out.println("[Battle #" + battleId + "] Turn " + turnCount + " complete. Waiting for next moves.");
+            System.out.println("[Battle #" + battleId + "] Turn " + turnCount + " complete. Waiting for next actions.");
+        }
+    }
+    
+    /** Helper record for sorting attacks by speed. */
+    private static class AttackEntry {
+        final ActionMessage action;
+        final Player attacker;
+        final Player defender;
+        final String attackerName;
+        final String defenderName;
+        AttackEntry(ActionMessage action, Player attacker, Player defender, String attackerName, String defenderName) {
+            this.action = action;
+            this.attacker = attacker;
+            this.defender = defender;
+            this.attackerName = attackerName;
+            this.defenderName = defenderName;
         }
     }
     
     /**
-     * Execute a single move and send damage results to both players.
+     * Execute a SWITCH action: change the player's active pokemon and notify both clients.
      */
-    private void executeMove(MoveMessage moveMsg, Player attacker, Player defender,
+    private void executeSwitch(ActionMessage action, Player switchingPlayer, String playerName) throws IOException {
+        int teamIndex = action.getSwitchPokemonIndex();
+        List<PokemonInstance> team = switchingPlayer.getTeam();
+        
+        if (teamIndex < 0 || teamIndex >= team.size()) {
+            System.err.println("[Battle #" + battleId + "] Invalid switch index: " + teamIndex);
+            return;
+        }
+        
+        PokemonInstance newPokemon = team.get(teamIndex);
+        if (newPokemon.isFainted()) {
+            System.err.println("[Battle #" + battleId + "] Cannot switch to fainted pokemon: " + newPokemon.getName());
+            return;
+        }
+        
+        switchingPlayer.setCurrentPokemon(newPokemon);
+        
+        System.out.println("[Battle #" + battleId + "] " + playerName + " switched to " + newPokemon.getName());
+        
+        // Notify both clients about the switch
+        SwitchNotifyMessage switchMsg = new SwitchNotifyMessage(
+                battleId, playerName,
+                newPokemon.getId(), newPokemon.getName(), newPokemon.getLevel(),
+                newPokemon.getCurrentHp(), newPokemon.getMaxHp()
+        );
+        player1Handler.sendMessage(switchMsg);
+        player2Handler.sendMessage(switchMsg);
+    }
+    
+    /**
+     * Execute a single ATTACK action and send damage results to both players.
+     */
+    private void executeMove(ActionMessage actionMsg, Player attacker, Player defender,
                             String attackerName, String defenderName) throws IOException {
         // Find the move in game data
-        Move move = gameDataDAO.getMove(moveMsg.getMoveId());
+        Move move = gameDataDAO.getMove(actionMsg.getMoveId());
         if (move == null) {
-            System.err.println("[Battle #" + battleId + "] Move not found: " + moveMsg.getMoveId());
+            System.err.println("[Battle #" + battleId + "] Move not found: " + actionMsg.getMoveId());
             return;
         }
         
@@ -244,6 +303,16 @@ public class OnlineBattle {
                 battleActive = false;
             } else {
                 defender.setCurrentPokemon(nextPokemon);
+
+                // Notify both clients about the forced switch so sprites/HP update
+                SwitchNotifyMessage switchMsg = new SwitchNotifyMessage(
+                    battleId, defenderName,
+                    nextPokemon.getId(), nextPokemon.getName(), nextPokemon.getLevel(),
+                    nextPokemon.getCurrentHp(), nextPokemon.getMaxHp()
+                );
+                player1Handler.sendMessage(switchMsg);
+                player2Handler.sendMessage(switchMsg);
+
                 BattleUpdateMessage updateMsg = new BattleUpdateMessage(
                     battleId,
                     defenderName + "'s " + targetPokemon.getName() + " fainted! Switching to " + nextPokemon.getName(),
@@ -335,6 +404,39 @@ public class OnlineBattle {
         System.out.println("[Battle #" + battleId + "] Battle ended! Winner: " + winnerName);
     }
     
+    /**
+     * Handle a player forfeiting (running away or disconnecting).
+     * The forfeiting player loses; the opponent wins.
+     */
+    public synchronized void forfeit(Integer forfeitingPlayerId) throws IOException {
+        if (!battleActive) return;
+        battleActive = false;
+
+        String winnerName;
+        Integer winnerId;
+        String loserName;
+
+        if (forfeitingPlayerId.equals(player1Id)) {
+            winnerName = player2Name;
+            winnerId   = player2Id;
+            loserName  = player1Name;
+        } else {
+            winnerName = player1Name;
+            winnerId   = player1Id;
+            loserName  = player2Name;
+        }
+
+        BattleEndMessage endMsg = new BattleEndMessage(
+            battleId, winnerName, winnerId, loserName + " forfeited the battle!"
+        );
+
+        // Try to notify both clients (one may already be disconnected)
+        try { player1Handler.sendMessage(endMsg); } catch (IOException ignored) {}
+        try { player2Handler.sendMessage(endMsg); } catch (IOException ignored) {}
+
+        System.out.println("[Battle #" + battleId + "] " + loserName + " forfeited! Winner: " + winnerName);
+    }
+
     // Getters
     public Integer getBattleId() { return battleId; }
     public boolean isBattleActive() { return battleActive; }
