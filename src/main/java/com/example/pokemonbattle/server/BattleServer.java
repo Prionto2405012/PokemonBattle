@@ -1,15 +1,20 @@
 package com.example.pokemonbattle.server;
 
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Scanner;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import com.example.pokemonbattle.database.GameDataDAO;
 import com.example.pokemonbattle.model.Move;
 import com.example.pokemonbattle.model.PokemonInstance;
 import com.example.pokemonbattle.model.PokemonSpecies;
-
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Main TCP Server for Pokemon Online Battles.

@@ -41,7 +41,7 @@
                     <HBox alignment="CENTER_LEFT" spacing="6">
                         <Label text="HP" styleClass="hp-tag"/>
                         <StackPane styleClass="hp-bar-track" prefWidth="180" prefHeight="8">
-                            <Rectangle fx:id="opponentHpBar" styleClass="hp-bar-fill" width="180" height="8" arcWidth="8" arcHeight="8"/>
+                            <Rectangle fx:id="opponentHpBar" styleClass="hp-bar-fill" width="180" height="8" arcWidth="8" arcHeight="8" StackPane.alignment="CENTER_LEFT"/>
                         </StackPane>
                     </HBox>
                     <Label fx:id="opponentPokemonHpLabel" text="100 / 100" styleClass="hp-text-label"/>
@@ -64,7 +64,7 @@
                     <HBox alignment="CENTER_LEFT" spacing="6">
                         <Label text="HP" styleClass="hp-tag"/>
                         <StackPane styleClass="hp-bar-track" prefWidth="180" prefHeight="8">
-                            <Rectangle fx:id="playerHpBar" styleClass="hp-bar-fill" width="180" height="8" arcWidth="8" arcHeight="8"/>
+                            <Rectangle fx:id="playerHpBar" styleClass="hp-bar-fill" width="180" height="8" arcWidth="8" arcHeight="8" StackPane.alignment="CENTER_LEFT"/>
                         </StackPane>
                     </HBox>
                     <Label fx:id="playerPokemonHpLabel" text="100 / 100" styleClass="hp-text-label"/>

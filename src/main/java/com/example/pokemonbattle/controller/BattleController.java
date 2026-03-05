@@ -213,10 +213,16 @@ public class BattleController implements Battle.BattleListener {
     private static final double SPRITE_PLAYER_BASE_PX = 260.0;
 
     /** Minimum rendered sprite height in px — prevents tiny Pokemon vanishing. */
-    private static final double SPRITE_MIN_PX = 120.0;
+    private static final double SPRITE_MIN_PX = 150.0;
 
     /** Maximum rendered sprite height in px — prevents huge Pokemon overflowing. */
-    private static final double SPRITE_MAX_PX = 420.0;
+    private static final double SPRITE_MAX_PX = 340.0;
+
+    /**
+     * Exponent applied to the height ratio — values below 1.0 compress size
+     * differences (0.5 = square-root curve, gentler scaling for large Pokemon).
+     */
+    private static final double SPRITE_SCALE_EXPONENT = 0.5;
     // Loaded once from resources/pokemon_heights.json — maps pokemonId → height in metres
     private static final java.util.Map<Integer, Double> POKEMON_HEIGHTS = loadPokemonHeights();
     private static java.util.Map<Integer, Double> loadPokemonHeights() {
@@ -281,7 +287,8 @@ public class BattleController implements Battle.BattleListener {
     private double getScaledSpritePx(int pokemonId, double basePx) {
         Double heightM = POKEMON_HEIGHTS.get(pokemonId);
         if (heightM == null || heightM <= 0) return basePx; // unknown → default
-        double scaled = basePx * (heightM / SPRITE_STANDARD_HEIGHT_M);
+        double ratio  = Math.pow(heightM / SPRITE_STANDARD_HEIGHT_M, SPRITE_SCALE_EXPONENT);
+        double scaled = basePx * ratio;
         double result = Math.max(SPRITE_MIN_PX, Math.min(SPRITE_MAX_PX, scaled));
         System.out.printf("[Sprite] id=%d height=%.1fm → %.0fpx%n", pokemonId, heightM, result);
         return result;
