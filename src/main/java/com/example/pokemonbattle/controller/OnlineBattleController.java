@@ -5,12 +5,14 @@ import java.util.List;
 import com.example.pokemonbattle.model.Move;
 import com.example.pokemonbattle.model.Player;
 import com.example.pokemonbattle.model.PokemonInstance;
+import com.example.pokemonbattle.server.ActionMessage;
 import com.example.pokemonbattle.server.BattleEndMessage;
 import com.example.pokemonbattle.server.BattleUpdateMessage;
 import com.example.pokemonbattle.server.DamageMessage;
+import com.example.pokemonbattle.server.ForfeitMessage;
 import com.example.pokemonbattle.server.GameMessage;
-import com.example.pokemonbattle.server.MoveMessage;
 import com.example.pokemonbattle.server.ServerConnection;
+import com.example.pokemonbattle.server.SwitchNotifyMessage;
 import com.example.pokemonbattle.server.TurnReadyMessage;
 import com.example.pokemonbattle.util.MusicManager;
 import com.example.pokemonbattle.util.SceneManager;
@@ -147,11 +149,12 @@ public class OnlineBattleController {
     private void handleServerMessage(GameMessage msg) {
         Platform.runLater(() -> {
             switch (msg.getMessageType()) {
-                case "DAMAGE"        -> applyDamage((DamageMessage)        msg);
-                case "BATTLE_UPDATE" -> applyBattleUpdate((BattleUpdateMessage) msg);
-                case "TURN_READY"    -> onTurnReady((TurnReadyMessage)     msg);
-                case "BATTLE_END"    -> applyBattleEnd((BattleEndMessage)  msg);
-                default              -> System.out.println("[OnlineBattle] Unknown msg: " + msg.getMessageType());
+                case "DAMAGE"         -> applyDamage((DamageMessage)        msg);
+                case "SWITCH_NOTIFY"  -> applySwitchNotify((SwitchNotifyMessage) msg);
+                case "BATTLE_UPDATE"  -> applyBattleUpdate((BattleUpdateMessage) msg);
+                case "TURN_READY"     -> onTurnReady((TurnReadyMessage)     msg);
+                case "BATTLE_END"     -> applyBattleEnd((BattleEndMessage)  msg);
+                default               -> System.out.println("[OnlineBattle] Unknown msg: " + msg.getMessageType());
             }
         });
     }
@@ -196,6 +199,31 @@ public class OnlineBattleController {
     private void applyBattleUpdate(BattleUpdateMessage msg) {
         battleStatusLabel.setText(msg.getMessage());
         updateBattleDisplay();
+    }
+
+    /**
+     * Apply a switch notification from the server.
+     * Updates the correct player's currentPokemon on this client.
+     */
+    private void applySwitchNotify(SwitchNotifyMessage msg) {
+        boolean isMe = player.getName().equals(msg.getPlayerName());
+        Player  side = isMe ? player : opponent;
+
+        // Find the pokemon in the team by ID and set it as current
+        for (PokemonInstance p : side.getTeam()) {
+            if (p.getId() == msg.getNewPokemonId()) {
+                side.setCurrentPokemon(p);
+                // Sync HP from server
+                p.setCurrentHp(msg.getNewPokemonHp());
+                break;
+            }
+        }
+
+        String who = isMe ? "You" : cap(msg.getPlayerName());
+        battleStatusLabel.setText(who + " switched to " + cap(msg.getNewPokemonName()) + "!");
+        updateBattleDisplay();
+
+        System.out.println("[OnlineBattle] " + msg.getPlayerName() + " switched to " + msg.getNewPokemonName());
     }
 
     /** Called when the server says the full turn is resolved — re-enable player input. */
@@ -252,9 +280,19 @@ public class OnlineBattleController {
         updatePokemonButtons();
     }
 
-    /** RUN = disconnect and return to setup screen. */
+    /** RUN = forfeit the battle (opponent wins) and return to setup screen. */
     private void onRunClicked() {
-        if (serverConnection != null) serverConnection.disconnect();
+        if (serverConnection != null) {
+            // If battle is still going, send a forfeit message so the opponent wins
+            if (!battleEnded && battleId != null) {
+                try {
+                    serverConnection.sendMessage(new ForfeitMessage(battleId));
+                } catch (Exception e) {
+                    System.err.println("[OnlineBattle] Failed to send forfeit: " + e.getMessage());
+                }
+            }
+            serverConnection.disconnect();
+        }
         SceneManager.clearData();
         SceneManager.switchSceneWithLoading("new_game.fxml", "Battle Setup", 1200, 700);
     }
@@ -264,7 +302,7 @@ public class OnlineBattleController {
         showActionButtons();
     }
 
-    /** Called when a move button is clicked. Sends MoveMessage to server. */
+    /** Called when a move button is clicked. Sends ActionMessage (ATTACK) to server. */
     private void onMoveSelected(Move move) {
         if (moveSent || battleEnded) return;
         moveSent = true;
@@ -279,13 +317,13 @@ public class OnlineBattleController {
 
         battleStatusLabel.setText("You chose " + cap(move.getName()) + "! Waiting for opponent...");
 
-        // Send to server
-        MoveMessage msg = new MoveMessage(battleId, move.getId(), move.getName(), turnCount);
+        // Send ATTACK action to server
+        ActionMessage msg = ActionMessage.attack(battleId, move.getId(), move.getName(), turnCount);
         try {
             serverConnection.sendMessage(msg);
-            System.out.println("[OnlineBattle] Move sent: " + move.getName());
+            System.out.println("[OnlineBattle] Attack action sent: " + move.getName());
         } catch (Exception e) {
-            System.err.println("[OnlineBattle] Failed to send move: " + e.getMessage());
+            System.err.println("[OnlineBattle] Failed to send action: " + e.getMessage());
             battleStatusLabel.setText("Error sending move: " + e.getMessage());
             moveSent = false;
             attackButton.setDisable(false);
@@ -293,10 +331,36 @@ public class OnlineBattleController {
     }
 
     private void onPokemonSelected(PokemonInstance pokemon) {
+        if (moveSent || battleEnded) return;
+        moveSent = true;
+
+        // Find the team index for this pokemon
+        int teamIndex = player.getTeam().indexOf(pokemon);
+
+        // Immediately update local display (server will also send SwitchNotifyMessage)
         player.setCurrentPokemon(pokemon);
-        battleStatusLabel.setText("Go, " + cap(pokemon.getName()) + "!");
+        battleStatusLabel.setText("Switching to " + cap(pokemon.getName()) + "! Waiting for opponent...");
         updateBattleDisplay();
+
+        // Lock UI — wait for opponent
         showActionButtons();
+        setVisible(waitingLabel, true);
+        waitingLabel.setText("⏳ Waiting for opponent's move...");
+        attackButton.setDisable(true);
+        changePokemonMainButton.setDisable(true);
+
+        // Send SWITCH action to server
+        ActionMessage msg = ActionMessage.switchPokemon(battleId, teamIndex, turnCount);
+        try {
+            serverConnection.sendMessage(msg);
+            System.out.println("[OnlineBattle] Switch action sent: index " + teamIndex + " (" + pokemon.getName() + ")");
+        } catch (Exception e) {
+            System.err.println("[OnlineBattle] Failed to send switch action: " + e.getMessage());
+            battleStatusLabel.setText("Error sending switch: " + e.getMessage());
+            moveSent = false;
+            attackButton.setDisable(false);
+            changePokemonMainButton.setDisable(false);
+        }
     }
 
     // ── Display helpers ──────────────────────────────────────────────────────

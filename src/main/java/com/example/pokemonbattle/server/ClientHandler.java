@@ -96,6 +96,12 @@ public class ClientHandler extends Thread {
                 case "FIND_OPPONENT_REQUEST":
                     handleFindOpponent((FindOpponentRequest) message);
                     break;
+                case "ACTION":
+                    handleAction((ActionMessage) message);
+                    break;
+                case "FORFEIT":
+                    handleForfeit((ForfeitMessage) message);
+                    break;
                 case "MOVE":
                     handleMove((MoveMessage) message);
                     break;
@@ -290,7 +296,38 @@ public class ClientHandler extends Thread {
     }
     
     /**
-     * Handle move submission during battle.
+     * Handle player forfeiting the battle.
+     */
+    private void handleForfeit(ForfeitMessage forfeitMsg) throws IOException {
+        if (currentBattle == null || !currentBattle.isBattleActive()) {
+            return;
+        }
+        try {
+            currentBattle.forfeit(userId);
+        } catch (IOException e) {
+            System.err.println("[Client #" + clientId + "] Error processing forfeit: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Handle action submission (ATTACK or SWITCH) during battle.
+     */
+    private void handleAction(ActionMessage actionMsg) throws IOException {
+        if (currentBattle == null || !currentBattle.isBattleActive()) {
+            sendMessage(new ErrorMessage("NO_ACTIVE_BATTLE", "No active battle"));
+            return;
+        }
+        
+        try {
+            currentBattle.submitAction(userId, actionMsg);
+        } catch (IOException e) {
+            System.err.println("[Client #" + clientId + "] Error submitting action: " + e.getMessage());
+            sendMessage(new ErrorMessage("ACTION_ERROR", "Failed to process action"));
+        }
+    }
+    
+    /**
+     * Handle move submission during battle (legacy — kept for backward compatibility).
      */
     private void handleMove(MoveMessage moveMsg) throws IOException {
         if (currentBattle == null || !currentBattle.isBattleActive()) {
@@ -298,8 +335,10 @@ public class ClientHandler extends Thread {
             return;
         }
         
+        // Convert legacy MoveMessage to ActionMessage and submit
+        ActionMessage action = ActionMessage.attack(moveMsg.getBattleId(), moveMsg.getMoveId(), moveMsg.getMoveName(), moveMsg.getTurn());
         try {
-            currentBattle.submitMove(userId, moveMsg);
+            currentBattle.submitAction(userId, action);
         } catch (IOException e) {
             System.err.println("[Client #" + clientId + "] Error submitting move: " + e.getMessage());
             sendMessage(new ErrorMessage("MOVE_ERROR", "Failed to process move"));
@@ -346,6 +385,15 @@ public class ClientHandler extends Thread {
             System.err.println("[Client #" + clientId + "] Error closing connection: " + e.getMessage());
         }
         
+        // If in an active battle, treat disconnect as forfeit
+        if (currentBattle != null && currentBattle.isBattleActive()) {
+            try {
+                currentBattle.forfeit(userId);
+            } catch (IOException e) {
+                System.err.println("[Client #" + clientId + "] Error forfeiting on disconnect: " + e.getMessage());
+            }
+        }
+
         // Notify server of disconnection
         if (authenticated && userId != null) {
             server.unregisterClient(this);
