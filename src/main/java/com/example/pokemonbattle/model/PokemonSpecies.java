@@ -55,11 +55,13 @@ public class PokemonSpecies {
             }
         }
         
-        // If no valid moves found, select up to 4 from the moves list anyway
+        // If no valid moves found, leave selectedMoves empty rather than
+        // falling back to IDs that don't exist in the moves map (which would
+        // silently produce a Pokemon with zero battle moves).
         if (availableMoveIds.isEmpty()) {
-            availableMoveIds = new ArrayList<>(moves);
+            return;
         }
-        
+
         // Shuffle and select up to 4 moves
         Collections.shuffle(availableMoveIds);
         int count = Math.min(4, availableMoveIds.size());

@@ -26,7 +26,7 @@ import javafx.scene.media.MediaPlayer;
 
 public final class MediaCache {
     private static final String BASE = "/com/example/pokemonbattle/assets/";
-    private static final String[] IMAGE_ASSETS = { "wc_bg.png", "menu1.png", "new_game.png", };
+    private static final String[] IMAGE_ASSETS = { "wc_bg.png", "menu1.png", "new_game.png", "fight.png", "battle2.jpg"};
     private static final String[] MEDIA_ASSETS = { "intro.mp4", "Pikachu.mp4", "start.mp4", };
 
     public record GifFrameData(WritableImage[] frames, long[] delaysMs) {

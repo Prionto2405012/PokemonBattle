@@ -1,8 +1,8 @@
 package com.example.pokemonbattle.util;
 
-import com.example.pokemonbattle.model.User;
-
 import java.util.prefs.Preferences;
+
+import com.example.pokemonbattle.model.User;
 
 /**
  * Singleton session manager that tracks the current user session.
@@ -29,7 +29,7 @@ public class PlayerSession {
         return instance;
     }
 
-    // ── User management ─────────────────────────────────────────
+    // User management
 
     /**
      * Initialize session for a logged-in user.
@@ -49,7 +49,7 @@ public class PlayerSession {
         return currentUser;
     }
 
-    // ── First-time detection ────────────────────────────────────
+    // First-time detection
 
     /**
      * User is first-time if no avatar has been saved yet.
@@ -58,7 +58,7 @@ public class PlayerSession {
         return avatarPath == null || avatarPath.isEmpty();
     }
 
-    // ── Avatar management ───────────────────────────────────────
+    // Avatar management
 
     /**
      * Save avatar selection and mark user as not-first-time.
@@ -80,7 +80,7 @@ public class PlayerSession {
         return avatarGender;
     }
 
-    // ── Persistence (Preferences API) ───────────────────────────
+    // Persistence (Preferences API)
 
     private void loadPreferences() {
         if (currentUser == null || currentUser.getId() == null) return;
@@ -108,7 +108,7 @@ public class PlayerSession {
         return Preferences.userRoot().node("/pokemonbattle/users/" + currentUser.getId());
     }
 
-    // ── Session lifecycle ───────────────────────────────────────
+    // Session lifecycle
 
     /**
      * Clear session (logout).

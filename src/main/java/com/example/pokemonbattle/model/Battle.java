@@ -252,16 +252,25 @@ public class Battle {
     }
 
     /**
-     * Calculate damage with type effectiveness
+     * Calculate damage with type effectiveness.
+     * Returns 0 for status moves or zero-power moves.
+     * Uses special attack/defense stats for special moves.
      */
     private int calculateDamage(Move move, PokemonInstance attacker, PokemonInstance defender) {
-        if (move.getPower() == null) {
-            return 0; // Status move, no damage
+        if (move.getPower() == null || move.getPower() == 0
+                || "status".equals(move.getDamage_class())) {
+            return 0; // Status move or zero-power move — no damage
         }
 
+        // Use the correct attacking/defending stats based on damage class
+        int atkStat = "special".equals(move.getDamage_class())
+                ? attacker.getSpAttack() : attacker.getAttack();
+        int defStat = "special".equals(move.getDamage_class())
+                ? defender.getSpDefense() : defender.getDefense();
+
         // Base damage formula (simplified)
-        double damage = ((2.0 * attacker.getLevel() / 5.0 + 2.0) * move.getPower() * 
-                        attacker.getAttack() / defender.getDefense()) / 50.0 + 2.0;
+        double damage = ((2.0 * attacker.getLevel() / 5.0 + 2.0) * move.getPower()
+                        * atkStat / (double) defStat) / 50.0 + 2.0;
 
         // Apply type effectiveness
         float effectiveness = getTypeEffectiveness(move.getType(), defender.getTypes());
@@ -362,14 +371,24 @@ public class Battle {
     }
 
     /**
-     * Get a random move for AI opponent
+     * Get a move for the AI opponent.
+     * Prefers offensive (non-status, non-zero-power) moves; falls back to any
+     * available move if the Pokemon only knows status moves.
      */
     public Move getAIMove(PokemonInstance pokemon) {
         List<PokemonInstance.MoveSlot> battleMoves = pokemon.getBattleMoves();
         if (battleMoves.isEmpty()) {
             return null;
         }
-        return battleMoves.get(random.nextInt(battleMoves.size())).getMove();
+        // Prefer moves that actually deal damage
+        List<PokemonInstance.MoveSlot> offensiveMoves = battleMoves.stream()
+                .filter(ms -> ms.getMove() != null
+                        && ms.getMove().getPower() != null
+                        && ms.getMove().getPower() > 0
+                        && !"status".equals(ms.getMove().getDamage_class()))
+                .toList();
+        List<PokemonInstance.MoveSlot> pool = offensiveMoves.isEmpty() ? battleMoves : offensiveMoves;
+        return pool.get(random.nextInt(pool.size())).getMove();
     }
 
     // ==================== Listener Notifications ====================
