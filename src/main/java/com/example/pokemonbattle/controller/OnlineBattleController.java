@@ -448,7 +448,6 @@ public class OnlineBattleController {
             System.err.println("PNG fallback error (" + pngPath + "): " + e.getMessage());
         }
     }
-
     private void updateHpBar(Rectangle bar, int hp, int maxHp) {
         if (bar == null || maxHp <= 0) return;
         double ratio = Math.max(0, (double) hp / maxHp);
