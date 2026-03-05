@@ -1103,85 +1103,104 @@ public class NewGameController {
 
         BattleHistoryManager historyMgr = BattleHistoryManager.getInstance();
         List<BattleRecord> records = historyMgr.getBattleHistory(user.getId());
-        int wins = historyMgr.getWinCount(user.getId());
+        int wins   = historyMgr.getWinCount(user.getId());
         int losses = historyMgr.getLossCount(user.getId());
 
-        // Build overlay programmatically (consistent overlay pattern)
+        // ── Root overlay (semi-transparent dark background) ──────────────────
         StackPane overlayRoot = new StackPane();
-        overlayRoot.getStyleClass().add("history-overlay-root");
         overlayRoot.setAlignment(Pos.CENTER);
+        overlayRoot.setStyle("-fx-background-color: rgba(0,0,0,0.65);");
 
+        // ── Inner card ───────────────────────────────────────────────────────
         VBox container = new VBox(15);
-        container.getStyleClass().add("history-container");
         container.setAlignment(Pos.TOP_CENTER);
-        container.setMaxWidth(560);
-        container.setMaxHeight(500);
-        container.setPadding(new Insets(24, 28, 24, 28));
+        container.setMaxWidth(580);
+        container.setMaxHeight(520);
+        container.setPadding(new Insets(28, 30, 24, 30));
+        container.setStyle(
+            "-fx-background-color: linear-gradient(to bottom, #1a3a35, #122b27);" +
+            "-fx-background-radius: 16;" +
+            "-fx-border-color: rgba(120,200,80,0.35);" +
+            "-fx-border-width: 1.5;" +
+            "-fx-border-radius: 16;" +
+            "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.6), 24, 0, 0, 6);"
+        );
 
         // Title
-        Label title = new Label("Battle History");
-        title.getStyleClass().add("history-title");
+        Label title = new Label("⚔ Battle History");
+        title.setStyle(
+            "-fx-font-size: 22px;" +
+            "-fx-font-weight: bold;" +
+            "-fx-text-fill: #78C850;" +
+            "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 4, 0, 0, 1);"
+        );
 
-        // Summary
+        // Summary row
         HBox summary = new HBox(30);
         summary.setAlignment(Pos.CENTER);
-        Label winSummary = new Label("Wins: " + wins);
-        winSummary.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #78C850;");
-        Label lossSummary = new Label("Losses: " + losses);
-        lossSummary.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #F08030;");
-        Label totalSummary = new Label("Total: " + (wins + losses));
-        totalSummary.setStyle("-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #b0eedf;");
-        summary.getChildren().addAll(winSummary, lossSummary, totalSummary);
+        summary.setPadding(new Insets(6, 0, 4, 0));
+
+        Label winLbl = new Label("✔  Wins: " + wins);
+        winLbl.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #78C850;");
+
+        Label lossLbl = new Label("✘  Losses: " + losses);
+        lossLbl.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #F08030;");
+
+        Label totalLbl = new Label("▣  Total: " + (wins + losses));
+        totalLbl.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #b0eedf;");
+
+        summary.getChildren().addAll(winLbl, lossLbl, totalLbl);
+
+        // Divider
+        javafx.scene.shape.Rectangle divider = new javafx.scene.shape.Rectangle();
+        divider.setHeight(1);
+        divider.setWidth(480);
+        divider.setFill(javafx.scene.paint.Color.web("#78C850", 0.25));
 
         // Records list
         VBox recordsList = new VBox(8);
-        recordsList.setPadding(new Insets(8));
+        recordsList.setPadding(new Insets(4, 6, 4, 6));
 
-        if (records.isEmpty()) {
-            Label empty = new Label("No battles yet. Start your first battle!");
+        if (records == null || records.isEmpty()) {
+            Label empty = new Label("No battle records yet — start your first battle!");
             empty.setStyle("-fx-font-size: 14px; -fx-text-fill: #90aea6; -fx-font-style: italic;");
             recordsList.getChildren().add(empty);
         } else {
-            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("MMM dd, yyyy HH:mm");
+            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("MMM dd, yyyy  HH:mm");
             for (BattleRecord record : records) {
-                HBox card = new HBox(12);
-                card.getStyleClass().add("history-record-card");
-                card.setAlignment(Pos.CENTER_LEFT);
-
-                // Result badge
-                Label resultBadge = new Label(record.getResult());
-                resultBadge.setStyle("-fx-font-size: 13px; -fx-font-weight: bold; -fx-padding: 4 10; " +
-                    "-fx-background-radius: 6; -fx-min-width: 50; -fx-alignment: CENTER; " +
-                    "-fx-background-color: " + ("WIN".equals(record.getResult()) ? "rgba(120,200,80,0.3)" : "rgba(240,128,48,0.3)") + "; " +
-                    "-fx-text-fill: " + ("WIN".equals(record.getResult()) ? "#78C850" : "#F08030") + ";");
-
-                // Info
-                VBox info = new VBox(2);
-                Label opponent = new Label("vs " + (record.getOpponentName() != null ? record.getOpponentName() : "Unknown")
-                    + " (" + record.getOpponentType() + ")");
-                opponent.setStyle("-fx-font-size: 13px; -fx-text-fill: #e0f0ec; -fx-font-weight: bold;");
-                Label pokemon = new Label("Team: " + String.join(", ", record.getPokemonUsed()));
-                pokemon.setStyle("-fx-font-size: 11px; -fx-text-fill: #90aea6;");
-                pokemon.setWrapText(true);
-                Label time = new Label(record.getTimestamp() != null ? record.getTimestamp().format(fmt) : "");
-                time.setStyle("-fx-font-size: 10px; -fx-text-fill: #6b8f85;");
-                info.getChildren().addAll(opponent, pokemon, time);
-                HBox.setHgrow(info, javafx.scene.layout.Priority.ALWAYS);
-
-                card.getChildren().addAll(resultBadge, info);
-                recordsList.getChildren().add(card);
+                recordsList.getChildren().add(buildRecordCard(record, fmt));
             }
         }
 
         ScrollPane scroll = new ScrollPane(recordsList);
         scroll.setFitToWidth(true);
-        scroll.setPrefHeight(320);
-        scroll.setStyle("-fx-background: transparent; -fx-background-color: transparent;");
+        scroll.setPrefHeight(330);
+        scroll.setStyle(
+            "-fx-background: transparent;" +
+            "-fx-background-color: transparent;" +
+            "-fx-border-color: transparent;"
+        );
+        // Make the viewport background transparent too
+        scroll.skinProperty().addListener((obs, o, n) -> {
+            if (scroll.lookup(".viewport") != null)
+                scroll.lookup(".viewport").setStyle("-fx-background-color: transparent;");
+        });
 
         // Close button
         Button closeBtn = new Button("Close");
-        closeBtn.getStyleClass().add("button-blue");
-        closeBtn.setPrefWidth(120);
+        closeBtn.setStyle(
+            "-fx-font-size: 14px;" +
+            "-fx-font-weight: bold;" +
+            "-fx-padding: 8 28;" +
+            "-fx-background-color: #2d7a6e;" +
+            "-fx-text-fill: white;" +
+            "-fx-background-radius: 8;" +
+            "-fx-cursor: hand;"
+        );
+        closeBtn.setOnMouseEntered(e ->
+            closeBtn.setStyle(closeBtn.getStyle().replace("#2d7a6e", "#3a9e8f")));
+        closeBtn.setOnMouseExited(e ->
+            closeBtn.setStyle(closeBtn.getStyle().replace("#3a9e8f", "#2d7a6e")));
         closeBtn.setOnAction(e -> {
             FadeTransition ft = new FadeTransition(Duration.millis(180), overlayRoot);
             ft.setToValue(0.0);
@@ -1189,10 +1208,10 @@ public class NewGameController {
             ft.play();
         });
 
-        container.getChildren().addAll(title, summary, scroll, closeBtn);
+        container.getChildren().addAll(title, summary, divider, scroll, closeBtn);
         overlayRoot.getChildren().add(container);
 
-        // Click outside to close
+        // Click outside card to close
         overlayRoot.setOnMouseClicked(e -> {
             if (e.getTarget() == overlayRoot) {
                 FadeTransition ft = new FadeTransition(Duration.millis(180), overlayRoot);
@@ -1203,15 +1222,90 @@ public class NewGameController {
         });
         container.setOnMouseClicked(e -> e.consume());
 
-        // Animate in
+        // Fade in
         overlayRoot.setOpacity(0.0);
         rootPane.getChildren().add(overlayRoot);
         MusicManager.getInstance().attachClickSounds(overlayRoot);
-        FadeTransition fadeIn = new FadeTransition(Duration.millis(200), overlayRoot);
+        FadeTransition fadeIn = new FadeTransition(Duration.millis(220), overlayRoot);
         fadeIn.setToValue(1.0);
         fadeIn.play();
     }
 
+    /** Build a single battle-record row card with fully inline styles. */
+    private HBox buildRecordCard(BattleRecord record, DateTimeFormatter fmt) {
+        boolean won = "WIN".equals(record.getResult());
+
+        HBox card = new HBox(14);
+        card.setAlignment(Pos.CENTER_LEFT);
+        card.setPadding(new Insets(10, 14, 10, 14));
+        card.setStyle(
+            "-fx-background-color: rgba(255,255,255,0.06);" +
+            "-fx-background-radius: 8;" +
+            "-fx-border-color: " + (won ? "rgba(120,200,80,0.3)" : "rgba(240,128,48,0.25)") + ";" +
+            "-fx-border-width: 1;" +
+            "-fx-border-radius: 8;" +
+            "-fx-cursor: default;"
+        );
+
+        // Hover highlight
+        card.setOnMouseEntered(e -> card.setStyle(
+            "-fx-background-color: rgba(255,255,255,0.11);" +
+            "-fx-background-radius: 8;" +
+            "-fx-border-color: " + (won ? "rgba(120,200,80,0.55)" : "rgba(240,128,48,0.5)") + ";" +
+            "-fx-border-width: 1;" +
+            "-fx-border-radius: 8;"
+        ));
+        card.setOnMouseExited(e -> card.setStyle(
+            "-fx-background-color: rgba(255,255,255,0.06);" +
+            "-fx-background-radius: 8;" +
+            "-fx-border-color: " + (won ? "rgba(120,200,80,0.3)" : "rgba(240,128,48,0.25)") + ";" +
+            "-fx-border-width: 1;" +
+            "-fx-border-radius: 8;"
+        ));
+
+        // Result badge
+        Label badge = new Label(record.getResult());
+        badge.setMinWidth(46);
+        badge.setStyle(
+            "-fx-font-size: 12px;" +
+            "-fx-font-weight: bold;" +
+            "-fx-alignment: CENTER;" +
+            "-fx-padding: 4 8;" +
+            "-fx-background-radius: 6;" +
+            "-fx-background-color: " + (won ? "rgba(120,200,80,0.22)" : "rgba(240,128,48,0.22)") + ";" +
+            "-fx-text-fill: " + (won ? "#78C850" : "#F08030") + ";"
+        );
+
+        // Opponent type icon  (AI vs ONLINE)
+        String opponentType = record.getOpponentType() != null ? record.getOpponentType() : "AI";
+        String typeIcon = "ONLINE".equalsIgnoreCase(opponentType) ? "🌐" : "🤖";
+
+        // Info column
+        VBox info = new VBox(3);
+        HBox.setHgrow(info, javafx.scene.layout.Priority.ALWAYS);
+
+        String opponentName = record.getOpponentName() != null ? record.getOpponentName() : "Unknown";
+        Label opponent = new Label(typeIcon + " vs " + opponentName + "  [" + opponentType + "]");
+        opponent.setStyle("-fx-font-size: 13px; -fx-text-fill: #e0f0ec; -fx-font-weight: bold;");
+
+        // Pokemon list — cap at a reasonable display length
+        String pokemonStr = record.getPokemonUsed() != null
+                ? String.join(", ", record.getPokemonUsed())
+                : "—";
+        if (pokemonStr.length() > 60) pokemonStr = pokemonStr.substring(0, 57) + "…";
+        Label pokemonLbl = new Label("🎴 " + pokemonStr);
+        pokemonLbl.setStyle("-fx-font-size: 11px; -fx-text-fill: #90aea6;");
+        pokemonLbl.setWrapText(false);
+
+        Label timeLbl = new Label(record.getTimestamp() != null
+                ? "🕐 " + record.getTimestamp().format(fmt) : "");
+        timeLbl.setStyle("-fx-font-size: 10px; -fx-text-fill: #5d8a80;");
+
+        info.getChildren().addAll(opponent, pokemonLbl, timeLbl);
+        card.getChildren().addAll(badge, info);
+
+        return card;
+    }
     // View Selected Pokémon Overlay
 
     @FXML
