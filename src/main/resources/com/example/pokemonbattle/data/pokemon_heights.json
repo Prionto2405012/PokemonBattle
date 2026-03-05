@@ -1,0 +1,752 @@
+{
+  "3": {
+    "id": 3,
+    "name": "venusaur",
+    "height": 2.0
+  },
+  "6": {
+    "id": 6,
+    "name": "charizard",
+    "height": 1.7
+  },
+  "9": {
+    "id": 9,
+    "name": "blastoise",
+    "height": 1.6
+  },
+  "31": {
+    "id": 31,
+    "name": "nidoqueen",
+    "height": 1.3
+  },
+  "34": {
+    "id": 34,
+    "name": "nidoking",
+    "height": 1.4
+  },
+  "38": {
+    "id": 38,
+    "name": "ninetales",
+    "height": 1.1
+  },
+  "45": {
+    "id": 45,
+    "name": "vileplume",
+    "height": 1.2
+  },
+  "55": {
+    "id": 55,
+    "name": "golduck",
+    "height": 1.7
+  },
+  "59": {
+    "id": 59,
+    "name": "arcanine",
+    "height": 1.9
+  },
+  "62": {
+    "id": 62,
+    "name": "poliwrath",
+    "height": 1.3
+  },
+  "65": {
+    "id": 65,
+    "name": "alakazam",
+    "height": 1.5
+  },
+  "68": {
+    "id": 68,
+    "name": "machamp",
+    "height": 1.6
+  },
+  "71": {
+    "id": 71,
+    "name": "victreebel",
+    "height": 1.7
+  },
+  "73": {
+    "id": 73,
+    "name": "tentacruel",
+    "height": 1.6
+  },
+  "76": {
+    "id": 76,
+    "name": "golem",
+    "height": 1.4
+  },
+  "78": {
+    "id": 78,
+    "name": "rapidash",
+    "height": 1.7
+  },
+  "80": {
+    "id": 80,
+    "name": "slowbro",
+    "height": 1.6
+  },
+  "89": {
+    "id": 89,
+    "name": "muk",
+    "height": 1.2
+  },
+  "91": {
+    "id": 91,
+    "name": "cloyster",
+    "height": 1.5
+  },
+  "94": {
+    "id": 94,
+    "name": "gengar",
+    "height": 1.5
+  },
+  "101": {
+    "id": 101,
+    "name": "electrode",
+    "height": 1.2
+  },
+  "103": {
+    "id": 103,
+    "name": "exeggutor",
+    "height": 2.0
+  },
+  "110": {
+    "id": 110,
+    "name": "weezing",
+    "height": 1.2
+  },
+  "115": {
+    "id": 115,
+    "name": "kangaskhan",
+    "height": 2.2
+  },
+  "121": {
+    "id": 121,
+    "name": "starmie",
+    "height": 1.1
+  },
+  "123": {
+    "id": 123,
+    "name": "scyther",
+    "height": 1.5
+  },
+  "125": {
+    "id": 125,
+    "name": "electabuzz",
+    "height": 1.1
+  },
+  "126": {
+    "id": 126,
+    "name": "magmar",
+    "height": 1.3
+  },
+  "127": {
+    "id": 127,
+    "name": "pinsir",
+    "height": 1.5
+  },
+  "128": {
+    "id": 128,
+    "name": "tauros",
+    "height": 1.4
+  },
+  "130": {
+    "id": 130,
+    "name": "gyarados",
+    "height": 6.5
+  },
+  "131": {
+    "id": 131,
+    "name": "lapras",
+    "height": 2.5
+  },
+  "134": {
+    "id": 134,
+    "name": "vaporeon",
+    "height": 1.0
+  },
+  "135": {
+    "id": 135,
+    "name": "jolteon",
+    "height": 0.8
+  },
+  "136": {
+    "id": 136,
+    "name": "flareon",
+    "height": 0.9
+  },
+  "139": {
+    "id": 139,
+    "name": "omastar",
+    "height": 1.0
+  },
+  "141": {
+    "id": 141,
+    "name": "kabutops",
+    "height": 1.3
+  },
+  "142": {
+    "id": 142,
+    "name": "aerodactyl",
+    "height": 1.8
+  },
+  "143": {
+    "id": 143,
+    "name": "snorlax",
+    "height": 2.1
+  },
+  "144": {
+    "id": 144,
+    "name": "articuno",
+    "height": 1.7
+  },
+  "145": {
+    "id": 145,
+    "name": "zapdos",
+    "height": 1.6
+  },
+  "146": {
+    "id": 146,
+    "name": "moltres",
+    "height": 2.0
+  },
+  "149": {
+    "id": 149,
+    "name": "dragonite",
+    "height": 2.2
+  },
+  "150": {
+    "id": 150,
+    "name": "mewtwo",
+    "height": 2.0
+  },
+  "151": {
+    "id": 151,
+    "name": "mew",
+    "height": 0.4
+  },
+  "154": {
+    "id": 154,
+    "name": "meganium",
+    "height": 1.8
+  },
+  "157": {
+    "id": 157,
+    "name": "typhlosion",
+    "height": 1.7
+  },
+  "160": {
+    "id": 160,
+    "name": "feraligatr",
+    "height": 2.3
+  },
+  "169": {
+    "id": 169,
+    "name": "crobat",
+    "height": 1.8
+  },
+  "181": {
+    "id": 181,
+    "name": "ampharos",
+    "height": 1.4
+  },
+  "182": {
+    "id": 182,
+    "name": "bellossom",
+    "height": 0.4
+  },
+  "186": {
+    "id": 186,
+    "name": "politoed",
+    "height": 1.1
+  },
+  "196": {
+    "id": 196,
+    "name": "espeon",
+    "height": 0.9
+  },
+  "197": {
+    "id": 197,
+    "name": "umbreon",
+    "height": 1.0
+  },
+  "199": {
+    "id": 199,
+    "name": "slowking",
+    "height": 2.0
+  },
+  "208": {
+    "id": 208,
+    "name": "steelix",
+    "height": 9.2
+  },
+  "212": {
+    "id": 212,
+    "name": "scizor",
+    "height": 1.8
+  },
+  "213": {
+    "id": 213,
+    "name": "shuckle",
+    "height": 0.6
+  },
+  "214": {
+    "id": 214,
+    "name": "heracross",
+    "height": 1.5
+  },
+  "217": {
+    "id": 217,
+    "name": "ursaring",
+    "height": 1.8
+  },
+  "229": {
+    "id": 229,
+    "name": "houndoom",
+    "height": 1.4
+  },
+  "230": {
+    "id": 230,
+    "name": "kingdra",
+    "height": 1.8
+  },
+  "232": {
+    "id": 232,
+    "name": "donphan",
+    "height": 1.1
+  },
+  "233": {
+    "id": 233,
+    "name": "porygon2",
+    "height": 0.6
+  },
+  "241": {
+    "id": 241,
+    "name": "miltank",
+    "height": 1.2
+  },
+  "242": {
+    "id": 242,
+    "name": "blissey",
+    "height": 1.5
+  },
+  "243": {
+    "id": 243,
+    "name": "raikou",
+    "height": 1.9
+  },
+  "244": {
+    "id": 244,
+    "name": "entei",
+    "height": 2.1
+  },
+  "245": {
+    "id": 245,
+    "name": "suicune",
+    "height": 2.0
+  },
+  "248": {
+    "id": 248,
+    "name": "tyranitar",
+    "height": 2.0
+  },
+  "249": {
+    "id": 249,
+    "name": "lugia",
+    "height": 5.2
+  },
+  "250": {
+    "id": 250,
+    "name": "ho-oh",
+    "height": 3.8
+  },
+  "251": {
+    "id": 251,
+    "name": "celebi",
+    "height": 0.6
+  },
+  "254": {
+    "id": 254,
+    "name": "sceptile",
+    "height": 1.7
+  },
+  "257": {
+    "id": 257,
+    "name": "blaziken",
+    "height": 1.9
+  },
+  "260": {
+    "id": 260,
+    "name": "swampert",
+    "height": 1.5
+  },
+  "282": {
+    "id": 282,
+    "name": "gardevoir",
+    "height": 1.6
+  },
+  "289": {
+    "id": 289,
+    "name": "slaking",
+    "height": 2.0
+  },
+  "295": {
+    "id": 295,
+    "name": "exploud",
+    "height": 1.5
+  },
+  "306": {
+    "id": 306,
+    "name": "aggron",
+    "height": 2.1
+  },
+  "321": {
+    "id": 321,
+    "name": "wailord",
+    "height": 14.5
+  },
+  "330": {
+    "id": 330,
+    "name": "flygon",
+    "height": 2.0
+  },
+  "334": {
+    "id": 334,
+    "name": "altaria",
+    "height": 1.1
+  },
+  "344": {
+    "id": 344,
+    "name": "claydol",
+    "height": 1.5
+  },
+  "346": {
+    "id": 346,
+    "name": "cradily",
+    "height": 1.5
+  },
+  "348": {
+    "id": 348,
+    "name": "armaldo",
+    "height": 1.5
+  },
+  "350": {
+    "id": 350,
+    "name": "milotic",
+    "height": 6.2
+  },
+  "365": {
+    "id": 365,
+    "name": "walrein",
+    "height": 1.4
+  },
+  "368": {
+    "id": 368,
+    "name": "gorebyss",
+    "height": 1.8
+  },
+  "369": {
+    "id": 369,
+    "name": "relicanth",
+    "height": 1.0
+  },
+  "373": {
+    "id": 373,
+    "name": "salamence",
+    "height": 1.5
+  },
+  "376": {
+    "id": 376,
+    "name": "metagross",
+    "height": 1.6
+  },
+  "377": {
+    "id": 377,
+    "name": "regirock",
+    "height": 1.7
+  },
+  "378": {
+    "id": 378,
+    "name": "regice",
+    "height": 1.8
+  },
+  "379": {
+    "id": 379,
+    "name": "registeel",
+    "height": 1.9
+  },
+  "380": {
+    "id": 380,
+    "name": "latias",
+    "height": 1.4
+  },
+  "381": {
+    "id": 381,
+    "name": "latios",
+    "height": 2.0
+  },
+  "382": {
+    "id": 382,
+    "name": "kyogre",
+    "height": 4.5
+  },
+  "383": {
+    "id": 383,
+    "name": "groudon",
+    "height": 3.5
+  },
+  "384": {
+    "id": 384,
+    "name": "rayquaza",
+    "height": 7.0
+  },
+  "385": {
+    "id": 385,
+    "name": "jirachi",
+    "height": 0.3
+  },
+  "386": {
+    "id": 386,
+    "name": "deoxys-normal",
+    "height": 1.7
+  },
+  "389": {
+    "id": 389,
+    "name": "torterra",
+    "height": 2.2
+  },
+  "392": {
+    "id": 392,
+    "name": "infernape",
+    "height": 1.2
+  },
+  "395": {
+    "id": 395,
+    "name": "empoleon",
+    "height": 1.7
+  },
+  "405": {
+    "id": 405,
+    "name": "luxray",
+    "height": 1.4
+  },
+  "407": {
+    "id": 407,
+    "name": "roserade",
+    "height": 0.9
+  },
+  "409": {
+    "id": 409,
+    "name": "rampardos",
+    "height": 1.6
+  },
+  "411": {
+    "id": 411,
+    "name": "bastiodon",
+    "height": 1.3
+  },
+  "419": {
+    "id": 419,
+    "name": "floatzel",
+    "height": 1.1
+  },
+  "426": {
+    "id": 426,
+    "name": "drifblim",
+    "height": 1.2
+  },
+  "429": {
+    "id": 429,
+    "name": "mismagius",
+    "height": 0.9
+  },
+  "430": {
+    "id": 430,
+    "name": "honchkrow",
+    "height": 0.9
+  },
+  "437": {
+    "id": 437,
+    "name": "bronzong",
+    "height": 1.3
+  },
+  "445": {
+    "id": 445,
+    "name": "garchomp",
+    "height": 1.9
+  },
+  "448": {
+    "id": 448,
+    "name": "lucario",
+    "height": 1.2
+  },
+  "450": {
+    "id": 450,
+    "name": "hippowdon",
+    "height": 2.0
+  },
+  "452": {
+    "id": 452,
+    "name": "drapion",
+    "height": 1.3
+  },
+  "454": {
+    "id": 454,
+    "name": "toxicroak",
+    "height": 1.3
+  },
+  "460": {
+    "id": 460,
+    "name": "abomasnow",
+    "height": 2.2
+  },
+  "461": {
+    "id": 461,
+    "name": "weavile",
+    "height": 1.1
+  },
+  "462": {
+    "id": 462,
+    "name": "magnezone",
+    "height": 1.2
+  },
+  "463": {
+    "id": 463,
+    "name": "lickilicky",
+    "height": 1.7
+  },
+  "464": {
+    "id": 464,
+    "name": "rhyperior",
+    "height": 2.4
+  },
+  "465": {
+    "id": 465,
+    "name": "tangrowth",
+    "height": 2.0
+  },
+  "466": {
+    "id": 466,
+    "name": "electivire",
+    "height": 1.8
+  },
+  "467": {
+    "id": 467,
+    "name": "magmortar",
+    "height": 1.6
+  },
+  "468": {
+    "id": 468,
+    "name": "togekiss",
+    "height": 1.5
+  },
+  "469": {
+    "id": 469,
+    "name": "yanmega",
+    "height": 1.9
+  },
+  "470": {
+    "id": 470,
+    "name": "leafeon",
+    "height": 1.0
+  },
+  "471": {
+    "id": 471,
+    "name": "glaceon",
+    "height": 0.8
+  },
+  "472": {
+    "id": 472,
+    "name": "gliscor",
+    "height": 2.0
+  },
+  "473": {
+    "id": 473,
+    "name": "mamoswine",
+    "height": 2.5
+  },
+  "474": {
+    "id": 474,
+    "name": "porygon-z",
+    "height": 0.9
+  },
+  "475": {
+    "id": 475,
+    "name": "gallade",
+    "height": 1.6
+  },
+  "476": {
+    "id": 476,
+    "name": "probopass",
+    "height": 1.4
+  },
+  "477": {
+    "id": 477,
+    "name": "dusknoir",
+    "height": 2.2
+  },
+  "480": {
+    "id": 480,
+    "name": "uxie",
+    "height": 0.3
+  },
+  "481": {
+    "id": 481,
+    "name": "mesprit",
+    "height": 0.3
+  },
+  "482": {
+    "id": 482,
+    "name": "azelf",
+    "height": 0.3
+  },
+  "483": {
+    "id": 483,
+    "name": "dialga",
+    "height": 5.4
+  },
+  "484": {
+    "id": 484,
+    "name": "palkia",
+    "height": 4.2
+  },
+  "485": {
+    "id": 485,
+    "name": "heatran",
+    "height": 1.7
+  },
+  "486": {
+    "id": 486,
+    "name": "regigigas",
+    "height": 3.7
+  },
+  "487": {
+    "id": 487,
+    "name": "giratina-altered",
+    "height": 4.5
+  },
+  "488": {
+    "id": 488,
+    "name": "cresselia",
+    "height": 1.5
+  },
+  "490": {
+    "id": 490,
+    "name": "manaphy",
+    "height": 0.3
+  },
+  "491": {
+    "id": 491,
+    "name": "darkrai",
+    "height": 1.5
+  },
+  "492": {
+    "id": 492,
+    "name": "shaymin-land",
+    "height": 0.2
+  },
+  "493": {
+    "id": 493,
+    "name": "arceus",
+    "height": 3.2
+  }
+}

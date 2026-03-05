@@ -250,3 +250,85 @@
     -fx-font-weight: bold;
     -fx-text-fill: #ffffff;
 }
+
+/* Battle Result Overlay */
+.result-card {
+    -fx-padding: 22 52 22 52;
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-border-width: 3;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.65), 32, 0.4, 0, 6);
+}
+.result-card-victory {
+    -fx-background-color: linear-gradient(to bottom, #8ac17f, #a8d38b);
+    -fx-border-color: #144509;
+}
+.result-card-defeat {
+    -fx-background-color: linear-gradient(to bottom, #1c2833, #31455a);
+    -fx-border-color: #12232c;
+}
+
+.result-title {
+    -fx-font-family: "SPACE NOVA";
+    -fx-font-size: 34px;
+    -fx-font-weight: bold;
+}
+.result-title-victory {
+    -fx-text-fill: #06311f;
+    -fx-effect: dropshadow(gaussian, rgba(157, 192, 142, 0.55), 14, 0.25, 0, 2);
+}
+.result-title-defeat {
+    -fx-text-fill: #9ab5ef;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.55), 10, 0.2, 0, 2);
+}
+
+.result-message {
+    -fx-font-family: "SPACE NOVA";
+    -fx-font-size: 16px;
+    -fx-text-alignment: center;
+}
+.result-message-victory {
+    -fx-text-fill: #074542;
+}
+.result-message-defeat {
+    -fx-text-fill: #b0bec5;
+}
+
+.result-btn {
+    -fx-font-family: "SPACE NOVA";
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-border-width: 2;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 6, 0, 1, 2);
+}
+.result-btn:hover {
+    -fx-scale-x: 1.06;
+    -fx-scale-y: 1.06;
+}
+.result-btn-back {
+    -fx-background-color: linear-gradient(to bottom, #78909c, #546e7a);
+    -fx-border-color: #455a64;
+    -fx-text-fill: white;
+}
+.result-btn-back:hover {
+    -fx-background-color: linear-gradient(to bottom, #90a4ae, #607d8b);
+}
+.result-btn-again-victory {
+    -fx-background-color: linear-gradient(to bottom, #ffa726, #e65100);
+    -fx-border-color: #bf360c;
+    -fx-text-fill: white;
+}
+.result-btn-again-victory:hover {
+    -fx-background-color: linear-gradient(to bottom, #ffca28, #f57c00);
+}
+.result-btn-again-defeat {
+    -fx-background-color: linear-gradient(to bottom, #455a64, #263238);
+    -fx-border-color: #37474f;
+    -fx-text-fill: #b0bec5;
+}
+.result-btn-again-defeat:hover {
+    -fx-background-color: linear-gradient(to bottom, #546e7a, #37474f);
+}

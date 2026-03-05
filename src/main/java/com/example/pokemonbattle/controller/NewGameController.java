@@ -159,7 +159,7 @@ public class NewGameController {
         // Set default selections (without showing borders)
         setDefaultSelections();
 
-        // ── Dashboard: load avatar + stats ──
+        // Dashboard: load avatar + stats
         loadDashboardData();
 
         // Start subtle avatar idle animation
@@ -167,7 +167,7 @@ public class NewGameController {
 
         MusicManager.getInstance().attachClickSounds(rootPane);
 
-        // ── First-time user: show avatar selection overlay ──
+        // First-time user: show avatar selection overlay
         if (PlayerSession.getInstance().isFirstTime()) {
             javafx.application.Platform.runLater(this::showAvatarSelectionOverlay);
         }
@@ -812,8 +812,9 @@ public class NewGameController {
         aiOpponent.getTeam().forEach(p -> System.out.println("  - " + p.getName() + " Lv." + p.getLevel()));
 
         // Navigate to battle scene and pass player and opponent data
-        SceneManager.switchSceneWithLoading("battle.fxml", "Pokemon Battle - Arena", 1200, 700, 
-            Map.of("player", player, "opponent", aiOpponent));
+        boolean isRandomTeam = "RANDOM".equals(selectedTeamType);
+        SceneManager.switchSceneWithLoading("battle.fxml", "Pokemon Battle - Arena", 1200, 700,
+            Map.of("player", player, "opponent", aiOpponent, "randomTeam", isRandomTeam));
     }
 
     /**
@@ -1026,7 +1027,7 @@ public class NewGameController {
             }
         }
     }
-    // ── Change Avatar ───────────────────────────────────────────
+    // Change Avatar
 
     @FXML
     void onChangeAvatarClick() {
@@ -1064,7 +1065,7 @@ public class NewGameController {
         }
     }
 
-    // ── Battle History Overlay ──────────────────────────────────
+    // Battle History Overlay
 
     @FXML
     void onBattleHistoryClick() {
@@ -1191,7 +1192,7 @@ public class NewGameController {
         fadeIn.play();
     }
 
-    // ── View Selected Pokémon Overlay ───────────────────────────
+    // View Selected Pokémon Overlay
 
     @FXML
     void onViewSelectedPokemonClick() {

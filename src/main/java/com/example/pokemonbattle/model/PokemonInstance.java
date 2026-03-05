@@ -181,6 +181,15 @@ public class PokemonInstance extends PokemonSpecies {
         moves.forEach(ms -> ms.currentPp = ms.move.getPp());
     }
 
+    /**
+     * Fully resets this Pokémon to its starting state: full HP, full PP, unfainted.
+     */
+    public void fullReset() {
+        this.currentHp = this.maxHp;
+        this.fainted = false;
+        restoreAllPp();
+    }
+
     @Override
     public String toString() {
         return String.format("%s (Lv%d) %d/%dHP", this.getName(), level, currentHp, maxHp);
