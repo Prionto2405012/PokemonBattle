@@ -1,7 +1,5 @@
 package com.example.pokemonbattle.controller;
 
-import java.util.List;
-
 import com.example.pokemonbattle.model.Move;
 import com.example.pokemonbattle.model.Player;
 import com.example.pokemonbattle.model.PokemonInstance;
@@ -36,7 +34,7 @@ import javafx.scene.shape.Rectangle;
  */
 public class OnlineBattleController {
 
-    // ── FXML injections ──────────────────────────────────────────────────────
+    // FXML injections
     @FXML private StackPane  rootPane;
     @FXML private ImageView  bgImage;
     @FXML private StackPane  battleSection;
@@ -82,7 +80,7 @@ public class OnlineBattleController {
     @FXML private VBox   pokemonSelectionBox;
     @FXML private VBox   pokemonButtonsBox;
 
-    // ── State ────────────────────────────────────────────────────────────────
+    // State
     private Player           player;
     private Player           opponent;
     private ServerConnection serverConnection;
@@ -93,7 +91,7 @@ public class OnlineBattleController {
 
     private static final double HP_BAR_MAX_WIDTH = 180.0;
 
-    // ── Lifecycle ────────────────────────────────────────────────────────────
+    // Lifecycle
 
     @FXML
     public void initialize() {
@@ -141,7 +139,7 @@ public class OnlineBattleController {
         MusicManager.getInstance().attachClickSounds(rootPane);
     }
 
-    // ── Server message handler ───────────────────────────────────────────────
+    // Server message handler
 
     /** Dispatches all incoming server messages on the JavaFX thread. */
     private void handleServerMessage(GameMessage msg) {
@@ -236,7 +234,7 @@ public class OnlineBattleController {
         System.out.println("[OnlineBattle] Battle ended — winner: " + msg.getWinnerName());
     }
 
-    // ── Button handlers ──────────────────────────────────────────────────────
+    // Button handlers
 
     @FXML
     private void onFightClicked() {
@@ -299,7 +297,7 @@ public class OnlineBattleController {
         showActionButtons();
     }
 
-    // ── Display helpers ──────────────────────────────────────────────────────
+    // Display helpers
 
     private void updateBattleDisplay() {
         updateSide(true,  player);
@@ -385,7 +383,7 @@ public class OnlineBattleController {
         }
     }
 
-    // ── Panel visibility helpers ─────────────────────────────────────────────
+    // Panel visibility helpers
 
     private void showActionButtons() {
         setVisible(actionButtonsBox,    true);
@@ -437,7 +435,7 @@ public class OnlineBattleController {
         return false;
     }
 
-    // ── Cosmetic canvas pattern (same as BattleController) ───────────────────
+    // Cosmetic canvas pattern (same as BattleController)
 
     private void drawOptionsPanelPattern() {
         if (optionsSection == null) return;
@@ -480,7 +478,7 @@ public class OnlineBattleController {
         optionsSection.getChildren().addFirst(canvas);
     }
 
-    // ── Utility ──────────────────────────────────────────────────────────────
+    // Utility
 
     private String cap(String s) {
         if (s == null || s.isEmpty()) return s;
