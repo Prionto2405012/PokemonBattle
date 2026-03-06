@@ -202,21 +202,24 @@ public class BattleController implements Battle.BattleListener {
     private Canvas confettiCanvas;
     private AnimationTimer confettiTimer;
 
+    // Battle log for history persistence
+    private final java.util.List<String> battleLog = new java.util.ArrayList<>();
+
     // ── Sprite scaling constants ─────────────────────────────────────────────
     /** The Pokemon height (in metres) that maps to the "standard" pixel size. */
     private static final double SPRITE_STANDARD_HEIGHT_M = 1.0;
 
     /** Base pixel height for the opponent sprite at standard height. */
-    private static final double SPRITE_OPPONENT_BASE_PX = 240.0;
+    private static final double SPRITE_OPPONENT_BASE_PX = 200.0;
 
     /** Base pixel height for the player sprite at standard height. */
-    private static final double SPRITE_PLAYER_BASE_PX = 260.0;
+    private static final double SPRITE_PLAYER_BASE_PX = 300.0;
 
     /** Minimum rendered sprite height in px — prevents tiny Pokemon vanishing. */
-    private static final double SPRITE_MIN_PX = 150.0;
+    private static final double SPRITE_MIN_PX = 130.0;
 
     /** Maximum rendered sprite height in px — prevents huge Pokemon overflowing. */
-    private static final double SPRITE_MAX_PX = 340.0;
+    private static final double SPRITE_MAX_PX = 380.0;
 
     /**
      * Exponent applied to the height ratio — values below 1.0 compress size
@@ -785,19 +788,25 @@ public class BattleController implements Battle.BattleListener {
     @Override
     public void onDamageDealt(String attacker, String move, String defender, int damage) {
         System.out.println(attacker + " used " + move + " on " + defender + " for " + damage + " damage!");
-        battleStatusLabel.setText(capitalize(attacker) + " used " + capitalize(move) + "! " + damage + " dmg!");
+        String entry = capitalize(attacker) + " used " + capitalize(move) + "! " + damage + " dmg!";
+        battleStatusLabel.setText(entry);
+        battleLog.add(entry);
     }
 
     @Override
     public void onPokemonFainted(String pokemonName) {
         System.out.println(pokemonName + " fainted!");
-        battleStatusLabel.setText(capitalize(pokemonName) + " fainted!");
+        String entry = capitalize(pokemonName) + " fainted!";
+        battleStatusLabel.setText(entry);
+        battleLog.add(entry);
     }
 
     @Override
     public void onPokemonSwitched(String playerName, String pokemonName) {
         System.out.println(playerName + " sent out " + pokemonName + "!");
-        battleStatusLabel.setText(playerName + " sent out " + capitalize(pokemonName) + "!");
+        String entry = playerName + " sent out " + capitalize(pokemonName) + "!";
+        battleStatusLabel.setText(entry);
+        battleLog.add(entry);
         if (playerName.equals(player.getName())) {
             displayPlayerTeam();
         } else {
@@ -944,18 +953,20 @@ public class BattleController implements Battle.BattleListener {
                 .map(p -> p.getName().toLowerCase())
                 .collect(Collectors.joining(","));
         String result = playerWon ? "WIN" : "LOSS";
+        String logStr = String.join("\n", battleLog);
 
         Thread t = new Thread(() -> {
             try (Connection conn = DatabaseManager.getInstance().getConnection()) {
                 String sql = "INSERT INTO battle_history "
-                        + "(user_id, result, pokemon_used, opponent_type, opponent_name) "
-                        + "VALUES (?, ?, ?, ?, ?)";
+                        + "(user_id, result, pokemon_used, opponent_type, opponent_name, battle_log) "
+                        + "VALUES (?, ?, ?, ?, ?, ?)";
                 try (PreparedStatement ps = conn.prepareStatement(sql)) {
                     ps.setInt(1, user.getId());
                     ps.setString(2, result);
                     ps.setString(3, pokemonUsed);
                     ps.setString(4, "AI");
                     ps.setString(5, opponent.getName());
+                    ps.setString(6, logStr);
                     ps.executeUpdate();
                 }
                 // Upsert win/loss counters in user_profiles

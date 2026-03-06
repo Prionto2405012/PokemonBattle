@@ -4,6 +4,7 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
@@ -36,6 +37,18 @@
                     <Font size="16" />
                 </font>
             </Label>
+
+            <!-- Search Bar -->
+            <HBox alignment="CENTER" spacing="8">
+                <padding>
+                    <Insets top="4" bottom="2"/>
+                </padding>
+                <TextField fx:id="searchField" promptText="🔍 Search Pokémon by name..."
+                    prefWidth="360" prefHeight="32"
+                    styleClass="pokemon-search-field"/>
+                <Label fx:id="searchResultCount" text=""
+                    style="-fx-font-size: 11px; -fx-text-fill: #90aea6;"/>
+            </HBox>
         </VBox>
 
         <!-- Main Content Area -->

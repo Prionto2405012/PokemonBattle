@@ -9,6 +9,7 @@ import java.util.function.Consumer;
 import com.example.pokemonbattle.model.Move;
 import com.example.pokemonbattle.model.PokemonInstance;
 import com.example.pokemonbattle.model.PokemonSpecies;
+import com.example.pokemonbattle.service.PokemonSearchService;
 import com.example.pokemonbattle.util.MusicManager;
 
 import javafx.animation.FadeTransition;
@@ -19,6 +20,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
@@ -61,6 +63,10 @@ public class PokemonSelectionOverlayController {
     private Button clearButton;
     @FXML
     private Button doneButton;
+    @FXML
+    private TextField searchField;
+    @FXML
+    private Label searchResultCount;
 
     // Data
     private List<PokemonSpecies> allPokemon;
@@ -72,6 +78,7 @@ public class PokemonSelectionOverlayController {
     private PokemonSpecies currentlyViewedPokemon;
     private static final Map<Integer, Image> spriteCache = new HashMap<>();
     private final Map<Integer, VBox> cardMap = new HashMap<>();
+    private final PokemonSearchService searchService = new PokemonSearchService();
     public void initializeData(List<PokemonSpecies> allPokemon, Map<Integer, Move> allMoves, 
                                 List<PokemonInstance> existingTeam, Consumer<List<PokemonInstance>> onDoneCallback) {
         this.allPokemon = allPokemon;
@@ -91,6 +98,11 @@ public class PokemonSelectionOverlayController {
             statsPokemonName.setStyle("-fx-font-size: 16px; -fx-text-fill: #aaaaaa; -fx-font-style: italic; -fx-text-alignment: center;");
         }
         
+        // Wire up search field
+        if (searchField != null) {
+            searchField.textProperty().addListener((obs, oldText, newText) -> onSearchChanged(newText));
+        }
+
         // Animate in
         animateIn();
 
@@ -102,13 +114,20 @@ public class PokemonSelectionOverlayController {
      * Pre-caches all sprite images on a background thread for instant display.
      */
     private void displayPokemonGrid() {
+        displayFilteredGrid(allPokemon);
+    }
+
+    /**
+     * Rebuild the grid with a filtered/sorted list of Pokemon.
+     */
+    private void displayFilteredGrid(List<PokemonSpecies> pokemonList) {
         pokemonGrid.getChildren().clear();
         cardMap.clear();
         pokemonGrid.setHgap(12);
         pokemonGrid.setVgap(12);
 
         // Pre-cache all sprites in background (non-blocking)
-        for (PokemonSpecies species : allPokemon) {
+        for (PokemonSpecies species : pokemonList) {
             getCachedSprite(species.getId());
         }
 
@@ -116,7 +135,7 @@ public class PokemonSelectionOverlayController {
         int row = 0;
         int col = 0;
 
-        for (PokemonSpecies species : allPokemon) {
+        for (PokemonSpecies species : pokemonList) {
             VBox pokemonCard = createPokemonCard(species);
             cardMap.put(species.getId(), pokemonCard);
             pokemonGrid.add(pokemonCard, col, row);
@@ -126,6 +145,27 @@ public class PokemonSelectionOverlayController {
                 col = 0;
                 row++;
             }
+        }
+    }
+
+    /**
+     * Called when the search field text changes. Filters and re-ranks the grid.
+     */
+    private void onSearchChanged(String query) {
+        List<PokemonSpecies> filtered = searchService.search(allPokemon, query);
+        displayFilteredGrid(filtered);
+
+        if (searchResultCount != null) {
+            if (query == null || query.isBlank()) {
+                searchResultCount.setText("");
+            } else {
+                searchResultCount.setText(filtered.size() + " of " + allPokemon.size() + " Pokémon");
+            }
+        }
+
+        // Scroll back to top
+        if (pokemonScrollPane != null) {
+            pokemonScrollPane.setVvalue(0);
         }
     }
 

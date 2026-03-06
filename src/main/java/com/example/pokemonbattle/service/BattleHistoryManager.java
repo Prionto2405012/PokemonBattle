@@ -48,6 +48,7 @@ public class BattleHistoryManager {
                 "pokemon_used TEXT NOT NULL, " +
                 "opponent_type TEXT NOT NULL, " +
                 "opponent_name TEXT, " +
+                "battle_log TEXT, " +
                 "timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP, " +
                 "FOREIGN KEY (user_id) REFERENCES users(id)" +
                 ")"
@@ -55,6 +56,12 @@ public class BattleHistoryManager {
             stmt.execute(
                 "CREATE INDEX IF NOT EXISTS idx_battle_history_user ON battle_history(user_id)"
             );
+            // Add battle_log column if it doesn't exist (migration for older DBs)
+            try {
+                stmt.execute("ALTER TABLE battle_history ADD COLUMN battle_log TEXT");
+            } catch (SQLException ignored) {
+                // Column already exists
+            }
             System.out.println("[BattleHistoryManager] Table verified");
         } catch (SQLException e) {
             System.err.println("[BattleHistoryManager] Failed to create table: " + e.getMessage());
@@ -67,8 +74,8 @@ public class BattleHistoryManager {
      * Save a battle record to the database.
      */
     public void saveBattleRecord(BattleRecord record) {
-        String sql = "INSERT INTO battle_history (user_id, result, pokemon_used, opponent_type, opponent_name, timestamp) " +
-                     "VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO battle_history (user_id, result, pokemon_used, opponent_type, opponent_name, battle_log, timestamp) " +
+                     "VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = dbManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, record.getUserId());
@@ -76,7 +83,8 @@ public class BattleHistoryManager {
             pstmt.setString(3, String.join(",", record.getPokemonUsed()));
             pstmt.setString(4, record.getOpponentType());
             pstmt.setString(5, record.getOpponentName());
-            pstmt.setTimestamp(6, Timestamp.valueOf(
+            pstmt.setString(6, record.getBattleLog());
+            pstmt.setTimestamp(7, Timestamp.valueOf(
                     record.getTimestamp() != null ? record.getTimestamp() : LocalDateTime.now()));
             pstmt.executeUpdate();
             System.out.println("[BattleHistoryManager] Battle record saved: " + record.getResult());
@@ -92,7 +100,7 @@ public class BattleHistoryManager {
      */
     public List<BattleRecord> getBattleHistory(int userId) {
         List<BattleRecord> records = new ArrayList<>();
-        String sql = "SELECT id, user_id, result, pokemon_used, opponent_type, opponent_name, timestamp " +
+        String sql = "SELECT id, user_id, result, pokemon_used, opponent_type, opponent_name, battle_log, timestamp " +
                      "FROM battle_history WHERE user_id = ? ORDER BY timestamp DESC";
         try (Connection conn = dbManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -109,6 +117,7 @@ public class BattleHistoryManager {
                             : new ArrayList<>());
                     record.setOpponentType(rs.getString("opponent_type"));
                     record.setOpponentName(rs.getString("opponent_name"));
+                    record.setBattleLog(rs.getString("battle_log"));
                     Timestamp ts = rs.getTimestamp("timestamp");
                     if (ts != null) record.setTimestamp(ts.toLocalDateTime());
                     records.add(record);
@@ -116,6 +125,43 @@ public class BattleHistoryManager {
             }
         } catch (SQLException e) {
             System.err.println("[BattleHistoryManager] Failed to load history: " + e.getMessage());
+        }
+        return records;
+    }
+
+    /**
+     * Get battle records filtered by opponent type (AI, ONLINE, or null for all).
+     */
+    public List<BattleRecord> getBattleHistoryByType(int userId, String opponentType) {
+        if (opponentType == null || opponentType.isEmpty()) return getBattleHistory(userId);
+
+        List<BattleRecord> records = new ArrayList<>();
+        String sql = "SELECT id, user_id, result, pokemon_used, opponent_type, opponent_name, battle_log, timestamp " +
+                     "FROM battle_history WHERE user_id = ? AND opponent_type = ? ORDER BY timestamp DESC";
+        try (Connection conn = dbManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, userId);
+            pstmt.setString(2, opponentType);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    BattleRecord record = new BattleRecord();
+                    record.setId(rs.getInt("id"));
+                    record.setUserId(rs.getInt("user_id"));
+                    record.setResult(rs.getString("result"));
+                    String pokemonStr = rs.getString("pokemon_used");
+                    record.setPokemonUsed(pokemonStr != null && !pokemonStr.isEmpty()
+                            ? Arrays.asList(pokemonStr.split(","))
+                            : new ArrayList<>());
+                    record.setOpponentType(rs.getString("opponent_type"));
+                    record.setOpponentName(rs.getString("opponent_name"));
+                    record.setBattleLog(rs.getString("battle_log"));
+                    Timestamp ts = rs.getTimestamp("timestamp");
+                    if (ts != null) record.setTimestamp(ts.toLocalDateTime());
+                    records.add(record);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("[BattleHistoryManager] Failed to load filtered history: " + e.getMessage());
         }
         return records;
     }

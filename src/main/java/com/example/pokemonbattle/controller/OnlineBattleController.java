@@ -2,6 +2,9 @@ package com.example.pokemonbattle.controller;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 import com.example.pokemonbattle.database.DatabaseManager;
@@ -22,6 +25,15 @@ import com.example.pokemonbattle.util.MusicManager;
 import com.example.pokemonbattle.util.PlayerSession;
 import com.example.pokemonbattle.util.SceneManager;
 
+import javafx.animation.AnimationTimer;
+import javafx.animation.FadeTransition;
+import javafx.animation.Interpolator;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.ParallelTransition;
+import javafx.animation.SequentialTransition;
+import javafx.animation.Timeline;
+import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
@@ -31,10 +43,13 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.util.Duration;
 /**
  * Controller for ONLINE battle screen.
  * Sends moves to the TCP server and updates HP from server-authoritative DamageMessages.
@@ -48,6 +63,7 @@ public class OnlineBattleController {
     @FXML private StackPane  battleSection;
     @FXML private AnchorPane battleField;
     @FXML private StackPane  optionsSection;
+    @FXML private HBox       mainBattleLayout;
 
     @FXML private ImageView playerSpriteImage;
     @FXML private ImageView opponentSpriteImage;
@@ -59,7 +75,7 @@ public class OnlineBattleController {
     @FXML private Rectangle playerHpBar;
     @FXML private Rectangle opponentHpBar;
 
-    // Hidden info refs (optional)
+    // Hidden info refs
     @FXML private Label playerNameLabel;
     @FXML private Label opponentNameLabel;
     @FXML private VBox  playerPokemonBox;
@@ -88,6 +104,29 @@ public class OnlineBattleController {
     @FXML private VBox   pokemonSelectionBox;
     @FXML private VBox   pokemonButtonsBox;
 
+    // VS Intro Screen nodes
+    @FXML private AnchorPane vsScreenPane;
+    @FXML private ImageView  vsBgImage;
+    @FXML private ImageView  vsPlayerSprite;
+    @FXML private ImageView  vsOpponentSprite;
+
+    // Black fade overlay
+    @FXML private Region rootBlackFade;
+
+    // Battle Result Overlay nodes
+    @FXML private StackPane battleResultOverlay;
+    @FXML private VBox      battleResultCard;
+    @FXML private Label     resultTitleLabel;
+    @FXML private Label     resultMessageLabel;
+    @FXML private Button    goBackResultButton;
+
+    // Forfeit Confirmation Overlay nodes
+    @FXML private StackPane forfeitOverlay;
+    @FXML private Region    forfeitBackdrop;
+    @FXML private VBox      forfeitDialog;
+    @FXML private Button    forfeitYesButton;
+    @FXML private Button    forfeitNoButton;
+
     // State
     private Player           player;
     private Player           opponent;
@@ -97,10 +136,33 @@ public class OnlineBattleController {
     private boolean          battleEnded = false;
     private boolean          moveSent    = false;
 
-    //confetti and battle ovrlay
+    // Battle log
+    private final List<String> battleLog = new ArrayList<>();
+
+    // Confetti and battle overlay
     private Canvas confettiCanvas;
-    private javafx.animation.AnimationTimer confettiTimer;
+    private AnimationTimer confettiTimer;
     private static final double HP_BAR_MAX_WIDTH = 180.0;
+
+    // ── Sprite scaling constants (same as BattleController) ──────────────
+    private static final double SPRITE_STANDARD_HEIGHT_M = 1.0;
+    private static final double SPRITE_OPPONENT_BASE_PX = 200.0;
+    private static final double SPRITE_PLAYER_BASE_PX = 300.0;
+    private static final double SPRITE_MIN_PX = 130.0;
+    private static final double SPRITE_MAX_PX = 380.0;
+    private static final double SPRITE_SCALE_EXPONENT = 0.5;
+    private static final java.util.Map<Integer, Double> POKEMON_HEIGHTS = loadPokemonHeights();
+
+    // ── VS Intro Animation Constants ─────────────────────────────────────
+    private static final double VS_SLIDE_STOP_OFFSET = 25.0;
+    private static final double VS_DRIFT_AMOUNT = 35.0;
+    private static final double VS_SLIDE_IN_MS = 320.0;
+    private static final double VS_DRIFT_HOLD_MS = 2700.0;
+    private static final double VS_SLIDE_OUT_EARLY_MS = 500.0;
+    private static final double VS_SLIDE_OUT_MS = 280.0;
+    private static final double VS_FADE_TO_BLACK_MS = 420.0;
+    private static final double VS_FADE_FROM_BLACK_MS = 380.0;
+    private static final double VS_OFFSCREEN_OFFSET = 700.0;
 
     // Lifecycle
 
@@ -109,6 +171,10 @@ public class OnlineBattleController {
         if (bgImage != null && rootPane != null) {
             bgImage.fitWidthProperty().bind(rootPane.widthProperty());
             bgImage.fitHeightProperty().bind(rootPane.heightProperty());
+        }
+        if (vsBgImage != null && rootPane != null) {
+            vsBgImage.fitWidthProperty().bind(rootPane.widthProperty());
+            vsBgImage.fitHeightProperty().bind(rootPane.heightProperty());
         }
 
         player           = (Player)           SceneManager.getData("player");
@@ -132,16 +198,113 @@ public class OnlineBattleController {
 
         setVisible(waitingLabel, false);
         drawOptionsPanelPattern();
-        updateBattleDisplay();
 
         battleStatusLabel.setText("Online Battle! " + cap(player.getCurrentPokemon().getName()) +
                 " vs " + cap(opponent.getCurrentPokemon().getName()));
 
         System.out.println("[OnlineBattle] Battle started vs " + opponent.getName());
         MusicManager.getInstance().attachClickSounds(rootPane);
+
+        // Kick off VS intro on next frame
+        Platform.runLater(this::playVSIntro);
     }
 
-    // Server message handler
+    // ── VS INTRO ────────────────────────────────────────────────────────────
+
+    private void playVSIntro() {
+        // Load opponent avatar (use a random NPC sprite)
+        int npcId = new Random().nextInt(7) + 1;
+        String npcPath = "/com/example/pokemonbattle/sprites/trainer/npc/" + npcId + ".png";
+        var npcUrl = getClass().getResource(npcPath);
+        if (npcUrl != null) {
+            vsOpponentSprite.setImage(new Image(npcUrl.toExternalForm(), 0, 0, true, true));
+        }
+
+        // Player trainer avatar
+        String avatarPath = PlayerSession.getInstance().getAvatarPath();
+        if (avatarPath != null) {
+            var avatarUrl = getClass().getResource(avatarPath);
+            if (avatarUrl != null) {
+                vsPlayerSprite.setImage(new Image(avatarUrl.toExternalForm(), 0, 0, true, true));
+            }
+        }
+
+        vsPlayerSprite.setTranslateX(-VS_OFFSCREEN_OFFSET);
+        vsOpponentSprite.setTranslateX(VS_OFFSCREEN_OFFSET);
+
+        // Phase 1: Slide in
+        TranslateTransition playerSlideIn = new TranslateTransition(
+                Duration.millis(VS_SLIDE_IN_MS), vsPlayerSprite);
+        playerSlideIn.setToX(VS_SLIDE_STOP_OFFSET);
+        playerSlideIn.setInterpolator(Interpolator.EASE_OUT);
+
+        TranslateTransition opponentSlideIn = new TranslateTransition(
+                Duration.millis(VS_SLIDE_IN_MS), vsOpponentSprite);
+        opponentSlideIn.setToX(-VS_SLIDE_STOP_OFFSET);
+        opponentSlideIn.setInterpolator(Interpolator.EASE_OUT);
+
+        ParallelTransition slideIn = new ParallelTransition(playerSlideIn, opponentSlideIn);
+
+        // Phase 2: Slow drift
+        double driftMs = VS_DRIFT_HOLD_MS - VS_SLIDE_OUT_EARLY_MS;
+
+        TranslateTransition playerDrift = new TranslateTransition(
+                Duration.millis(driftMs), vsPlayerSprite);
+        playerDrift.setByX(VS_DRIFT_AMOUNT);
+        playerDrift.setInterpolator(Interpolator.LINEAR);
+
+        TranslateTransition opponentDrift = new TranslateTransition(
+                Duration.millis(driftMs), vsOpponentSprite);
+        opponentDrift.setByX(-VS_DRIFT_AMOUNT);
+        opponentDrift.setInterpolator(Interpolator.LINEAR);
+
+        ParallelTransition drift = new ParallelTransition(playerDrift, opponentDrift);
+
+        // Phase 3: Slide out
+        TranslateTransition playerSlideOut = new TranslateTransition(
+                Duration.millis(VS_SLIDE_OUT_MS), vsPlayerSprite);
+        playerSlideOut.setByX(VS_OFFSCREEN_OFFSET * 2.2);
+        playerSlideOut.setInterpolator(Interpolator.EASE_IN);
+
+        TranslateTransition opponentSlideOut = new TranslateTransition(
+                Duration.millis(VS_SLIDE_OUT_MS), vsOpponentSprite);
+        opponentSlideOut.setByX(-VS_OFFSCREEN_OFFSET * 2.2);
+        opponentSlideOut.setInterpolator(Interpolator.EASE_IN);
+
+        ParallelTransition slideOut = new ParallelTransition(playerSlideOut, opponentSlideOut);
+
+        SequentialTransition vsSequence = new SequentialTransition(slideIn, drift, slideOut);
+        vsSequence.setOnFinished(e -> fadeToBlackAndRevealBattle());
+        vsSequence.play();
+    }
+
+    private void fadeToBlackAndRevealBattle() {
+        rootBlackFade.setOpacity(0.0);
+        rootBlackFade.setVisible(true);
+
+        FadeTransition fadeToBlack = new FadeTransition(
+                Duration.millis(VS_FADE_TO_BLACK_MS), rootBlackFade);
+        fadeToBlack.setToValue(1.0);
+
+        fadeToBlack.setOnFinished(e -> {
+            vsScreenPane.setVisible(false);
+            vsScreenPane.setManaged(false);
+            mainBattleLayout.setVisible(true);
+            mainBattleLayout.setManaged(true);
+
+            updateBattleDisplay();
+
+            FadeTransition fadeFromBlack = new FadeTransition(
+                    Duration.millis(VS_FADE_FROM_BLACK_MS), rootBlackFade);
+            fadeFromBlack.setToValue(0.0);
+            fadeFromBlack.setOnFinished(ev -> rootBlackFade.setVisible(false));
+            fadeFromBlack.play();
+        });
+
+        fadeToBlack.play();
+    }
+
+    // ── Server message handler ──────────────────────────────────────────────
 
     private void handleServerMessage(GameMessage msg) {
         Platform.runLater(() -> {
@@ -172,16 +335,20 @@ public class OnlineBattleController {
             effText = " (Not very effective...)";
         else if (msg.getEffectiveness() != null && msg.getEffectiveness() == 0f)   effText = " (No effect)";
 
-        battleStatusLabel.setText(cap(msg.getAttackerName()) + " used " +
-                cap(msg.getMoveUsed()) + "! " + msg.getDamageDealt() + " dmg" + effText);
+        String logEntry = cap(msg.getAttackerName()) + " used " +
+                cap(msg.getMoveUsed()) + "! " + msg.getDamageDealt() + " dmg" + effText;
+        battleStatusLabel.setText(logEntry);
+        battleLog.add(logEntry);
 
         if (msg.isTargetFainted()) {
             targetPokemon.setFainted(true);
             PokemonInstance next = target.getFirstAvailablePokemon();
             if (next != null) {
                 target.setCurrentPokemon(next);
-                battleStatusLabel.setText(cap(targetPokemon.getName()) +
-                        " fainted! " + cap(target.getName()) + " sends out " + cap(next.getName()) + "!");
+                String faintEntry = cap(targetPokemon.getName()) +
+                        " fainted! " + cap(target.getName()) + " sends out " + cap(next.getName()) + "!";
+                battleStatusLabel.setText(faintEntry);
+                battleLog.add(faintEntry);
                 updateBattleDisplay();
             }
         }
@@ -189,6 +356,7 @@ public class OnlineBattleController {
 
     private void applyBattleUpdate(BattleUpdateMessage msg) {
         battleStatusLabel.setText(msg.getMessage());
+        battleLog.add(msg.getMessage());
         updateBattleDisplay();
     }
 
@@ -205,7 +373,9 @@ public class OnlineBattleController {
         }
 
         String who = isMe ? "You" : cap(msg.getPlayerName());
-        battleStatusLabel.setText(who + " switched to " + cap(msg.getNewPokemonName()) + "!");
+        String switchEntry = who + " switched to " + cap(msg.getNewPokemonName()) + "!";
+        battleStatusLabel.setText(switchEntry);
+        battleLog.add(switchEntry);
         updateBattleDisplay();
     }
 
@@ -221,7 +391,7 @@ public class OnlineBattleController {
 
     /** Handle battle end: save result to DB, then update UI. */
     private void applyBattleEnd(BattleEndMessage msg) {
-        if (battleEnded) return; // already handled (e.g. forfeit path)
+        if (battleEnded) return;
         battleEnded = true;
 
         boolean playerWon = player.getName().equals(msg.getWinnerName());
@@ -230,6 +400,9 @@ public class OnlineBattleController {
 
         System.out.println("[OnlineBattle] Battle ended — winner: " + msg.getWinnerName());
     }
+
+    // ── Result Overlay (same as AI battle) ──────────────────────────────────
+
     private void showResultOverlay(boolean playerWon) {
         if (playerWon) {
             MusicManager.getInstance().stopBGM();
@@ -237,71 +410,49 @@ public class OnlineBattleController {
             startConfetti();
         }
 
-        // Build overlay programmatically — same style as BattleController
-        javafx.scene.layout.StackPane overlay = new javafx.scene.layout.StackPane();
-        overlay.setStyle("-fx-background-color: rgba(0,0,0,0.60);");
-
-        javafx.scene.layout.VBox card = new javafx.scene.layout.VBox(16);
-        card.setAlignment(javafx.geometry.Pos.CENTER);
-        card.setMaxWidth(560);
-        card.setMaxHeight(300);
-
-        if (playerWon) {
-            card.setStyle("-fx-background-color: linear-gradient(to bottom, #8ac17f, #a8d38b);" +
-                        "-fx-background-radius: 20; -fx-border-radius: 20;" +
-                        "-fx-border-color: #144509; -fx-border-width: 3;" +
-                        "-fx-padding: 22 52 22 52;" +
-                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.65), 32, 0.4, 0, 6);");
-        } else {
-            card.setStyle("-fx-background-color: linear-gradient(to bottom, #1c2833, #31455a);" +
-                        "-fx-background-radius: 20; -fx-border-radius: 20;" +
-                        "-fx-border-color: #12232c; -fx-border-width: 3;" +
-                        "-fx-padding: 22 52 22 52;" +
-                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.65), 32, 0.4, 0, 6);");
-        }
-
-        javafx.scene.control.Label title = new javafx.scene.control.Label(playerWon ? "Victory!" : "Defeat...");
-        title.setStyle("-fx-font-family: 'SPACE NOVA'; -fx-font-size: 34px; -fx-font-weight: bold;" +
-                    (playerWon ? "-fx-text-fill: #06311f;" : "-fx-text-fill: #9ab5ef;"));
-
-        javafx.scene.control.Label message = new javafx.scene.control.Label(playerWon
+        resultTitleLabel.setText(playerWon ? "Victory!" : "Defeat...");
+        resultMessageLabel.setText(playerWon
                 ? "Congratulations! You defeated " + cap(opponent.getName()) + "!"
                 : "You lost against " + cap(opponent.getName()) + ". Better luck next time!");
-        message.setWrapText(true);
-        message.setMaxWidth(460);
-        message.setStyle("-fx-font-family: 'SPACE NOVA'; -fx-font-size: 16px; -fx-text-alignment: center;" +
-                        (playerWon ? "-fx-text-fill: #074542;" : "-fx-text-fill: #b0bec5;"));
 
-        javafx.scene.control.Button leaveBtn = new javafx.scene.control.Button("Back to Menu");
-        leaveBtn.setPrefWidth(220);
-        leaveBtn.setPrefHeight(50);
-        leaveBtn.setStyle("-fx-font-family: 'SPACE NOVA'; -fx-font-size: 15px; -fx-font-weight: bold;" +
-                        "-fx-background-color: linear-gradient(to bottom, #78909c, #546e7a);" +
-                        "-fx-background-radius: 10; -fx-border-radius: 10;" +
-                        "-fx-border-color: #455a64; -fx-border-width: 2; -fx-text-fill: white; -fx-cursor: hand;");
-        leaveBtn.setOnAction(e -> doDisconnectAndLeave());
+        // Palette: swap style classes
+        battleResultCard.getStyleClass().removeAll("result-card-victory", "result-card-defeat");
+        resultTitleLabel.getStyleClass().removeAll("result-title-victory", "result-title-defeat");
+        resultMessageLabel.getStyleClass().removeAll("result-message-victory", "result-message-defeat");
 
-        card.getChildren().addAll(title, message, leaveBtn);
-        overlay.getChildren().add(card);
+        String variant = playerWon ? "victory" : "defeat";
+        battleResultCard.getStyleClass().add("result-card-" + variant);
+        resultTitleLabel.getStyleClass().add("result-title-" + variant);
+        resultMessageLabel.getStyleClass().add("result-message-" + variant);
 
         // Fade in
-        overlay.setOpacity(0);
-        rootPane.getChildren().add(overlay);
-        javafx.animation.FadeTransition ft = new javafx.animation.FadeTransition(
-                javafx.util.Duration.millis(450), overlay);
+        battleResultOverlay.setOpacity(0);
+        battleResultOverlay.setVisible(true);
+        battleResultOverlay.setManaged(true);
+        FadeTransition ft = new FadeTransition(Duration.millis(450), battleResultOverlay);
         ft.setToValue(1.0);
         ft.play();
 
         disableAllButtons();
     }
 
+    @FXML
+    private void onGoBackClicked() {
+        if (confettiTimer != null) {
+            confettiTimer.stop();
+            confettiTimer = null;
+        }
+        doDisconnectAndLeave();
+    }
+
+    /** Particle confetti shower that auto-stops after ~4 s. */
     private void startConfetti() {
         if (confettiCanvas != null) rootPane.getChildren().remove(confettiCanvas);
         confettiCanvas = new Canvas();
         confettiCanvas.widthProperty().bind(rootPane.widthProperty());
         confettiCanvas.heightProperty().bind(rootPane.heightProperty());
         confettiCanvas.setMouseTransparent(true);
-        int insertIdx = Math.max(0, rootPane.getChildren().size() - 1);
+        int insertIdx = Math.max(0, rootPane.getChildren().size() - 2);
         rootPane.getChildren().add(insertIdx, confettiCanvas);
 
         final int N = 140;
@@ -314,7 +465,7 @@ public class OnlineBattleController {
             Color.web("#DDA0DD"), Color.web("#98D8C8"), Color.web("#F7DC6F")
         };
         Color[] colors = new Color[N];
-        java.util.Random rng = new java.util.Random();
+        Random rng = new Random();
         double sw = rootPane.getWidth() > 0 ? rootPane.getWidth() : 1200;
         for (int i = 0; i < N; i++) {
             x[i] = rng.nextDouble() * sw;
@@ -328,7 +479,7 @@ public class OnlineBattleController {
         }
 
         long[] t0 = {-1L};
-        confettiTimer = new javafx.animation.AnimationTimer() {
+        confettiTimer = new AnimationTimer() {
             @Override public void handle(long now) {
                 if (t0[0] < 0) t0[0] = now;
                 double elapsed = (now - t0[0]) / 1_000_000_000.0;
@@ -357,40 +508,36 @@ public class OnlineBattleController {
         };
         confettiTimer.start();
     }
-    // Battle result persistence
 
-    /**
-     * Saves the online battle result to battle_history and user_profiles tables.
-     * Runs on a daemon thread so it never blocks the FX thread.
-     */
+    // ── Battle result persistence ───────────────────────────────────────────
+
     private void saveBattleResult(boolean playerWon, String winnerName) {
         User user = PlayerSession.getInstance().getCurrentUser();
-        if (user == null) return; // not logged in — skip
+        if (user == null) return;
 
-        // Build comma-separated list of pokemon used
         String pokemonUsed = player.getTeam().stream()
                 .map(p -> p.getName().toLowerCase())
                 .collect(Collectors.joining(","));
 
         String result = playerWon ? "WIN" : "LOSS";
+        String logStr = String.join("\n", battleLog);
 
         Thread t = new Thread(() -> {
             try (Connection conn = DatabaseManager.getInstance().getConnection()) {
 
-                // Insert battle record
                 String sql = "INSERT INTO battle_history "
-                        + "(user_id, result, pokemon_used, opponent_type, opponent_name) "
-                        + "VALUES (?, ?, ?, ?, ?)";
+                        + "(user_id, result, pokemon_used, opponent_type, opponent_name, battle_log) "
+                        + "VALUES (?, ?, ?, ?, ?, ?)";
                 try (PreparedStatement ps = conn.prepareStatement(sql)) {
                     ps.setInt(1, user.getId());
                     ps.setString(2, result);
                     ps.setString(3, pokemonUsed);
-                    ps.setString(4, "ONLINE");          // distinguish from AI battles
-                    ps.setString(5, opponent.getName()); // real opponent username
+                    ps.setString(4, "ONLINE");
+                    ps.setString(5, opponent.getName());
+                    ps.setString(6, logStr);
                     ps.executeUpdate();
                 }
 
-                // Upsert win/loss counters
                 String upsert = "INSERT INTO user_profiles "
                         + "(user_id, wins, losses, total_battles) VALUES (?,?,?,1) "
                         + "ON CONFLICT(user_id) DO UPDATE SET "
@@ -416,7 +563,7 @@ public class OnlineBattleController {
         t.start();
     }
 
-    // Button handlers
+    // ── Button handlers ─────────────────────────────────────────────────────
 
     @FXML
     private void onFightClicked() {
@@ -433,35 +580,101 @@ public class OnlineBattleController {
     }
 
     private void onRunClicked() {
-        if(battleEnded){
+        if (battleEnded) {
             doDisconnectAndLeave();
             return;
-        }    
-        javafx.scene.control.Alert alert=new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Forfeit Battle");
-        alert.setHeaderText("Are you sure you want to forfeit the battle?");
-        alert.setContentText("Your opponent will be declared the winner.");
-        alert.showAndWait().ifPresent(response -> {
-            if (response == javafx.scene.control.ButtonType.OK) {
-                if(serverConnection != null && battleId != null) {
-                    try {
-                        serverConnection.sendMessage(new ForfeitMessage(battleId));
-                    } catch (Exception e) {
-                        System.err.println("[OnlineBattle] Failed to send forfeit message: " + e.getMessage());
-                    }
+        }
+        showForfeitOverlay();
+    }
+
+    // ── Forfeit Confirmation Overlay ────────────────────────────────────────
+
+    private void showForfeitOverlay() {
+        forfeitOverlay.setVisible(true);
+        forfeitOverlay.setManaged(true);
+        forfeitOverlay.setMouseTransparent(false);
+
+        forfeitOverlay.setOpacity(0);
+        forfeitDialog.setScaleX(0.85);
+        forfeitDialog.setScaleY(0.85);
+        forfeitDialog.setOpacity(0);
+
+        FadeTransition backdropFade = new FadeTransition(Duration.millis(220), forfeitOverlay);
+        backdropFade.setFromValue(0);
+        backdropFade.setToValue(1);
+        backdropFade.setInterpolator(Interpolator.EASE_OUT);
+
+        Timeline dialogPop = new Timeline(
+            new KeyFrame(Duration.ZERO,
+                new KeyValue(forfeitDialog.scaleXProperty(), 0.85),
+                new KeyValue(forfeitDialog.scaleYProperty(), 0.85),
+                new KeyValue(forfeitDialog.opacityProperty(), 0)
+            ),
+            new KeyFrame(Duration.millis(260),
+                new KeyValue(forfeitDialog.scaleXProperty(), 1.0, Interpolator.SPLINE(0.2, 0.9, 0.3, 1)),
+                new KeyValue(forfeitDialog.scaleYProperty(), 1.0, Interpolator.SPLINE(0.2, 0.9, 0.3, 1)),
+                new KeyValue(forfeitDialog.opacityProperty(), 1.0, Interpolator.EASE_OUT)
+            )
+        );
+
+        backdropFade.play();
+        dialogPop.play();
+    }
+
+    private void hideForfeitOverlay(Runnable onFinished) {
+        Timeline dialogDismiss = new Timeline(
+            new KeyFrame(Duration.ZERO,
+                new KeyValue(forfeitDialog.scaleXProperty(), 1.0),
+                new KeyValue(forfeitDialog.scaleYProperty(), 1.0),
+                new KeyValue(forfeitDialog.opacityProperty(), 1.0)
+            ),
+            new KeyFrame(Duration.millis(180),
+                new KeyValue(forfeitDialog.scaleXProperty(), 0.88, Interpolator.EASE_IN),
+                new KeyValue(forfeitDialog.scaleYProperty(), 0.88, Interpolator.EASE_IN),
+                new KeyValue(forfeitDialog.opacityProperty(), 0.0, Interpolator.EASE_IN)
+            )
+        );
+        FadeTransition backdropFade = new FadeTransition(Duration.millis(200), forfeitOverlay);
+        backdropFade.setFromValue(1);
+        backdropFade.setToValue(0);
+        backdropFade.setInterpolator(Interpolator.EASE_IN);
+        backdropFade.setOnFinished(e -> {
+            forfeitOverlay.setVisible(false);
+            forfeitOverlay.setManaged(false);
+            if (onFinished != null) onFinished.run();
+        });
+        dialogDismiss.play();
+        backdropFade.play();
+    }
+
+    @FXML
+    private void onForfeitConfirmed() {
+        hideForfeitOverlay(() -> {
+            if (serverConnection != null && battleId != null) {
+                try {
+                    serverConnection.sendMessage(new ForfeitMessage(battleId));
+                } catch (Exception e) {
+                    System.err.println("[OnlineBattle] Failed to send forfeit message: " + e.getMessage());
                 }
-                battleEnded=true;
-                saveBattleResult(false, opponent.getName());
-                showResultOverlay(false);
             }
+            battleEnded = true;
+            battleLog.add("Player forfeited the battle.");
+            saveBattleResult(false, opponent.getName());
+            showResultOverlay(false);
         });
     }
+
+    @FXML
+    private void onForfeitCancelled() {
+        hideForfeitOverlay(null);
+    }
+
     private void doDisconnectAndLeave() {
-        if(confettiTimer!=null){
+        if (confettiTimer != null) {
             confettiTimer.stop();
-            confettiTimer=null;
+            confettiTimer = null;
         }
-        if(serverConnection!=null){
+        if (serverConnection != null) {
             try {
                 serverConnection.disconnect();
             } catch (Exception e) {
@@ -488,7 +701,9 @@ public class OnlineBattleController {
         attackButton.setDisable(true);
         changePokemonMainButton.setDisable(true);
 
-        battleStatusLabel.setText("You chose " + cap(move.getName()) + "! Waiting for opponent...");
+        String logEntry = "You chose " + cap(move.getName()) + "!";
+        battleStatusLabel.setText(logEntry + " Waiting for opponent...");
+        battleLog.add(logEntry);
 
         ActionMessage msg = ActionMessage.attack(battleId, move.getId(), move.getName(), turnCount);
         try {
@@ -507,7 +722,9 @@ public class OnlineBattleController {
 
         int teamIndex = player.getTeam().indexOf(pokemon);
         player.setCurrentPokemon(pokemon);
-        battleStatusLabel.setText("Switching to " + cap(pokemon.getName()) + "! Waiting for opponent...");
+        String logEntry = "Switching to " + cap(pokemon.getName()) + "!";
+        battleStatusLabel.setText(logEntry + " Waiting for opponent...");
+        battleLog.add(logEntry);
         updateBattleDisplay();
 
         showActionButtons();
@@ -528,7 +745,7 @@ public class OnlineBattleController {
         }
     }
 
-    // Display helpers
+    // ── Display helpers ─────────────────────────────────────────────────────
 
     private void updateBattleDisplay() {
         updateSide(true,  player);
@@ -541,6 +758,12 @@ public class OnlineBattleController {
 
         String direction = isPlayer ? "back" : "front";
         ImageView target = isPlayer ? playerSpriteImage : opponentSpriteImage;
+
+        double basePx = isPlayer ? SPRITE_PLAYER_BASE_PX : SPRITE_OPPONENT_BASE_PX;
+        double scaledPx = getScaledSpritePx(pok.getId(), basePx);
+        target.setFitWidth(scaledPx);
+        target.setFitHeight(scaledPx);
+
         loadSpriteWithFallback(target, pok.getId(), direction);
 
         String nameHp = cap(pok.getName()) + "  Lv." + pok.getLevel();
@@ -553,6 +776,59 @@ public class OnlineBattleController {
             opponentPokemonHpLabel.setText(pok.getCurrentHp() + " / " + pok.getMaxHp());
             updateHpBar(opponentHpBar, pok.getCurrentHp(), pok.getMaxHp());
         }
+    }
+
+    // ── Sprite scaling (same logic as BattleController) ─────────────────────
+
+    private static java.util.Map<Integer, Double> loadPokemonHeights() {
+        java.util.Map<Integer, Double> map = new java.util.HashMap<>();
+        try (var stream = OnlineBattleController.class.getResourceAsStream(
+                    "/com/example/pokemonbattle/data/pokemon_heights.json")) {
+            if (stream == null) {
+                System.err.println("[OnlineBattleController] pokemon_heights.json not found — using default sizes");
+                return map;
+            }
+            String json = new String(stream.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
+            int currentId = -1;
+            java.util.regex.Matcher idMatcher =
+                java.util.regex.Pattern.compile("\"id\"\\s*:\\s*(\\d+)").matcher(json);
+            java.util.regex.Matcher hMatcher =
+                java.util.regex.Pattern.compile("\"height\"\\s*:\\s*([\\d.]+)").matcher(json);
+            java.util.List<long[]> ids     = new java.util.ArrayList<>();
+            java.util.List<long[]> heights = new java.util.ArrayList<>();
+
+            while (idMatcher.find()) {
+                ids.add(new long[]{ idMatcher.start(), Long.parseLong(idMatcher.group(1)) });
+            }
+            while (hMatcher.find()) {
+                heights.add(new long[]{ hMatcher.start(),
+                    Double.doubleToLongBits(Double.parseDouble(hMatcher.group(1))) });
+            }
+
+            int hi = 0;
+            for (long[] idEntry : ids) {
+                long idPos = idEntry[0];
+                int  id    = (int) idEntry[1];
+                while (hi < heights.size() && heights.get(hi)[0] < idPos) hi++;
+                if (hi < heights.size()) {
+                    double height = Double.longBitsToDouble(heights.get(hi)[1]);
+                    map.put(id, height);
+                    hi++;
+                }
+            }
+            System.out.println("[OnlineBattleController] Loaded heights for " + map.size() + " Pokemon");
+        } catch (Exception e) {
+            System.err.println("[OnlineBattleController] Failed to load pokemon_heights.json: " + e.getMessage());
+        }
+        return map;
+    }
+
+    private double getScaledSpritePx(int pokemonId, double basePx) {
+        Double heightM = POKEMON_HEIGHTS.get(pokemonId);
+        if (heightM == null || heightM <= 0) return basePx;
+        double ratio  = Math.pow(heightM / SPRITE_STANDARD_HEIGHT_M, SPRITE_SCALE_EXPONENT);
+        double scaled = basePx * ratio;
+        return Math.max(SPRITE_MIN_PX, Math.min(SPRITE_MAX_PX, scaled));
     }
 
     private void loadSpriteWithFallback(ImageView target, int pokemonId, String direction) {
@@ -574,7 +850,6 @@ public class OnlineBattleController {
             }
         }
 
-        // PNG fallback
         String pngPath = String.format(
                 "/com/example/pokemonbattle/sprites/%s/%d.png", direction, pokemonId);
         try {
@@ -588,6 +863,7 @@ public class OnlineBattleController {
             System.err.println("PNG fallback error (" + pngPath + "): " + e.getMessage());
         }
     }
+
     private void updateHpBar(Rectangle bar, int hp, int maxHp) {
         if (bar == null || maxHp <= 0) return;
         double ratio = Math.max(0, (double) hp / maxHp);
@@ -639,7 +915,7 @@ public class OnlineBattleController {
         }
     }
 
-    // Panel visibility helpers
+    // ── Panel visibility helpers ────────────────────────────────────────────
 
     private void showActionButtons() {
         setVisible(actionButtonsBox,    true);
@@ -690,7 +966,7 @@ public class OnlineBattleController {
         return false;
     }
 
-    // Cosmetic canvas pattern
+    // ── Options panel background pattern ─────────────────────────────────────
 
     private void drawOptionsPanelPattern() {
         if (optionsSection == null) return;
@@ -733,7 +1009,12 @@ public class OnlineBattleController {
         optionsSection.getChildren().addFirst(canvas);
     }
 
-    // Utility
+    // ── Utility ─────────────────────────────────────────────────────────────
+
+    /** Get the battle log for persistence. */
+    public List<String> getBattleLog() {
+        return new ArrayList<>(battleLog);
+    }
 
     private String cap(String s) {
         if (s == null || s.isEmpty()) return s;
