@@ -35,7 +35,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-
 /**
  * Controller for ONLINE battle screen.
  * Sends moves to the TCP server and updates HP from server-authoritative DamageMessages.
@@ -98,6 +97,9 @@ public class OnlineBattleController {
     private boolean          battleEnded = false;
     private boolean          moveSent    = false;
 
+    //confetti and battle ovrlay
+    private Canvas confettiCanvas;
+    private javafx.animation.AnimationTimer confettiTimer;
     private static final double HP_BAR_MAX_WIDTH = 180.0;
 
     // Lifecycle
@@ -219,29 +221,142 @@ public class OnlineBattleController {
 
     /** Handle battle end: save result to DB, then update UI. */
     private void applyBattleEnd(BattleEndMessage msg) {
+        if (battleEnded) return; // already handled (e.g. forfeit path)
         battleEnded = true;
 
         boolean playerWon = player.getName().equals(msg.getWinnerName());
-
-        // Persist result (same logic as BattleController)
         saveBattleResult(playerWon, msg.getWinnerName());
-
-        String resultText = playerWon
-                ? "🏆 You WIN! " + cap(msg.getWinnerName()) + " is victorious!"
-                : "❌ You lost. " + cap(msg.getWinnerName()) + " wins!";
-        battleStatusLabel.setText(resultText);
-
-        disableAllButtons();
-
-        backButton.setText("Back to Menu");
-        backButton.setDisable(false);
-        backButton.setOnAction(e -> onRunClicked());
-        setVisible(backButton, true);
-        setVisible(waitingLabel, false);
+        showResultOverlay(playerWon);
 
         System.out.println("[OnlineBattle] Battle ended — winner: " + msg.getWinnerName());
     }
+    private void showResultOverlay(boolean playerWon) {
+        if (playerWon) {
+            MusicManager.getInstance().stopBGM();
+            MusicManager.getInstance().playVictorySFX();
+            startConfetti();
+        }
 
+        // Build overlay programmatically — same style as BattleController
+        javafx.scene.layout.StackPane overlay = new javafx.scene.layout.StackPane();
+        overlay.setStyle("-fx-background-color: rgba(0,0,0,0.60);");
+
+        javafx.scene.layout.VBox card = new javafx.scene.layout.VBox(16);
+        card.setAlignment(javafx.geometry.Pos.CENTER);
+        card.setMaxWidth(560);
+        card.setMaxHeight(300);
+
+        if (playerWon) {
+            card.setStyle("-fx-background-color: linear-gradient(to bottom, #8ac17f, #a8d38b);" +
+                        "-fx-background-radius: 20; -fx-border-radius: 20;" +
+                        "-fx-border-color: #144509; -fx-border-width: 3;" +
+                        "-fx-padding: 22 52 22 52;" +
+                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.65), 32, 0.4, 0, 6);");
+        } else {
+            card.setStyle("-fx-background-color: linear-gradient(to bottom, #1c2833, #31455a);" +
+                        "-fx-background-radius: 20; -fx-border-radius: 20;" +
+                        "-fx-border-color: #12232c; -fx-border-width: 3;" +
+                        "-fx-padding: 22 52 22 52;" +
+                        "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.65), 32, 0.4, 0, 6);");
+        }
+
+        javafx.scene.control.Label title = new javafx.scene.control.Label(playerWon ? "Victory!" : "Defeat...");
+        title.setStyle("-fx-font-family: 'SPACE NOVA'; -fx-font-size: 34px; -fx-font-weight: bold;" +
+                    (playerWon ? "-fx-text-fill: #06311f;" : "-fx-text-fill: #9ab5ef;"));
+
+        javafx.scene.control.Label message = new javafx.scene.control.Label(playerWon
+                ? "Congratulations! You defeated " + cap(opponent.getName()) + "!"
+                : "You lost against " + cap(opponent.getName()) + ". Better luck next time!");
+        message.setWrapText(true);
+        message.setMaxWidth(460);
+        message.setStyle("-fx-font-family: 'SPACE NOVA'; -fx-font-size: 16px; -fx-text-alignment: center;" +
+                        (playerWon ? "-fx-text-fill: #074542;" : "-fx-text-fill: #b0bec5;"));
+
+        javafx.scene.control.Button leaveBtn = new javafx.scene.control.Button("Back to Menu");
+        leaveBtn.setPrefWidth(220);
+        leaveBtn.setPrefHeight(50);
+        leaveBtn.setStyle("-fx-font-family: 'SPACE NOVA'; -fx-font-size: 15px; -fx-font-weight: bold;" +
+                        "-fx-background-color: linear-gradient(to bottom, #78909c, #546e7a);" +
+                        "-fx-background-radius: 10; -fx-border-radius: 10;" +
+                        "-fx-border-color: #455a64; -fx-border-width: 2; -fx-text-fill: white; -fx-cursor: hand;");
+        leaveBtn.setOnAction(e -> doDisconnectAndLeave());
+
+        card.getChildren().addAll(title, message, leaveBtn);
+        overlay.getChildren().add(card);
+
+        // Fade in
+        overlay.setOpacity(0);
+        rootPane.getChildren().add(overlay);
+        javafx.animation.FadeTransition ft = new javafx.animation.FadeTransition(
+                javafx.util.Duration.millis(450), overlay);
+        ft.setToValue(1.0);
+        ft.play();
+
+        disableAllButtons();
+    }
+
+    private void startConfetti() {
+        if (confettiCanvas != null) rootPane.getChildren().remove(confettiCanvas);
+        confettiCanvas = new Canvas();
+        confettiCanvas.widthProperty().bind(rootPane.widthProperty());
+        confettiCanvas.heightProperty().bind(rootPane.heightProperty());
+        confettiCanvas.setMouseTransparent(true);
+        int insertIdx = Math.max(0, rootPane.getChildren().size() - 1);
+        rootPane.getChildren().add(insertIdx, confettiCanvas);
+
+        final int N = 140;
+        double[] x = new double[N], y = new double[N];
+        double[] vx = new double[N], vy = new double[N];
+        double[] ang = new double[N], av = new double[N], sz = new double[N];
+        Color[] palette = {
+            Color.web("#FFD700"), Color.web("#FF6B6B"), Color.web("#4ECDC4"),
+            Color.web("#45B7D1"), Color.web("#96CEB4"), Color.web("#FFEAA7"),
+            Color.web("#DDA0DD"), Color.web("#98D8C8"), Color.web("#F7DC6F")
+        };
+        Color[] colors = new Color[N];
+        java.util.Random rng = new java.util.Random();
+        double sw = rootPane.getWidth() > 0 ? rootPane.getWidth() : 1200;
+        for (int i = 0; i < N; i++) {
+            x[i] = rng.nextDouble() * sw;
+            y[i] = -rng.nextDouble() * 300;
+            vx[i] = (rng.nextDouble() - 0.5) * 3.5;
+            vy[i] = 2.5 + rng.nextDouble() * 3;
+            ang[i] = rng.nextDouble() * Math.PI * 2;
+            av[i] = (rng.nextDouble() - 0.5) * 0.14;
+            sz[i] = 6 + rng.nextDouble() * 9;
+            colors[i] = palette[rng.nextInt(palette.length)];
+        }
+
+        long[] t0 = {-1L};
+        confettiTimer = new javafx.animation.AnimationTimer() {
+            @Override public void handle(long now) {
+                if (t0[0] < 0) t0[0] = now;
+                double elapsed = (now - t0[0]) / 1_000_000_000.0;
+                double alpha = Math.max(0.0, 1.0 - elapsed / 4.0);
+                GraphicsContext gc = confettiCanvas.getGraphicsContext2D();
+                gc.clearRect(0, 0, confettiCanvas.getWidth(), confettiCanvas.getHeight());
+                for (int i = 0; i < N; i++) {
+                    x[i] += vx[i]; y[i] += vy[i]; ang[i] += av[i];
+                    if (y[i] > confettiCanvas.getHeight() + 20) {
+                        y[i] = -12; x[i] = rng.nextDouble() * confettiCanvas.getWidth();
+                    }
+                    gc.save();
+                    gc.setGlobalAlpha(alpha);
+                    gc.setFill(colors[i]);
+                    gc.translate(x[i], y[i]);
+                    gc.rotate(Math.toDegrees(ang[i]));
+                    gc.fillRect(-sz[i] / 2, -sz[i] / 4, sz[i], sz[i] / 2);
+                    gc.restore();
+                }
+                if (elapsed >= 4.0) {
+                    stop();
+                    gc.clearRect(0, 0, confettiCanvas.getWidth(), confettiCanvas.getHeight());
+                    rootPane.getChildren().remove(confettiCanvas);
+                }
+            }
+        };
+        confettiTimer.start();
+    }
     // Battle result persistence
 
     /**
@@ -318,15 +433,40 @@ public class OnlineBattleController {
     }
 
     private void onRunClicked() {
-        if (serverConnection != null) {
-            if (!battleEnded && battleId != null) {
-                try {
-                    serverConnection.sendMessage(new ForfeitMessage(battleId));
-                } catch (Exception e) {
-                    System.err.println("[OnlineBattle] Failed to send forfeit: " + e.getMessage());
+        if(battleEnded){
+            doDisconnectAndLeave();
+            return;
+        }    
+        javafx.scene.control.Alert alert=new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Forfeit Battle");
+        alert.setHeaderText("Are you sure you want to forfeit the battle?");
+        alert.setContentText("Your opponent will be declared the winner.");
+        alert.showAndWait().ifPresent(response -> {
+            if (response == javafx.scene.control.ButtonType.OK) {
+                if(serverConnection != null && battleId != null) {
+                    try {
+                        serverConnection.sendMessage(new ForfeitMessage(battleId));
+                    } catch (Exception e) {
+                        System.err.println("[OnlineBattle] Failed to send forfeit message: " + e.getMessage());
+                    }
                 }
+                battleEnded=true;
+                saveBattleResult(false, opponent.getName());
+                showResultOverlay(false);
             }
-            serverConnection.disconnect();
+        });
+    }
+    private void doDisconnectAndLeave() {
+        if(confettiTimer!=null){
+            confettiTimer.stop();
+            confettiTimer=null;
+        }
+        if(serverConnection!=null){
+            try {
+                serverConnection.disconnect();
+            } catch (Exception e) {
+                System.err.println("[OnlineBattle] Failed to close server connection: " + e.getMessage());
+            }
         }
         SceneManager.clearData();
         SceneManager.switchSceneWithLoading("new_game.fxml", "Battle Setup", 1200, 700);

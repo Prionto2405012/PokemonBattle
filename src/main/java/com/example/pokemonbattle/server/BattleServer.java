@@ -236,8 +236,15 @@ public class BattleServer {
             
             // Keep server running and listen for commands
             Scanner scanner = new Scanner(System.in);
+            boolean hasConsole = scanner.hasNextLine(); // false when stdin is closed (e.g. IDE run)
             while (server.isRunning()) {
+                if (!hasConsole) {
+                    // No interactive console — just keep the server alive
+                    try { Thread.sleep(1000); } catch (InterruptedException ie) { Thread.currentThread().interrupt(); break; }
+                    continue;
+                }
                 System.out.print("> ");
+                if (!scanner.hasNextLine()) break; // stdin closed mid-run
                 String command = scanner.nextLine().trim().toLowerCase();
                 
                 switch (command) {
