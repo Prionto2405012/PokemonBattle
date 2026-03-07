@@ -13,8 +13,9 @@ public class BattleRecord {
     private int userId;
     private String result;            // "WIN" or "LOSS"
     private List<String> pokemonUsed; // Names of Pokémon used
-    private String opponentType;      // "AI" or "LOCAL"
+    private String opponentType;      // "AI", "ONLINE", or "LOCAL"
     private String opponentName;
+    private String battleLog;         // Newline-separated log entries
     private LocalDateTime timestamp;
 
     /** Default constructor for DB mapping. */
@@ -53,6 +54,9 @@ public class BattleRecord {
 
     public LocalDateTime getTimestamp() { return timestamp; }
     public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }
+
+    public String getBattleLog() { return battleLog; }
+    public void setBattleLog(String battleLog) { this.battleLog = battleLog; }
 
     @Override
     public String toString() {

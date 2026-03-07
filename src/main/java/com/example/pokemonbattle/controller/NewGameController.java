@@ -1102,9 +1102,6 @@ public class NewGameController {
         }
 
         BattleHistoryManager historyMgr = BattleHistoryManager.getInstance();
-        List<BattleRecord> records = historyMgr.getBattleHistory(user.getId());
-        int wins   = historyMgr.getWinCount(user.getId());
-        int losses = historyMgr.getLossCount(user.getId());
 
         // ── Root overlay (semi-transparent dark background) ──────────────────
         StackPane overlayRoot = new StackPane();
@@ -1114,8 +1111,8 @@ public class NewGameController {
         // ── Inner card ───────────────────────────────────────────────────────
         VBox container = new VBox(15);
         container.setAlignment(Pos.TOP_CENTER);
-        container.setMaxWidth(580);
-        container.setMaxHeight(520);
+        container.setMaxWidth(620);
+        container.setMaxHeight(560);
         container.setPadding(new Insets(28, 30, 24, 30));
         container.setStyle(
             "-fx-background-color: linear-gradient(to bottom, #1a3a35, #122b27);" +
@@ -1140,16 +1137,37 @@ public class NewGameController {
         summary.setAlignment(Pos.CENTER);
         summary.setPadding(new Insets(6, 0, 4, 0));
 
-        Label winLbl = new Label("✔  Wins: " + wins);
+        Label winLbl = new Label();
         winLbl.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #78C850;");
 
-        Label lossLbl = new Label("✘  Losses: " + losses);
+        Label lossLbl = new Label();
         lossLbl.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #F08030;");
 
-        Label totalLbl = new Label("▣  Total: " + (wins + losses));
+        Label totalLbl = new Label();
         totalLbl.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #b0eedf;");
 
         summary.getChildren().addAll(winLbl, lossLbl, totalLbl);
+
+        // ── Filter buttons ───────────────────────────────────────────────────
+        HBox filterRow = new HBox(10);
+        filterRow.setAlignment(Pos.CENTER);
+        filterRow.setPadding(new Insets(2, 0, 4, 0));
+
+        String filterBtnBase = "-fx-font-size: 12px; -fx-font-weight: bold; -fx-padding: 5 16; " +
+                "-fx-background-radius: 14; -fx-cursor: hand; -fx-border-radius: 14; -fx-border-width: 1.5;";
+        String filterActive = filterBtnBase +
+                "-fx-background-color: #2d7a6e; -fx-text-fill: white; -fx-border-color: #78C850;";
+        String filterInactive = filterBtnBase +
+                "-fx-background-color: rgba(255,255,255,0.06); -fx-text-fill: #90aea6; -fx-border-color: rgba(120,200,80,0.2);";
+
+        Button filterAll = new Button("All");
+        Button filterAI = new Button("🤖 AI");
+        Button filterOnline = new Button("🌐 Online");
+        filterAll.setStyle(filterActive);
+        filterAI.setStyle(filterInactive);
+        filterOnline.setStyle(filterInactive);
+
+        filterRow.getChildren().addAll(filterAll, filterAI, filterOnline);
 
         // Divider
         javafx.scene.shape.Rectangle divider = new javafx.scene.shape.Rectangle();
@@ -1161,30 +1179,70 @@ public class NewGameController {
         VBox recordsList = new VBox(8);
         recordsList.setPadding(new Insets(4, 6, 4, 6));
 
-        if (records == null || records.isEmpty()) {
-            Label empty = new Label("No battle records yet — start your first battle!");
-            empty.setStyle("-fx-font-size: 14px; -fx-text-fill: #90aea6; -fx-font-style: italic;");
-            recordsList.getChildren().add(empty);
-        } else {
-            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("MMM dd, yyyy  HH:mm");
-            for (BattleRecord record : records) {
-                recordsList.getChildren().add(buildRecordCard(record, fmt));
-            }
-        }
-
         ScrollPane scroll = new ScrollPane(recordsList);
         scroll.setFitToWidth(true);
-        scroll.setPrefHeight(330);
+        scroll.setPrefHeight(310);
         scroll.setStyle(
             "-fx-background: transparent;" +
             "-fx-background-color: transparent;" +
             "-fx-border-color: transparent;"
         );
-        // Make the viewport background transparent too
         scroll.skinProperty().addListener((obs, o, n) -> {
             if (scroll.lookup(".viewport") != null)
                 scroll.lookup(".viewport").setStyle("-fx-background-color: transparent;");
         });
+
+        // Shared state for active filter
+        final String[] activeFilter = { null }; // null = all
+
+        // Populate helper
+        Runnable refreshList = () -> {
+            List<BattleRecord> records = historyMgr.getBattleHistoryByType(user.getId(), activeFilter[0]);
+            long wins = records.stream().filter(r -> "WIN".equals(r.getResult())).count();
+            long losses = records.stream().filter(r -> "LOSS".equals(r.getResult())).count();
+
+            winLbl.setText("✔  Wins: " + wins);
+            lossLbl.setText("✘  Losses: " + losses);
+            totalLbl.setText("▣  Total: " + records.size());
+
+            recordsList.getChildren().clear();
+            if (records.isEmpty()) {
+                Label empty = new Label("No battle records yet — start your first battle!");
+                empty.setStyle("-fx-font-size: 14px; -fx-text-fill: #90aea6; -fx-font-style: italic;");
+                recordsList.getChildren().add(empty);
+            } else {
+                DateTimeFormatter fmt = DateTimeFormatter.ofPattern("MMM dd, yyyy  HH:mm");
+                for (BattleRecord record : records) {
+                    recordsList.getChildren().add(buildRecordCard(record, fmt));
+                }
+            }
+        };
+
+        // Apply filter on click
+        filterAll.setOnAction(e -> {
+            activeFilter[0] = null;
+            filterAll.setStyle(filterActive);
+            filterAI.setStyle(filterInactive);
+            filterOnline.setStyle(filterInactive);
+            refreshList.run();
+        });
+        filterAI.setOnAction(e -> {
+            activeFilter[0] = "AI";
+            filterAll.setStyle(filterInactive);
+            filterAI.setStyle(filterActive);
+            filterOnline.setStyle(filterInactive);
+            refreshList.run();
+        });
+        filterOnline.setOnAction(e -> {
+            activeFilter[0] = "ONLINE";
+            filterAll.setStyle(filterInactive);
+            filterAI.setStyle(filterInactive);
+            filterOnline.setStyle(filterActive);
+            refreshList.run();
+        });
+
+        // Initial load
+        refreshList.run();
 
         // Close button
         Button closeBtn = new Button("Close");
@@ -1208,7 +1266,7 @@ public class NewGameController {
             ft.play();
         });
 
-        container.getChildren().addAll(title, summary, divider, scroll, closeBtn);
+        container.getChildren().addAll(title, summary, filterRow, divider, scroll, closeBtn);
         overlayRoot.getChildren().add(container);
 
         // Click outside card to close
@@ -1231,37 +1289,24 @@ public class NewGameController {
         fadeIn.play();
     }
 
-    /** Build a single battle-record row card with fully inline styles. */
+    /** Build a single battle-record row card with expandable battle log. */
     private HBox buildRecordCard(BattleRecord record, DateTimeFormatter fmt) {
         boolean won = "WIN".equals(record.getResult());
 
         HBox card = new HBox(14);
         card.setAlignment(Pos.CENTER_LEFT);
         card.setPadding(new Insets(10, 14, 10, 14));
-        card.setStyle(
-            "-fx-background-color: rgba(255,255,255,0.06);" +
-            "-fx-background-radius: 8;" +
-            "-fx-border-color: " + (won ? "rgba(120,200,80,0.3)" : "rgba(240,128,48,0.25)") + ";" +
-            "-fx-border-width: 1;" +
-            "-fx-border-radius: 8;" +
-            "-fx-cursor: default;"
-        );
 
-        // Hover highlight
-        card.setOnMouseEntered(e -> card.setStyle(
-            "-fx-background-color: rgba(255,255,255,0.11);" +
-            "-fx-background-radius: 8;" +
-            "-fx-border-color: " + (won ? "rgba(120,200,80,0.55)" : "rgba(240,128,48,0.5)") + ";" +
-            "-fx-border-width: 1;" +
-            "-fx-border-radius: 8;"
-        ));
-        card.setOnMouseExited(e -> card.setStyle(
-            "-fx-background-color: rgba(255,255,255,0.06);" +
-            "-fx-background-radius: 8;" +
-            "-fx-border-color: " + (won ? "rgba(120,200,80,0.3)" : "rgba(240,128,48,0.25)") + ";" +
-            "-fx-border-width: 1;" +
-            "-fx-border-radius: 8;"
-        ));
+        String baseBorderColor = won ? "rgba(120,200,80,0.3)" : "rgba(240,128,48,0.25)";
+        String hoverBorderColor = won ? "rgba(120,200,80,0.55)" : "rgba(240,128,48,0.5)";
+        String baseStyle = "-fx-background-color: rgba(255,255,255,0.06); -fx-background-radius: 8; " +
+            "-fx-border-color: " + baseBorderColor + "; -fx-border-width: 1; -fx-border-radius: 8; -fx-cursor: hand;";
+        String hoverStyle = "-fx-background-color: rgba(255,255,255,0.11); -fx-background-radius: 8; " +
+            "-fx-border-color: " + hoverBorderColor + "; -fx-border-width: 1; -fx-border-radius: 8; -fx-cursor: hand;";
+
+        card.setStyle(baseStyle);
+        card.setOnMouseEntered(e -> card.setStyle(hoverStyle));
+        card.setOnMouseExited(e -> card.setStyle(baseStyle));
 
         // Result badge
         Label badge = new Label(record.getResult());
@@ -1302,6 +1347,54 @@ public class NewGameController {
         timeLbl.setStyle("-fx-font-size: 10px; -fx-text-fill: #5d8a80;");
 
         info.getChildren().addAll(opponent, pokemonLbl, timeLbl);
+
+        // Battle log expandable section
+        boolean hasLog = record.getBattleLog() != null && !record.getBattleLog().isBlank();
+        if (hasLog) {
+            VBox logBox = new VBox(3);
+            logBox.setPadding(new Insets(6, 0, 0, 0));
+            logBox.setVisible(false);
+            logBox.setManaged(false);
+
+            Label logHeader = new Label("📜 Battle Log");
+            logHeader.setStyle("-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #78C850;");
+
+            VBox logEntries = new VBox(1);
+            logEntries.setPadding(new Insets(2, 0, 0, 8));
+            for (String line : record.getBattleLog().split("\n")) {
+                if (line.isBlank()) continue;
+                Label entry = new Label("• " + line);
+                entry.setStyle("-fx-font-size: 10px; -fx-text-fill: #8ab0a6;");
+                entry.setWrapText(true);
+                logEntries.getChildren().add(entry);
+            }
+
+            ScrollPane logScroll = new ScrollPane(logEntries);
+            logScroll.setFitToWidth(true);
+            logScroll.setMaxHeight(120);
+            logScroll.setPrefHeight(100);
+            logScroll.setStyle("-fx-background: transparent; -fx-background-color: transparent; " +
+                    "-fx-border-color: transparent;");
+            logScroll.skinProperty().addListener((obs, o, n) -> {
+                if (logScroll.lookup(".viewport") != null)
+                    logScroll.lookup(".viewport").setStyle("-fx-background-color: transparent;");
+            });
+
+            logBox.getChildren().addAll(logHeader, logScroll);
+            info.getChildren().add(logBox);
+
+            Label expandHint = new Label("▸ Click to show log");
+            expandHint.setStyle("-fx-font-size: 9px; -fx-text-fill: #5d8a80; -fx-font-style: italic;");
+            info.getChildren().add(expandHint);
+
+            card.setOnMouseClicked(e -> {
+                boolean showing = logBox.isVisible();
+                logBox.setVisible(!showing);
+                logBox.setManaged(!showing);
+                expandHint.setText(showing ? "▸ Click to show log" : "▾ Click to hide log");
+            });
+        }
+
         card.getChildren().addAll(badge, info);
 
         return card;
