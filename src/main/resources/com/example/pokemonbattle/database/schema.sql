@@ -66,9 +66,10 @@ CREATE TABLE IF NOT EXISTS battle_history (
     user_id         INTEGER NOT NULL,
     result          TEXT    NOT NULL CHECK(result IN ('WIN','LOSS')),
     pokemon_used    TEXT    NOT NULL,    -- comma-separated pokemon names
-    opponent_type   TEXT    NOT NULL CHECK(opponent_type IN ('AI','LOCAL')),
+    opponent_type   TEXT    NOT NULL CHECK(opponent_type IN ('AI','LOCAL','ONLINE')),
     opponent_name   TEXT,
-    battle_date     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    battle_log      TEXT,
+    timestamp       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 CREATE INDEX IF NOT EXISTS idx_battle_history_user ON battle_history(user_id);
