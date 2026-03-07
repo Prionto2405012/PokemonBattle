@@ -15,7 +15,7 @@ public class HelloApplication extends Application {
         Font menuFont = Font.loadFont(
             HelloApplication.class.getResourceAsStream("/com/example/pokemonbattle/fonts/menu.ttf"), 18);
         if (menuFont != null) System.out.println("[App] menu.ttf family: " + menuFont.getFamily());
-        else System.err.println("[App] Failed to load menu.ttf");
+        else System.err.println("[App] Failed to lod menu.ttf");
 
         Font spaceNova = Font.loadFont(
             HelloApplication.class.getResourceAsStream("/com/example/pokemonbattle/fonts/SpaceNova-6Rpd1.otf"), 18);
