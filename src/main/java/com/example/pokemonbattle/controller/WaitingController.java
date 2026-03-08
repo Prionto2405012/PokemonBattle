@@ -14,6 +14,7 @@ import com.example.pokemonbattle.server.GameMessage;
 import com.example.pokemonbattle.server.LoginRequest;
 import com.example.pokemonbattle.server.LoginResponse;
 import com.example.pokemonbattle.server.ServerConnection;
+import com.example.pokemonbattle.server.ServerDiscovery;
 import com.example.pokemonbattle.util.PlayerSession;
 import com.example.pokemonbattle.util.SceneManager;
 
@@ -39,12 +40,13 @@ public class WaitingController {
     @FXML private ImageView pokeballImage;
     @FXML private Button cancelButton;
 
-    private static final String SERVER_HOST = "localhost";
+    private static final String SERVER_HOST = "localhost"; // fallback only
     private static final int    SERVER_PORT  = 5555;
 
     private ServerConnection serverConnection;
     private Player player;
     private volatile boolean cancelled = false;
+    private boolean useDiscovery = false; // true = LAN discovery, false = localhost
 
     // Dots animation timeline
     private Timeline dotsTimeline;
@@ -55,6 +57,10 @@ public class WaitingController {
     public void initialize() {
         // Load the player object built by NewGameController
         player = (Player) SceneManager.getData("player");
+
+        // Check if LAN discovery was requested (Online Player mode)
+        Object mode = SceneManager.getData("connectionMode");
+        useDiscovery = "ONLINE".equals(mode);
 
         // Start animations
         startDotsAnimation();
@@ -94,14 +100,37 @@ public class WaitingController {
     /** Main matchmaking flow — runs on background thread. */
     private void connectAndMatchmake() {
         try {
-            // 1. Connect
-            updateStatus("Connecting to server...", "Reaching " + SERVER_HOST + ":" + SERVER_PORT);
-            serverConnection = new ServerConnection(SERVER_HOST, SERVER_PORT);
+            String host;
+
+            if (useDiscovery) {
+                // ONLINE mode: discover the server on the LAN via UDP broadcast
+                updateStatus("Looking for server...", "Scanning local network for Pokemon Battle server");
+                host = ServerDiscovery.discoverServer(5000);
+                if (host == null) {
+                    Platform.runLater(() -> {
+                        stopAnimations();
+                        statusLabel.setText("No server found on network");
+                        subStatusLabel.setText("Make sure the server is running on the same WiFi");
+                        cancelButton.setText("Back");
+                    });
+                    return;
+                }
+                System.out.println("[WaitingController] Discovered server at: " + host);
+            } else {
+                // LOCAL mode: connect to localhost directly
+                host = SERVER_HOST;
+            }
+
+            if (cancelled) return;
+
+            // 2. Connect
+            updateStatus("Connecting to server...", "Reaching " + host + ":" + SERVER_PORT);
+            serverConnection = new ServerConnection(host, SERVER_PORT);
             serverConnection.connect();
 
             if (cancelled) return;
 
-            // 2. Login
+            // 3. Login
             updateStatus("Logging in...", "Authenticating your account");
             User sessionUser = PlayerSession.getInstance().getCurrentUser();
             String username, password;

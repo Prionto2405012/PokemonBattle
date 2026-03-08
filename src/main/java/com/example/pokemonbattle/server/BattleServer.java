@@ -67,6 +67,10 @@ public class BattleServer {
         serverSocket = new ServerSocket(port);
         running = true;
         
+        // Start UDP discovery so clients on the same LAN can find this server
+        // automatically without needing the IP to be hardcoded.
+        ServerDiscovery.startBroadcasting(port);
+        
         System.out.println("╔═══════════════════════════════════════════════════════════╗");
         System.out.println("║         Pokemon Battle Online Server Started              ║");
         System.out.println("║              Listening on port " + port + "               ║");
@@ -182,6 +186,7 @@ public class BattleServer {
     public synchronized void shutdown() {
         System.out.println("\n[Server] Shutting down server...");
         running = false;
+        ServerDiscovery.stopBroadcasting();
         
         // Close all client connections
         for (ClientHandler client : connectedClients) {
