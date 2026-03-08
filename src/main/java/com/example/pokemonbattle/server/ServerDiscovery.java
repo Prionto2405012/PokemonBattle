@@ -120,11 +120,26 @@ public class ServerDiscovery {
 
     /**
      * Returns the machine's active LAN IPv4 address (non-loopback).
+     * Uses the OS routing table to pick the correct interface — this works
+     * reliably even when the machine has VirtualBox, Hyper-V, WSL, etc.
      * Falls back to {@code 127.0.0.1} if none is found.
      */
     private static String getLocalIpAddress() throws SocketException {
+        // Preferred method: ask the OS which interface it would use to reach
+        // an external IP. No packet is actually sent.
+        try (DatagramSocket probe = new DatagramSocket()) {
+            probe.connect(InetAddress.getByName("8.8.8.8"), 80);
+            String ip = probe.getLocalAddress().getHostAddress();
+            if (ip != null && !ip.startsWith("0.") && !ip.equals("127.0.0.1")) {
+                return ip;
+            }
+        } catch (Exception ignored) {
+            // fall through to manual scan
+        }
+
+        // Fallback: scan interfaces manually
         for (NetworkInterface iface : Collections.list(NetworkInterface.getNetworkInterfaces())) {
-            if (iface.isLoopback() || !iface.isUp()) continue;
+            if (iface.isLoopback() || !iface.isUp() || iface.isVirtual()) continue;
             for (InetAddress addr : Collections.list(iface.getInetAddresses())) {
                 if (addr instanceof Inet4Address) {
                     return addr.getHostAddress();
