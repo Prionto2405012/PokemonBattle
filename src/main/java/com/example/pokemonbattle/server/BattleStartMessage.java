@@ -10,10 +10,11 @@ public class BattleStartMessage extends GameMessage {
     private Integer[] opponentPokemonLevels;
     private String[]  opponentPokemonNames;
     private Integer[] opponentMoveIds; // flat: 4 per pokemon
+    private String opponentAvatarPath; // opponent's avatar resource path
 
     public BattleStartMessage(Integer battleId, String opponentName, Integer opponentUserId,
                               Integer[] pokemonIds, Integer[] pokemonLevels, String[] pokemonNames,
-                              Integer[] moveIds) {
+                              Integer[] moveIds, String opponentAvatarPath) {
         super("BATTLE_START");
         this.battleId              = battleId;
         this.opponentName          = opponentName;
@@ -22,6 +23,7 @@ public class BattleStartMessage extends GameMessage {
         this.opponentPokemonLevels = pokemonLevels;
         this.opponentPokemonNames  = pokemonNames;
         this.opponentMoveIds       = moveIds;
+        this.opponentAvatarPath    = opponentAvatarPath;
     }
 
     public Integer   getBattleId()              { return battleId; }
@@ -31,4 +33,5 @@ public class BattleStartMessage extends GameMessage {
     public Integer[] getOpponentPokemonLevels() { return opponentPokemonLevels; }
     public String[]  getOpponentPokemonNames()  { return opponentPokemonNames; }
     public Integer[] getOpponentMoveIds()       { return opponentMoveIds; }
+    public String    getOpponentAvatarPath()    { return opponentAvatarPath; }
 }

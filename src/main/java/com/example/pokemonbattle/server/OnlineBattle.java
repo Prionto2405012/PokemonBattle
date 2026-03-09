@@ -1,16 +1,16 @@
 package com.example.pokemonbattle.server;
 
-import com.example.pokemonbattle.model.Battle;
-import com.example.pokemonbattle.model.Player;
-import com.example.pokemonbattle.model.PokemonInstance;
-import com.example.pokemonbattle.model.Move;
-import com.example.pokemonbattle.database.GameDataDAO;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.example.pokemonbattle.database.GameDataDAO;
+import com.example.pokemonbattle.model.Battle;
+import com.example.pokemonbattle.model.Move;
+import com.example.pokemonbattle.model.Player;
+import com.example.pokemonbattle.model.PokemonInstance;
 
 /**
  * Server-side battle management.
@@ -37,10 +37,14 @@ public class OnlineBattle {
     
     private boolean battleActive = true;
     private int turnCount = 0;
+
+    private final String player1AvatarPath;
+    private final String player2AvatarPath;
     
     public OnlineBattle(Integer player1Id, String player1Name, ClientHandler player1Handler,
                        Integer player2Id, String player2Name, ClientHandler player2Handler,
-                       Player battlePlayer1, Player battlePlayer2) {
+                       Player battlePlayer1, Player battlePlayer2,
+                       String player1AvatarPath, String player2AvatarPath) {
         synchronized (OnlineBattle.class) {
             this.battleId = battleIdCounter++;
         }
@@ -52,6 +56,9 @@ public class OnlineBattle {
         this.player2Id = player2Id;
         this.player2Name = player2Name;
         this.player2Handler = player2Handler;
+
+        this.player1AvatarPath = player1AvatarPath;
+        this.player2AvatarPath = player2AvatarPath;
         
         this.battleEngine = new Battle(battlePlayer1, battlePlayer2);
         this.gameDataDAO = new GameDataDAO();
@@ -86,10 +93,11 @@ public class OnlineBattle {
             }
         }
         
-        // Send to player 1: opponent's pokemon
+        // Send to player 1: opponent's pokemon + avatar
         BattleStartMessage msg1 = new BattleStartMessage(
             battleId, player2Name, player2Id,
-            p2PokemonIds, p2PokemonLevels, p2PokemonNames, p2MoveIds
+            p2PokemonIds, p2PokemonLevels, p2PokemonNames, p2MoveIds,
+            player2AvatarPath
         );
         player1Handler.sendMessage(msg1);
         
@@ -115,7 +123,8 @@ public class OnlineBattle {
         
         BattleStartMessage msg2 = new BattleStartMessage(
             battleId, player1Name, player1Id,
-            p1PokemonIds, p1PokemonLevels, p1PokemonNames, p1MoveIds
+            p1PokemonIds, p1PokemonLevels, p1PokemonNames, p1MoveIds,
+            player1AvatarPath
         );
         player2Handler.sendMessage(msg2);
         
