@@ -132,6 +132,7 @@ public class OnlineBattleController {
     private Player           opponent;
     private ServerConnection serverConnection;
     private Integer          battleId;
+    private String           opponentAvatarPath;
     private int              turnCount = 0;
     private boolean          battleEnded = false;
     private boolean          moveSent    = false;
@@ -181,6 +182,7 @@ public class OnlineBattleController {
         opponent         = (Player)           SceneManager.getData("opponent");
         serverConnection = (ServerConnection) SceneManager.getData("serverConnection");
         battleId         = (Integer)          SceneManager.getData("battleId");
+        opponentAvatarPath = (String)         SceneManager.getData("opponentAvatarPath");
 
         if (player == null || opponent == null || serverConnection == null) {
             battleStatusLabel.setText("Error: missing battle data!");
@@ -213,12 +215,22 @@ public class OnlineBattleController {
     // ── VS INTRO ────────────────────────────────────────────────────────────
 
     private void playVSIntro() {
-        // Load opponent avatar (use a random NPC sprite)
-        int npcId = new Random().nextInt(7) + 1;
-        String npcPath = "/com/example/pokemonbattle/sprites/trainer/npc/" + npcId + ".png";
-        var npcUrl = getClass().getResource(npcPath);
-        if (npcUrl != null) {
-            vsOpponentSprite.setImage(new Image(npcUrl.toExternalForm(), 0, 0, true, true));
+        // Load opponent avatar (use opponent's actual avatar, fall back to random NPC)
+        boolean opponentAvatarLoaded = false;
+        if (opponentAvatarPath != null && !opponentAvatarPath.isEmpty()) {
+            var oppUrl = getClass().getResource(opponentAvatarPath);
+            if (oppUrl != null) {
+                vsOpponentSprite.setImage(new Image(oppUrl.toExternalForm(), 0, 0, true, true));
+                opponentAvatarLoaded = true;
+            }
+        }
+        if (!opponentAvatarLoaded) {
+            int npcId = new Random().nextInt(7) + 1;
+            String npcPath = "/com/example/pokemonbattle/sprites/trainer/npc/" + npcId + ".png";
+            var npcUrl = getClass().getResource(npcPath);
+            if (npcUrl != null) {
+                vsOpponentSprite.setImage(new Image(npcUrl.toExternalForm(), 0, 0, true, true));
+            }
         }
 
         // Player trainer avatar

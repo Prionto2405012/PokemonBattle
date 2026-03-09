@@ -1,15 +1,18 @@
 package com.example.pokemonbattle.server;
 
-import com.example.pokemonbattle.database.UserDAO;
-import com.example.pokemonbattle.database.GameDataDAO;
-import com.example.pokemonbattle.model.User;
-import com.example.pokemonbattle.model.Player;
-import com.example.pokemonbattle.model.PokemonInstance;
-
-import java.io.*;
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.sql.SQLException;
 import java.util.Optional;
+
+import com.example.pokemonbattle.database.GameDataDAO;
+import com.example.pokemonbattle.database.UserDAO;
+import com.example.pokemonbattle.model.Player;
+import com.example.pokemonbattle.model.PokemonInstance;
+import com.example.pokemonbattle.model.User;
 
 /**
  * Handles a single client connection.
@@ -231,11 +234,16 @@ public class ClientHandler extends Thread {
             return;
         }
         
-        // Create online battle
+        // Create online battle (pass avatar paths from both clients)
+        String myAvatar = myRequest.getAvatarPath();
+        String opponentAvatar = opponent.pendingFindRequest != null
+                ? opponent.pendingFindRequest.getAvatarPath() : null;
+
         OnlineBattle battle = new OnlineBattle(
             myRequest.getUserId(), myRequest.getPlayerName(), this,
             opponent.userId, opponent.playerName, opponent,
-            myPlayer, opponentPlayer
+            myPlayer, opponentPlayer,
+            myAvatar, opponentAvatar
         );
         
         // Set battle for both handlers

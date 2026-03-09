@@ -9,10 +9,12 @@ public class FindOpponentRequest extends GameMessage {
     private Integer[] pokemonLevels;
     private String[]  pokemonNames;
     private Integer[] moveIds; // flat: 4 moves per pokemon, index i*4+j
+    private String avatarPath; // player's avatar resource path
 
     public FindOpponentRequest(Integer userId, String playerName,
                                Integer[] pokemonIds, Integer[] pokemonLevels,
-                               String[] pokemonNames, Integer[] moveIds) {
+                               String[] pokemonNames, Integer[] moveIds,
+                               String avatarPath) {
         super("FIND_OPPONENT_REQUEST");
         this.userId        = userId;
         this.playerName    = playerName;
@@ -20,6 +22,7 @@ public class FindOpponentRequest extends GameMessage {
         this.pokemonLevels = pokemonLevels;
         this.pokemonNames  = pokemonNames;
         this.moveIds       = moveIds;
+        this.avatarPath    = avatarPath;
     }
 
     public Integer   getUserId()       { return userId; }
@@ -28,4 +31,5 @@ public class FindOpponentRequest extends GameMessage {
     public Integer[] getPokemonLevels(){ return pokemonLevels; }
     public String[]  getPokemonNames() { return pokemonNames; }
     public Integer[] getMoveIds()      { return moveIds; }
+    public String    getAvatarPath()   { return avatarPath; }
 }

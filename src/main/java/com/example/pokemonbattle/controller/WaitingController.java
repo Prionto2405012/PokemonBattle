@@ -237,7 +237,8 @@ public class WaitingController {
         }
 
         FindOpponentRequest req = new FindOpponentRequest(userId, playerName,
-                ids, levels, names, moveIds);
+                ids, levels, names, moveIds,
+                PlayerSession.getInstance().getAvatarPath());
         serverConnection.sendMessage(req);
     }
 
@@ -278,6 +279,7 @@ public class WaitingController {
         data.put("serverConnection",   serverConnection);
         data.put("battleId",           msg.getBattleId());
         data.put("isOnlineBattle",     true);
+        data.put("opponentAvatarPath", msg.getOpponentAvatarPath());
 
         Platform.runLater(() -> {
             stopAnimations();
