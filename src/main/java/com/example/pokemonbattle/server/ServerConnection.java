@@ -85,6 +85,7 @@ public class ServerConnection {
         try {
             outputStream.writeObject(message);
             outputStream.flush();
+            outputStream.reset(); // Clear serialization cache to prevent stream corruption
             System.out.println("[Client] Sent: " + message.getMessageType());
         } catch (IOException e) {
             connected = false;

@@ -51,8 +51,8 @@ public class ClientHandler extends Thread {
         try {
             // Enable TCP keepalive so the OS detects dead connections
             socket.setKeepAlive(true);
-            // Read timeout: if no data for 60s, assume disconnected
-            socket.setSoTimeout(60_000);
+            // Read timeout: if no data for 120s, check connection health
+            socket.setSoTimeout(120_000);
 
             // Initialize streams (output stream first to avoid deadlock)
             outputStream = new ObjectOutputStream(socket.getOutputStream());
@@ -73,7 +73,7 @@ public class ClientHandler extends Thread {
                         System.err.println("[Client #" + clientId + "] Unknown message type: " + message.getClass());
                     }
                 } catch (java.net.SocketTimeoutException e) {
-                    // No data for 60s — check if still connected
+                    // No data for 120s — check if still connected
                     if (socket.isClosed() || !socket.isConnected()) {
                         System.out.println("[Client #" + clientId + "] Connection timed out");
                         connected = false;
@@ -82,8 +82,14 @@ public class ClientHandler extends Thread {
                 } catch (EOFException e) {
                     System.out.println("[Client #" + clientId + "] Connection closed by client");
                     connected = false;
+                } catch (java.io.StreamCorruptedException e) {
+                    System.err.println("[Client #" + clientId + "] Stream corrupted: " + e.getMessage());
+                    connected = false;
                 } catch (ClassNotFoundException e) {
                     System.err.println("[Client #" + clientId + "] ClassNotFoundException: " + e.getMessage());
+                    connected = false;
+                } catch (IOException e) {
+                    System.err.println("[Client #" + clientId + "] IO error reading message: " + e.getMessage());
                     connected = false;
                 }
             }
@@ -371,6 +377,7 @@ public class ClientHandler extends Thread {
         try {
             outputStream.writeObject(message);
             outputStream.flush();
+            outputStream.reset(); // Clear serialization cache to prevent stream corruption
             System.out.println("[Client #" + clientId + "] Sent: " + message.getMessageType());
         } catch (IOException e) {
             System.err.println("[Client #" + clientId + "] Error sending message: " + e.getMessage());
