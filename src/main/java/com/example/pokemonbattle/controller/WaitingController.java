@@ -103,9 +103,10 @@ public class WaitingController {
             String host;
 
             if (useDiscovery) {
-                // ONLINE mode: discover the server on the LAN via UDP broadcast
+                // ONLINE mode: try UDP broadcast then TCP subnet scan (handles AP isolation)
                 updateStatus("Looking for server...", "Scanning local network for Pokemon Battle server");
-                host = ServerDiscovery.discoverServer(5000);
+                host = ServerDiscovery.discoverServer(10000,
+                        status -> updateStatus("Looking for server...", status));
                 if (host == null) {
                     Platform.runLater(() -> {
                         stopAnimations();
