@@ -372,23 +372,78 @@ public class Battle {
 
     /**
      * Get a move for the AI opponent.
-     * Prefers offensive (non-status, non-zero-power) moves; falls back to any
-     * available move if the Pokemon only knows status moves.
+     * Scores each offensive move by estimated damage (power × type effectiveness × STAB)
+     * and picks the highest-scoring one. Falls back to a random move if no
+     * offensive moves are available. 20% chance to pick a random offensive move
+     * for variety so the AI isn't perfectly predictable.
      */
-    public Move getAIMove(PokemonInstance pokemon) {
-        List<PokemonInstance.MoveSlot> battleMoves = pokemon.getBattleMoves();
+    public Move getAIMove(PokemonInstance aiPokemon, PokemonInstance target) {
+        List<PokemonInstance.MoveSlot> battleMoves = aiPokemon.getBattleMoves();
         if (battleMoves.isEmpty()) {
             return null;
         }
-        // Prefer moves that actually deal damage
+
+        // Filter to offensive moves with PP remaining
         List<PokemonInstance.MoveSlot> offensiveMoves = battleMoves.stream()
                 .filter(ms -> ms.getMove() != null
                         && ms.getMove().getPower() != null
                         && ms.getMove().getPower() > 0
-                        && !"status".equals(ms.getMove().getDamage_class()))
+                        && !"status".equals(ms.getMove().getDamage_class())
+                        && ms.getCurrentPp() > 0)
                 .toList();
-        List<PokemonInstance.MoveSlot> pool = offensiveMoves.isEmpty() ? battleMoves : offensiveMoves;
-        return pool.get(random.nextInt(pool.size())).getMove();
+
+        if (offensiveMoves.isEmpty()) {
+            // No offensive moves — pick any move with PP
+            List<PokemonInstance.MoveSlot> usable = battleMoves.stream()
+                    .filter(ms -> ms.getCurrentPp() > 0).toList();
+            if (usable.isEmpty()) usable = battleMoves;
+            return usable.get(random.nextInt(usable.size())).getMove();
+        }
+
+        // 20% chance to pick randomly for unpredictability
+        if (random.nextDouble() < 0.2) {
+            return offensiveMoves.get(random.nextInt(offensiveMoves.size())).getMove();
+        }
+
+        // Score each offensive move and pick the best
+        Move bestMove = null;
+        double bestScore = -1;
+
+        List<String> aiTypes = aiPokemon.getTypes();
+        List<String> defenderTypes = target.getTypes();
+
+        for (PokemonInstance.MoveSlot slot : offensiveMoves) {
+            Move move = slot.getMove();
+            double score = move.getPower();
+
+            // Type effectiveness multiplier
+            float effectiveness = getTypeEffectiveness(move.getType(), defenderTypes);
+            score *= effectiveness;
+
+            // STAB (Same Type Attack Bonus) — 1.5× if move type matches attacker type
+            if (aiTypes != null && move.getType() != null) {
+                for (String t : aiTypes) {
+                    if (t.equalsIgnoreCase(move.getType())) {
+                        score *= 1.5;
+                        break;
+                    }
+                }
+            }
+
+            // Prefer the correct attack stat category
+            if ("special".equals(move.getDamage_class())) {
+                score *= aiPokemon.getSpAttack() / 100.0;
+            } else {
+                score *= aiPokemon.getAttack() / 100.0;
+            }
+
+            if (score > bestScore) {
+                bestScore = score;
+                bestMove = move;
+            }
+        }
+
+        return bestMove != null ? bestMove : offensiveMoves.get(0).getMove();
     }
 
     // ==================== Listener Notifications ====================
