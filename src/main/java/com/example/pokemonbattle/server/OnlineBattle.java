@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Server-side battle management.
@@ -37,6 +39,8 @@ public class OnlineBattle {
     
     private boolean battleActive = true;
     private int turnCount = 0;
+    private static final long TURN_TIMEOUT_MS = 90_000; // 90 seconds per turn
+    private Timer turnTimer;
     
     public OnlineBattle(Integer player1Id, String player1Name, ClientHandler player1Handler,
                        Integer player2Id, String player2Name, ClientHandler player2Handler,
@@ -91,7 +95,7 @@ public class OnlineBattle {
             battleId, player2Name, player2Id,
             p2PokemonIds, p2PokemonLevels, p2PokemonNames, p2MoveIds
         );
-        player1Handler.sendMessage(msg1);
+        safeSend(player1Handler, msg1, player1Name);
         
         // Get pokemon data for player 1 (to send to player 2)
         Player player1 = battleEngine.getPlayer1();
@@ -117,12 +121,13 @@ public class OnlineBattle {
             battleId, player1Name, player1Id,
             p1PokemonIds, p1PokemonLevels, p1PokemonNames, p1MoveIds
         );
-        player2Handler.sendMessage(msg2);
+        safeSend(player2Handler, msg2, player2Name);
         
         // Link this battle to both handlers so they can send moves
         player1Handler.setBattle(this);
         player2Handler.setBattle(this);
         
+        startTurnTimer();
         System.out.println("[Battle #" + battleId + "] Battle started! Waiting for moves...");
     }
     
@@ -131,6 +136,7 @@ public class OnlineBattle {
      * When both players submit actions, process the turn.
      */
     public synchronized void submitAction(Integer playerId, ActionMessage action) throws IOException {
+        cancelTurnTimer();
         if (playerId.equals(player1Id)) {
             pendingActions.put(player1Id, action);
             System.out.println("[Battle #" + battleId + "] Player 1 (" + player1Name + ") submitted action: " + action.getActionType()
@@ -144,6 +150,9 @@ public class OnlineBattle {
         // If both players have submitted actions, process the turn
         if (pendingActions.size() == 2) {
             processTurn();
+        } else {
+            // One player submitted; restart timer for the other
+            startTurnTimer();
         }
     }
     
@@ -201,8 +210,9 @@ public class OnlineBattle {
         // Signal both clients that the turn is complete and they may submit next action
         if (battleActive) {
             TurnReadyMessage turnReady = new TurnReadyMessage(battleId, turnCount);
-            player1Handler.sendMessage(turnReady);
-            player2Handler.sendMessage(turnReady);
+            safeSend(player1Handler, turnReady, player1Name);
+            safeSend(player2Handler, turnReady, player2Name);
+            startTurnTimer();
             System.out.println("[Battle #" + battleId + "] Turn " + turnCount + " complete. Waiting for next actions.");
         }
     }
@@ -251,8 +261,8 @@ public class OnlineBattle {
                 newPokemon.getId(), newPokemon.getName(), newPokemon.getLevel(),
                 newPokemon.getCurrentHp(), newPokemon.getMaxHp()
         );
-        player1Handler.sendMessage(switchMsg);
-        player2Handler.sendMessage(switchMsg);
+        safeSend(player1Handler, switchMsg, player1Name);
+        safeSend(player2Handler, switchMsg, player2Name);
     }
     
     /**
@@ -289,8 +299,8 @@ public class OnlineBattle {
             move.getName()
         );
         
-        player1Handler.sendMessage(damageMsg);
-        player2Handler.sendMessage(damageMsg);
+        safeSend(player1Handler, damageMsg, player1Name);
+        safeSend(player2Handler, damageMsg, player2Name);
         
         System.out.println("[Battle #" + battleId + "] " + attackerName + " used " + move.getName() + 
                           " on " + defenderName + " for " + damage + " damage!");
@@ -310,8 +320,8 @@ public class OnlineBattle {
                     nextPokemon.getId(), nextPokemon.getName(), nextPokemon.getLevel(),
                     nextPokemon.getCurrentHp(), nextPokemon.getMaxHp()
                 );
-                player1Handler.sendMessage(switchMsg);
-                player2Handler.sendMessage(switchMsg);
+                safeSend(player1Handler, switchMsg, player1Name);
+                safeSend(player2Handler, switchMsg, player2Name);
 
                 BattleUpdateMessage updateMsg = new BattleUpdateMessage(
                     battleId,
@@ -319,8 +329,8 @@ public class OnlineBattle {
                     turnCount,
                     "all_waiting"
                 );
-                player1Handler.sendMessage(updateMsg);
-                player2Handler.sendMessage(updateMsg);
+                safeSend(player1Handler, updateMsg, player1Name);
+                safeSend(player2Handler, updateMsg, player2Name);
             }
         }
     }
@@ -376,6 +386,7 @@ public class OnlineBattle {
      */
     private void endBattle() throws IOException {
         battleActive = false;
+        cancelTurnTimer();
         
         Player player1 = battleEngine.getPlayer1();
         Player player2 = battleEngine.getPlayer2();
@@ -398,8 +409,8 @@ public class OnlineBattle {
             "All opponent's pokemon fainted"
         );
         
-        player1Handler.sendMessage(endMsg);
-        player2Handler.sendMessage(endMsg);
+        safeSend(player1Handler, endMsg, player1Name);
+        safeSend(player2Handler, endMsg, player2Name);
         
         System.out.println("[Battle #" + battleId + "] Battle ended! Winner: " + winnerName);
     }
@@ -411,6 +422,7 @@ public class OnlineBattle {
     public synchronized void forfeit(Integer forfeitingPlayerId) throws IOException {
         if (!battleActive) return;
         battleActive = false;
+        cancelTurnTimer();
 
         String winnerName;
         Integer winnerId;
@@ -442,4 +454,77 @@ public class OnlineBattle {
     public boolean isBattleActive() { return battleActive; }
     public Integer getPlayer1Id() { return player1Id; }
     public Integer getPlayer2Id() { return player2Id; }
+
+    /**
+     * Start (or restart) the turn timer. If 90 seconds elapse without both
+     * players submitting, the player who hasn't submitted yet is forfeited.
+     */
+    private void startTurnTimer() {
+        cancelTurnTimer();
+        turnTimer = new Timer("TurnTimer-" + battleId, true);
+        turnTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                synchronized (OnlineBattle.this) {
+                    if (!battleActive) return;
+
+                    boolean p1Submitted = pendingActions.containsKey(player1Id);
+                    boolean p2Submitted = pendingActions.containsKey(player2Id);
+
+                    if (p1Submitted && p2Submitted) return; // both submitted, nothing to do
+
+                    // Forfeit whoever hasn't submitted
+                    Integer afkPlayerId;
+                    String  afkName;
+                    if (!p1Submitted && !p2Submitted) {
+                        // Neither submitted — forfeit both is awkward, pick player1
+                        afkPlayerId = player1Id;
+                        afkName = player1Name;
+                    } else if (!p1Submitted) {
+                        afkPlayerId = player1Id;
+                        afkName = player1Name;
+                    } else {
+                        afkPlayerId = player2Id;
+                        afkName = player2Name;
+                    }
+
+                    System.out.println("[Battle #" + battleId + "] Turn timeout! " + afkName + " did not submit an action.");
+                    try {
+                        forfeit(afkPlayerId);
+                    } catch (IOException e) {
+                        System.err.println("[Battle #" + battleId + "] Error during timeout forfeit: " + e.getMessage());
+                        battleActive = false;
+                    }
+                }
+            }
+        }, TURN_TIMEOUT_MS);
+    }
+
+    private void cancelTurnTimer() {
+        if (turnTimer != null) {
+            turnTimer.cancel();
+            turnTimer = null;
+        }
+    }
+
+    /**
+     * Safely send a message to a client. If the send fails, treat it as
+     * a disconnect: forfeit the battle on behalf of the disconnected player.
+     */
+    private void safeSend(ClientHandler handler, GameMessage message, String playerName) {
+        try {
+            handler.sendMessage(message);
+        } catch (IOException e) {
+            System.err.println("[Battle #" + battleId + "] Failed to send to " + playerName + ": " + e.getMessage());
+            if (battleActive) {
+                try {
+                    Integer disconnectedId = handler == player1Handler ? player1Id : player2Id;
+                    forfeit(disconnectedId);
+                } catch (IOException ex) {
+                    System.err.println("[Battle #" + battleId + "] Error during disconnect forfeit: " + ex.getMessage());
+                    battleActive = false;
+                }
+            }
+        }
+    }
 }

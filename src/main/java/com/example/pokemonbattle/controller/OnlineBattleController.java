@@ -189,6 +189,7 @@ public class OnlineBattleController {
         }
 
         serverConnection.setMessageListener(this::handleServerMessage);
+        serverConnection.setOnDisconnect(() -> Platform.runLater(this::handleDisconnect));
 
         attackButton.setOnAction(e -> onFightClicked());
         changePokemonMainButton.setOnAction(e -> onChangePokemonClicked());
@@ -399,6 +400,36 @@ public class OnlineBattleController {
         showResultOverlay(playerWon);
 
         System.out.println("[OnlineBattle] Battle ended — winner: " + msg.getWinnerName());
+    }
+
+    /** Handle unexpected disconnect (server crash, network loss, opponent quit). */
+    private void handleDisconnect() {
+        if (battleEnded) return;
+        battleEnded = true;
+
+        battleStatusLabel.setText("Connection lost!");
+        battleLog.add("Connection to server lost.");
+        disableAllButtons();
+        setVisible(waitingLabel, false);
+
+        // Treat disconnect as a draw — show a neutral overlay
+        resultTitleLabel.setText("Disconnected");
+        resultMessageLabel.setText("Connection to the server was lost.\nThe battle could not be completed.");
+        battleResultCard.getStyleClass().removeAll("result-card-victory", "result-card-defeat");
+        resultTitleLabel.getStyleClass().removeAll("result-title-victory", "result-title-defeat");
+        resultMessageLabel.getStyleClass().removeAll("result-message-victory", "result-message-defeat");
+        battleResultCard.getStyleClass().add("result-card-defeat");
+        resultTitleLabel.getStyleClass().add("result-title-defeat");
+        resultMessageLabel.getStyleClass().add("result-message-defeat");
+
+        battleResultOverlay.setOpacity(0);
+        battleResultOverlay.setVisible(true);
+        battleResultOverlay.setManaged(true);
+        FadeTransition ft = new FadeTransition(Duration.millis(450), battleResultOverlay);
+        ft.setToValue(1.0);
+        ft.play();
+
+        System.out.println("[OnlineBattle] Disconnected from server during battle");
     }
 
     // ── Result Overlay (same as AI battle) ──────────────────────────────────

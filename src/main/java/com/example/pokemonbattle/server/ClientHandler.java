@@ -49,6 +49,11 @@ public class ClientHandler extends Thread {
     @Override
     public void run() {
         try {
+            // Enable TCP keepalive so the OS detects dead connections
+            socket.setKeepAlive(true);
+            // Read timeout: if no data for 60s, assume disconnected
+            socket.setSoTimeout(60_000);
+
             // Initialize streams (output stream first to avoid deadlock)
             outputStream = new ObjectOutputStream(socket.getOutputStream());
             outputStream.flush();
@@ -60,12 +65,20 @@ public class ClientHandler extends Thread {
             while (connected) {
                 try {
                     Object message = inputStream.readObject();
+                    // Reset timeout after each successful read
                     
                     if (message instanceof GameMessage) {
                         handleMessage((GameMessage) message);
                     } else {
                         System.err.println("[Client #" + clientId + "] Unknown message type: " + message.getClass());
                     }
+                } catch (java.net.SocketTimeoutException e) {
+                    // No data for 60s — check if still connected
+                    if (socket.isClosed() || !socket.isConnected()) {
+                        System.out.println("[Client #" + clientId + "] Connection timed out");
+                        connected = false;
+                    }
+                    // otherwise keep waiting (client might just be idle)
                 } catch (EOFException e) {
                     System.out.println("[Client #" + clientId + "] Connection closed by client");
                     connected = false;
