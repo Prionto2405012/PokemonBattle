@@ -2,6 +2,8 @@ package com.example.pokemonbattle.controller;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -23,6 +25,9 @@ import javafx.animation.SequentialTransition;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.geometry.Bounds;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
@@ -31,6 +36,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -40,7 +47,7 @@ import javafx.util.Duration;
 
 public class BattleController implements Battle.BattleListener {
 
-    // Existing battle UI
+    // FXML injections
     @FXML
     private StackPane rootPane;
     @FXML
@@ -86,14 +93,6 @@ public class BattleController implements Battle.BattleListener {
     @FXML
     private Button backButton;
     @FXML
-    private Button moveButton1;
-    @FXML
-    private Button moveButton2;
-    @FXML
-    private Button moveButton3;
-    @FXML
-    private Button moveButton4;
-    @FXML
     private Button attackButton;
     @FXML
     private Button changePokemonMainButton;
@@ -102,17 +101,15 @@ public class BattleController implements Battle.BattleListener {
     @FXML
     private VBox moveSelectionBox;
     @FXML
+    private VBox moveButtonsContainer; // replaces the 4 individual move buttons
+    @FXML
     private VBox pokemonSelectionBox;
     @FXML
     private VBox pokemonButtonsBox;
     @FXML
     private VBox actionButtonsBox;
-
-    /** Wrapper HBox for the main battle UI — hidden until VS intro ends. */
     @FXML
     private HBox mainBattleLayout;
-
-    // Battle Result Overlay nodes
     @FXML
     private StackPane battleResultOverlay;
     @FXML
@@ -125,8 +122,6 @@ public class BattleController implements Battle.BattleListener {
     private Button goBackResultButton;
     @FXML
     private Button battleAgainResultButton;
-
-    // VS Intro Screen node
     @FXML
     private AnchorPane vsScreenPane;
     @FXML
@@ -135,344 +130,228 @@ public class BattleController implements Battle.BattleListener {
     private ImageView vsPlayerSprite;
     @FXML
     private ImageView vsOpponentSprite;
-
-    /** Full-screen black Region that sits at rootPane level for the cross-fade. */
     @FXML
     private Region rootBlackFade;
 
-    // VS Intro Animation Constants
-    // All values are intentionally named and extracted so you can tweak them.
+    // Move list constants (customise size / position of the "i" button here)
+    private static final double MOVE_BTN_HEIGHT = 50.0; // px height of each move row
+    private static final double INFO_BTN_WIDTH = 18.0; // px width of the "i" button
+    private static final double INFO_BTN_HEIGHT = 18.0; // px height of the "i" button
+    private static final double INFO_BTN_INSET_TOP = 4.0; // top margin inside move btn
+    private static final double INFO_BTN_INSET_RIGHT = 4.0; // right margin inside move btn
 
-    /**
-     * px from the screen edge where each trainer sprite comes to rest (~6–7 mm at
-     * 96 dpi).
-     */
-    private static final double VS_SLIDE_STOP_OFFSET = 25.0;
-
-    /**
-     * Total px each sprite drifts during the hold phase (toward its exit
-     * direction).
-     */
-    private static final double VS_DRIFT_AMOUNT = 35.0;
-
-    /** Duration (ms) of the fast slide-in. */
-    private static final double VS_SLIDE_IN_MS = 320.0;
-
-    /**
-     * Total hold time (ms) after slide-in — sprites are visible and drifting.
-     * The slide-out begins VS_SLIDE_OUT_EARLY_MS before this window closes.
-     */
-    private static final double VS_DRIFT_HOLD_MS = 2700.0;
-
-    /**
-     * How many ms before the end of VS_DRIFT_HOLD_MS the slide-out starts.
-     * E.g. 650 → sprites exit 650 ms before the hold window would have ended.
-     */
-    private static final double VS_SLIDE_OUT_EARLY_MS = 500.0;
-
-    /** Duration (ms) of the fast slide-out. */
-    private static final double VS_SLIDE_OUT_MS = 280.0;
-
-    /** Duration (ms) of the black overlay fade-in (VS screen → black). */
-    private static final double VS_FADE_TO_BLACK_MS = 420.0;
-
-    /** Duration (ms) of the black overlay fade-out (black → battle screen). */
-    private static final double VS_FADE_FROM_BLACK_MS = 380.0;
-
-    /**
-     * How far off-screen (px) the sprites start / end.
-     * Must comfortably exceed the scene width (1200 px default).
-     */
-    private static final double VS_OFFSCREEN_OFFSET = 700.0;
-
-    /**
-     * Number of NPC trainer sprites available in sprites/trainer/npc/ (1.png …
-     * N.png).
-     */
-    private static final int VS_NPC_COUNT = 7;
-
-    // Battle model
+    // Battle model / state
     private Player player;
     private Player opponent;
     private Battle battle;
     private boolean randomTeam;
     private static final double HP_BAR_MAX_WIDTH = 180.0;
 
-    // Confetti animation state
+    // Move-button tracking
+    private final List<Button> activeMoveButtons = new ArrayList<>();
+
+    // Info overlay (floating layer in rootPane)
+    private Pane infoFloatingLayer;
+    private VBox infoCard;
+    private Label infoName, infoType, infoPower, infoAccuracy, infoPp;
+
+    // Confetti
     private Canvas confettiCanvas;
     private AnimationTimer confettiTimer;
 
-    // Battle log for history persistence
-    private final java.util.List<String> battleLog = new java.util.ArrayList<>();
+    // Battle log
+    private final List<String> battleLog = new ArrayList<>();
 
-    // ── Sprite scaling constants ─────────────────────────────────────────────
-    /** The Pokemon height (in metres) that maps to the "standard" pixel size. */
+    // Sprite scaling constants
     private static final double SPRITE_STANDARD_HEIGHT_M = 1.0;
-
-    /** Base pixel height for the opponent sprite at standard height. */
-    private static final double SPRITE_OPPONENT_BASE_PX = 200.0;
-
-    /** Base pixel height for the player sprite at standard height. */
-    private static final double SPRITE_PLAYER_BASE_PX = 300.0;
-
-    /** Minimum rendered sprite height in px — prevents tiny Pokemon vanishing. */
-    private static final double SPRITE_MIN_PX = 130.0;
-
-    /** Maximum rendered sprite height in px — prevents huge Pokemon overflowing. */
-    private static final double SPRITE_MAX_PX = 380.0;
-
-    /**
-     * Exponent applied to the height ratio — values below 1.0 compress size
-     * differences (0.5 = square-root curve, gentler scaling for large Pokemon).
-     */
-    private static final double SPRITE_SCALE_EXPONENT = 0.5;
-    // Loaded once from resources/pokemon_heights.json — maps pokemonId → height in metres
+        private static final double SPRITE_OPPONENT_BASE_PX = 180.0;
+        private static final double SPRITE_PLAYER_BASE_PX = 250.0;
+        private static final double SPRITE_OPPONENT_MIN_PX = 90.0;
+        private static final double SPRITE_OPPONENT_MAX_PX = 340.0;
+        private static final double SPRITE_PLAYER_MIN_PX = 120.0;
+        private static final double SPRITE_PLAYER_MAX_PX = 420.0;
+    private static final double SPRITE_SCALE_EXPONENT = 0.75;
     private static final java.util.Map<Integer, Double> POKEMON_HEIGHTS = loadPokemonHeights();
-    private static java.util.Map<Integer, Double> loadPokemonHeights() {
-        java.util.Map<Integer, Double> map = new java.util.HashMap<>();
-        try (var stream = BattleController.class.getResourceAsStream(
-                    "/com/example/pokemonbattle/data/pokemon_heights.json")) {
-            if (stream == null) {
-                System.err.println("[BattleController] pokemon_heights.json not found — using default sizes");
-                return map;
-            }
-            String json = new String(stream.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
-            // JSON structure per entry (each field on its own line):
-            //   "1": {
-            //     "id": 1,
-            //     "name": "bulbasaur",
-            //     "height": 0.7
-            //   },
-            // Strategy: track the most recently seen "id" value, then pair it
-            // with the next "height" value we encounter.
-            int currentId = -1;
-            java.util.regex.Matcher idMatcher =
-                java.util.regex.Pattern.compile("\"id\"\\s*:\\s*(\\d+)").matcher(json);
-            java.util.regex.Matcher hMatcher =
-                java.util.regex.Pattern.compile("\"height\"\\s*:\\s*([\\d.]+)").matcher(json);
-            // Collect all id positions and height positions, then pair them up
-            java.util.List<long[]> ids     = new java.util.ArrayList<>(); // [charPos, id]
-            java.util.List<long[]> heights = new java.util.ArrayList<>(); // [charPos, heightBits]
 
-            while (idMatcher.find()) {
-                ids.add(new long[]{ idMatcher.start(), Long.parseLong(idMatcher.group(1)) });
-            }
-            while (hMatcher.find()) {
-                heights.add(new long[]{ hMatcher.start(),
-                    Double.doubleToLongBits(Double.parseDouble(hMatcher.group(1))) });
-            }
+    // VS Intro constants
+    private static final double VS_SLIDE_STOP_OFFSET = 25.0;
+    private static final double VS_DRIFT_AMOUNT = 35.0;
+    private static final double VS_SLIDE_IN_MS = 320.0;
+    private static final double VS_DRIFT_HOLD_MS = 2700.0;
+    private static final double VS_SLIDE_OUT_EARLY_MS = 500.0;
+    private static final double VS_SLIDE_OUT_MS = 280.0;
+    private static final double VS_FADE_TO_BLACK_MS = 420.0;
+    private static final double VS_FADE_FROM_BLACK_MS = 380.0;
+    private static final double VS_OFFSCREEN_OFFSET = 700.0;
+    private static final int VS_NPC_COUNT = 7;
 
-            // Each id appears just before its height in the file — pair greedily
-            int hi = 0;
-            for (long[] idEntry : ids) {
-                long idPos = idEntry[0];
-                int  id    = (int) idEntry[1];
-                // Find the first height that comes after this id's position
-                while (hi < heights.size() && heights.get(hi)[0] < idPos) hi++;
-                if (hi < heights.size()) {
-                    double height = Double.longBitsToDouble(heights.get(hi)[1]);
-                    map.put(id, height);
-                    hi++; // consume this height
-                }
-            }
+    // Lifecycle
 
-            System.out.println("[BattleController] Loaded heights for " + map.size() + " Pokemon");
-        } catch (Exception e) {
-            System.err.println("[BattleController] Failed to load pokemon_heights.json: " + e.getMessage());
-        }
-        return map;
-    }
-    /**
-     * Returns a scaled pixel size for a sprite based on the Pokemon's real height.
-     * A Pokemon of SPRITE_STANDARD_HEIGHT_M gets exactly basePx pixels.
-     * Clamped to [SPRITE_MIN_PX, SPRITE_MAX_PX].
-     */
-    private double getScaledSpritePx(int pokemonId, double basePx) {
-        Double heightM = POKEMON_HEIGHTS.get(pokemonId);
-        if (heightM == null || heightM <= 0) return basePx; // unknown → default
-        double ratio  = Math.pow(heightM / SPRITE_STANDARD_HEIGHT_M, SPRITE_SCALE_EXPONENT);
-        double scaled = basePx * ratio;
-        double result = Math.max(SPRITE_MIN_PX, Math.min(SPRITE_MAX_PX, scaled));
-        System.out.printf("[Sprite] id=%d height=%.1fm → %.0fpx%n", pokemonId, heightM, result);
-        return result;
-    }
-    // INITIALISATION
     @FXML
     public void initialize() {
-        // Background image fills the scene
         if (bgImage != null && rootPane != null) {
             bgImage.fitWidthProperty().bind(rootPane.widthProperty());
             bgImage.fitHeightProperty().bind(rootPane.heightProperty());
         }
-
-        // VS background fills the VS pane (same dimensions as rootPane)
         if (vsBgImage != null && rootPane != null) {
             vsBgImage.fitWidthProperty().bind(rootPane.widthProperty());
             vsBgImage.fitHeightProperty().bind(rootPane.heightProperty());
         }
 
-        // Wire up existing battle buttons
         startBattleButton.setOnAction(e -> onBack());
         backButton.setOnAction(e -> onBack());
         attackButton.setOnAction(e -> onAttackClicked());
         changePokemonMainButton.setOnAction(e -> onChangePokemonClicked());
-        if (itemsButton != null) {
+        if (itemsButton != null)
             itemsButton.setOnAction(e -> onItemsClicked());
-        }
 
-        moveButton1.setDisable(true);
-        moveButton2.setDisable(true);
-        moveButton3.setDisable(true);
-        moveButton4.setDisable(true);
-
-        // Load battle data and prepare the options-panel background pattern
-        // (these are fast operations — both run before the VS intro plays)
         loadBattleData();
         drawOptionsPanelPattern();
+        setupInfoOverlay();
         SceneManager.enableCoordDebug(rootPane);
         MusicManager.getInstance().attachClickSounds(rootPane);
 
-        // Kick off the VS intro on the next frame so the scene is fully laid out
         Platform.runLater(this::playVSIntro);
     }
 
-    // VS INTRO — play on scene entry, then reveal main battle UI
-    /**
-     * Runs the full VS intro sequence:
-     *
-     * 1. Both trainer sprites slide in fast from opposite edges.
-     * 2. Sprites hold on screen and drift slowly toward the centre.
-     * 3. ~VS_SLIDE_OUT_EARLY_MS ms before the hold ends both sprites exit
-     * fast in the same direction they were drifting.
-     * 4. The black root-overlay fades to opaque.
-     * 5. Main battle layout is revealed; black overlay fades back out.
-     */
+    // Info overlay setup
+
+    private void setupInfoOverlay() {
+        infoName = styledLabel("-fx-font-weight:bold;-fx-font-size:13px;-fx-text-fill:white;");
+        infoType = styledLabel("-fx-font-size:11px;-fx-text-fill:#90caf9;");
+        infoPower = styledLabel("-fx-font-size:11px;-fx-text-fill:#ffe082;");
+        infoAccuracy = styledLabel("-fx-font-size:11px;-fx-text-fill:#a5d6a7;");
+        infoPp = styledLabel("-fx-font-size:11px;-fx-text-fill:#e0e0e0;");
+
+        infoCard = new VBox(4, infoName, infoType, infoPower, infoAccuracy, infoPp);
+        infoCard.setStyle(
+                "-fx-background-color:linear-gradient(to bottom,#1a1a2e,#16213e);" +
+                        "-fx-background-radius:10;" +
+                        "-fx-border-color:rgba(100,180,255,0.45);" +
+                        "-fx-border-radius:10;" +
+                        "-fx-border-width:1.5;" +
+                        "-fx-padding:10 14 10 14;" +
+                        "-fx-effect:dropshadow(gaussian,rgba(0,0,0,0.75),18,0,0,4);");
+        infoCard.setVisible(false);
+        infoCard.setManaged(false);
+
+        infoFloatingLayer = new Pane(infoCard);
+        infoFloatingLayer.setMouseTransparent(true);
+        infoFloatingLayer.prefWidthProperty().bind(rootPane.widthProperty());
+        infoFloatingLayer.prefHeightProperty().bind(rootPane.heightProperty());
+        rootPane.getChildren().add(infoFloatingLayer);
+    }
+
+    private Label styledLabel(String style) {
+        Label l = new Label();
+        l.setStyle(style);
+        return l;
+    }
+
+    private void showInfoOverlay(Button iBtn, Move move, int currentPp) {
+        infoName.setText(capitalize(move.getName()));
+        String type = (move.getType() != null) ? move.getType() : "normal";
+        infoType.setText("Type: " + capitalize(type));
+        int pow = move.getPower();
+        infoPower.setText("Power: " + (pow > 0 ? String.valueOf(pow) : "—"));
+        int acc = move.getAccuracy();
+        infoAccuracy.setText("Accuracy: " + (acc > 0 ? acc + "%" : "—"));
+        int maxPp = move.getPp() > 0 ? move.getPp() : currentPp;
+        infoPp.setText("PP: " + currentPp + " / " + maxPp);
+
+        infoCard.setVisible(true);
+
+        Platform.runLater(() -> {
+            Bounds b = iBtn.localToScene(iBtn.getBoundsInLocal());
+            Bounds r = rootPane.localToScene(rootPane.getBoundsInLocal());
+            double cardW = infoCard.getWidth() > 10 ? infoCard.getWidth() : 200;
+            double cardH = infoCard.getHeight() > 10 ? infoCard.getHeight() : 120;
+            double x = (b.getMinX() - r.getMinX()) - cardW - 10;
+            double y = (b.getMinY() - r.getMinY()) - cardH / 2.0 + iBtn.getHeight() / 2.0;
+            x = Math.max(4, x);
+            y = Math.max(4, Math.min(y, rootPane.getHeight() - cardH - 4));
+            infoCard.setLayoutX(x);
+            infoCard.setLayoutY(y);
+        });
+    }
+
+    private void hideInfoOverlay() {
+        if (infoCard != null)
+            infoCard.setVisible(false);
+    }
+
+    // VS Intro
+
     private void playVSIntro() {
-        // Load trainer sprites
-        // Random NPC opponent (sprites/trainer/npc/1.png … N.png)
         int npcId = new Random().nextInt(VS_NPC_COUNT) + 1;
         String npcPath = "/com/example/pokemonbattle/sprites/trainer/npc/" + npcId + ".png";
         var npcUrl = getClass().getResource(npcPath);
-        if (npcUrl != null) {
+        if (npcUrl != null)
             vsOpponentSprite.setImage(new Image(npcUrl.toExternalForm(), 0, 0, true, true));
-        }
 
-        // Player trainer (avatar chosen in new-game screen)
         String avatarPath = PlayerSession.getInstance().getAvatarPath();
         if (avatarPath != null) {
             var avatarUrl = getClass().getResource(avatarPath);
-            if (avatarUrl != null) {
+            if (avatarUrl != null)
                 vsPlayerSprite.setImage(new Image(avatarUrl.toExternalForm(), 0, 0, true, true));
-            }
         }
-        // vsPlayerSprite has AnchorPane.leftAnchor = 0
-        // translateX = -VS_OFFSCREEN_OFFSET → sprite is off-screen LEFT
-        // translateX = +VS_SLIDE_STOP_OFFSET → left edge is STOP_OFFSET px from left
-        // border
-        // exits via large positive translateX → off-screen RIGHT
-        //
-        // vsOpponentSprite has AnchorPane.rightAnchor = 0
-        // translateX = +VS_OFFSCREEN_OFFSET → sprite is off-screen RIGHT
-        // translateX = -VS_SLIDE_STOP_OFFSET → right edge is STOP_OFFSET px from right
-        // border
-        // exits via large negative translateX → off-screen LEFT
 
         vsPlayerSprite.setTranslateX(-VS_OFFSCREEN_OFFSET);
         vsOpponentSprite.setTranslateX(VS_OFFSCREEN_OFFSET);
 
-        // Phase 1: Slide in (fast, ease-out so they feel weighty)
-        TranslateTransition playerSlideIn = new TranslateTransition(
-                Duration.millis(VS_SLIDE_IN_MS), vsPlayerSprite);
+        TranslateTransition playerSlideIn = new TranslateTransition(Duration.millis(VS_SLIDE_IN_MS), vsPlayerSprite);
         playerSlideIn.setToX(VS_SLIDE_STOP_OFFSET);
         playerSlideIn.setInterpolator(Interpolator.EASE_OUT);
-
-        TranslateTransition opponentSlideIn = new TranslateTransition(
-                Duration.millis(VS_SLIDE_IN_MS), vsOpponentSprite);
+        TranslateTransition opponentSlideIn = new TranslateTransition(Duration.millis(VS_SLIDE_IN_MS),
+                vsOpponentSprite);
         opponentSlideIn.setToX(-VS_SLIDE_STOP_OFFSET);
         opponentSlideIn.setInterpolator(Interpolator.EASE_OUT);
-
         ParallelTransition slideIn = new ParallelTransition(playerSlideIn, opponentSlideIn);
 
-        // Phase 2: Slow drift (sprites inch toward each other
-        // Duration is shorter than VS_DRIFT_HOLD_MS by VS_SLIDE_OUT_EARLY_MS
-        // so the slide-out starts before the "expected" hold window closes.
         double driftMs = VS_DRIFT_HOLD_MS - VS_SLIDE_OUT_EARLY_MS;
-
-        TranslateTransition playerDrift = new TranslateTransition(
-                Duration.millis(driftMs), vsPlayerSprite);
-        playerDrift.setByX(VS_DRIFT_AMOUNT); // drifts right
+        TranslateTransition playerDrift = new TranslateTransition(Duration.millis(driftMs), vsPlayerSprite);
+        playerDrift.setByX(VS_DRIFT_AMOUNT);
         playerDrift.setInterpolator(Interpolator.LINEAR);
-
-        TranslateTransition opponentDrift = new TranslateTransition(
-                Duration.millis(driftMs), vsOpponentSprite);
-        opponentDrift.setByX(-VS_DRIFT_AMOUNT); // drifts left
+        TranslateTransition opponentDrift = new TranslateTransition(Duration.millis(driftMs), vsOpponentSprite);
+        opponentDrift.setByX(-VS_DRIFT_AMOUNT);
         opponentDrift.setInterpolator(Interpolator.LINEAR);
-
         ParallelTransition drift = new ParallelTransition(playerDrift, opponentDrift);
 
-        // Phase 3: Slide out fast (ease-in so they feel like they launch)
-        // Player exits RIGHT (same direction it was drifting).
-        // Opponent exits LEFT (same direction it was drifting).
-        // setByX uses a large enough value to clear any screen width.
-        TranslateTransition playerSlideOut = new TranslateTransition(
-                Duration.millis(VS_SLIDE_OUT_MS), vsPlayerSprite);
+        TranslateTransition playerSlideOut = new TranslateTransition(Duration.millis(VS_SLIDE_OUT_MS), vsPlayerSprite);
         playerSlideOut.setByX(VS_OFFSCREEN_OFFSET * 2.2);
         playerSlideOut.setInterpolator(Interpolator.EASE_IN);
-
-        TranslateTransition opponentSlideOut = new TranslateTransition(
-                Duration.millis(VS_SLIDE_OUT_MS), vsOpponentSprite);
+        TranslateTransition opponentSlideOut = new TranslateTransition(Duration.millis(VS_SLIDE_OUT_MS),
+                vsOpponentSprite);
         opponentSlideOut.setByX(-VS_OFFSCREEN_OFFSET * 2.2);
         opponentSlideOut.setInterpolator(Interpolator.EASE_IN);
-
         ParallelTransition slideOut = new ParallelTransition(playerSlideOut, opponentSlideOut);
 
-        // Wire up the full sequenc
         SequentialTransition vsSequence = new SequentialTransition(slideIn, drift, slideOut);
-
         vsSequence.setOnFinished(e -> fadeToBlackAndRevealBattle());
-
         vsSequence.play();
     }
 
-    /**
-     * Fades the root black overlay to opaque, swaps VS screen for the main
-     * battle layout, then fades the overlay back to transparent.
-     */
     private void fadeToBlackAndRevealBattle() {
-        // Make sure the overlay is visible (it starts at opacity 0)
         rootBlackFade.setOpacity(0.0);
         rootBlackFade.setVisible(true);
-
-        FadeTransition fadeToBlack = new FadeTransition(
-                Duration.millis(VS_FADE_TO_BLACK_MS), rootBlackFade);
+        FadeTransition fadeToBlack = new FadeTransition(Duration.millis(VS_FADE_TO_BLACK_MS), rootBlackFade);
         fadeToBlack.setToValue(1.0);
-
         fadeToBlack.setOnFinished(e -> {
-            // Swap screens while fully black — no jarring pop
             vsScreenPane.setVisible(false);
             vsScreenPane.setManaged(false);
             mainBattleLayout.setVisible(true);
             mainBattleLayout.setManaged(true);
-
-            // Auto-start the battle while screen is still black so sprites
-            // are loaded by the time the fade-in completes.
             onStartBattle();
-
-            // Fade back in to reveal the battle scene
-            FadeTransition fadeFromBlack = new FadeTransition(
-                    Duration.millis(VS_FADE_FROM_BLACK_MS), rootBlackFade);
+            FadeTransition fadeFromBlack = new FadeTransition(Duration.millis(VS_FADE_FROM_BLACK_MS), rootBlackFade);
             fadeFromBlack.setToValue(0.0);
-            fadeFromBlack.setOnFinished(ev -> {
-                // Cleanup: make overlay non-interactive once invisible
-                rootBlackFade.setVisible(false);
-            });
+            fadeFromBlack.setOnFinished(ev -> rootBlackFade.setVisible(false));
             fadeFromBlack.play();
         });
-
         fadeToBlack.play();
     }
 
-    // OPTIONS PANEL BACKGROUND PATTERN
+    // Options panel background
+
     private void drawOptionsPanelPattern() {
         if (optionsSection == null)
             return;
@@ -482,45 +361,36 @@ public class BattleController implements Battle.BattleListener {
     }
 
     private void repaintPattern() {
-        double w = optionsSection.getWidth();
-        double h = optionsSection.getHeight();
+        double w = optionsSection.getWidth(), h = optionsSection.getHeight();
         if (w <= 0 || h <= 0)
             return;
-
         optionsSection.getChildren().removeIf(n -> "patternCanvas".equals(n.getId()));
-
         Canvas canvas = new Canvas(w, h);
         canvas.setId("patternCanvas");
         canvas.setMouseTransparent(true);
         GraphicsContext gc = canvas.getGraphicsContext2D();
-
-        gc.setFill(new javafx.scene.paint.LinearGradient(
-                0, 0, 0, 1, true, javafx.scene.paint.CycleMethod.NO_CYCLE,
+        gc.setFill(new javafx.scene.paint.LinearGradient(0, 0, 0, 1, true, javafx.scene.paint.CycleMethod.NO_CYCLE,
                 new javafx.scene.paint.Stop(0, Color.web("#5cbdb0")),
                 new javafx.scene.paint.Stop(0.5, Color.web("#3a9e8f")),
                 new javafx.scene.paint.Stop(1, Color.web("#2d8a7c"))));
         gc.fillRect(0, 0, w, h);
-
         gc.setStroke(Color.color(1, 1, 1, 0.08));
         gc.setLineWidth(12);
-        for (double i = -h; i < w + h; i += 36) {
+        for (double i = -h; i < w + h; i += 36)
             gc.strokeLine(i, 0, i + h, h);
-        }
-
         gc.setStroke(Color.color(1, 1, 1, 0.06));
         gc.setLineWidth(2);
-        double spacing = 80;
-        for (double y = spacing / 2; y < h; y += spacing) {
-            for (double x = spacing / 2; x < w; x += spacing) {
+        double sp = 80;
+        for (double y = sp / 2; y < h; y += sp)
+            for (double x = sp / 2; x < w; x += sp) {
                 gc.strokeOval(x - 14, y - 14, 28, 28);
                 gc.strokeLine(x - 14, y, x + 14, y);
             }
-        }
-
         optionsSection.getChildren().addFirst(canvas);
     }
 
-    // BATTLE DATA LOADING
+    // Battle data loading
+
     private void loadBattleData() {
         player = (Player) SceneManager.getData("player");
         opponent = (Player) SceneManager.getData("opponent");
@@ -537,32 +407,26 @@ public class BattleController implements Battle.BattleListener {
         opponentNameLabel.setText(opponent.getName());
         displayOpponentTeam();
         battleStatusLabel.setText("Teams loaded! Ready to battle.");
-
-        System.out.println("\n=== BATTLE SCREEN LOADED ===");
-        System.out.println("Player: " + player.getName() + " vs " + opponent.getName());
     }
 
     private void displayPlayerTeam() {
         playerPokemonBox.getChildren().clear();
-        StringBuilder teamInfo = new StringBuilder("Team Size: " + player.getTeam().size() + "\n");
-        for (PokemonInstance pokemon : player.getTeam()) {
-            teamInfo.append("• ").append(capitalize(pokemon.getName()))
-                    .append(" (Lv.").append(pokemon.getLevel()).append(")\n");
-        }
-        playerTeamLabel.setText(teamInfo.toString().trim());
+        StringBuilder sb = new StringBuilder("Team Size: " + player.getTeam().size() + "\n");
+        for (PokemonInstance p : player.getTeam())
+            sb.append("• ").append(capitalize(p.getName())).append(" (Lv.").append(p.getLevel()).append(")\n");
+        playerTeamLabel.setText(sb.toString().trim());
     }
 
     private void displayOpponentTeam() {
         opponentPokemonBox.getChildren().clear();
-        StringBuilder teamInfo = new StringBuilder("Team Size: " + opponent.getTeam().size() + "\n");
-        for (PokemonInstance pokemon : opponent.getTeam()) {
-            teamInfo.append("• ").append(capitalize(pokemon.getName()))
-                    .append(" (Lv.").append(pokemon.getLevel()).append(")\n");
-        }
-        opponentTeamLabel.setText(teamInfo.toString().trim());
+        StringBuilder sb = new StringBuilder("Team Size: " + opponent.getTeam().size() + "\n");
+        for (PokemonInstance p : opponent.getTeam())
+            sb.append("• ").append(capitalize(p.getName())).append(" (Lv.").append(p.getLevel()).append(")\n");
+        opponentTeamLabel.setText(sb.toString().trim());
     }
 
-    // BATTLE START & DISPLAY
+    // Battle start & display
+
     private void onStartBattle() {
         if (player == null || opponent == null) {
             battleStatusLabel.setText("Error: Teams not loaded!");
@@ -573,107 +437,110 @@ public class BattleController implements Battle.BattleListener {
         updateBattleDisplay();
         showActionButtons();
         battleStatusLabel.setText("Battle Started! " +
-                capitalize(player.getCurrentPokemon().getName()) +
-                " vs " + capitalize(opponent.getCurrentPokemon().getName()));
+                capitalize(player.getCurrentPokemon().getName()) + " vs " +
+                capitalize(opponent.getCurrentPokemon().getName()));
     }
 
     private void updateBattleDisplay() {
         if (player == null || opponent == null)
             return;
+        PokemonInstance pp = player.getCurrentPokemon(), op = opponent.getCurrentPokemon();
 
-        PokemonInstance playerPok = player.getCurrentPokemon();
-        PokemonInstance opponentPok = opponent.getCurrentPokemon();
-
-        // Animated GIF sprites with PNG fallback
-        double playerPx   = getScaledSpritePx(playerPok.getId(),   SPRITE_PLAYER_BASE_PX);
-        double opponentPx = getScaledSpritePx(opponentPok.getId(), SPRITE_OPPONENT_BASE_PX);
+        double playerPx = getScaledSpritePx(pp.getId(), SPRITE_PLAYER_BASE_PX, SPRITE_PLAYER_MIN_PX, SPRITE_PLAYER_MAX_PX);
+        double opponentPx = getScaledSpritePx(op.getId(), SPRITE_OPPONENT_BASE_PX, SPRITE_OPPONENT_MIN_PX,
+            SPRITE_OPPONENT_MAX_PX);
         playerSpriteImage.setFitWidth(playerPx);
         playerSpriteImage.setFitHeight(playerPx);
         opponentSpriteImage.setFitWidth(opponentPx);
         opponentSpriteImage.setFitHeight(opponentPx);
-        loadSpriteWithFallback(playerSpriteImage, playerPok.getId(), "back");
-        loadSpriteWithFallback(opponentSpriteImage, opponentPok.getId(), "front");
+        loadSpriteWithFallback(playerSpriteImage, pp.getId(), "back");
+        loadSpriteWithFallback(opponentSpriteImage, op.getId(), "front");
 
-        playerPokemonNameLabel.setText(capitalize(playerPok.getName()) + "  Lv." + playerPok.getLevel());
-        playerPokemonHpLabel.setText(playerPok.getCurrentHp() + " / " + playerPok.getMaxHp());
-        opponentPokemonNameLabel.setText(capitalize(opponentPok.getName()) + "  Lv." + opponentPok.getLevel());
-        opponentPokemonHpLabel.setText(opponentPok.getCurrentHp() + " / " + opponentPok.getMaxHp());
+        playerPokemonNameLabel.setText(capitalize(pp.getName()) + "  Lv." + pp.getLevel());
+        playerPokemonHpLabel.setText(pp.getCurrentHp() + " / " + pp.getMaxHp());
+        opponentPokemonNameLabel.setText(capitalize(op.getName()) + "  Lv." + op.getLevel());
+        opponentPokemonHpLabel.setText(op.getCurrentHp() + " / " + op.getMaxHp());
+        updateHpBar(playerHpBar, pp.getCurrentHp(), pp.getMaxHp());
+        updateHpBar(opponentHpBar, op.getCurrentHp(), op.getMaxHp());
+    }
 
-        updateHpBar(playerHpBar, playerPok.getCurrentHp(), playerPok.getMaxHp());
-        updateHpBar(opponentHpBar, opponentPok.getCurrentHp(), opponentPok.getMaxHp());
+    // Move buttons (list layout)
+
+    private void updateMoveButtons() {
+        activeMoveButtons.clear();
+        moveButtonsContainer.getChildren().clear();
+
+        PokemonInstance cur = player.getCurrentPokemon();
+        var moves = cur.getBattleMoves();
+        for (int i = 0; i < 4; i++) {
+            if (i < moves.size()) {
+                Move m = moves.get(i).getMove();
+                int pp = moves.get(i).getCurrentPp();
+                moveButtonsContainer.getChildren().add(createMoveRow(m, pp));
+            }
+        }
     }
 
     /**
-     * Loads an animated GIF sprite (sprites/{dir}/gif/{id}.gif) for the battle
-     * field ImageViews. Falls back to the static PNG if no GIF exists.
-     * JavaFX animates GIF images natively via ImageView — no Timeline needed.
+     * Builds one move row: a coloured list button + type/PP overlay + "i" info
+     * button.
      */
-    private void loadSpriteWithFallback(ImageView target, int pokemonId, String direction) {
-        String gifPath = String.format(
-                "/com/example/pokemonbattle/sprites/%s/gif/%d.gif", direction, pokemonId);
-        var gifUrl = getClass().getResource(gifPath);
-        if (gifUrl != null) {
-            try {
-                Image gifImage = new Image(gifUrl.toExternalForm(),
-                        target.getFitWidth() > 0 ? target.getFitWidth() : 0,
-                        target.getFitHeight() > 0 ? target.getFitHeight() : 0,
-                        true, true, true); // backgroundLoading = true
-                if (!gifImage.isError()) {
-                    target.setImage(gifImage);
-                    return;
-                }
-            } catch (Exception e) {
-                System.err.println("GIF load error (" + gifPath + "): " + e.getMessage());
-            }
-        }
+    private HBox createMoveRow(Move move, int currentPp) {
+        String type = (move.getType() != null) ? move.getType() : "normal";
+        int maxPp = move.getPp() > 0 ? move.getPp() : currentPp;
+        String grad = getTypeGradient(type);
+        String border = getTypeBorderColor(type);
 
-        // PNG fallback
-        String pngPath = String.format(
-                "/com/example/pokemonbattle/sprites/%s/%d.png", direction, pokemonId);
-        try {
-            var pngStream = getClass().getResourceAsStream(pngPath);
-            if (pngStream != null) {
-                Image pngImage = new Image(pngStream);
-                if (!pngImage.isError())
-                    target.setImage(pngImage);
-            }
-        } catch (Exception e) {
-            System.err.println("PNG fallback error (" + pngPath + "): " + e.getMessage());
-        }
+        // Main move button (fills full row width)
+        Button moveBtn = new Button(capitalize(move.getName()));
+        moveBtn.setMaxWidth(Double.MAX_VALUE);
+        moveBtn.setPrefHeight(MOVE_BTN_HEIGHT);
+        moveBtn.setStyle(
+                "-fx-background-color:" + grad + ";" +
+                        "-fx-background-radius:10;-fx-border-color:" + border + ";" +
+                        "-fx-border-radius:10;-fx-border-width:2;-fx-text-fill:white;" +
+                        "-fx-font-family:'SPACE NOVA';-fx-font-size:13px;-fx-font-weight:bold;" +
+                        "-fx-cursor:hand;-fx-alignment:center-left;-fx-padding:0 0 0 14;");
+        moveBtn.setOnAction(e -> onMoveSelected(move));
+        activeMoveButtons.add(moveBtn);
+
+        // Type + PP labels (right side, mouse-transparent overlay)
+        Label typeLabel = new Label(capitalize(type));
+        typeLabel.setStyle("-fx-font-size:10px;-fx-text-fill:rgba(255,255,255,0.75);-fx-font-style:italic;");
+        Label ppLabel = new Label("PP: " + currentPp + "/" + maxPp);
+        ppLabel.setStyle("-fx-font-size:10px;-fx-text-fill:rgba(255,255,255,0.90);");
+        VBox rightInfo = new VBox(2, typeLabel, ppLabel);
+        rightInfo.setAlignment(Pos.CENTER_RIGHT);
+        rightInfo.setMouseTransparent(true);
+        StackPane.setAlignment(rightInfo, Pos.CENTER_RIGHT);
+        StackPane.setMargin(rightInfo, new Insets(0, INFO_BTN_WIDTH + INFO_BTN_INSET_RIGHT + 6, 0, 0));
+
+        // "i" info button — light-blue gradient, top-right corner
+        Button iBtn = new Button("i");
+        iBtn.getStyleClass().add("move-info-btn");
+        iBtn.setStyle(iBtn.getStyle() +
+                "-fx-min-width:" + INFO_BTN_WIDTH + ";-fx-max-width:" + INFO_BTN_WIDTH + ";" +
+                "-fx-min-height:" + INFO_BTN_HEIGHT + ";-fx-max-height:" + INFO_BTN_HEIGHT + ";");
+        StackPane.setAlignment(iBtn, Pos.TOP_RIGHT);
+        StackPane.setMargin(iBtn, new Insets(INFO_BTN_INSET_TOP, INFO_BTN_INSET_RIGHT, 0, 0));
+        final int finalPp = currentPp;
+        iBtn.setOnMouseEntered(e -> showInfoOverlay(iBtn, move, finalPp));
+        iBtn.setOnMouseExited(e -> hideInfoOverlay());
+        iBtn.setOnAction(e -> {
+        }); // consume click — don't trigger move
+
+        StackPane wrapper = new StackPane(moveBtn, rightInfo, iBtn);
+        HBox.setHgrow(wrapper, Priority.ALWAYS);
+
+        HBox row = new HBox(wrapper);
+        HBox.setHgrow(wrapper, Priority.ALWAYS);
+        return row;
     }
 
-    private void updateHpBar(Rectangle hpBar, int currentHp, int maxHp) {
-        if (hpBar == null || maxHp <= 0)
-            return;
-        double ratio = Math.max(0, (double) currentHp / maxHp);
-        hpBar.setWidth(HP_BAR_MAX_WIDTH * ratio);
-        if (ratio > 0.5)
-            hpBar.setFill(Color.web("#78C850"));
-        else if (ratio > 0.2)
-            hpBar.setFill(Color.web("#F8D030"));
-        else
-            hpBar.setFill(Color.web("#F85888"));
-    }
-
-    // MOVE BUTTONS
-    private void updateMoveButtons() {
-        PokemonInstance currentPok = player.getCurrentPokemon();
-        var moves = currentPok.getBattleMoves();
-        Button[] moveButtons = { moveButton1, moveButton2, moveButton3, moveButton4 };
-
-        for (int i = 0; i < moveButtons.length; i++) {
-            if (i < moves.size()) {
-                Move move = moves.get(i).getMove();
-                int pp = moves.get(i).getCurrentPp();
-                moveButtons[i].setText(capitalize(move.getName()) + "\nPP: " + pp);
-                moveButtons[i].setDisable(false);
-                moveButtons[i].setOnAction(e -> onMoveSelected(move));
-            } else {
-                moveButtons[i].setText("---");
-                moveButtons[i].setDisable(true);
-                moveButtons[i].setOnAction(null);
-            }
-        }
+    private void disableMoveButtons() {
+        for (Button b : activeMoveButtons)
+            b.setDisable(true);
+        hideInfoOverlay();
     }
 
     private void onMoveSelected(Move move) {
@@ -688,21 +555,154 @@ public class BattleController implements Battle.BattleListener {
         battle.executeRound(move, aiMove);
         updateBattleDisplay();
         updateMoveButtons();
-
-        if (!battle.isFinished()) {
+        if (!battle.isFinished())
             showActionButtons();
+    }
+
+    // Type colour helpers
+
+    private String getTypeGradient(String type) {
+        if (type == null)
+            return "linear-gradient(to bottom,#546e7a,#37474f)";
+        return switch (type.toLowerCase()) {
+            case "normal" -> "linear-gradient(to bottom,#b5c1d4,#bdd9e1)";
+            case "fire" -> "linear-gradient(to bottom,#F08030,#A84820)";
+            case "water" -> "linear-gradient(to bottom,#6890F0,#3860C0)";
+            case "electric" -> "linear-gradient(to bottom,#C8A800,#906800)";
+            case "grass" -> "linear-gradient(to bottom,#78C850,#489820)";
+            case "ice" -> "linear-gradient(to bottom,#68B8B8,#3888A0)";
+            case "fighting" -> "linear-gradient(to bottom,#C03028,#801010)";
+            case "poison" -> "linear-gradient(to bottom,#A040A0,#702070)";
+            case "ground" -> "linear-gradient(to bottom,#B89838,#806818)";
+            case "flying" -> "linear-gradient(to bottom,#7868C0,#584890)";
+            case "psychic" -> "linear-gradient(to bottom,#F85888,#A81040)";
+            case "bug" -> "linear-gradient(to bottom,#788800,#506000)";
+            case "rock" -> "linear-gradient(to bottom,#B8A038,#887010)";
+            case "ghost" -> "linear-gradient(to bottom,#705898,#402870)";
+            case "dragon" -> "linear-gradient(to bottom,#7038F8,#4008C8)";
+            case "dark" -> "linear-gradient(to bottom,#705848,#402818)";
+            case "steel" -> "linear-gradient(to bottom,#8898A8,#607080)";
+            case "fairy" -> "linear-gradient(to bottom,#D87898,#A05070)";
+            default -> "linear-gradient(to bottom,#546e7a,#37474f)";
+        };
+    }
+
+    private String getTypeBorderColor(String type) {
+        if (type == null)
+            return "#263238";
+        return switch (type.toLowerCase()) {
+            case "normal" -> "#b5c1d4";
+            case "fire" -> "#7A2800";
+            case "water" -> "#183890";
+            case "electric" -> "#604800";
+            case "grass" -> "#286800";
+            case "ice" -> "#186070";
+            case "fighting" -> "#500000";
+            case "poison" -> "#480048";
+            case "ground" -> "#604808";
+            case "flying" -> "#382880";
+            case "psychic" -> "#780028";
+            case "bug" -> "#304800";
+            case "rock" -> "#584808";
+            case "ghost" -> "#200048";
+            case "dragon" -> "#200098";
+            case "dark" -> "#201008";
+            case "steel" -> "#384860";
+            case "fairy" -> "#783048";
+            default -> "#263238";
+        };
+    }
+
+    // Sprite helpers
+
+    private static java.util.Map<Integer, Double> loadPokemonHeights() {
+        java.util.Map<Integer, Double> map = new java.util.HashMap<>();
+        try (var stream = BattleController.class.getResourceAsStream(
+                "/com/example/pokemonbattle/data/pokemon_heights.json")) {
+            if (stream == null) {
+                System.err.println("[BattleController] pokemon_heights.json not found");
+                return map;
+            }
+            String json = new String(stream.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
+            java.util.regex.Matcher idM = java.util.regex.Pattern.compile("\"id\"\\s*:\\s*(\\d+)").matcher(json);
+            java.util.regex.Matcher hM = java.util.regex.Pattern.compile("\"height\"\\s*:\\s*([\\d.]+)").matcher(json);
+            java.util.List<long[]> ids = new java.util.ArrayList<>(), heights = new java.util.ArrayList<>();
+            while (idM.find())
+                ids.add(new long[] { idM.start(), Long.parseLong(idM.group(1)) });
+            while (hM.find())
+                heights.add(new long[] { hM.start(), Double.doubleToLongBits(Double.parseDouble(hM.group(1))) });
+            int hi = 0;
+            for (long[] idEntry : ids) {
+                long idPos = idEntry[0];
+                int id = (int) idEntry[1];
+                while (hi < heights.size() && heights.get(hi)[0] < idPos)
+                    hi++;
+                if (hi < heights.size()) {
+                    map.put(id, Double.longBitsToDouble(heights.get(hi)[1]));
+                    hi++;
+                }
+            }
+            System.out.println("[BattleController] Loaded heights for " + map.size() + " Pokemon");
+        } catch (Exception e) {
+            System.err.println("[BattleController] Failed to load pokemon_heights.json: " + e.getMessage());
         }
-        // If battle finished, the onBattleEnd listener handles UI.
+        return map;
     }
 
-    private void disableMoveButtons() {
-        moveButton1.setDisable(true);
-        moveButton2.setDisable(true);
-        moveButton3.setDisable(true);
-        moveButton4.setDisable(true);
+    private double getScaledSpritePx(int pokemonId, double basePx, double minPx, double maxPx) {
+        Double h = POKEMON_HEIGHTS.get(pokemonId);
+        if (h == null || h <= 0)
+            return basePx;
+        return Math.max(minPx,
+                Math.min(maxPx, basePx * Math.pow(h / SPRITE_STANDARD_HEIGHT_M, SPRITE_SCALE_EXPONENT)));
     }
 
-    // ACTION / PANEL SWITCHING
+    private void loadSpriteWithFallback(ImageView target, int pokemonId, String direction) {
+        String gifPath = String.format("/com/example/pokemonbattle/sprites/%s/gif/%d.gif", direction, pokemonId);
+        var gifUrl = getClass().getResource(gifPath);
+        if (gifUrl != null) {
+            try {
+                Image gif = new Image(gifUrl.toExternalForm(),
+                        target.getFitWidth() > 0 ? target.getFitWidth() : 0,
+                        target.getFitHeight() > 0 ? target.getFitHeight() : 0, true, true, true);
+                if (!gif.isError()) {
+                    target.setImage(gif);
+                    return;
+                }
+            } catch (Exception e) {
+                System.err.println("GIF load error (" + gifPath + "): " + e.getMessage());
+            }
+        }
+        String pngPath = String.format("/com/example/pokemonbattle/sprites/%s/%d.png", direction, pokemonId);
+        try {
+            var pngStream = getClass().getResourceAsStream(pngPath);
+            if (pngStream != null) {
+                    Image png = new Image(pngStream,
+                            target.getFitWidth() > 0 ? target.getFitWidth() : 0,
+                            target.getFitHeight() > 0 ? target.getFitHeight() : 0, true, true);
+                if (!png.isError())
+                    target.setImage(png);
+            }
+        } catch (Exception e) {
+            System.err.println("PNG fallback error (" + pngPath + "): " + e.getMessage());
+        }
+    }
+
+    private void updateHpBar(Rectangle bar, int hp, int maxHp) {
+        if (bar == null || maxHp <= 0)
+            return;
+        double ratio = Math.max(0, (double) hp / maxHp);
+        bar.setWidth(HP_BAR_MAX_WIDTH * ratio);
+        if (ratio > 0.5)
+            bar.setFill(Color.web("#78C850"));
+        else if (ratio > 0.2)
+            bar.setFill(Color.web("#F8D030"));
+        else
+            bar.setFill(Color.web("#F85888"));
+    }
+
+    // Panel switching
+
     private void onBack() {
         SceneManager.clearData();
         SceneManager.switchSceneWithLoading("new_game.fxml", "Pokemon Battle - Setup", 1200, 700);
@@ -748,23 +748,22 @@ public class BattleController implements Battle.BattleListener {
     private void updatePokemonButtons() {
         pokemonButtonsBox.getChildren().clear();
         for (PokemonInstance pokemon : player.getTeam()) {
-            Button pokemonBtn = new Button(capitalize(pokemon.getName()) +
+            Button btn = new Button(capitalize(pokemon.getName()) +
                     (pokemon.isFainted() ? " (Fainted)" : "  Lv." + pokemon.getLevel()));
-            pokemonBtn.setPrefWidth(260);
-            pokemonBtn.setPrefHeight(42);
-            pokemonBtn.getStyleClass().addAll("option-btn", "option-btn-green");
-            pokemonBtn.setStyle("-fx-font-size: 13px;");
-
+            btn.setPrefWidth(260);
+            btn.setPrefHeight(42);
+            btn.getStyleClass().addAll("option-btn", "option-btn-green");
+            btn.setStyle("-fx-font-size: 13px;");
             if (pokemon.isFainted()) {
-                pokemonBtn.setDisable(true);
-                pokemonBtn.setStyle("-fx-font-size: 13px; -fx-opacity: 0.5;");
+                btn.setDisable(true);
+                btn.setStyle("-fx-font-size: 13px; -fx-opacity: 0.5;");
             } else if (pokemon.getId() == player.getCurrentPokemon().getId()) {
-                pokemonBtn.setText(pokemonBtn.getText() + " ✓");
-                pokemonBtn.setDisable(true);
+                btn.setText(btn.getText() + " ✓");
+                btn.setDisable(true);
             } else {
-                pokemonBtn.setOnAction(e -> onPokemonSelected(pokemon));
+                btn.setOnAction(e -> onPokemonSelected(pokemon));
             }
-            pokemonButtonsBox.getChildren().add(pokemonBtn);
+            pokemonButtonsBox.getChildren().add(btn);
         }
     }
 
@@ -784,10 +783,10 @@ public class BattleController implements Battle.BattleListener {
         pokemonSelectionBox.setManaged(false);
     }
 
-    // BATTLE LISTENER CALLBACKS
+    // Battle listener callbacks
+
     @Override
     public void onDamageDealt(String attacker, String move, String defender, int damage) {
-        System.out.println(attacker + " used " + move + " on " + defender + " for " + damage + " damage!");
         String entry = capitalize(attacker) + " used " + capitalize(move) + "! " + damage + " dmg!";
         battleStatusLabel.setText(entry);
         battleLog.add(entry);
@@ -795,7 +794,6 @@ public class BattleController implements Battle.BattleListener {
 
     @Override
     public void onPokemonFainted(String pokemonName) {
-        System.out.println(pokemonName + " fainted!");
         String entry = capitalize(pokemonName) + " fainted!";
         battleStatusLabel.setText(entry);
         battleLog.add(entry);
@@ -803,65 +801,49 @@ public class BattleController implements Battle.BattleListener {
 
     @Override
     public void onPokemonSwitched(String playerName, String pokemonName) {
-        System.out.println(playerName + " sent out " + pokemonName + "!");
         String entry = playerName + " sent out " + capitalize(pokemonName) + "!";
         battleStatusLabel.setText(entry);
         battleLog.add(entry);
-        if (playerName.equals(player.getName())) {
+        if (playerName.equals(player.getName()))
             displayPlayerTeam();
-        } else {
+        else
             displayOpponentTeam();
-        }
         updateBattleDisplay();
         updateMoveButtons();
     }
 
     @Override
     public void onBattleEnd(String winnerName) {
-        System.out.println("\n=== BATTLE END ===");
-        System.out.println("Winner: " + winnerName);
-
         boolean playerWon = winnerName.equals(player.getName());
-
-        // Persist result to database in background
         saveBattleResult(playerWon);
-
-        // Victory music (stop BGM, play victory SFX) — only on win
         if (playerWon) {
             MusicManager.getInstance().stopBGM();
             MusicManager.getInstance().playVictorySFX();
         }
-
-        // Show result overlay on FX thread (listener may come from battle thread)
         Platform.runLater(() -> showResultOverlay(playerWon));
     }
 
-    // RESULT OVERLAY
+    // Result overlay
 
     private void showResultOverlay(boolean playerWon) {
-        // Confetti only for victory
         if (playerWon)
             startConfetti();
-
-        // Text
         resultTitleLabel.setText(playerWon ? "Victory!" : "Defeat...");
         resultMessageLabel.setText(playerWon
                 ? "Congratulations! You won against " + opponent.getName() + "!"
                 : "You lost against " + opponent.getName() + ". Better luck next time!");
 
-        // Palette: swap style classes
         battleResultCard.getStyleClass().removeAll("result-card-victory", "result-card-defeat");
         resultTitleLabel.getStyleClass().removeAll("result-title-victory", "result-title-defeat");
         resultMessageLabel.getStyleClass().removeAll("result-message-victory", "result-message-defeat");
         battleAgainResultButton.getStyleClass().removeAll("result-btn-again-victory", "result-btn-again-defeat");
 
-        String variant = playerWon ? "victory" : "defeat";
-        battleResultCard.getStyleClass().add("result-card-" + variant);
-        resultTitleLabel.getStyleClass().add("result-title-" + variant);
-        resultMessageLabel.getStyleClass().add("result-message-" + variant);
-        battleAgainResultButton.getStyleClass().add("result-btn-again-" + variant);
+        String v = playerWon ? "victory" : "defeat";
+        battleResultCard.getStyleClass().add("result-card-" + v);
+        resultTitleLabel.getStyleClass().add("result-title-" + v);
+        resultMessageLabel.getStyleClass().add("result-message-" + v);
+        battleAgainResultButton.getStyleClass().add("result-btn-again-" + v);
 
-        // Fade in the overlay
         battleResultOverlay.setOpacity(0);
         battleResultOverlay.setVisible(true);
         battleResultOverlay.setManaged(true);
@@ -870,7 +852,39 @@ public class BattleController implements Battle.BattleListener {
         ft.play();
     }
 
-    /** Particle confetti shower that auto-stops after ~4 s. */
+    @FXML
+    private void onGoBackClicked() {
+        if (confettiTimer != null) {
+            confettiTimer.stop();
+            confettiTimer = null;
+        }
+        onBack();
+    }
+
+    @FXML
+    private void onBattleAgainClicked() {
+        if (confettiTimer != null) {
+            confettiTimer.stop();
+            confettiTimer = null;
+        }
+        if (confettiCanvas != null) {
+            rootPane.getChildren().remove(confettiCanvas);
+            confettiCanvas = null;
+        }
+        Player freshPlayer = new Player(player.getName());
+        if (randomTeam) {
+            freshPlayer.generateRandomTeam();
+        } else {
+            for (PokemonInstance p : player.getTeam())
+                freshPlayer.addToTeam(new PokemonInstance(p.getId(), p.getLevel()));
+        }
+        Player freshOpponent = new Player("AI Trainer");
+        freshOpponent.generateRandomTeam();
+        SceneManager.switchSceneWithLoading("battle.fxml", "Pokemon Battle - Arena", 1200, 700,
+                Map.of("player", freshPlayer, "opponent", freshOpponent, "randomTeam", randomTeam));
+    }
+
+    // Confetti
     private void startConfetti() {
         if (confettiCanvas != null)
             rootPane.getChildren().remove(confettiCanvas);
@@ -878,18 +892,16 @@ public class BattleController implements Battle.BattleListener {
         confettiCanvas.widthProperty().bind(rootPane.widthProperty());
         confettiCanvas.heightProperty().bind(rootPane.heightProperty());
         confettiCanvas.setMouseTransparent(true);
-        // Insert just below the result overlay (second-to-last child of rootPane)
         int insertIdx = Math.max(0, rootPane.getChildren().size() - 2);
         rootPane.getChildren().add(insertIdx, confettiCanvas);
 
         final int N = 140;
-        double[] x = new double[N], y = new double[N];
-        double[] vx = new double[N], vy = new double[N];
+        double[] x = new double[N], y = new double[N], vx = new double[N], vy = new double[N];
         double[] ang = new double[N], av = new double[N], sz = new double[N];
         Color[] palette = {
-                Color.web("#FFD700"), Color.web("#FF6B6B"), Color.web("#4ECDC4"),
-                Color.web("#45B7D1"), Color.web("#96CEB4"), Color.web("#FFEAA7"),
-                Color.web("#DDA0DD"), Color.web("#98D8C8"), Color.web("#F7DC6F")
+                Color.web("#FFD700"), Color.web("#FF6B6B"), Color.web("#4ECDC4"), Color.web("#45B7D1"),
+                Color.web("#96CEB4"), Color.web("#FFEAA7"), Color.web("#DDA0DD"), Color.web("#98D8C8"),
+                Color.web("#F7DC6F")
         };
         Color[] colors = new Color[N];
         Random rng = new Random();
@@ -904,7 +916,6 @@ public class BattleController implements Battle.BattleListener {
             sz[i] = 6 + rng.nextDouble() * 9;
             colors[i] = palette[rng.nextInt(palette.length)];
         }
-
         long[] t0 = { -1L };
         confettiTimer = new AnimationTimer() {
             @Override
@@ -913,10 +924,8 @@ public class BattleController implements Battle.BattleListener {
                     t0[0] = now;
                 double elapsed = (now - t0[0]) / 1_000_000_000.0;
                 double alpha = Math.max(0.0, 1.0 - elapsed / 4.0);
-
                 GraphicsContext gc = confettiCanvas.getGraphicsContext2D();
                 gc.clearRect(0, 0, confettiCanvas.getWidth(), confettiCanvas.getHeight());
-
                 for (int i = 0; i < N; i++) {
                     x[i] += vx[i];
                     y[i] += vy[i];
@@ -943,23 +952,18 @@ public class BattleController implements Battle.BattleListener {
         confettiTimer.start();
     }
 
-    /** Persist battle outcome to the battle_history and user_profiles tables. */
+    // DB persistence
     private void saveBattleResult(boolean playerWon) {
         var user = PlayerSession.getInstance().getCurrentUser();
         if (user == null)
-            return; // not logged-in session — skip
-
-        String pokemonUsed = player.getTeam().stream()
-                .map(p -> p.getName().toLowerCase())
+            return;
+        String pokemonUsed = player.getTeam().stream().map(p -> p.getName().toLowerCase())
                 .collect(Collectors.joining(","));
         String result = playerWon ? "WIN" : "LOSS";
         String logStr = String.join("\n", battleLog);
-
         Thread t = new Thread(() -> {
             try (Connection conn = DatabaseManager.getInstance().getConnection()) {
-                String sql = "INSERT INTO battle_history "
-                        + "(user_id, result, pokemon_used, opponent_type, opponent_name, battle_log) "
-                        + "VALUES (?, ?, ?, ?, ?, ?)";
+                String sql = "INSERT INTO battle_history (user_id,result,pokemon_used,opponent_type,opponent_name,battle_log) VALUES (?,?,?,?,?,?)";
                 try (PreparedStatement ps = conn.prepareStatement(sql)) {
                     ps.setInt(1, user.getId());
                     ps.setString(2, result);
@@ -969,11 +973,8 @@ public class BattleController implements Battle.BattleListener {
                     ps.setString(6, logStr);
                     ps.executeUpdate();
                 }
-                // Upsert win/loss counters in user_profiles
-                String upsert = "INSERT INTO user_profiles "
-                        + "(user_id, wins, losses, total_battles) VALUES (?,?,?,1) "
-                        + "ON CONFLICT(user_id) DO UPDATE SET "
-                        + "wins=wins+?, losses=losses+?, total_battles=total_battles+1";
+                String upsert = "INSERT INTO user_profiles (user_id,wins,losses,total_battles) VALUES (?,?,?,1) " +
+                        "ON CONFLICT(user_id) DO UPDATE SET wins=wins+?,losses=losses+?,total_battles=total_battles+1";
                 try (PreparedStatement ups = conn.prepareStatement(upsert)) {
                     int w = playerWon ? 1 : 0, l = playerWon ? 0 : 1;
                     ups.setInt(1, user.getId());
@@ -991,49 +992,10 @@ public class BattleController implements Battle.BattleListener {
         t.start();
     }
 
-    // RESULT OVERLAY BUTTONS
-
-    @FXML
-    private void onGoBackClicked() {
-        if (confettiTimer != null) {
-            confettiTimer.stop();
-            confettiTimer = null;
-        }
-        onBack();
-    }
-
-    @FXML
-    private void onBattleAgainClicked() {
-        if (confettiTimer != null) {
-            confettiTimer.stop();
-            confettiTimer = null;
-        }
-        if (confettiCanvas != null) {
-            rootPane.getChildren().remove(confettiCanvas);
-            confettiCanvas = null;
-        }
-        // Re-build player team: re-randomise if original was random, otherwise
-        // create fresh PokemonInstances from the same IDs (full HP/PP restored).
-        Player freshPlayer = new Player(player.getName());
-        if (randomTeam) {
-            freshPlayer.generateRandomTeam();
-        } else {
-            for (PokemonInstance p : player.getTeam()) {
-                freshPlayer.addToTeam(new PokemonInstance(p.getId(), p.getLevel()));
-            }
-        }
-        // Always a brand-new random AI team
-        Player freshOpponent = new Player("AI Trainer");
-        freshOpponent.generateRandomTeam();
-
-        SceneManager.switchSceneWithLoading("battle.fxml", "Pokemon Battle - Arena", 1200, 700,
-                Map.of("player", freshPlayer, "opponent", freshOpponent, "randomTeam", randomTeam));
-    }
-
-    // HELPERS
-    private String capitalize(String str) {
-        if (str == null || str.isEmpty())
-            return str;
-        return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
+    // Utility
+    private String capitalize(String s) {
+        if (s == null || s.isEmpty())
+            return s;
+        return s.substring(0, 1).toUpperCase() + s.substring(1).toLowerCase();
     }
 }

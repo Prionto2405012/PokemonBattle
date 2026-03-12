@@ -395,3 +395,49 @@
     -fx-scale-x: 0.97; -fx-scale-y: 0.97;
     -fx-translate-y: 1;
 }
+/* ── Move list style (replaces 2x2 grid) ── */
+.move-btn-list {
+    -fx-font-family: "SPACE NOVA";
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #ffffff;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-border-width: 2;
+    -fx-cursor: hand;
+    -fx-alignment: center-left;
+    -fx-padding: 0 0 0 14;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.35), 6, 0, 1, 2);
+}
+.move-btn-list:hover {
+    -fx-scale-x: 1.025;
+    -fx-scale-y: 1.025;
+    -fx-brightness: 1.12;
+}
+.move-btn-list:pressed {
+    -fx-scale-x: 0.97;
+    -fx-scale-y: 0.97;
+    -fx-translate-y: 1;
+}
+.move-btn-list:disabled {
+    -fx-opacity: 0.38;
+}
+
+/* ── Info (i) button ── */
+.move-info-btn {
+    -fx-background-color: linear-gradient(to bottom, #64b5f6, #1976d2);
+    -fx-background-radius: 9;
+    -fx-border-color: #0d47a1;
+    -fx-border-radius: 9;
+    -fx-border-width: 1;
+    -fx-text-fill: white;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-padding: 0;
+}
+.move-info-btn:hover {
+    -fx-background-color: linear-gradient(to bottom, #90caf9, #1e88e5);
+    -fx-scale-x: 1.12;
+    -fx-scale-y: 1.12;
+}
