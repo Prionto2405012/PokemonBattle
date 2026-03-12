@@ -1,5 +1,14 @@
 .battle-screen {
     -fx-background-color: #1a1a2e;
+    -move-info-bg-top: #1a1a2e;
+    -move-info-bg-bottom: #16213e;
+    -move-info-border: rgba(100, 180, 255, 0.45);
+    -move-info-text: #ffffff;
+    -move-info-type: #90caf9;
+    -move-info-power: #ffe082;
+    -move-info-accuracy: #a5d6a7;
+    -move-info-pp: #e0e0e0;
+    -move-info-description: #f2f5ff;
 }
 
 .battle-section {
@@ -440,4 +449,53 @@
     -fx-background-color: linear-gradient(to bottom, #90caf9, #1e88e5);
     -fx-scale-x: 1.12;
     -fx-scale-y: 1.12;
+}
+
+/* Hover info overlay for the move-list i button */
+.move-info-overlay {
+    -fx-background-color: linear-gradient(to bottom, -move-info-bg-top, -move-info-bg-bottom);
+    -fx-background-radius: 10;
+    -fx-border-color: -move-info-border;
+    -fx-border-radius: 10;
+    -fx-border-width: 1.5;
+    -fx-padding: 10 14 10 14;
+    -fx-spacing: 4;
+    -fx-max-width: 290;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.75), 18, 0, 0, 4);
+}
+
+.move-info-title {
+    -fx-font-family: "SPACE NOVA";
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -move-info-text;
+}
+
+.move-info-stat {
+    -fx-font-family: "SPACE NOVA";
+    -fx-font-size: 11px;
+}
+
+.move-info-type {
+    -fx-text-fill: -move-info-type;
+}
+
+.move-info-power {
+    -fx-text-fill: -move-info-power;
+}
+
+.move-info-accuracy {
+    -fx-text-fill: -move-info-accuracy;
+}
+
+.move-info-pp {
+    -fx-text-fill: -move-info-pp;
+}
+
+.move-info-description {
+    -fx-font-family: "menu";
+    -fx-font-size: 11px;
+    -fx-text-fill: -move-info-description;
+    -fx-line-spacing: 1.5px;
+    -fx-padding: 4 0 0 0;
 }

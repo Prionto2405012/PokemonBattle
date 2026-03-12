@@ -22,6 +22,7 @@ import com.google.gson.reflect.TypeToken;
  */
 public class GameDataDAO {
 
+    private static final String MOVES_JSON_WITH_DESC = "/com/example/pokemonbattle/database/moves_gen4_with_desc.json";
     private static final String MOVES_JSON = "/com/example/pokemonbattle/database/moves_gen4.json";
     private static final String POKEMON_JSON = "/com/example/pokemonbattle/database/pokemon_gen4.json";
     private static final String ITEMS_JSON = "/com/example/pokemonbattle/database/battle_items.json";
@@ -51,7 +52,7 @@ public class GameDataDAO {
                 Gson gson = new Gson();
 
                 // ── Moves ──
-                String movesJson = readResource(MOVES_JSON);
+                String movesJson = readResourceOrFallback(MOVES_JSON_WITH_DESC, MOVES_JSON);
                 List<Move> movesList = gson.fromJson(movesJson,
                         new TypeToken<List<Move>>(){}.getType());
                 Map<Integer, Move> movesMap = new HashMap<>(movesList.size() * 2);
@@ -120,5 +121,14 @@ public class GameDataDAO {
             if (is == null) throw new Exception("Resource not found: " + path);
             return new String(is.readAllBytes(), StandardCharsets.UTF_8);
         }
+    }
+
+    private String readResourceOrFallback(String preferredPath, String fallbackPath) throws Exception {
+        try (InputStream preferred = getClass().getResourceAsStream(preferredPath)) {
+            if (preferred != null) {
+                return new String(preferred.readAllBytes(), StandardCharsets.UTF_8);
+            }
+        }
+        return readResource(fallbackPath);
     }
 }

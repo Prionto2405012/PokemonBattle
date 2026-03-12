@@ -153,7 +153,7 @@ public class BattleController implements Battle.BattleListener {
     // Info overlay (floating layer in rootPane)
     private Pane infoFloatingLayer;
     private VBox infoCard;
-    private Label infoName, infoType, infoPower, infoAccuracy, infoPp;
+    private Label infoName, infoType, infoPower, infoAccuracy, infoPp, infoDescription;
 
     // Confetti
     private Canvas confettiCanvas;
@@ -217,21 +217,17 @@ public class BattleController implements Battle.BattleListener {
     // Info overlay setup
 
     private void setupInfoOverlay() {
-        infoName = styledLabel("-fx-font-weight:bold;-fx-font-size:13px;-fx-text-fill:white;");
-        infoType = styledLabel("-fx-font-size:11px;-fx-text-fill:#90caf9;");
-        infoPower = styledLabel("-fx-font-size:11px;-fx-text-fill:#ffe082;");
-        infoAccuracy = styledLabel("-fx-font-size:11px;-fx-text-fill:#a5d6a7;");
-        infoPp = styledLabel("-fx-font-size:11px;-fx-text-fill:#e0e0e0;");
+        infoName = styledLabel("move-info-title");
+        infoType = styledLabel("move-info-stat move-info-type");
+        infoPower = styledLabel("move-info-stat move-info-power");
+        infoAccuracy = styledLabel("move-info-stat move-info-accuracy");
+        infoPp = styledLabel("move-info-stat move-info-pp");
+        infoDescription = styledLabel("move-info-description");
+        infoDescription.setWrapText(true);
+        infoDescription.setMaxWidth(260);
 
-        infoCard = new VBox(4, infoName, infoType, infoPower, infoAccuracy, infoPp);
-        infoCard.setStyle(
-                "-fx-background-color:linear-gradient(to bottom,#1a1a2e,#16213e);" +
-                        "-fx-background-radius:10;" +
-                        "-fx-border-color:rgba(100,180,255,0.45);" +
-                        "-fx-border-radius:10;" +
-                        "-fx-border-width:1.5;" +
-                        "-fx-padding:10 14 10 14;" +
-                        "-fx-effect:dropshadow(gaussian,rgba(0,0,0,0.75),18,0,0,4);");
+        infoCard = new VBox(4, infoName, infoType, infoPower, infoAccuracy, infoPp, infoDescription);
+        infoCard.getStyleClass().add("move-info-overlay");
         infoCard.setVisible(false);
         infoCard.setManaged(false);
 
@@ -242,9 +238,9 @@ public class BattleController implements Battle.BattleListener {
         rootPane.getChildren().add(infoFloatingLayer);
     }
 
-    private Label styledLabel(String style) {
+    private Label styledLabel(String styleClasses) {
         Label l = new Label();
-        l.setStyle(style);
+        l.getStyleClass().addAll(styleClasses.split("\\s+"));
         return l;
     }
 
@@ -258,6 +254,11 @@ public class BattleController implements Battle.BattleListener {
         infoAccuracy.setText("Accuracy: " + (acc > 0 ? acc + "%" : "—"));
         int maxPp = move.getPp() > 0 ? move.getPp() : currentPp;
         infoPp.setText("PP: " + currentPp + " / " + maxPp);
+        String desc = move.getDescription();
+        if (desc == null || desc.isBlank()) {
+            desc = "No description available.";
+        }
+        infoDescription.setText(desc);
 
         infoCard.setVisible(true);
 
@@ -265,7 +266,7 @@ public class BattleController implements Battle.BattleListener {
             Bounds b = iBtn.localToScene(iBtn.getBoundsInLocal());
             Bounds r = rootPane.localToScene(rootPane.getBoundsInLocal());
             double cardW = infoCard.getWidth() > 10 ? infoCard.getWidth() : 200;
-            double cardH = infoCard.getHeight() > 10 ? infoCard.getHeight() : 120;
+            double cardH = infoCard.getHeight() > 10 ? infoCard.getHeight() : 170;
             double x = (b.getMinX() - r.getMinX()) - cardW - 10;
             double y = (b.getMinY() - r.getMinY()) - cardH / 2.0 + iBtn.getHeight() / 2.0;
             x = Math.max(4, x);
