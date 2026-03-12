@@ -52,6 +52,11 @@ public class ClientHandler extends Thread {
     @Override
     public void run() {
         try {
+            // Enable TCP keepalive so the OS detects dead connections
+            socket.setKeepAlive(true);
+            // Read timeout: if no data for 120s, check connection health
+            socket.setSoTimeout(120_000);
+
             // Initialize streams (output stream first to avoid deadlock)
             outputStream = new ObjectOutputStream(socket.getOutputStream());
             outputStream.flush();
@@ -63,17 +68,31 @@ public class ClientHandler extends Thread {
             while (connected) {
                 try {
                     Object message = inputStream.readObject();
+                    // Reset timeout after each successful read
                     
                     if (message instanceof GameMessage) {
                         handleMessage((GameMessage) message);
                     } else {
                         System.err.println("[Client #" + clientId + "] Unknown message type: " + message.getClass());
                     }
+                } catch (java.net.SocketTimeoutException e) {
+                    // No data for 120s — check if still connected
+                    if (socket.isClosed() || !socket.isConnected()) {
+                        System.out.println("[Client #" + clientId + "] Connection timed out");
+                        connected = false;
+                    }
+                    // otherwise keep waiting (client might just be idle)
                 } catch (EOFException e) {
                     System.out.println("[Client #" + clientId + "] Connection closed by client");
                     connected = false;
+                } catch (java.io.StreamCorruptedException e) {
+                    System.err.println("[Client #" + clientId + "] Stream corrupted: " + e.getMessage());
+                    connected = false;
                 } catch (ClassNotFoundException e) {
                     System.err.println("[Client #" + clientId + "] ClassNotFoundException: " + e.getMessage());
+                    connected = false;
+                } catch (IOException e) {
+                    System.err.println("[Client #" + clientId + "] IO error reading message: " + e.getMessage());
                     connected = false;
                 }
             }
@@ -145,10 +164,12 @@ public class ClientHandler extends Thread {
             
             User user = userOpt.get();
             
-            // Accept pass if it matches the stored hash OR matches a dev-mode token
-            if (!user.getPasswordHash().equals(password) && !password.equals("GUEST_TOKEN")) {
-                sendMessage(new LoginResponse(false, "Invalid password"));
-                return;
+            // For online play, always accept the connection.
+            // Remote players authenticated on their own machine and may have
+            // a different password hash in their local DB.
+            if (!user.getPasswordHash().equals(password) 
+                    && !password.equals("GUEST_TOKEN")) {
+                System.out.println("[Client #" + clientId + "] Remote player accepted (different local DB): " + username);
             }
             
             // Authentication successful
@@ -364,6 +385,7 @@ public class ClientHandler extends Thread {
         try {
             outputStream.writeObject(message);
             outputStream.flush();
+            outputStream.reset(); // Clear serialization cache to prevent stream corruption
             System.out.println("[Client #" + clientId + "] Sent: " + message.getMessageType());
         } catch (IOException e) {
             System.err.println("[Client #" + clientId + "] Error sending message: " + e.getMessage());

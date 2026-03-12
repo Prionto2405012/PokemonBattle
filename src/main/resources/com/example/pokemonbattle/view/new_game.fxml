@@ -130,6 +130,8 @@
                                           styleClass="button-green" text="AI Opponent"/>
                             <ToggleButton fx:id="localOpponentButton" prefHeight="30" prefWidth="170"
                                           styleClass="button-orange" text="Local Player"/>
+                            <ToggleButton fx:id="onlineOpponentButton" prefHeight="30" prefWidth="170"
+                                          styleClass="button-purple" text="Online Player"/>
                         </HBox>
                         <Label fx:id="matchingStatusLabel"
                                style="-fx-font-size:12px; -fx-text-fill:#ffffff; -fx-font-style:italic;"

@@ -42,6 +42,7 @@ public class ServerConnection {
     
     private boolean connected = false;
     private Consumer<GameMessage> messageListener;
+    private Runnable onDisconnect;
     
     private Thread receiverThread;
     
@@ -84,6 +85,7 @@ public class ServerConnection {
         try {
             outputStream.writeObject(message);
             outputStream.flush();
+            outputStream.reset(); // Clear serialization cache to prevent stream corruption
             System.out.println("[Client] Sent: " + message.getMessageType());
         } catch (IOException e) {
             connected = false;
@@ -112,15 +114,22 @@ public class ServerConnection {
             } catch (EOFException e) {
                 System.out.println("[Client] Server disconnected");
                 connected = false;
+                fireDisconnect();
             } catch (IOException e) {
                 if (connected) {
                     System.err.println("[Client] Connection error: " + e.getMessage());
                 }
                 connected = false;
+                fireDisconnect();
             } catch (ClassNotFoundException e) {
                 System.err.println("[Client] ClassNotFoundException: " + e.getMessage());
             }
         }
+    }
+
+    private void fireDisconnect() {
+        Runnable cb = onDisconnect;
+        if (cb != null) cb.run();
     }
     
     /**
@@ -128,6 +137,13 @@ public class ServerConnection {
      */
     public void setMessageListener(Consumer<GameMessage> listener) {
         this.messageListener = listener;
+    }
+
+    /**
+     * Set a callback that fires when the connection is lost unexpectedly.
+     */
+    public void setOnDisconnect(Runnable callback) {
+        this.onDisconnect = callback;
     }
     
     /**

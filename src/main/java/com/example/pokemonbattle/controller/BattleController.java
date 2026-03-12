@@ -684,7 +684,7 @@ public class BattleController implements Battle.BattleListener {
         battleStatusLabel.setText("Used " + capitalize(move.getName()) + "!");
         disableMoveButtons();
 
-        Move aiMove = battle.getAIMove(opponent.getCurrentPokemon());
+        Move aiMove = battle.getAIMove(opponent.getCurrentPokemon(), player.getCurrentPokemon());
         battle.executeRound(move, aiMove);
         updateBattleDisplay();
         updateMoveButtons();
