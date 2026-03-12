@@ -1,8 +1,8 @@
 .battle-screen {
     -fx-background-color: #1a1a2e;
-    -move-info-bg-top: #1a1a2e;
-    -move-info-bg-bottom: #16213e;
-    -move-info-border: rgba(100, 180, 255, 0.45);
+    -move-info-bg-top: rgba(26, 33, 62, 0.72);
+    -move-info-bg-bottom: rgba(20, 30, 52, 0.78);
+    -move-info-border: rgba(255, 255, 255, 0.22);
     -move-info-text: #ffffff;
     -move-info-type: #90caf9;
     -move-info-power: #ffe082;
@@ -454,14 +454,16 @@
 /* Hover info overlay for the move-list i button */
 .move-info-overlay {
     -fx-background-color: linear-gradient(to bottom, -move-info-bg-top, -move-info-bg-bottom);
-    -fx-background-radius: 10;
+    -fx-background-radius: 12;
     -fx-border-color: -move-info-border;
-    -fx-border-radius: 10;
-    -fx-border-width: 1.5;
+    -fx-border-radius: 12;
+    -fx-border-width: 1;
     -fx-padding: 10 14 10 14;
     -fx-spacing: 4;
-    -fx-max-width: 290;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.75), 18, 0, 0, 4);
+    -fx-min-width: 200;
+    -fx-min-height: 110;
+    -fx-max-width: 260;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.65), 20, 0.15, 0, 4);
 }
 
 .move-info-title {

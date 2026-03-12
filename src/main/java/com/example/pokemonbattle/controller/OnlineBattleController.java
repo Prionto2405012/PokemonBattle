@@ -279,6 +279,7 @@ public class OnlineBattleController {
         infoCard.getStyleClass().add("move-info-overlay");
         infoCard.setVisible(false);
         infoCard.setManaged(false);
+        infoCard.setMouseTransparent(true);
 
         infoFloatingLayer = new Pane(infoCard);
         infoFloatingLayer.setMouseTransparent(true);
@@ -307,15 +308,25 @@ public class OnlineBattleController {
         if (desc == null || desc.isBlank()) {
             desc = "No description available.";
         }
+        int splitAt = desc.indexOf("\n\n");
+        if (splitAt >= 0 && splitAt + 2 < desc.length()) {
+            desc = desc.substring(splitAt + 2).trim();
+        }
         infoDescription.setText(desc);
 
         infoCard.setVisible(true);
+        infoFloatingLayer.toFront();
+        infoCard.toFront();
 
         Platform.runLater(() -> {
+            infoCard.applyCss();
+            infoCard.autosize();
             Bounds b = iBtn.localToScene(iBtn.getBoundsInLocal());
             Bounds r = rootPane.localToScene(rootPane.getBoundsInLocal());
-            double cardW = infoCard.getWidth() > 10 ? infoCard.getWidth() : 200;
-            double cardH = infoCard.getHeight() > 10 ? infoCard.getHeight() : 170;
+            double cardW = infoCard.getWidth() > 10 ? infoCard.getWidth() : infoCard.prefWidth(-1);
+            double cardH = infoCard.getHeight() > 10 ? infoCard.getHeight() : infoCard.prefHeight(-1);
+            if (cardW < 160) cardW = 220;
+            if (cardH < 120) cardH = 170;
             double x = (b.getMinX() - r.getMinX()) - cardW - 10;
             double y = (b.getMinY() - r.getMinY()) - cardH / 2.0 + iBtn.getHeight() / 2.0;
             x = Math.max(4, x);
@@ -794,6 +805,7 @@ public class OnlineBattleController {
         StackPane.setMargin(iBtn, new Insets(INFO_BTN_INSET_TOP, INFO_BTN_INSET_RIGHT, 0, 0));
         final int finalPp = currentPp;
         iBtn.setOnMouseEntered(e -> showInfoOverlay(iBtn, move, finalPp));
+        iBtn.setOnMousePressed(e -> showInfoOverlay(iBtn, move, finalPp));
         iBtn.setOnMouseExited(e -> hideInfoOverlay());
         iBtn.setOnAction(e -> {
         });
