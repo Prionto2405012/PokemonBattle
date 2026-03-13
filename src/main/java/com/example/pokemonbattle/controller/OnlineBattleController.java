@@ -163,7 +163,10 @@ public class OnlineBattleController {
     private Button forfeitYesButton;
     @FXML
     private Button forfeitNoButton;
-
+    @FXML
+    private HBox playerTypesBox;
+    @FXML
+    private HBox opponentTypesBox;
     // Move list constants (customise size / position of the "i" button here)
     private static final double MOVE_BTN_HEIGHT = 50.0;
     private static final double INFO_BTN_WIDTH = 18.0;
@@ -182,6 +185,16 @@ public class OnlineBattleController {
     private int turnCount = 0;
     private boolean battleEnded = false;
     private boolean moveSent = false;
+    // Pokemon info overlay
+    private VBox pokemonInfoCard;
+    private Label pokemonInfoName, pokemonInfoLevel;
+    private HBox pokemonInfoTypes;
+    private VBox pokemonInfoStats, pokemonInfoMoves;
+
+    // Pokemon selection constants
+    private static final double POKEMON_BTN_HEIGHT = 60.0;
+    private static final double POKEMON_SPRITE_SIZE = 50.0;
+    private static final double POKEMON_INFO_BTN_SIZE = 16.0;
 
     private final List<String> battleLog = new ArrayList<>();
 
@@ -201,12 +214,12 @@ public class OnlineBattleController {
 
     // Sprite scaling
     private static final double SPRITE_STANDARD_HEIGHT_M = 1.0;
-        private static final double SPRITE_OPPONENT_BASE_PX = 180.0;
-        private static final double SPRITE_PLAYER_BASE_PX = 250.0;
-        private static final double SPRITE_OPPONENT_MIN_PX = 90.0;
-        private static final double SPRITE_OPPONENT_MAX_PX = 340.0;
-        private static final double SPRITE_PLAYER_MIN_PX = 120.0;
-        private static final double SPRITE_PLAYER_MAX_PX = 420.0;
+    private static final double SPRITE_OPPONENT_BASE_PX = 180.0;
+    private static final double SPRITE_PLAYER_BASE_PX = 250.0;
+    private static final double SPRITE_OPPONENT_MIN_PX = 90.0;
+    private static final double SPRITE_OPPONENT_MAX_PX = 340.0;
+    private static final double SPRITE_PLAYER_MIN_PX = 120.0;
+    private static final double SPRITE_PLAYER_MAX_PX = 420.0;
     private static final double SPRITE_SCALE_EXPONENT = 0.75;
     private static final java.util.Map<Integer, Double> POKEMON_HEIGHTS = loadPokemonHeights();
 
@@ -258,6 +271,7 @@ public class OnlineBattleController {
         setVisible(waitingLabel, false);
         drawOptionsPanelPattern();
         setupInfoOverlay();
+        setupPokemonInfoOverlay();
 
         battleStatusLabel.setText("Online Battle! " + cap(player.getCurrentPokemon().getName()) +
                 " vs " + cap(opponent.getCurrentPokemon().getName()));
@@ -289,6 +303,99 @@ public class OnlineBattleController {
         infoFloatingLayer.prefWidthProperty().bind(rootPane.widthProperty());
         infoFloatingLayer.prefHeightProperty().bind(rootPane.heightProperty());
         rootPane.getChildren().add(infoFloatingLayer);
+    }
+
+    private void setupPokemonInfoOverlay() {
+        pokemonInfoName = styledLabel("pokemon-info-name");
+        pokemonInfoLevel = styledLabel("pokemon-info-level");
+        pokemonInfoTypes = new HBox(4);
+        pokemonInfoTypes.setAlignment(Pos.CENTER_LEFT);
+        pokemonInfoStats = new VBox(3);
+        pokemonInfoMoves = new VBox(3);
+
+        VBox header = new VBox(2, pokemonInfoName, pokemonInfoLevel, pokemonInfoTypes);
+        header.setAlignment(Pos.CENTER_LEFT);
+
+        Label statsTitle = styledLabel("pokemon-info-section-title");
+        statsTitle.setText("Stats:");
+        Label movesTitle = styledLabel("pokemon-info-section-title");
+        movesTitle.setText("Moves:");
+
+        pokemonInfoCard = new VBox(8, header, statsTitle, pokemonInfoStats, movesTitle, pokemonInfoMoves);
+        pokemonInfoCard.getStyleClass().add("pokemon-info-overlay");
+        pokemonInfoCard.setVisible(false);
+        pokemonInfoCard.setManaged(false);
+        pokemonInfoCard.setMouseTransparent(true);
+        pokemonInfoCard.setMaxWidth(300);
+
+        if (infoFloatingLayer != null) {
+            infoFloatingLayer.getChildren().add(pokemonInfoCard);
+        }
+    }
+
+    private void showPokemonInfoOverlay(Button iBtn, PokemonInstance pokemon) {
+        pokemonInfoName.setText(cap(pokemon.getName()));
+        pokemonInfoLevel.setText("Lv. " + pokemon.getLevel());
+
+        // Update types
+        pokemonInfoTypes.getChildren().clear();
+        for (String type : pokemon.getTypes()) {
+            Label typeLabel = new Label(type.toUpperCase());
+            typeLabel.setStyle("-fx-font-size: 9px; -fx-padding: 3 6; -fx-background-color: " +
+                    getTypeColor(type) + "; -fx-text-fill: white; -fx-background-radius: 4; -fx-font-weight: bold;");
+            pokemonInfoTypes.getChildren().add(typeLabel);
+        }
+
+        // Update stats
+        pokemonInfoStats.getChildren().clear();
+        pokemonInfoStats.getChildren()
+                .add(createStatLabel("HP: " + pokemon.getCurrentHp() + " / " + pokemon.getMaxHp()));
+        pokemonInfoStats.getChildren().add(createStatLabel("Attack: " + pokemon.getAttack()));
+        pokemonInfoStats.getChildren().add(createStatLabel("Defense: " + pokemon.getDefense()));
+        pokemonInfoStats.getChildren().add(createStatLabel("Sp.Atk: " + pokemon.getSpAttack()));
+        pokemonInfoStats.getChildren().add(createStatLabel("Sp.Def: " + pokemon.getSpDefense()));
+        pokemonInfoStats.getChildren().add(createStatLabel("Speed: " + pokemon.getSpeed()));
+
+        // Update moves
+        pokemonInfoMoves.getChildren().clear();
+        for (var battleMove : pokemon.getBattleMoves()) {
+            Move move = battleMove.getMove();
+            String moveName = cap(move.getName());
+            String moveType = move.getType() != null ? cap(move.getType()) : "Normal";
+            Label moveLabel = new Label("• " + moveName + " (" + moveType + ")");
+            moveLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #e0e0e0;");
+            pokemonInfoMoves.getChildren().add(moveLabel);
+        }
+
+        pokemonInfoCard.setVisible(true);
+        infoFloatingLayer.toFront();
+        pokemonInfoCard.toFront();
+
+        Platform.runLater(() -> {
+            pokemonInfoCard.applyCss();
+            pokemonInfoCard.autosize();
+            Bounds b = iBtn.localToScene(iBtn.getBoundsInLocal());
+            Bounds r = rootPane.localToScene(rootPane.getBoundsInLocal());
+            double cardW = pokemonInfoCard.getWidth() > 10 ? pokemonInfoCard.getWidth() : pokemonInfoCard.prefWidth(-1);
+            double cardH = pokemonInfoCard.getHeight() > 10 ? pokemonInfoCard.getHeight()
+                    : pokemonInfoCard.prefHeight(-1);
+            if (cardW < 200)
+                cardW = 280;
+            if (cardH < 150)
+                cardH = 200;
+            double x = (b.getMinX() - r.getMinX()) - cardW - 10;
+            double y = (b.getMinY() - r.getMinY()) - cardH / 2.0 + iBtn.getHeight() / 2.0;
+            x = Math.max(4, x);
+            y = Math.max(4, Math.min(y, rootPane.getHeight() - cardH - 4));
+            pokemonInfoCard.setLayoutX(x);
+            pokemonInfoCard.setLayoutY(y);
+        });
+    }
+
+    private Label createStatLabel(String text) {
+        Label label = new Label(text);
+        label.setStyle("-fx-font-size: 11px; -fx-text-fill: #d0d0d0;");
+        return label;
     }
 
     private Label styledLabel(String styleClasses) {
@@ -328,8 +435,10 @@ public class OnlineBattleController {
             Bounds r = rootPane.localToScene(rootPane.getBoundsInLocal());
             double cardW = infoCard.getWidth() > 10 ? infoCard.getWidth() : infoCard.prefWidth(-1);
             double cardH = infoCard.getHeight() > 10 ? infoCard.getHeight() : infoCard.prefHeight(-1);
-            if (cardW < 160) cardW = 220;
-            if (cardH < 120) cardH = 170;
+            if (cardW < 160)
+                cardW = 220;
+            if (cardH < 120)
+                cardH = 170;
             double x = (b.getMinX() - r.getMinX()) - cardW - 10;
             double y = (b.getMinY() - r.getMinY()) - cardH / 2.0 + iBtn.getHeight() / 2.0;
             x = Math.max(4, x);
@@ -342,8 +451,45 @@ public class OnlineBattleController {
     private void hideInfoOverlay() {
         if (infoCard != null)
             infoCard.setVisible(false);
+        if (pokemonInfoCard != null) // Add this
+            pokemonInfoCard.setVisible(false);
     }
 
+    private String getTypeColor(String type) {
+        return switch (type.toLowerCase()) {
+            case "grass" -> "#78C850";
+            case "fire" -> "#F08030";
+            case "water" -> "#6890F0";
+            case "electric" -> "#F8D030";
+            case "psychic" -> "#F85888";
+            case "ice" -> "#98D8D8";
+            case "dragon" -> "#7038F8";
+            case "dark" -> "#705848";
+            case "fairy" -> "#EE99AC";
+            case "normal" -> "#9ba5a4";
+            case "fighting" -> "#C03028";
+            case "flying" -> "#A890F0";
+            case "poison" -> "#A040A0";
+            case "ground" -> "#E0C068";
+            case "rock" -> "#B8A038";
+            case "bug" -> "#A8B820";
+            case "ghost" -> "#705898";
+            case "steel" -> "#B8B8D0";
+            default -> "#68A090";
+        };
+    }
+
+    private void updateTypeBadges(HBox typesBox, List<String> types) {
+        if (typesBox == null)
+            return;
+        typesBox.getChildren().clear();
+        for (String type : types) {
+            Label typeLabel = new Label(type.substring(0, Math.min(3, type.length())).toUpperCase());
+            typeLabel.setStyle("-fx-font-size: 9px; -fx-padding: 2 5; -fx-background-color: " +
+                    getTypeColor(type) + "; -fx-text-fill: white; -fx-background-radius: 3; -fx-font-weight: bold;");
+            typesBox.getChildren().add(typeLabel);
+        }
+    }
     // VS Intro
 
     private void playVSIntro() {
@@ -954,6 +1100,11 @@ public class OnlineBattleController {
             opponentPokemonHpLabel.setText(pok.getCurrentHp() + " / " + pok.getMaxHp());
             updateHpBar(opponentHpBar, pok.getCurrentHp(), pok.getMaxHp());
         }
+        if (isPlayer) {
+            updateTypeBadges(playerTypesBox, pok.getTypes());
+        } else {
+            updateTypeBadges(opponentTypesBox, pok.getTypes());
+        }
     }
 
     // Sprite helpers
@@ -1020,9 +1171,9 @@ public class OnlineBattleController {
         try {
             var pngStream = getClass().getResourceAsStream(pngPath);
             if (pngStream != null) {
-                    Image png = new Image(pngStream,
-                            target.getFitWidth() > 0 ? target.getFitWidth() : 0,
-                            target.getFitHeight() > 0 ? target.getFitHeight() : 0, true, true);
+                Image png = new Image(pngStream,
+                        target.getFitWidth() > 0 ? target.getFitWidth() : 0,
+                        target.getFitHeight() > 0 ? target.getFitHeight() : 0, true, true);
                 if (!png.isError())
                     target.setImage(png);
             }
@@ -1048,22 +1199,115 @@ public class OnlineBattleController {
 
     private void updatePokemonButtons() {
         pokemonButtonsBox.getChildren().clear();
-        for (PokemonInstance p : player.getTeam()) {
-            Button btn = new Button(cap(p.getName()) + (p.isFainted() ? " (Fainted)" : "  Lv." + p.getLevel()));
-            btn.setPrefWidth(260);
-            btn.setPrefHeight(42);
-            btn.getStyleClass().addAll("option-btn", "option-btn-green");
-            btn.setStyle("-fx-font-size: 13px;");
-            if (p.isFainted()) {
-                btn.setDisable(true);
-                btn.setStyle("-fx-font-size: 13px; -fx-opacity: 0.5;");
-            } else if (p == player.getCurrentPokemon()) {
-                btn.setText(btn.getText() + " ✓");
-                btn.setDisable(true);
-            } else {
-                btn.setOnAction(e -> onPokemonSelected(p));
+        for (PokemonInstance pokemon : player.getTeam()) {
+            HBox pokemonRow = createPokemonRow(pokemon);
+            pokemonButtonsBox.getChildren().add(pokemonRow);
+        }
+    }
+
+    private HBox createPokemonRow(PokemonInstance pokemon) {
+        boolean isFainted = pokemon.isFainted();
+        boolean isCurrent = pokemon == player.getCurrentPokemon();
+
+        // Sprite
+        ImageView sprite = new ImageView();
+        sprite.setFitWidth(POKEMON_SPRITE_SIZE);
+        sprite.setFitHeight(POKEMON_SPRITE_SIZE);
+        sprite.setPreserveRatio(true);
+
+        String gifPath = "/com/example/pokemonbattle/sprites/front/gif/" + pokemon.getId() + ".gif";
+        var gifUrl = getClass().getResource(gifPath);
+        if (gifUrl != null) {
+            try {
+                Image gif = new Image(gifUrl.toExternalForm(), POKEMON_SPRITE_SIZE, POKEMON_SPRITE_SIZE, true, true,
+                        true);
+                if (!gif.isError()) {
+                    sprite.setImage(gif);
+                }
+            } catch (Exception e) {
+                loadPokemonPngSprite(sprite, pokemon.getId());
             }
-            pokemonButtonsBox.getChildren().add(btn);
+        } else {
+            loadPokemonPngSprite(sprite, pokemon.getId());
+        }
+
+        if (isFainted) {
+            sprite.setOpacity(0.4);
+        }
+
+        // Main button content
+        VBox textContent = new VBox(2);
+        textContent.setAlignment(Pos.CENTER_LEFT);
+
+        Label nameLabel = new Label(cap(pokemon.getName()));
+        nameLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: white;");
+
+        Label levelLabel = new Label(
+                "Lv. " + pokemon.getLevel() + "  •  HP: " + pokemon.getCurrentHp() + "/" + pokemon.getMaxHp());
+        levelLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: rgba(255,255,255,0.85);");
+
+        textContent.getChildren().addAll(nameLabel, levelLabel);
+
+        HBox contentBox = new HBox(10, sprite, textContent);
+        contentBox.setAlignment(Pos.CENTER_LEFT);
+        HBox.setHgrow(textContent, Priority.ALWAYS);
+
+        StackPane buttonBase = new StackPane(contentBox);
+        buttonBase.setPadding(new Insets(8, 50, 8, 8));
+        buttonBase.setPrefHeight(POKEMON_BTN_HEIGHT);
+        buttonBase.setMaxWidth(Double.MAX_VALUE);
+
+        String bgColor = isFainted ? "rgba(100, 100, 100, 0.3)"
+                : isCurrent ? "rgba(120, 200, 80, 0.25)"
+                        : "linear-gradient(to right, rgba(106, 173, 140, 0.4), rgba(126, 189, 185, 0.3))";
+
+        buttonBase.setStyle("-fx-background-color: " + bgColor + ";" +
+                "-fx-background-radius: 10; -fx-border-color: rgba(255,255,255,0.3);" +
+                "-fx-border-radius: 10; -fx-border-width: 1.5;" +
+                "-fx-cursor: " + (isFainted || isCurrent ? "default" : "hand") + ";");
+
+        // Info button
+        Button infoBtn = new Button("i");
+        infoBtn.getStyleClass().add("move-info-btn");
+        infoBtn.setStyle(infoBtn.getStyle() +
+                "-fx-min-width:" + POKEMON_INFO_BTN_SIZE + ";-fx-max-width:" + POKEMON_INFO_BTN_SIZE + ";" +
+                "-fx-min-height:" + POKEMON_INFO_BTN_SIZE + ";-fx-max-height:" + POKEMON_INFO_BTN_SIZE + ";");
+        StackPane.setAlignment(infoBtn, Pos.CENTER_RIGHT);
+        StackPane.setMargin(infoBtn, new Insets(0, 8, 0, 0));
+        infoBtn.setOnMouseEntered(e -> showPokemonInfoOverlay(infoBtn, pokemon));
+        infoBtn.setOnMouseExited(e -> hideInfoOverlay());
+        infoBtn.setOnAction(e -> {
+        }); // Consume click
+
+        buttonBase.getChildren().add(infoBtn);
+
+        if (!isFainted && !isCurrent) {
+            buttonBase.setOnMouseClicked(e -> onPokemonSelected(pokemon));
+            buttonBase.setOnMouseEntered(e -> {
+                buttonBase.setStyle(buttonBase.getStyle() + "-fx-background-color: rgba(126, 189, 185, 0.5);");
+            });
+            buttonBase.setOnMouseExited(e -> {
+                buttonBase.setStyle(buttonBase.getStyle() + "-fx-background-color: " + bgColor + ";");
+            });
+        }
+
+        HBox row = new HBox(buttonBase);
+        HBox.setHgrow(buttonBase, Priority.ALWAYS);
+        return row;
+    }
+
+    private void loadPokemonPngSprite(ImageView sprite, int pokemonId) {
+        String pngPath = "/com/example/pokemonbattle/sprites/front/" + pokemonId + ".png";
+        try {
+            var pngStream = getClass().getResourceAsStream(pngPath);
+            if (pngStream != null) {
+                Image png = new Image(pngStream, POKEMON_SPRITE_SIZE, POKEMON_SPRITE_SIZE, true, true);
+                if (!png.isError()) {
+                    sprite.setImage(png);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to load Pokemon sprite: " + e.getMessage());
         }
     }
 
@@ -1261,6 +1505,7 @@ public class OnlineBattleController {
         t.setDaemon(true);
         t.start();
     }
+
     // Utility
     public List<String> getBattleLog() {
         return new ArrayList<>(battleLog);

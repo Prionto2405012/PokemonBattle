@@ -75,6 +75,10 @@ public class BattleController implements Battle.BattleListener {
     @FXML
     private Rectangle opponentHpBar;
     @FXML
+    private HBox playerTypesBox;
+    @FXML
+    private HBox opponentTypesBox;
+    @FXML
     private Label playerNameLabel;
     @FXML
     private Label playerTeamLabel;
@@ -101,7 +105,7 @@ public class BattleController implements Battle.BattleListener {
     @FXML
     private VBox moveSelectionBox;
     @FXML
-    private VBox moveButtonsContainer; // replaces the 4 individual move buttons
+    private VBox moveButtonsContainer;
     @FXML
     private VBox pokemonSelectionBox;
     @FXML
@@ -133,14 +137,19 @@ public class BattleController implements Battle.BattleListener {
     @FXML
     private Region rootBlackFade;
 
-    // Move list constants (customise size / position of the "i" button here)
-    private static final double MOVE_BTN_HEIGHT = 50.0; // px height of each move row
-    private static final double INFO_BTN_WIDTH = 18.0; // px width of the "i" button
-    private static final double INFO_BTN_HEIGHT = 18.0; // px height of the "i" button
-    private static final double INFO_BTN_INSET_TOP = 4.0; // top margin inside move btn
-    private static final double INFO_BTN_INSET_RIGHT = 4.0; // right margin inside move btn
-    private static final double EFF_ICON_INSET_RIGHT = 8.0; // right margin inside move btn
-    private static final double EFF_ICON_INSET_BOTTOM = 6.0; // bottom margin inside move btn
+    // Move list constants
+    private static final double MOVE_BTN_HEIGHT = 50.0;
+    private static final double INFO_BTN_WIDTH = 18.0;
+    private static final double INFO_BTN_HEIGHT = 18.0;
+    private static final double INFO_BTN_INSET_TOP = 4.0;
+    private static final double INFO_BTN_INSET_RIGHT = 4.0;
+    private static final double EFF_ICON_INSET_RIGHT = 8.0;
+    private static final double EFF_ICON_INSET_BOTTOM = 6.0;
+
+    // Pokemon selection constants
+    private static final double POKEMON_BTN_HEIGHT = 60.0;
+    private static final double POKEMON_SPRITE_SIZE = 50.0;
+    private static final double POKEMON_INFO_BTN_SIZE = 16.0;
 
     // Battle model / state
     private Player player;
@@ -157,6 +166,12 @@ public class BattleController implements Battle.BattleListener {
     private VBox infoCard;
     private Label infoName, infoType, infoPower, infoAccuracy, infoPp, infoDescription;
 
+    // Pokemon info overlay
+    private VBox pokemonInfoCard;
+    private Label pokemonInfoName, pokemonInfoLevel;
+    private HBox pokemonInfoTypes;
+    private VBox pokemonInfoStats, pokemonInfoMoves;
+
     // Confetti
     private Canvas confettiCanvas;
     private AnimationTimer confettiTimer;
@@ -166,12 +181,12 @@ public class BattleController implements Battle.BattleListener {
 
     // Sprite scaling constants
     private static final double SPRITE_STANDARD_HEIGHT_M = 1.0;
-        private static final double SPRITE_OPPONENT_BASE_PX = 180.0;
-        private static final double SPRITE_PLAYER_BASE_PX = 250.0;
-        private static final double SPRITE_OPPONENT_MIN_PX = 90.0;
-        private static final double SPRITE_OPPONENT_MAX_PX = 340.0;
-        private static final double SPRITE_PLAYER_MIN_PX = 120.0;
-        private static final double SPRITE_PLAYER_MAX_PX = 420.0;
+    private static final double SPRITE_OPPONENT_BASE_PX = 180.0;
+    private static final double SPRITE_PLAYER_BASE_PX = 250.0;
+    private static final double SPRITE_OPPONENT_MIN_PX = 90.0;
+    private static final double SPRITE_OPPONENT_MAX_PX = 340.0;
+    private static final double SPRITE_PLAYER_MIN_PX = 120.0;
+    private static final double SPRITE_PLAYER_MAX_PX = 420.0;
     private static final double SPRITE_SCALE_EXPONENT = 0.75;
     private static final java.util.Map<Integer, Double> POKEMON_HEIGHTS = loadPokemonHeights();
 
@@ -210,6 +225,7 @@ public class BattleController implements Battle.BattleListener {
         loadBattleData();
         drawOptionsPanelPattern();
         setupInfoOverlay();
+        setupPokemonInfoOverlay();
         SceneManager.enableCoordDebug(rootPane);
         MusicManager.getInstance().attachClickSounds(rootPane);
 
@@ -239,6 +255,35 @@ public class BattleController implements Battle.BattleListener {
         infoFloatingLayer.prefWidthProperty().bind(rootPane.widthProperty());
         infoFloatingLayer.prefHeightProperty().bind(rootPane.heightProperty());
         rootPane.getChildren().add(infoFloatingLayer);
+    }
+
+    // Pokemon info overlay setup
+    private void setupPokemonInfoOverlay() {
+        pokemonInfoName = styledLabel("pokemon-info-name");
+        pokemonInfoLevel = styledLabel("pokemon-info-level");
+        pokemonInfoTypes = new HBox(4);
+        pokemonInfoTypes.setAlignment(Pos.CENTER_LEFT);
+        pokemonInfoStats = new VBox(3);
+        pokemonInfoMoves = new VBox(3);
+
+        VBox header = new VBox(2, pokemonInfoName, pokemonInfoLevel, pokemonInfoTypes);
+        header.setAlignment(Pos.CENTER_LEFT);
+
+        Label statsTitle = styledLabel("pokemon-info-section-title");
+        statsTitle.setText("Stats:");
+        Label movesTitle = styledLabel("pokemon-info-section-title");
+        movesTitle.setText("Moves:");
+
+        pokemonInfoCard = new VBox(8, header, statsTitle, pokemonInfoStats, movesTitle, pokemonInfoMoves);
+        pokemonInfoCard.getStyleClass().add("pokemon-info-overlay");
+        pokemonInfoCard.setVisible(false);
+        pokemonInfoCard.setManaged(false);
+        pokemonInfoCard.setMouseTransparent(true);
+        pokemonInfoCard.setMaxWidth(300);
+
+        if (infoFloatingLayer != null) {
+            infoFloatingLayer.getChildren().add(pokemonInfoCard);
+        }
     }
 
     private Label styledLabel(String styleClasses) {
@@ -289,9 +334,72 @@ public class BattleController implements Battle.BattleListener {
         });
     }
 
+    private void showPokemonInfoOverlay(Button iBtn, PokemonInstance pokemon) {
+        pokemonInfoName.setText(capitalize(pokemon.getName()));
+        pokemonInfoLevel.setText("Lv. " + pokemon.getLevel());
+        
+        // Update types
+        pokemonInfoTypes.getChildren().clear();
+        for (String type : pokemon.getTypes()) {
+            Label typeLabel = new Label(type.toUpperCase());
+            typeLabel.setStyle("-fx-font-size: 9px; -fx-padding: 3 6; -fx-background-color: " + 
+                    getTypeColor(type) + "; -fx-text-fill: white; -fx-background-radius: 4; -fx-font-weight: bold;");
+            pokemonInfoTypes.getChildren().add(typeLabel);
+        }
+
+        // Update stats
+        pokemonInfoStats.getChildren().clear();
+        pokemonInfoStats.getChildren().add(createStatLabel("HP: " + pokemon.getCurrentHp() + " / " + pokemon.getMaxHp()));
+        pokemonInfoStats.getChildren().add(createStatLabel("Attack: " + pokemon.getAttack()));
+        pokemonInfoStats.getChildren().add(createStatLabel("Defense: " + pokemon.getDefense()));
+        pokemonInfoStats.getChildren().add(createStatLabel("Sp.Atk: " + pokemon.getSpAttack()));
+        pokemonInfoStats.getChildren().add(createStatLabel("Sp.Def: " + pokemon.getSpDefense()));
+        pokemonInfoStats.getChildren().add(createStatLabel("Speed: " + pokemon.getSpeed()));
+
+        // Update moves
+        pokemonInfoMoves.getChildren().clear();
+        for (var battleMove : pokemon.getBattleMoves()) {
+            Move move = battleMove.getMove();
+            String moveName = capitalize(move.getName());
+            String moveType = move.getType() != null ? capitalize(move.getType()) : "Normal";
+            Label moveLabel = new Label("• " + moveName + " (" + moveType + ")");
+            moveLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #e0e0e0;");
+            pokemonInfoMoves.getChildren().add(moveLabel);
+        }
+
+        pokemonInfoCard.setVisible(true);
+        infoFloatingLayer.toFront();
+        pokemonInfoCard.toFront();
+
+        Platform.runLater(() -> {
+            pokemonInfoCard.applyCss();
+            pokemonInfoCard.autosize();
+            Bounds b = iBtn.localToScene(iBtn.getBoundsInLocal());
+            Bounds r = rootPane.localToScene(rootPane.getBoundsInLocal());
+            double cardW = pokemonInfoCard.getWidth() > 10 ? pokemonInfoCard.getWidth() : pokemonInfoCard.prefWidth(-1);
+            double cardH = pokemonInfoCard.getHeight() > 10 ? pokemonInfoCard.getHeight() : pokemonInfoCard.prefHeight(-1);
+            if (cardW < 200) cardW = 280;
+            if (cardH < 150) cardH = 200;
+            double x = (b.getMinX() - r.getMinX()) - cardW - 10;
+            double y = (b.getMinY() - r.getMinY()) - cardH / 2.0 + iBtn.getHeight() / 2.0;
+            x = Math.max(4, x);
+            y = Math.max(4, Math.min(y, rootPane.getHeight() - cardH - 4));
+            pokemonInfoCard.setLayoutX(x);
+            pokemonInfoCard.setLayoutY(y);
+        });
+    }
+
+    private Label createStatLabel(String text) {
+        Label label = new Label(text);
+        label.setStyle("-fx-font-size: 11px; -fx-text-fill: #d0d0d0;");
+        return label;
+    }
+
     private void hideInfoOverlay() {
         if (infoCard != null)
             infoCard.setVisible(false);
+        if (pokemonInfoCard != null)
+            pokemonInfoCard.setVisible(false);
     }
 
     // VS Intro
@@ -476,6 +584,21 @@ public class BattleController implements Battle.BattleListener {
         opponentPokemonHpLabel.setText(op.getCurrentHp() + " / " + op.getMaxHp());
         updateHpBar(playerHpBar, pp.getCurrentHp(), pp.getMaxHp());
         updateHpBar(opponentHpBar, op.getCurrentHp(), op.getMaxHp());
+        
+        // Update type badges
+        updateTypeBadges(playerTypesBox, pp.getTypes());
+        updateTypeBadges(opponentTypesBox, op.getTypes());
+    }
+
+    private void updateTypeBadges(HBox typesBox, List<String> types) {
+        if (typesBox == null) return;
+        typesBox.getChildren().clear();
+        for (String type : types) {
+            Label typeLabel = new Label(type.substring(0, Math.min(3, type.length())).toUpperCase());
+            typeLabel.setStyle("-fx-font-size: 9px; -fx-padding: 2 5; -fx-background-color: " + 
+                    getTypeColor(type) + "; -fx-text-fill: white; -fx-background-radius: 3; -fx-font-weight: bold;");
+            typesBox.getChildren().add(typeLabel);
+        }
     }
 
     // Move buttons (list layout)
@@ -497,17 +620,12 @@ public class BattleController implements Battle.BattleListener {
         }
     }
 
-    /**
-     * Builds one move row: a coloured list button + type/PP overlay + "i" info
-     * button.
-     */
     private HBox createMoveRow(Move move, int currentPp, float effectiveness) {
         String type = (move.getType() != null) ? move.getType() : "normal";
         int maxPp = move.getPp() > 0 ? move.getPp() : currentPp;
         String grad = getTypeGradient(type);
         String border = getTypeBorderColor(type);
 
-        // Main move button (fills full row width)
         Button moveBtn = new Button(capitalize(move.getName()));
         moveBtn.setMaxWidth(Double.MAX_VALUE);
         moveBtn.setPrefHeight(MOVE_BTN_HEIGHT);
@@ -520,7 +638,6 @@ public class BattleController implements Battle.BattleListener {
         moveBtn.setOnAction(e -> onMoveSelected(move));
         activeMoveButtons.add(moveBtn);
 
-        // Type + PP labels (right side, mouse-transparent overlay)
         Label typeLabel = new Label(capitalize(type));
         typeLabel.setStyle("-fx-font-size:10px;-fx-text-fill:rgba(255,255,255,0.75);-fx-font-style:italic;");
         Label ppLabel = new Label("PP: " + currentPp + "/" + maxPp);
@@ -531,7 +648,6 @@ public class BattleController implements Battle.BattleListener {
         StackPane.setAlignment(rightInfo, Pos.CENTER_RIGHT);
         StackPane.setMargin(rightInfo, new Insets(0, INFO_BTN_WIDTH + INFO_BTN_INSET_RIGHT + 6, 0, 0));
 
-        // "i" info button — light-blue gradient, top-right corner
         Button iBtn = new Button("i");
         iBtn.getStyleClass().add("move-info-btn");
         iBtn.setStyle(iBtn.getStyle() +
@@ -544,7 +660,7 @@ public class BattleController implements Battle.BattleListener {
         iBtn.setOnMousePressed(e -> showInfoOverlay(iBtn, move, finalPp));
         iBtn.setOnMouseExited(e -> hideInfoOverlay());
         iBtn.setOnAction(e -> {
-        }); // consume click — don't trigger move
+        });
 
         Label effLabel = createEffectivenessIndicator(effectiveness);
         if (effLabel != null) {
@@ -669,6 +785,30 @@ public class BattleController implements Battle.BattleListener {
             case "steel" -> "#384860";
             case "fairy" -> "#783048";
             default -> "#263238";
+        };
+    }
+
+    private String getTypeColor(String type) {
+        return switch (type.toLowerCase()) {
+            case "grass" -> "#78C850";
+            case "fire" -> "#F08030";
+            case "water" -> "#6890F0";
+            case "electric" -> "#F8D030";
+            case "psychic" -> "#F85888";
+            case "ice" -> "#98D8D8";
+            case "dragon" -> "#7038F8";
+            case "dark" -> "#705848";
+            case "fairy" -> "#EE99AC";
+            case "normal" -> "#A8A878";
+            case "fighting" -> "#C03028";
+            case "flying" -> "#A890F0";
+            case "poison" -> "#A040A0";
+            case "ground" -> "#E0C068";
+            case "rock" -> "#B8A038";
+            case "bug" -> "#A8B820";
+            case "ghost" -> "#705898";
+            case "steel" -> "#B8B8D0";
+            default -> "#68A090";
         };
     }
 
@@ -807,22 +947,116 @@ public class BattleController implements Battle.BattleListener {
     private void updatePokemonButtons() {
         pokemonButtonsBox.getChildren().clear();
         for (PokemonInstance pokemon : player.getTeam()) {
-            Button btn = new Button(capitalize(pokemon.getName()) +
-                    (pokemon.isFainted() ? " (Fainted)" : "  Lv." + pokemon.getLevel()));
-            btn.setPrefWidth(260);
-            btn.setPrefHeight(42);
-            btn.getStyleClass().addAll("option-btn", "option-btn-green");
-            btn.setStyle("-fx-font-size: 13px;");
-            if (pokemon.isFainted()) {
-                btn.setDisable(true);
-                btn.setStyle("-fx-font-size: 13px; -fx-opacity: 0.5;");
-            } else if (pokemon.getId() == player.getCurrentPokemon().getId()) {
-                btn.setText(btn.getText() + " ✓");
-                btn.setDisable(true);
-            } else {
-                btn.setOnAction(e -> onPokemonSelected(pokemon));
+            HBox pokemonRow = createPokemonRow(pokemon);
+            pokemonButtonsBox.getChildren().add(pokemonRow);
+        }
+    }
+
+    private HBox createPokemonRow(PokemonInstance pokemon) {
+        boolean isFainted = pokemon.isFainted();
+        boolean isCurrent = pokemon.getId() == player.getCurrentPokemon().getId();
+
+        // Sprite
+        ImageView sprite = new ImageView();
+        sprite.setFitWidth(POKEMON_SPRITE_SIZE);
+        sprite.setFitHeight(POKEMON_SPRITE_SIZE);
+        sprite.setPreserveRatio(true);
+        
+        String gifPath = "/com/example/pokemonbattle/sprites/front/gif/" + pokemon.getId() + ".gif";
+        var gifUrl = getClass().getResource(gifPath);
+        if (gifUrl != null) {
+            try {
+                Image gif = new Image(gifUrl.toExternalForm(), POKEMON_SPRITE_SIZE, POKEMON_SPRITE_SIZE, true, true, true);
+                if (!gif.isError()) {
+                    sprite.setImage(gif);
+                }
+            } catch (Exception e) {
+                loadPokemonPngSprite(sprite, pokemon.getId());
             }
-            pokemonButtonsBox.getChildren().add(btn);
+        } else {
+            loadPokemonPngSprite(sprite, pokemon.getId());
+        }
+
+        if (isFainted) {
+            sprite.setOpacity(0.4);
+        }
+
+        // Main button content
+        VBox textContent = new VBox(2);
+        textContent.setAlignment(Pos.CENTER_LEFT);
+        
+        Label nameLabel = new Label(capitalize(pokemon.getName()));
+        nameLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: white;");
+        
+        Label levelLabel = new Label("Lv. " + pokemon.getLevel() + "  •  HP: " + pokemon.getCurrentHp() + "/" + pokemon.getMaxHp());
+        levelLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: rgba(255,255,255,0.85);");
+        
+        textContent.getChildren().addAll(nameLabel, levelLabel);
+
+        // Status indicator
+        Label statusLabel = new Label(isCurrent ? "✓ IN BATTLE" : (isFainted ? "FAINTED" : ""));
+        statusLabel.setStyle("-fx-font-size: 10px; -fx-font-weight: bold; -fx-text-fill: " +
+                (isCurrent ? "#78C850" : "#F08030") + ";");
+
+        HBox contentBox = new HBox(10, sprite, textContent);
+        contentBox.setAlignment(Pos.CENTER_LEFT);
+        HBox.setHgrow(textContent, Priority.ALWAYS);
+
+        StackPane buttonBase = new StackPane(contentBox);
+        buttonBase.setPadding(new Insets(8, 50, 8, 8));
+        buttonBase.setPrefHeight(POKEMON_BTN_HEIGHT);
+        buttonBase.setMaxWidth(Double.MAX_VALUE);
+
+        String bgColor = isFainted ? "rgba(100, 100, 100, 0.3)" : 
+                         isCurrent ? "rgba(120, 200, 80, 0.25)" :
+                         "linear-gradient(to right, rgba(106, 173, 140, 0.4), rgba(126, 189, 185, 0.3))";
+        
+        buttonBase.setStyle("-fx-background-color: " + bgColor + ";" +
+                "-fx-background-radius: 10; -fx-border-color: rgba(255,255,255,0.3);" +
+                "-fx-border-radius: 10; -fx-border-width: 1.5;" +
+                "-fx-cursor: " + (isFainted || isCurrent ? "default" : "hand") + ";");
+
+        // Info button
+        Button infoBtn = new Button("i");
+        infoBtn.getStyleClass().add("move-info-btn");
+        infoBtn.setStyle(infoBtn.getStyle() +
+                "-fx-min-width:" + POKEMON_INFO_BTN_SIZE + ";-fx-max-width:" + POKEMON_INFO_BTN_SIZE + ";" +
+                "-fx-min-height:" + POKEMON_INFO_BTN_SIZE + ";-fx-max-height:" + POKEMON_INFO_BTN_SIZE + ";");
+        StackPane.setAlignment(infoBtn, Pos.CENTER_RIGHT);
+        StackPane.setMargin(infoBtn, new Insets(0, 8, 0, 0));
+        infoBtn.setOnMouseEntered(e -> showPokemonInfoOverlay(infoBtn, pokemon));
+        infoBtn.setOnMouseExited(e -> hideInfoOverlay());
+        infoBtn.setOnAction(e -> {}); // Consume click
+
+        buttonBase.getChildren().add(infoBtn);
+
+        if (!isFainted && !isCurrent) {
+            buttonBase.setOnMouseClicked(e -> onPokemonSelected(pokemon));
+            buttonBase.setOnMouseEntered(e -> {
+                buttonBase.setStyle(buttonBase.getStyle() + "-fx-background-color: rgba(126, 189, 185, 0.5);");
+            });
+            buttonBase.setOnMouseExited(e -> {
+                buttonBase.setStyle(buttonBase.getStyle() + "-fx-background-color: " + bgColor + ";");
+            });
+        }
+
+        HBox row = new HBox(buttonBase);
+        HBox.setHgrow(buttonBase, Priority.ALWAYS);
+        return row;
+    }
+
+    private void loadPokemonPngSprite(ImageView sprite, int pokemonId) {
+        String pngPath = "/com/example/pokemonbattle/sprites/front/" + pokemonId + ".png";
+        try {
+            var pngStream = getClass().getResourceAsStream(pngPath);
+            if (pngStream != null) {
+                Image png = new Image(pngStream, POKEMON_SPRITE_SIZE, POKEMON_SPRITE_SIZE, true, true);
+                if (!png.isError()) {
+                    sprite.setImage(png);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to load Pokemon sprite: " + e.getMessage());
         }
     }
 
