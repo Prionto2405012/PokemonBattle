@@ -13,6 +13,7 @@ import com.example.pokemonbattle.model.Battle;
 import com.example.pokemonbattle.model.Move;
 import com.example.pokemonbattle.model.Player;
 import com.example.pokemonbattle.model.PokemonInstance;
+import com.example.pokemonbattle.util.BattleAnimationManager;
 import com.example.pokemonbattle.util.MusicManager;
 import com.example.pokemonbattle.util.PlayerSession;
 import com.example.pokemonbattle.util.SceneManager;
@@ -202,6 +203,7 @@ public class BattleController implements Battle.BattleListener {
     private static final double VS_OFFSCREEN_OFFSET = 700.0;
     private static final int VS_NPC_COUNT = 7;
 
+    private BattleAnimationManager animationManager;
     // Lifecycle
 
     @FXML
@@ -230,8 +232,81 @@ public class BattleController implements Battle.BattleListener {
         MusicManager.getInstance().attachClickSounds(rootPane);
 
         Platform.runLater(this::playVSIntro);
+        animationManager = new BattleAnimationManager(playerSpriteImage, opponentSpriteImage, battleField);
     }
 
+    private void onMoveSelected(Move move) {
+        if (battle.isFinished()) {
+            battleStatusLabel.setText("Battle is already finished!");
+            return;
+        }
+
+        disableMoveButtons();
+        hideActionButtons();
+
+        PokemonInstance playerPokemon = player.getCurrentPokemon();
+        PokemonInstance opponentPokemon = opponent.getCurrentPokemon();
+        Move aiMove = battle.getAIMove(opponentPokemon, playerPokemon);
+
+        // Determine who moves first based on speed stat
+        boolean playerMovesFirst = playerPokemon.getSpeed() >= opponentPokemon.getSpeed();
+
+        if (playerMovesFirst) {
+            // Player attacks first
+            battleStatusLabel
+                    .setText(capitalize(playerPokemon.getName()) + " used " + capitalize(move.getName()) + "!");
+
+            animationManager.playAttackAnimation( playerSpriteImage, opponentSpriteImage,move,() -> {
+                        // After player's animation, check if opponent can still attack
+                        if (!opponentPokemon.isFainted() && aiMove != null) {
+                            battleStatusLabel.setText(capitalize(opponentPokemon.getName()) + " used "
+                                    + capitalize(aiMove.getName()) + "!");
+
+                            animationManager.playAttackAnimation( opponentSpriteImage, playerSpriteImage, aiMove, () -> finalizeBattleRound(move, aiMove));
+                        } else {
+                            finalizeBattleRound(move, aiMove);
+                        }
+                    });
+        } else {
+            // Opponent attacks first
+            battleStatusLabel
+                    .setText(capitalize(opponentPokemon.getName()) + " used " + capitalize(aiMove.getName()) + "!");
+
+            animationManager.playAttackAnimation(
+                    opponentSpriteImage,
+                    playerSpriteImage,
+                    aiMove,
+                    () -> {
+                        // After opponent's animation, check if player can still attack
+                        if (!playerPokemon.isFainted()) {
+                            battleStatusLabel.setText(
+                                    capitalize(playerPokemon.getName()) + " used " + capitalize(move.getName()) + "!");
+
+                            animationManager.playAttackAnimation(
+                                    playerSpriteImage,
+                                    opponentSpriteImage,
+                                    move,
+                                    () -> finalizeBattleRound(move, aiMove));
+                        } else {
+                            finalizeBattleRound(move, aiMove);
+                        }
+                    });
+        }
+    }
+
+    private void finalizeBattleRound(Move playerMove, Move aiMove) {
+        battle.executeRound(playerMove, aiMove);
+        updateBattleDisplay();
+        updateMoveButtons();
+        if (!battle.isFinished()) {
+            showActionButtons();
+        }
+    }
+
+    private void hideActionButtons() {
+        actionButtonsBox.setVisible(false);
+        actionButtonsBox.setManaged(false);
+    }
     // Info overlay setup
 
     private void setupInfoOverlay() {
@@ -323,8 +398,10 @@ public class BattleController implements Battle.BattleListener {
             Bounds r = rootPane.localToScene(rootPane.getBoundsInLocal());
             double cardW = infoCard.getWidth() > 10 ? infoCard.getWidth() : infoCard.prefWidth(-1);
             double cardH = infoCard.getHeight() > 10 ? infoCard.getHeight() : infoCard.prefHeight(-1);
-            if (cardW < 160) cardW = 220;
-            if (cardH < 120) cardH = 170;
+            if (cardW < 160)
+                cardW = 220;
+            if (cardH < 120)
+                cardH = 170;
             double x = (b.getMinX() - r.getMinX()) - cardW - 10;
             double y = (b.getMinY() - r.getMinY()) - cardH / 2.0 + iBtn.getHeight() / 2.0;
             x = Math.max(4, x);
@@ -337,19 +414,20 @@ public class BattleController implements Battle.BattleListener {
     private void showPokemonInfoOverlay(Button iBtn, PokemonInstance pokemon) {
         pokemonInfoName.setText(capitalize(pokemon.getName()));
         pokemonInfoLevel.setText("Lv. " + pokemon.getLevel());
-        
+
         // Update types
         pokemonInfoTypes.getChildren().clear();
         for (String type : pokemon.getTypes()) {
             Label typeLabel = new Label(type.toUpperCase());
-            typeLabel.setStyle("-fx-font-size: 9px; -fx-padding: 3 6; -fx-background-color: " + 
+            typeLabel.setStyle("-fx-font-size: 9px; -fx-padding: 3 6; -fx-background-color: " +
                     getTypeColor(type) + "; -fx-text-fill: white; -fx-background-radius: 4; -fx-font-weight: bold;");
             pokemonInfoTypes.getChildren().add(typeLabel);
         }
 
         // Update stats
         pokemonInfoStats.getChildren().clear();
-        pokemonInfoStats.getChildren().add(createStatLabel("HP: " + pokemon.getCurrentHp() + " / " + pokemon.getMaxHp()));
+        pokemonInfoStats.getChildren()
+                .add(createStatLabel("HP: " + pokemon.getCurrentHp() + " / " + pokemon.getMaxHp()));
         pokemonInfoStats.getChildren().add(createStatLabel("Attack: " + pokemon.getAttack()));
         pokemonInfoStats.getChildren().add(createStatLabel("Defense: " + pokemon.getDefense()));
         pokemonInfoStats.getChildren().add(createStatLabel("Sp.Atk: " + pokemon.getSpAttack()));
@@ -377,9 +455,12 @@ public class BattleController implements Battle.BattleListener {
             Bounds b = iBtn.localToScene(iBtn.getBoundsInLocal());
             Bounds r = rootPane.localToScene(rootPane.getBoundsInLocal());
             double cardW = pokemonInfoCard.getWidth() > 10 ? pokemonInfoCard.getWidth() : pokemonInfoCard.prefWidth(-1);
-            double cardH = pokemonInfoCard.getHeight() > 10 ? pokemonInfoCard.getHeight() : pokemonInfoCard.prefHeight(-1);
-            if (cardW < 200) cardW = 280;
-            if (cardH < 150) cardH = 200;
+            double cardH = pokemonInfoCard.getHeight() > 10 ? pokemonInfoCard.getHeight()
+                    : pokemonInfoCard.prefHeight(-1);
+            if (cardW < 200)
+                cardW = 280;
+            if (cardH < 150)
+                cardH = 200;
             double x = (b.getMinX() - r.getMinX()) - cardW - 10;
             double y = (b.getMinY() - r.getMinY()) - cardH / 2.0 + iBtn.getHeight() / 2.0;
             x = Math.max(4, x);
@@ -568,9 +649,10 @@ public class BattleController implements Battle.BattleListener {
             return;
         PokemonInstance pp = player.getCurrentPokemon(), op = opponent.getCurrentPokemon();
 
-        double playerPx = getScaledSpritePx(pp.getId(), SPRITE_PLAYER_BASE_PX, SPRITE_PLAYER_MIN_PX, SPRITE_PLAYER_MAX_PX);
+        double playerPx = getScaledSpritePx(pp.getId(), SPRITE_PLAYER_BASE_PX, SPRITE_PLAYER_MIN_PX,
+                SPRITE_PLAYER_MAX_PX);
         double opponentPx = getScaledSpritePx(op.getId(), SPRITE_OPPONENT_BASE_PX, SPRITE_OPPONENT_MIN_PX,
-            SPRITE_OPPONENT_MAX_PX);
+                SPRITE_OPPONENT_MAX_PX);
         playerSpriteImage.setFitWidth(playerPx);
         playerSpriteImage.setFitHeight(playerPx);
         opponentSpriteImage.setFitWidth(opponentPx);
@@ -584,18 +666,19 @@ public class BattleController implements Battle.BattleListener {
         opponentPokemonHpLabel.setText(op.getCurrentHp() + " / " + op.getMaxHp());
         updateHpBar(playerHpBar, pp.getCurrentHp(), pp.getMaxHp());
         updateHpBar(opponentHpBar, op.getCurrentHp(), op.getMaxHp());
-        
+
         // Update type badges
         updateTypeBadges(playerTypesBox, pp.getTypes());
         updateTypeBadges(opponentTypesBox, op.getTypes());
     }
 
     private void updateTypeBadges(HBox typesBox, List<String> types) {
-        if (typesBox == null) return;
+        if (typesBox == null)
+            return;
         typesBox.getChildren().clear();
         for (String type : types) {
             Label typeLabel = new Label(type.substring(0, Math.min(3, type.length())).toUpperCase());
-            typeLabel.setStyle("-fx-font-size: 9px; -fx-padding: 2 5; -fx-background-color: " + 
+            typeLabel.setStyle("-fx-font-size: 9px; -fx-padding: 2 5; -fx-background-color: " +
                     getTypeColor(type) + "; -fx-text-fill: white; -fx-background-radius: 3; -fx-font-weight: bold;");
             typesBox.getChildren().add(typeLabel);
         }
@@ -716,22 +799,6 @@ public class BattleController implements Battle.BattleListener {
         tt.setCycleCount(TranslateTransition.INDEFINITE);
         tt.play();
         return label;
-    }
-
-    private void onMoveSelected(Move move) {
-        if (battle.isFinished()) {
-            battleStatusLabel.setText("Battle is already finished!");
-            return;
-        }
-        battleStatusLabel.setText("Used " + capitalize(move.getName()) + "!");
-        disableMoveButtons();
-
-        Move aiMove = battle.getAIMove(opponent.getCurrentPokemon(), player.getCurrentPokemon());
-        battle.executeRound(move, aiMove);
-        updateBattleDisplay();
-        updateMoveButtons();
-        if (!battle.isFinished())
-            showActionButtons();
     }
 
     // Type colour helpers
@@ -876,9 +943,9 @@ public class BattleController implements Battle.BattleListener {
         try {
             var pngStream = getClass().getResourceAsStream(pngPath);
             if (pngStream != null) {
-                    Image png = new Image(pngStream,
-                            target.getFitWidth() > 0 ? target.getFitWidth() : 0,
-                            target.getFitHeight() > 0 ? target.getFitHeight() : 0, true, true);
+                Image png = new Image(pngStream,
+                        target.getFitWidth() > 0 ? target.getFitWidth() : 0,
+                        target.getFitHeight() > 0 ? target.getFitHeight() : 0, true, true);
                 if (!png.isError())
                     target.setImage(png);
             }
@@ -961,12 +1028,13 @@ public class BattleController implements Battle.BattleListener {
         sprite.setFitWidth(POKEMON_SPRITE_SIZE);
         sprite.setFitHeight(POKEMON_SPRITE_SIZE);
         sprite.setPreserveRatio(true);
-        
+
         String gifPath = "/com/example/pokemonbattle/sprites/front/gif/" + pokemon.getId() + ".gif";
         var gifUrl = getClass().getResource(gifPath);
         if (gifUrl != null) {
             try {
-                Image gif = new Image(gifUrl.toExternalForm(), POKEMON_SPRITE_SIZE, POKEMON_SPRITE_SIZE, true, true, true);
+                Image gif = new Image(gifUrl.toExternalForm(), POKEMON_SPRITE_SIZE, POKEMON_SPRITE_SIZE, true, true,
+                        true);
                 if (!gif.isError()) {
                     sprite.setImage(gif);
                 }
@@ -984,13 +1052,14 @@ public class BattleController implements Battle.BattleListener {
         // Main button content
         VBox textContent = new VBox(2);
         textContent.setAlignment(Pos.CENTER_LEFT);
-        
+
         Label nameLabel = new Label(capitalize(pokemon.getName()));
         nameLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: white;");
-        
-        Label levelLabel = new Label("Lv. " + pokemon.getLevel() + "  •  HP: " + pokemon.getCurrentHp() + "/" + pokemon.getMaxHp());
+
+        Label levelLabel = new Label(
+                "Lv. " + pokemon.getLevel() + "  •  HP: " + pokemon.getCurrentHp() + "/" + pokemon.getMaxHp());
         levelLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: rgba(255,255,255,0.85);");
-        
+
         textContent.getChildren().addAll(nameLabel, levelLabel);
 
         // Status indicator
@@ -1007,10 +1076,10 @@ public class BattleController implements Battle.BattleListener {
         buttonBase.setPrefHeight(POKEMON_BTN_HEIGHT);
         buttonBase.setMaxWidth(Double.MAX_VALUE);
 
-        String bgColor = isFainted ? "rgba(100, 100, 100, 0.3)" : 
-                         isCurrent ? "rgba(120, 200, 80, 0.25)" :
-                         "linear-gradient(to right, rgba(106, 173, 140, 0.4), rgba(126, 189, 185, 0.3))";
-        
+        String bgColor = isFainted ? "rgba(100, 100, 100, 0.3)"
+                : isCurrent ? "rgba(120, 200, 80, 0.25)"
+                        : "linear-gradient(to right, rgba(106, 173, 140, 0.4), rgba(126, 189, 185, 0.3))";
+
         buttonBase.setStyle("-fx-background-color: " + bgColor + ";" +
                 "-fx-background-radius: 10; -fx-border-color: rgba(255,255,255,0.3);" +
                 "-fx-border-radius: 10; -fx-border-width: 1.5;" +
@@ -1026,7 +1095,8 @@ public class BattleController implements Battle.BattleListener {
         StackPane.setMargin(infoBtn, new Insets(0, 8, 0, 0));
         infoBtn.setOnMouseEntered(e -> showPokemonInfoOverlay(infoBtn, pokemon));
         infoBtn.setOnMouseExited(e -> hideInfoOverlay());
-        infoBtn.setOnAction(e -> {}); // Consume click
+        infoBtn.setOnAction(e -> {
+        }); // Consume click
 
         buttonBase.getChildren().add(infoBtn);
 

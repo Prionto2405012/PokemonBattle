@@ -2,8 +2,10 @@ package com.example.pokemonbattle.controller;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Random;
 import java.util.stream.Collectors;
 
@@ -22,6 +24,7 @@ import com.example.pokemonbattle.server.GameMessage;
 import com.example.pokemonbattle.server.ServerConnection;
 import com.example.pokemonbattle.server.SwitchNotifyMessage;
 import com.example.pokemonbattle.server.TurnReadyMessage;
+import com.example.pokemonbattle.util.BattleAnimationManager;
 import com.example.pokemonbattle.util.MusicManager;
 import com.example.pokemonbattle.util.PlayerSession;
 import com.example.pokemonbattle.util.SceneManager;
@@ -234,6 +237,10 @@ public class OnlineBattleController {
     private static final double VS_FADE_FROM_BLACK_MS = 380.0;
     private static final double VS_OFFSCREEN_OFFSET = 700.0;
 
+    private BattleAnimationManager animationManager;
+    private final Queue<DamageMessage> pendingDamageMessages = new ArrayDeque<>();
+    private boolean damageAnimationInProgress = false;
+
     // Lifecycle
 
     @FXML
@@ -278,6 +285,7 @@ public class OnlineBattleController {
 
         MusicManager.getInstance().attachClickSounds(rootPane);
         Platform.runLater(this::playVSIntro);
+        animationManager = new BattleAnimationManager(playerSpriteImage, opponentSpriteImage, battleField);
     }
 
     // Info overlay
@@ -582,39 +590,75 @@ public class OnlineBattleController {
     }
 
     private void applyDamage(DamageMessage msg) {
+        pendingDamageMessages.offer(msg);
+        processNextDamageMessage();
+    }
+
+    private void processNextDamageMessage() {
+        if (damageAnimationInProgress) {
+            return;
+        }
+
+        DamageMessage msg = pendingDamageMessages.poll();
+        if (msg == null) {
+            return;
+        }
+
+        damageAnimationInProgress = true;
         boolean targetIsMe = player.getName().equals(msg.getTargetName());
         Player target = targetIsMe ? player : opponent;
         PokemonInstance targetPok = target.getCurrentPokemon();
-        if (targetPok == null)
+        if (targetPok == null) {
+            damageAnimationInProgress = false;
+            processNextDamageMessage();
             return;
+        }
 
-        targetPok.setCurrentHp(msg.getTargetCurrentHp());
-        updateBattleDisplay();
+        ImageView attackerSprite = player.getName().equals(msg.getAttackerName())
+                ? playerSpriteImage
+                : opponentSpriteImage;
+        ImageView defenderSprite = attackerSprite == playerSpriteImage
+                ? opponentSpriteImage
+                : playerSpriteImage;
 
-        String effText = "";
-        if (msg.getEffectiveness() != null && msg.getEffectiveness() > 1.0f)
-            effText = " (Super effective!)";
-        else if (msg.getEffectiveness() != null && msg.getEffectiveness() < 1.0f && msg.getEffectiveness() > 0)
-            effText = " (Not very effective...)";
-        else if (msg.getEffectiveness() != null && msg.getEffectiveness() == 0f)
-            effText = " (No effect)";
+        Runnable afterAnimation = () -> {
+            targetPok.setCurrentHp(msg.getTargetCurrentHp());
+            updateBattleDisplay();
 
-        String logEntry = cap(msg.getAttackerName()) + " used " + cap(msg.getMoveUsed()) + "! " + msg.getDamageDealt()
-                + " dmg" + effText;
-        battleStatusLabel.setText(logEntry);
-        battleLog.add(logEntry);
+            String effText = "";
+            if (msg.getEffectiveness() != null && msg.getEffectiveness() > 1.0f)
+                effText = " (Super effective!)";
+            else if (msg.getEffectiveness() != null && msg.getEffectiveness() < 1.0f && msg.getEffectiveness() > 0)
+                effText = " (Not very effective...)";
+            else if (msg.getEffectiveness() != null && msg.getEffectiveness() == 0f)
+                effText = " (No effect)";
 
-        if (msg.isTargetFainted()) {
-            targetPok.setFainted(true);
-            PokemonInstance next = target.getFirstAvailablePokemon();
-            if (next != null) {
-                target.setCurrentPokemon(next);
-                String faintEntry = cap(targetPok.getName()) + " fainted! " + cap(target.getName()) + " sends out "
-                        + cap(next.getName()) + "!";
-                battleStatusLabel.setText(faintEntry);
-                battleLog.add(faintEntry);
-                updateBattleDisplay();
+            String logEntry = cap(msg.getAttackerName()) + " used " + cap(msg.getMoveUsed()) + "! "
+                    + msg.getDamageDealt() + " dmg" + effText;
+            battleStatusLabel.setText(logEntry);
+            battleLog.add(logEntry);
+
+            if (msg.isTargetFainted()) {
+                targetPok.setFainted(true);
+                PokemonInstance next = target.getFirstAvailablePokemon();
+                if (next != null) {
+                    target.setCurrentPokemon(next);
+                    String faintEntry = cap(targetPok.getName()) + " fainted! " + cap(target.getName()) + " sends out "
+                            + cap(next.getName()) + "!";
+                    battleStatusLabel.setText(faintEntry);
+                    battleLog.add(faintEntry);
+                    updateBattleDisplay();
+                }
             }
+
+            damageAnimationInProgress = false;
+            processNextDamageMessage();
+        };
+
+        if (animationManager != null) {
+            animationManager.playAttackAnimation(attackerSprite, defenderSprite, null, afterAnimation);
+        } else {
+            afterAnimation.run();
         }
     }
 
@@ -653,6 +697,8 @@ public class OnlineBattleController {
     private void applyBattleEnd(BattleEndMessage msg) {
         if (battleEnded)
             return;
+        pendingDamageMessages.clear();
+        damageAnimationInProgress = false;
         battleEnded = true;
         boolean playerWon = player.getName().equals(msg.getWinnerName());
         saveBattleResult(playerWon, msg.getWinnerName());
@@ -662,6 +708,8 @@ public class OnlineBattleController {
     private void handleDisconnect() {
         if (battleEnded)
             return;
+        pendingDamageMessages.clear();
+        damageAnimationInProgress = false;
         battleEnded = true;
         battleStatusLabel.setText("Connection lost!");
         battleLog.add("Connection to server lost.");
