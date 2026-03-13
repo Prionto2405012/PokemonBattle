@@ -9,6 +9,11 @@
     -move-info-accuracy: #a5d6a7;
     -move-info-pp: #e0e0e0;
     -move-info-description: #f2f5ff;
+    -move-eff-size: 12px;
+    -move-eff-super: #7CFF6B;
+    -move-eff-notvery: #ffcc66;
+    -move-eff-immune: #b0b0b0;
+    -move-eff-shadow: rgba(0, 0, 0, 0.55);
 }
 
 .battle-section {
@@ -500,4 +505,24 @@
     -fx-text-fill: -move-info-description;
     -fx-line-spacing: 1.5px;
     -fx-padding: 4 0 0 0;
+}
+
+/* Move effectiveness indicator */
+.move-eff-indicator {
+    -fx-font-family: "SPACE NOVA";
+    -fx-font-size: -move-eff-size;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, -move-eff-shadow, 8, 0.25, 0, 1);
+}
+
+.move-eff-super {
+    -fx-text-fill: -move-eff-super;
+}
+
+.move-eff-notvery {
+    -fx-text-fill: -move-eff-notvery;
+}
+
+.move-eff-immune {
+    -fx-text-fill: -move-eff-immune;
 }

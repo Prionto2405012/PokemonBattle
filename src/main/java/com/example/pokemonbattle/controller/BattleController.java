@@ -139,6 +139,8 @@ public class BattleController implements Battle.BattleListener {
     private static final double INFO_BTN_HEIGHT = 18.0; // px height of the "i" button
     private static final double INFO_BTN_INSET_TOP = 4.0; // top margin inside move btn
     private static final double INFO_BTN_INSET_RIGHT = 4.0; // right margin inside move btn
+    private static final double EFF_ICON_INSET_RIGHT = 8.0; // right margin inside move btn
+    private static final double EFF_ICON_INSET_BOTTOM = 6.0; // bottom margin inside move btn
 
     // Battle model / state
     private Player player;
@@ -483,12 +485,14 @@ public class BattleController implements Battle.BattleListener {
         moveButtonsContainer.getChildren().clear();
 
         PokemonInstance cur = player.getCurrentPokemon();
+        PokemonInstance foe = opponent != null ? opponent.getCurrentPokemon() : null;
         var moves = cur.getBattleMoves();
         for (int i = 0; i < 4; i++) {
             if (i < moves.size()) {
                 Move m = moves.get(i).getMove();
                 int pp = moves.get(i).getCurrentPp();
-                moveButtonsContainer.getChildren().add(createMoveRow(m, pp));
+                float eff = getMoveEffectiveness(m, foe);
+                moveButtonsContainer.getChildren().add(createMoveRow(m, pp, eff));
             }
         }
     }
@@ -497,7 +501,7 @@ public class BattleController implements Battle.BattleListener {
      * Builds one move row: a coloured list button + type/PP overlay + "i" info
      * button.
      */
-    private HBox createMoveRow(Move move, int currentPp) {
+    private HBox createMoveRow(Move move, int currentPp, float effectiveness) {
         String type = (move.getType() != null) ? move.getType() : "normal";
         int maxPp = move.getPp() > 0 ? move.getPp() : currentPp;
         String grad = getTypeGradient(type);
@@ -542,7 +546,18 @@ public class BattleController implements Battle.BattleListener {
         iBtn.setOnAction(e -> {
         }); // consume click — don't trigger move
 
-        StackPane wrapper = new StackPane(moveBtn, rightInfo, iBtn);
+        Label effLabel = createEffectivenessIndicator(effectiveness);
+        if (effLabel != null) {
+            StackPane.setAlignment(effLabel, Pos.BOTTOM_RIGHT);
+            StackPane.setMargin(effLabel, new Insets(0, EFF_ICON_INSET_RIGHT, EFF_ICON_INSET_BOTTOM, 0));
+        }
+
+        StackPane wrapper = new StackPane();
+        wrapper.getChildren().add(moveBtn);
+        wrapper.getChildren().add(rightInfo);
+        wrapper.getChildren().add(iBtn);
+        if (effLabel != null)
+            wrapper.getChildren().add(effLabel);
         HBox.setHgrow(wrapper, Priority.ALWAYS);
 
         HBox row = new HBox(wrapper);
@@ -554,6 +569,37 @@ public class BattleController implements Battle.BattleListener {
         for (Button b : activeMoveButtons)
             b.setDisable(true);
         hideInfoOverlay();
+    }
+
+    private float getMoveEffectiveness(Move move, PokemonInstance defender) {
+        if (defender == null || move == null)
+            return 1.0f;
+        return Battle.getTypeEffectivenessMultiplier(move.getType(), defender.getTypes());
+    }
+
+    private Label createEffectivenessIndicator(float effectiveness) {
+        if (effectiveness > 1.0f) {
+            return buildEffLabel("▲", "move-eff-indicator move-eff-super");
+        }
+        if (effectiveness > 0.0f && effectiveness < 1.0f) {
+            return buildEffLabel("▼", "move-eff-indicator move-eff-notvery");
+        }
+        if (effectiveness == 0.0f) {
+            return buildEffLabel("x", "move-eff-indicator move-eff-immune");
+        }
+        return null;
+    }
+
+    private Label buildEffLabel(String text, String classes) {
+        Label label = new Label(text);
+        label.getStyleClass().addAll(classes.split("\\s+"));
+        label.setMouseTransparent(true);
+        TranslateTransition tt = new TranslateTransition(Duration.millis(900), label);
+        tt.setByY(-2.5);
+        tt.setAutoReverse(true);
+        tt.setCycleCount(TranslateTransition.INDEFINITE);
+        tt.play();
+        return label;
     }
 
     private void onMoveSelected(Move move) {

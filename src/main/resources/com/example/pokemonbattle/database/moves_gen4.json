@@ -7,7 +7,7 @@
     "pp": 10,
     "type": "normal",
     "damage_class": "special",
-    "description": "Power: 80\nAccuracy: 100\nPP: 10\n\nPounds with fore\u00ad legs or tail."
+    "description": "Power: 80\nAccuracy: 100\nPP: 10\n\n1st turn: Prepare 2nd turn: Attack"
   },
   {
     "id": 3,
@@ -17,7 +17,7 @@
     "pp": 30,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 50\nAccuracy: 95\nPP: 30\n\nRepeatedly slaps 2-5 times."
+    "description": "Power: 50\nAccuracy: 95\nPP: 30\n\nCuts using claws, scythes, etc."
   },
   {
     "id": 4,
@@ -27,7 +27,7 @@
     "pp": 20,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 15\nAccuracy: 85\nPP: 20\n\nRepeatedly punches 2-5 times."
+    "description": "Power: 15\nAccuracy: 85\nPP: 20\n\nBinds the target for 2-5 turns."
   },
   {
     "id": 5,
@@ -37,7 +37,7 @@
     "pp": 25,
     "type": "grass",
     "damage_class": "physical",
-    "description": "Power: 45\nAccuracy: 100\nPP: 25\n\nA powerful punch thrown very hard."
+    "description": "Power: 45\nAccuracy: 100\nPP: 25\n\nWhips the foe with slender vines."
   },
   {
     "id": 6,
@@ -47,7 +47,7 @@
     "pp": 15,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 70\nAccuracy: 100\nPP: 15\n\nThrows coins. Gets them back later."
+    "description": "Power: 70\nAccuracy: 100\nPP: 15\n\nAn attack that may make foe flinch."
   },
   {
     "id": 7,
@@ -57,7 +57,7 @@
     "pp": 35,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 40\nAccuracy: 100\nPP: 35\n\nA fiery punch. May cause a burn."
+    "description": "Power: 40\nAccuracy: 100\nPP: 35\n\nA full-body charge attack."
   },
   {
     "id": 8,
@@ -67,7 +67,7 @@
     "pp": 15,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 85\nAccuracy: 100\nPP: 15\n\nAn icy punch. May cause freezing."
+    "description": "Power: 85\nAccuracy: 100\nPP: 15\n\nAn attack that may cause paralysis."
   },
   {
     "id": 9,
@@ -77,7 +77,7 @@
     "pp": 20,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 90\nAccuracy: 85\nPP: 20\n\nAn electric punch. It may paralyze."
+    "description": "Power: 90\nAccuracy: 85\nPP: 20\n\nA tackle that also hurts the user."
   },
   {
     "id": 10,
@@ -87,7 +87,7 @@
     "pp": 15,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 120\nAccuracy: 100\nPP: 15\n\nScratches with sharp claws."
+    "description": "Power: 120\nAccuracy: 100\nPP: 15\n\nA tackle that also hurts the user."
   },
   {
     "id": 12,
@@ -97,7 +97,7 @@
     "pp": 15,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 80\nAccuracy: 100\nPP: 15\n\nA one-hit KO, pincer attack."
+    "description": "Power: 80\nAccuracy: 100\nPP: 15\n\nA powerful physi\u00ad cal attack."
   },
   {
     "id": 13,
@@ -107,7 +107,7 @@
     "pp": 15,
     "type": "grass",
     "damage_class": "special",
-    "description": "Power: 40\nAccuracy: 100\nPP: 15\n\n1st turn: Prepare 2nd turn: Attack"
+    "description": "Power: 40\nAccuracy: 100\nPP: 15\n\nSteals 1/2 of the damage inflicted."
   },
   {
     "id": 16,
@@ -117,7 +117,7 @@
     "pp": 25,
     "type": "grass",
     "damage_class": "physical",
-    "description": "Power: 55\nAccuracy: 95\nPP: 25\n\nWhips up a strong gust of wind."
+    "description": "Power: 55\nAccuracy: 95\nPP: 25\n\nA sharp-edged leaf is launched to slash at the foe. It has a high critical-hit ratio."
   },
   {
     "id": 17,
@@ -127,7 +127,7 @@
     "pp": 10,
     "type": "grass",
     "damage_class": "special",
-    "description": "Power: 120\nAccuracy: 100\nPP: 10\n\nStrikes the target with wings."
+    "description": "Power: 120\nAccuracy: 100\nPP: 10\n\n1st turn: Prepare 2nd turn: Attack"
   },
   {
     "id": 20,
@@ -137,7 +137,7 @@
     "pp": 10,
     "type": "grass",
     "damage_class": "special",
-    "description": "Power: 120\nAccuracy: 100\nPP: 10\n\nBinds the target for 2-5 turns."
+    "description": "Power: 120\nAccuracy: 100\nPP: 10\n\nWorks 2-3 turns and confuses user."
   },
   {
     "id": 23,
@@ -147,7 +147,7 @@
     "pp": 20,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 20\nAccuracy: 100\nPP: 20\n\nAn attack that may cause flinching."
+    "description": "Power: 20\nAccuracy: 100\nPP: 20\n\nRaises ATTACK if the user is hit."
   },
   {
     "id": 30,
@@ -157,7 +157,7 @@
     "pp": 20,
     "type": "poison",
     "damage_class": "special",
-    "description": "Power: 65\nAccuracy: 100\nPP: 20\n\nAn attack using a horn to jab."
+    "description": "Power: 65\nAccuracy: 100\nPP: 20\n\nAn attack that may poison the foe."
   },
   {
     "id": 31,
@@ -167,7 +167,7 @@
     "pp": 10,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 130\nAccuracy: 100\nPP: 10\n\nJabs the target 2-5 times."
+    "description": "Power: 130\nAccuracy: 100\nPP: 10\n\n1st turn: Prepare 2nd turn: Attack"
   },
   {
     "id": 36,
@@ -177,7 +177,7 @@
     "pp": 15,
     "type": "normal",
     "damage_class": "special",
-    "description": "Power: 50\nAccuracy: 100\nPP: 15\n\nA tackle that also hurts the user."
+    "description": "Power: 50\nAccuracy: 100\nPP: 15\n\nAn attack useable only while asleep."
   },
   {
     "id": 39,
@@ -187,7 +187,7 @@
     "pp": 10,
     "type": "poison",
     "damage_class": "special",
-    "description": "Power: 90\nAccuracy: 100\nPP: 10\n\nLowers the foe's DEFENSE."
+    "description": "Power: 90\nAccuracy: 100\nPP: 10\n\nAn attack that may poison the foe."
   },
   {
     "id": 40,
@@ -197,7 +197,7 @@
     "pp": 10,
     "type": "ground",
     "damage_class": "special",
-    "description": "Power: 20\nAccuracy: 100\nPP: 10\n\nAn attack that may poison the target."
+    "description": "Power: 20\nAccuracy: 100\nPP: 10\n\nReduces the foe's accuracy."
   },
   {
     "id": 41,
@@ -207,7 +207,7 @@
     "pp": 10,
     "type": "dragon",
     "damage_class": "physical",
-    "description": "Power: 120\nAccuracy: 100\nPP: 10\n\nJabs the foe twice using stingers."
+    "description": "Power: 120\nAccuracy: 100\nPP: 10\n\nWorks 2-3 turns and confuses user."
   },
   {
     "id": 42,
@@ -217,7 +217,7 @@
     "pp": 10,
     "type": "grass",
     "damage_class": "special",
-    "description": "Power: 75\nAccuracy: 100\nPP: 10\n\nFires pins that strike 2-5 times."
+    "description": "Power: 75\nAccuracy: 100\nPP: 10\n\nSteals 1/2 of the damage inflicted."
   },
   {
     "id": 45,
@@ -227,7 +227,7 @@
     "pp": 40,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 40\nAccuracy: 100\nPP: 40\n\nReduces the foe's ATTACK."
+    "description": "Power: 40\nAccuracy: 100\nPP: 40\n\nLeaves the foe with at least 1HP."
   },
   {
     "id": 47,
@@ -237,7 +237,7 @@
     "pp": 20,
     "type": "bug",
     "damage_class": "physical",
-    "description": "Power: 40\nAccuracy: 95\nPP: 20\n\nMay cause the foe to fall asleep."
+    "description": "Power: 40\nAccuracy: 95\nPP: 20\n\nSuccessive hits raise power."
   },
   {
     "id": 55,
@@ -247,7 +247,7 @@
     "pp": 15,
     "type": "normal",
     "damage_class": "special",
-    "description": "Power: 60\nAccuracy: 100\nPP: 15\n\nSquirts water to attack."
+    "description": "Power: 60\nAccuracy: 100\nPP: 15\n\nThe power varies with the POK\u00e9MON."
   },
   {
     "id": 57,
@@ -257,7 +257,7 @@
     "pp": 15,
     "type": "fighting",
     "damage_class": "physical",
-    "description": "Power: 40\nAccuracy: 100\nPP: 15\n\nA strong water- type attack."
+    "description": "Power: 40\nAccuracy: 100\nPP: 15\n\nAn attack that may lower DEFENSE."
   },
   {
     "id": 58,
@@ -267,7 +267,7 @@
     "pp": 20,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 70\nAccuracy: 100\nPP: 20\n\nAn attack that may freeze the foe."
+    "description": "Power: 70\nAccuracy: 100\nPP: 20\n\nBoosts ATTACK when burned, paralyzed, or poisoned."
   },
   {
     "id": 62,
@@ -277,7 +277,7 @@
     "pp": 20,
     "type": "dark",
     "damage_class": "physical",
-    "description": "Power: 65\nAccuracy: 100\nPP: 20\n\nAn attack that may lower ATTACK."
+    "description": "Power: 65\nAccuracy: 100\nPP: 20\n\nKnocks down the foe\u2019s held item to prevent its use."
   },
   {
     "id": 63,
@@ -287,7 +287,7 @@
     "pp": 20,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 70\nAccuracy: 100\nPP: 20\n\n1st turn: Attack 2nd turn: Rest"
+    "description": "Power: 70\nAccuracy: 100\nPP: 20\n\nAn attack with effects that vary by location."
   },
   {
     "id": 64,
@@ -297,7 +297,7 @@
     "pp": 10,
     "type": "normal",
     "damage_class": "special",
-    "description": "Power: 50\nAccuracy: 100\nPP: 10\n\nJabs the foe with a beak, etc."
+    "description": "Power: 50\nAccuracy: 100\nPP: 10\n\nThe move\u2019s type and power change with the weather."
   },
   {
     "id": 66,
@@ -307,7 +307,7 @@
     "pp": 30,
     "type": "grass",
     "damage_class": "physical",
-    "description": "Power: 25\nAccuracy: 100\nPP: 30\n\nAn attack that al\u00ad so hurts the user."
+    "description": "Power: 25\nAccuracy: 100\nPP: 30\n\nShoots 2 to 5 seeds in a row to strike the foe."
   },
   {
     "id": 67,
@@ -317,7 +317,7 @@
     "pp": 20,
     "type": "grass",
     "damage_class": "special",
-    "description": "Power: 60\nAccuracy: -\nPP: 20\n\nAn attack that may cause flinching."
+    "description": "Power: 60\nAccuracy: -\nPP: 20\n\nAttacks with a strange leaf that cannot be evaded."
   },
   {
     "id": 70,
@@ -327,7 +327,7 @@
     "pp": 15,
     "type": "grass",
     "damage_class": "physical",
-    "description": "Power: 80\nAccuracy: 100\nPP: 15\n\nA powerful physi\u00ad cal attack."
+    "description": "Power: 80\nAccuracy: 100\nPP: 15\n\nThe user slams a barrage of hard- shelled seeds down on the foe from above."
   },
   {
     "id": 71,
@@ -337,7 +337,7 @@
     "pp": 10,
     "type": "grass",
     "damage_class": "special",
-    "description": "Power: 90\nAccuracy: 100\nPP: 10\n\nSteals 1/2 of the damage inflicted."
+    "description": "Power: 90\nAccuracy: 100\nPP: 10\n\nThe user draws power from nature and fires it at the foe. It may also lower the target\u2019s Sp. Def."
   },
   {
     "id": 72,
@@ -347,7 +347,7 @@
     "pp": 5,
     "type": "grass",
     "damage_class": "special",
-    "description": "Power: 130\nAccuracy: 90\nPP: 5\n\nSteals 1/2 of the damage inflicted."
+    "description": "Power: 130\nAccuracy: 90\nPP: 5\n\nA storm of sharp leaves is whipped up. The attack\u2019s recoil sharply reduces the user\u2019s Sp. Atk stat."
   },
   {
     "id": 73,
@@ -357,7 +357,7 @@
     "pp": 10,
     "type": "grass",
     "damage_class": "physical",
-    "description": "Power: 120\nAccuracy: 85\nPP: 10\n\nSteals HP from the foe on every turn."
+    "description": "Power: 120\nAccuracy: 85\nPP: 10\n\nThe user violently whirls its vines or tentacles to harshly lash the foe. "
   },
   {
     "id": 76,
@@ -367,7 +367,7 @@
     "pp": 10,
     "type": "poison",
     "damage_class": "special",
-    "description": "Power: 65\nAccuracy: 100\nPP: 10\n\n1st turn: Prepare 2nd turn: Attack"
+    "description": "Power: 65\nAccuracy: 100\nPP: 10\n\nThe user drenches the target in a special poisonous liquid. Its power is doubled if the target is poisoned."
   },
   {
     "id": 77,
@@ -377,7 +377,7 @@
     "pp": 20,
     "type": "poison",
     "damage_class": "special",
-    "description": "Power: 40\nAccuracy: 100\nPP: 20\n\nA move that may poison the foe."
+    "description": "Power: 40\nAccuracy: 100\nPP: 20\n\nThe user spits fluid that works to melt the target. This harshly reduces the target\u2019s Sp. Def stat."
   },
   {
     "id": 78,
@@ -387,7 +387,7 @@
     "pp": 15,
     "type": "normal",
     "damage_class": "special",
-    "description": "Power: 60\nAccuracy: 100\nPP: 15\n\nA move that may paralyze the foe."
+    "description": "Power: 60\nAccuracy: 100\nPP: 15\n\nThe user attacks the target with a song. Others can join in the Round and make the attack do greater damage."
   },
   {
     "id": 79,
@@ -397,7 +397,7 @@
     "pp": 15,
     "type": "normal",
     "damage_class": "special",
-    "description": "Power: 40\nAccuracy: 100\nPP: 15\n\nMay cause the foe to fall asleep."
+    "description": "Power: 40\nAccuracy: 100\nPP: 15\n\nThe user attacks the target with an echoing voice. If this move is used every turn, it does greater damage."
   },
   {
     "id": 80,
@@ -407,7 +407,7 @@
     "pp": 10,
     "type": "grass",
     "damage_class": "special",
-    "description": "Power: 80\nAccuracy: 100\nPP: 10\n\nWorks 2-3 turns and confuses user."
+    "description": "Power: 80\nAccuracy: 100\nPP: 10\n\nA column of grass hits opposing Pok\u00e9mon. When used with its water equivalent, its damage increases into a vast swamp."
   },
   {
     "id": 84,
@@ -417,7 +417,7 @@
     "pp": 20,
     "type": "grass",
     "damage_class": "physical",
-    "description": "Power: 55\nAccuracy: 100\nPP: 20\n\nAn electrical attack that may paralyze the foe."
+    "description": "Power: 55\nAccuracy: 100\nPP: 20\n\nGliding on the ground, the user attacks the target. This move always goes first on Grassy Terrain."
   },
   {
     "id": 85,
@@ -427,7 +427,7 @@
     "pp": 10,
     "type": "normal",
     "damage_class": "special",
-    "description": "Power: 80\nAccuracy: 100\nPP: 10\n\nAn attack that may cause paralysis."
+    "description": "Power: 80\nAccuracy: 100\nPP: 10\n\nIf the user has Terastallized, it unleashes energy of its Tera Type. This move inflicts damage using the Attack or Sp. Atk stat\u2014whichever is higher for the user."
   },
   {
     "id": 86,
@@ -437,7 +437,7 @@
     "pp": 20,
     "type": "grass",
     "damage_class": "physical",
-    "description": "Power: 50\nAccuracy: 100\nPP: 20\n\nA move that may cause paralysis."
+    "description": "Power: 50\nAccuracy: 100\nPP: 20\n\nThe user attacks suddenly as if leaping out from tall grass. The user's nimble footwork boosts its Speed stat."
   },
   {
     "id": 88,
@@ -447,7 +447,7 @@
     "pp": 5,
     "type": "normal",
     "damage_class": "special",
-    "description": "Power: 150\nAccuracy: 90\nPP: 5\n\nDrops rocks on the enemy."
+    "description": "Power: 150\nAccuracy: 90\nPP: 5\n\n1st turn: Attack 2nd turn: Rest"
   },
   {
     "id": 89,
@@ -467,7 +467,7 @@
     "pp": 5,
     "type": "grass",
     "damage_class": "special",
-    "description": "Power: 150\nAccuracy: 90\nPP: 5\n\nA poison move with increasing damage."
+    "description": "Power: 150\nAccuracy: 90\nPP: 5\n\nPowerful, but leaves the user immobile the next turn."
   },
   {
     "id": 93,
@@ -477,7 +477,7 @@
     "pp": 20,
     "type": "poison",
     "damage_class": "physical",
-    "description": "Power: 80\nAccuracy: 100\nPP: 20\n\nThe foe is hit by a weak telekinetic force. It may also leave the foe confused."
+    "description": "Power: 80\nAccuracy: 100\nPP: 20\n\nThe foe is stabbed with a tentacle or arm steeped in poison. It may also poison the foe."
   },
   {
     "id": 94,
@@ -487,7 +487,7 @@
     "pp": 10,
     "type": "ground",
     "damage_class": "special",
-    "description": "Power: 90\nAccuracy: 100\nPP: 10\n\nAn attack that may lower SPCL.DEF."
+    "description": "Power: 90\nAccuracy: 100\nPP: 10\n\nThe user makes the ground under the foe erupt with power. It may also lower the target\u2019s Sp. Def."
   },
   {
     "id": 95,
@@ -497,7 +497,7 @@
     "pp": 5,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 150\nAccuracy: 90\nPP: 5\n\nMay put the foe to sleep."
+    "description": "Power: 150\nAccuracy: 90\nPP: 5\n\nThe user charges at the foe using every bit of its power. The user must rest on the next turn."
   },
   {
     "id": 96,
@@ -507,7 +507,7 @@
     "pp": 20,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 90\nAccuracy: 85\nPP: 20\n\nRaises the user's ATTACK."
+    "description": "Power: 90\nAccuracy: 85\nPP: 20\n\nA charging attack that may also leave the foe confused. It can also be used to scale rocky walls."
   },
   {
     "id": 97,
@@ -517,7 +517,7 @@
     "pp": 20,
     "type": "ground",
     "damage_class": "physical",
-    "description": "Power: 60\nAccuracy: 100\nPP: 20\n\nSharply increases the user's SPEED."
+    "description": "Power: 60\nAccuracy: 100\nPP: 20\n\nThe user stomps down on the ground and attacks everything in the area. Hit Pok\u00e9mon\u2019s Speed stat is reduced."
   },
   {
     "id": 98,
@@ -527,7 +527,7 @@
     "pp": 15,
     "type": "grass",
     "damage_class": "physical",
-    "description": "Power: 90\nAccuracy: 100\nPP: 15\n\nLets the user get in the first hit."
+    "description": "Power: 90\nAccuracy: 100\nPP: 15\n\nThe user stirs up a violent petal blizzard and attacks everything around it."
   },
   {
     "id": 99,
@@ -537,7 +537,7 @@
     "pp": 10,
     "type": "ground",
     "damage_class": "physical",
-    "description": "Power: 75\nAccuracy: 100\nPP: 10\n\nRaises ATTACK if the user is hit."
+    "description": "Power: 75\nAccuracy: 100\nPP: 10\n\nDriven by frustration, the user attacks the target. If the user\u2019s previous move has failed, the power of this move doubles."
   },
   {
     "id": 100,
@@ -547,7 +547,7 @@
     "pp": 10,
     "type": "normal",
     "damage_class": "special",
-    "description": "Power: 50\nAccuracy: 100\nPP: 10\n\nA move for fleeing from battle."
+    "description": "Power: 50\nAccuracy: 100\nPP: 10\n\nThe user utilizes the power of the terrain to attack. This move\u2019s type and power changes depending on the terrain when it\u2019s used."
   },
   {
     "id": 101,
@@ -557,7 +557,7 @@
     "pp": 20,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 80\nAccuracy: 85\nPP: 20\n\nThe user's level equals damage HP."
+    "description": "Power: 80\nAccuracy: 85\nPP: 20\n\nA powerful punch thrown very hard."
   },
   {
     "id": 102,
@@ -567,7 +567,7 @@
     "pp": 15,
     "type": "fire",
     "damage_class": "physical",
-    "description": "Power: 75\nAccuracy: 100\nPP: 15\n\nCopies a move used by the foe."
+    "description": "Power: 75\nAccuracy: 100\nPP: 15\n\nA fiery punch. May cause a burn."
   },
   {
     "id": 103,
@@ -577,7 +577,7 @@
     "pp": 15,
     "type": "electric",
     "damage_class": "physical",
-    "description": "Power: 75\nAccuracy: 100\nPP: 15\n\nSharply reduces the foe's DEFENSE."
+    "description": "Power: 75\nAccuracy: 100\nPP: 15\n\nAn electric punch. It may paralyze."
   },
   {
     "id": 104,
@@ -587,7 +587,7 @@
     "pp": 35,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 40\nAccuracy: 100\nPP: 35\n\nHeightens evasive\u00ad ness."
+    "description": "Power: 40\nAccuracy: 100\nPP: 35\n\nScratches with sharp claws."
   },
   {
     "id": 105,
@@ -597,7 +597,7 @@
     "pp": 35,
     "type": "flying",
     "damage_class": "physical",
-    "description": "Power: 60\nAccuracy: 100\nPP: 35\n\nRecovers up to half the user\u2019s maximum HP."
+    "description": "Power: 60\nAccuracy: 100\nPP: 35\n\nStrikes the target with wings."
   },
   {
     "id": 106,
@@ -607,7 +607,7 @@
     "pp": 5,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 120\nAccuracy: 75\nPP: 5\n\nStiffens the body\u2019s  muscles to raise DEFENSE."
+    "description": "Power: 120\nAccuracy: 75\nPP: 5\n\nThe target is attacked by a kick launched with muscle-packed power."
   },
   {
     "id": 108,
@@ -617,7 +617,7 @@
     "pp": 25,
     "type": "dark",
     "damage_class": "physical",
-    "description": "Power: 60\nAccuracy: 100\nPP: 25\n\nLowers the foe's accuracy."
+    "description": "Power: 60\nAccuracy: 100\nPP: 25\n\nAn attack that may cause flinching."
   },
   {
     "id": 109,
@@ -627,7 +627,7 @@
     "pp": 25,
     "type": "fire",
     "damage_class": "special",
-    "description": "Power: 40\nAccuracy: 100\nPP: 25\n\nA move that causes confusion."
+    "description": "Power: 40\nAccuracy: 100\nPP: 25\n\nThe foe is attacked with small flames. The foe may suffer a burn."
   },
   {
     "id": 110,
@@ -637,7 +637,7 @@
     "pp": 15,
     "type": "fire",
     "damage_class": "special",
-    "description": "Power: 90\nAccuracy: 100\nPP: 15\n\nHeightens the user's DEFENSE."
+    "description": "Power: 90\nAccuracy: 100\nPP: 15\n\nAn attack that may inflict a burn."
   },
   {
     "id": 111,
@@ -647,7 +647,7 @@
     "pp": 20,
     "type": "fighting",
     "damage_class": "physical",
-    "description": "Power: 80\nAccuracy: 80\nPP: 20\n\nHeightens the user's DEFENSE."
+    "description": "Power: 80\nAccuracy: 80\nPP: 20\n\nAn attack that al\u00ad so hurts the user."
   },
   {
     "id": 115,
@@ -657,7 +657,7 @@
     "pp": 15,
     "type": "fire",
     "damage_class": "special",
-    "description": "Power: 35\nAccuracy: 85\nPP: 15\n\nRaises DEFENSE with a barrier."
+    "description": "Power: 35\nAccuracy: 85\nPP: 15\n\nTraps foe in fire for 2-5 turns."
   },
   {
     "id": 116,
@@ -667,7 +667,7 @@
     "pp": 10,
     "type": "ground",
     "damage_class": "physical",
-    "description": "Power: 80\nAccuracy: 100\nPP: 10\n\nRaises the criti\u00ad cal hit ratio."
+    "description": "Power: 80\nAccuracy: 100\nPP: 10\n\n1st turn: Burrow 2nd turn: Attack"
   },
   {
     "id": 118,
@@ -677,7 +677,7 @@
     "pp": 5,
     "type": "fire",
     "damage_class": "special",
-    "description": "Power: 110\nAccuracy: 85\nPP: 5\n\nRandomly uses any POK\u00e9MON move."
+    "description": "Power: 110\nAccuracy: 85\nPP: 5\n\nAn attack that may cause a burn."
   },
   {
     "id": 119,
@@ -687,7 +687,7 @@
     "pp": 20,
     "type": "normal",
     "damage_class": "special",
-    "description": "Power: 60\nAccuracy: -\nPP: 20\n\nCounters with the same move."
+    "description": "Power: 60\nAccuracy: -\nPP: 20\n\nSprays star-shaped rays that never miss."
   },
   {
     "id": 120,
@@ -697,7 +697,7 @@
     "pp": 15,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 18\nAccuracy: 80\nPP: 15\n\nPowerful but makes the user faint."
+    "description": "Power: 18\nAccuracy: 80\nPP: 15\n\nQuickly scratches 2-5 times."
   },
   {
     "id": 121,
@@ -707,7 +707,7 @@
     "pp": 10,
     "type": "rock",
     "damage_class": "physical",
-    "description": "Power: 75\nAccuracy: 90\nPP: 10\n\nEggs are hurled at the foe."
+    "description": "Power: 75\nAccuracy: 90\nPP: 10\n\nAn attack that may cause flinching."
   },
   {
     "id": 122,
@@ -717,7 +717,7 @@
     "pp": 20,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 70\nAccuracy: 100\nPP: 20\n\nAn attack that may cause paralysis."
+    "description": "Power: 70\nAccuracy: 100\nPP: 20\n\nHas a high criti\u00ad cal hit ratio."
   },
   {
     "id": 124,
@@ -727,7 +727,7 @@
     "pp": 5,
     "type": "fighting",
     "damage_class": "physical",
-    "description": "Power: 100\nAccuracy: 50\nPP: 5\n\nAn attack that may poison the foe."
+    "description": "Power: 100\nAccuracy: 50\nPP: 5\n\nAn attack that always confuses."
   },
   {
     "id": 125,
@@ -737,7 +737,7 @@
     "pp": 20,
     "type": "dragon",
     "damage_class": "special",
-    "description": "Power: 60\nAccuracy: 100\nPP: 20\n\nAn attack that may cause flinching."
+    "description": "Power: 60\nAccuracy: 100\nPP: 20\n\nA strong breath attack."
   },
   {
     "id": 126,
@@ -747,7 +747,7 @@
     "pp": 15,
     "type": "steel",
     "damage_class": "physical",
-    "description": "Power: 100\nAccuracy: 75\nPP: 15\n\nAn attack that may cause a burn."
+    "description": "Power: 100\nAccuracy: 75\nPP: 15\n\nAn attack that may reduce DEFENSE."
   },
   {
     "id": 127,
@@ -757,7 +757,7 @@
     "pp": 35,
     "type": "steel",
     "damage_class": "physical",
-    "description": "Power: 50\nAccuracy: 95\nPP: 35\n\nAn aquatic charge attack."
+    "description": "Power: 50\nAccuracy: 95\nPP: 35\n\nAn attack that may up user's ATTACK."
   },
   {
     "id": 128,
@@ -767,7 +767,7 @@
     "pp": 15,
     "type": "dark",
     "damage_class": "physical",
-    "description": "Power: 80\nAccuracy: 100\nPP: 15\n\nTraps the foe for 2-5 turns."
+    "description": "Power: 80\nAccuracy: 100\nPP: 15\n\nAn attack that may lower SPCL.DEF."
   },
   {
     "id": 129,
@@ -777,7 +777,7 @@
     "pp": 5,
     "type": "rock",
     "damage_class": "special",
-    "description": "Power: 60\nAccuracy: 100\nPP: 5\n\nSprays star-shaped rays that never miss."
+    "description": "Power: 60\nAccuracy: 100\nPP: 5\n\nAn attack that may raise all stats."
   },
   {
     "id": 131,
@@ -787,7 +787,7 @@
     "pp": 10,
     "type": "fire",
     "damage_class": "special",
-    "description": "Power: 95\nAccuracy: 90\nPP: 10\n\nFires spikes to hit 2-5 times."
+    "description": "Power: 95\nAccuracy: 90\nPP: 10\n\nExhales a hot breath on the foe. May inflict a burn."
   },
   {
     "id": 133,
@@ -797,7 +797,7 @@
     "pp": 20,
     "type": "fighting",
     "damage_class": "physical",
-    "description": "Power: 150\nAccuracy: 100\nPP: 20\n\nSharply raises the user's SPCL.DEF."
+    "description": "Power: 150\nAccuracy: 100\nPP: 20\n\nA powerful loyalty attack. The user flinches if hit."
   },
   {
     "id": 134,
@@ -807,7 +807,7 @@
     "pp": 15,
     "type": "fighting",
     "damage_class": "physical",
-    "description": "Power: 75\nAccuracy: 100\nPP: 15\n\nReduces the foe's accuracy."
+    "description": "Power: 75\nAccuracy: 100\nPP: 15\n\nDestroys barriers such as REFLECT and causes damage."
   },
   {
     "id": 135,
@@ -817,7 +817,7 @@
     "pp": 25,
     "type": "flying",
     "damage_class": "special",
-    "description": "Power: 60\nAccuracy: 95\nPP: 25\n\nRestores HP by 1/2 the user's max HP."
+    "description": "Power: 60\nAccuracy: 95\nPP: 25\n\nHacks with razorlike wind. High critical-hit ratio."
   },
   {
     "id": 136,
@@ -827,7 +827,7 @@
     "pp": 5,
     "type": "fire",
     "damage_class": "special",
-    "description": "Power: 130\nAccuracy: 90\nPP: 5\n\nMay miss and hurt the user."
+    "description": "Power: 130\nAccuracy: 90\nPP: 5\n\nAllows a full-power attack, but sharply lowers SP. ATK."
   },
   {
     "id": 137,
@@ -837,7 +837,7 @@
     "pp": 15,
     "type": "rock",
     "damage_class": "physical",
-    "description": "Power: 60\nAccuracy: 95\nPP: 15\n\nA move that may cause paralysis."
+    "description": "Power: 60\nAccuracy: 95\nPP: 15\n\nStops the foe from moving with rocks and cuts SPEED."
   },
   {
     "id": 138,
@@ -847,7 +847,7 @@
     "pp": 20,
     "type": "flying",
     "damage_class": "physical",
-    "description": "Power: 60\nAccuracy: -\nPP: 20\n\nSteals HP from a sleeping victim."
+    "description": "Power: 60\nAccuracy: -\nPP: 20\n\nAn extremely speedy and unavoidable attack."
   },
   {
     "id": 139,
@@ -857,7 +857,7 @@
     "pp": 15,
     "type": "dragon",
     "damage_class": "physical",
-    "description": "Power: 80\nAccuracy: 100\nPP: 15\n\nA move that may poison the foe."
+    "description": "Power: 80\nAccuracy: 100\nPP: 15\n\nSlashes the foe with sharp claws."
   },
   {
     "id": 142,
@@ -867,7 +867,7 @@
     "pp": 15,
     "type": "fire",
     "damage_class": "physical",
-    "description": "Power: 120\nAccuracy: 100\nPP: 15\n\nMay cause the foe to fall asleep."
+    "description": "Power: 120\nAccuracy: 100\nPP: 15\n\nThe user cloaks itself in fire and charges at the foe. The user sustains serious damage, too."
   },
   {
     "id": 143,
@@ -877,7 +877,7 @@
     "pp": 10,
     "type": "dragon",
     "damage_class": "special",
-    "description": "Power: 85\nAccuracy: 100\nPP: 10\n\n1st turn: Prepare 2nd turn: Attack"
+    "description": "Power: 85\nAccuracy: 100\nPP: 10\n\nThe foe is attacked with a shock wave generated by the user\u2019s gaping mouth. "
   },
   {
     "id": 144,
@@ -887,7 +887,7 @@
     "pp": 10,
     "type": "dragon",
     "damage_class": "physical",
-    "description": "Power: 100\nAccuracy: 75\nPP: 10\n\nThe user assumes the foe's guise."
+    "description": "Power: 100\nAccuracy: 75\nPP: 10\n\nThe user tackles the foe while exhibiting overwhelming menace. It may also make the target flinch."
   },
   {
     "id": 145,
@@ -897,7 +897,7 @@
     "pp": 5,
     "type": "fighting",
     "damage_class": "special",
-    "description": "Power: 120\nAccuracy: 70\nPP: 5\n\nAn attack that may reduce SPEED."
+    "description": "Power: 120\nAccuracy: 70\nPP: 5\n\nThe user heightens its mental focus and unleashes its power. It may also lower the target\u2019s Sp. Def."
   },
   {
     "id": 146,
@@ -907,7 +907,7 @@
     "pp": 15,
     "type": "ghost",
     "damage_class": "physical",
-    "description": "Power: 70\nAccuracy: 100\nPP: 15\n\nAn attack that may cause confusion."
+    "description": "Power: 70\nAccuracy: 100\nPP: 15\n\nThe user slashes with a sharp claw made from shadows. It has a high critical-hit ratio."
   },
   {
     "id": 147,
@@ -917,7 +917,7 @@
     "pp": 15,
     "type": "fire",
     "damage_class": "physical",
-    "description": "Power: 65\nAccuracy: 95\nPP: 15\n\nA move that induces sleep."
+    "description": "Power: 65\nAccuracy: 95\nPP: 15\n\nThe user bites with flame-cloaked fangs. It may also make the foe flinch or sustain a burn."
   },
   {
     "id": 149,
@@ -927,7 +927,7 @@
     "pp": 15,
     "type": "fire",
     "damage_class": "special",
-    "description": "Power: 70\nAccuracy: 100\nPP: 15\n\nAn attack with variable power."
+    "description": "Power: 70\nAccuracy: 100\nPP: 15\n\nThe user attacks the target with a bursting flame. The bursting flame damages Pok\u00e9mon next to the target as well."
   },
   {
     "id": 150,
@@ -937,7 +937,7 @@
     "pp": 20,
     "type": "fire",
     "damage_class": "physical",
-    "description": "Power: 50\nAccuracy: 100\nPP: 20\n\nHas no effect whatsoever."
+    "description": "Power: 50\nAccuracy: 100\nPP: 20\n\nThe user cloaks itself with flame and attacks. Building up more power, it raises the user\u2019s Speed stat."
   },
   {
     "id": 151,
@@ -947,7 +947,7 @@
     "pp": 15,
     "type": "fire",
     "damage_class": "special",
-    "description": "Power: 60\nAccuracy: 100\nPP: 15\n\nSharply raises the user's DEFENSE."
+    "description": "Power: 60\nAccuracy: 100\nPP: 15\n\nThe user attacks the target with fire. If the target is holding a Berry, the Berry becomes burnt up and unusable."
   },
   {
     "id": 152,
@@ -957,7 +957,7 @@
     "pp": 15,
     "type": "flying",
     "damage_class": "physical",
-    "description": "Power: 55\nAccuracy: 100\nPP: 15\n\nHas a high criti\u00ad cal hit ratio."
+    "description": "Power: 55\nAccuracy: 100\nPP: 15\n\nThe user nimbly strikes the target. If the user is not holding an item, this attack inflicts massive damage."
   },
   {
     "id": 153,
@@ -967,7 +967,7 @@
     "pp": 5,
     "type": "fire",
     "damage_class": "special",
-    "description": "Power: 100\nAccuracy: 50\nPP: 5\n\nVery powerful but makes user faint."
+    "description": "Power: 100\nAccuracy: 50\nPP: 5\n\nThe user attacks by engulfing the target in an intense fire. It leaves the target with a burn."
   },
   {
     "id": 154,
@@ -977,7 +977,7 @@
     "pp": 10,
     "type": "fire",
     "damage_class": "special",
-    "description": "Power: 80\nAccuracy: 100\nPP: 10\n\nQuickly scratches 2-5 times."
+    "description": "Power: 80\nAccuracy: 100\nPP: 10\n\nA column of fire hits opposing Pok\u00e9mon. When used with its Grass equivalent, its damage increases into a vast sea of fire."
   },
   {
     "id": 155,
@@ -987,7 +987,7 @@
     "pp": 10,
     "type": "dragon",
     "damage_class": "physical",
-    "description": "Power: 60\nAccuracy: 90\nPP: 10\n\nAn attack that strikes twice."
+    "description": "Power: 60\nAccuracy: 90\nPP: 10\n\nThe user knocks away the target and drags out another Pok\u00e9mon in its party. In the wild, the battle ends."
   },
   {
     "id": 156,
@@ -997,7 +997,7 @@
     "pp": 20,
     "type": "fighting",
     "damage_class": "physical",
-    "description": "Power: 40\nAccuracy: 100\nPP: 20\n\nSleep for 2 turns to fully recover."
+    "description": "Power: 40\nAccuracy: 100\nPP: 20\n\nStriking opponents over and over makes the user\u2019s fists harder. Hitting a target raises the Attack stat."
   },
   {
     "id": 157,
@@ -1007,7 +1007,7 @@
     "pp": 15,
     "type": "dragon",
     "damage_class": "physical",
-    "description": "Power: 60\nAccuracy: 100\nPP: 15\n\nAn attack that may cause flinching."
+    "description": "Power: 60\nAccuracy: 100\nPP: 15\n\nThe user swings its tough tail wildly and attacks opposing Pok\u00e9mon. This also lowers their Attack stats."
   },
   {
     "id": 158,
@@ -1017,7 +1017,7 @@
     "pp": 10,
     "type": "fire",
     "damage_class": "physical",
-    "description": "Power: 75\nAccuracy: 100\nPP: 10\n\nAn attack that may cause flinching."
+    "description": "Power: 75\nAccuracy: 100\nPP: 10\n\nSpurred by desperation, the user attacks the target. This move's power is doubled if the user's previous move failed."
   },
   {
     "id": 159,
@@ -1027,7 +1027,7 @@
     "pp": 15,
     "type": "flying",
     "damage_class": "physical",
-    "description": "Power: 90\nAccuracy: 95\nPP: 15\n\nA move that raises the user's ATTACK."
+    "description": "Power: 90\nAccuracy: 95\nPP: 15\n\n1st turn: Fly 2nd turn: Attack"
   },
   {
     "id": 162,
@@ -1037,7 +1037,7 @@
     "pp": 25,
     "type": "steel",
     "damage_class": "physical",
-    "description": "Power: 70\nAccuracy: 90\nPP: 25\n\nCuts the foe's HP by 1/2."
+    "description": "Power: 70\nAccuracy: 90\nPP: 25\n\nStiff wings strike the foe."
   },
   {
     "id": 163,
@@ -1047,7 +1047,7 @@
     "pp": 20,
     "type": "dragon",
     "damage_class": "special",
-    "description": "Power: 40\nAccuracy: 100\nPP: 20\n\nHas a high criti\u00ad cal hit ratio."
+    "description": "Power: 40\nAccuracy: 100\nPP: 20\n\nWhips up a tornado to attack."
   },
   {
     "id": 164,
@@ -1057,7 +1057,7 @@
     "pp": 10,
     "type": "fire",
     "damage_class": "physical",
-    "description": "Power: 85\nAccuracy: 90\nPP: 10\n\nMakes a decoy with 1/4 user's max HP."
+    "description": "Power: 85\nAccuracy: 90\nPP: 10\n\nA kick with a high critical- hit ratio. May cause a burn."
   },
   {
     "id": 165,
@@ -1067,7 +1067,7 @@
     "pp": 5,
     "type": "fire",
     "damage_class": "special",
-    "description": "Power: 150\nAccuracy: 90\nPP: 5\n\nUsed only if all PP are exhausted."
+    "description": "Power: 150\nAccuracy: 90\nPP: 5\n\nPowerful, but leaves the user immobile the next turn."
   },
   {
     "id": 168,
@@ -1077,7 +1077,7 @@
     "pp": 15,
     "type": "flying",
     "damage_class": "special",
-    "description": "Power: 75\nAccuracy: 95\nPP: 15\n\nWhile attacking, it may steal the foe\u2019s held item."
+    "description": "Power: 75\nAccuracy: 95\nPP: 15\n\nThe user attacks with a blade of air that slices even the sky. It may also make the target flinch."
   },
   {
     "id": 170,
@@ -1087,7 +1087,7 @@
     "pp": 5,
     "type": "ghost",
     "damage_class": "special",
-    "description": "Power: 60\nAccuracy: 100\nPP: 5\n\nEnsures the next attack will hit."
+    "description": "Power: 60\nAccuracy: 100\nPP: 5\n\nThe user creates a gust of repulsive wind. It may also raise all the user\u2019s stats at once."
   },
   {
     "id": 171,
@@ -1097,7 +1097,7 @@
     "pp": 10,
     "type": "flying",
     "damage_class": "physical",
-    "description": "Power: 60\nAccuracy: 100\nPP: 10\n\nA sleeper loses 1/4 HP every turn."
+    "description": "Power: 60\nAccuracy: 100\nPP: 10\n\nThe user takes the target into the sky, then drops it during the next turn. The target cannot attack while in the sky."
   },
   {
     "id": 173,
@@ -1107,7 +1107,7 @@
     "pp": 10,
     "type": "flying",
     "damage_class": "special",
-    "description": "Power: 110\nAccuracy: 70\nPP: 10\n\nAn attack useable only while asleep."
+    "description": "Power: 110\nAccuracy: 70\nPP: 10\n\nThe user attacks by wrapping its opponent in a fierce wind that flies up into the sky. It may also confuse the target."
   },
   {
     "id": 174,
@@ -1117,7 +1117,7 @@
     "pp": 10,
     "type": "fire",
     "damage_class": "special",
-    "description": "Power: 75\nAccuracy: 100\nPP: 10\n\nWorks differently for ghost-types."
+    "description": "Power: 75\nAccuracy: 100\nPP: 10\n\nThe user attacks by breathing a special, hot fire. This also lowers the target\u2019s Sp. Atk stat."
   },
   {
     "id": 175,
@@ -1127,7 +1127,7 @@
     "pp": 20,
     "type": "dark",
     "damage_class": "physical",
-    "description": "Power: 60\nAccuracy: 100\nPP: 20\n\nStronger if the user's HP is low."
+    "description": "Power: 60\nAccuracy: 100\nPP: 20\n\nThe user swings its body around violently to inflict damage on everything in its vicinity."
   },
   {
     "id": 176,
@@ -1137,7 +1137,7 @@
     "pp": 20,
     "type": "dragon",
     "damage_class": "physical",
-    "description": "Power: 25\nAccuracy: 90\nPP: 20\n\nThe user's type is made resistant."
+    "description": "Power: 25\nAccuracy: 90\nPP: 20\n\nThe user attacks by shooting scales two to five times in a row. This move boosts the user\u2019s Speed stat but lowers its Defense stat."
   },
   {
     "id": 177,
@@ -1147,7 +1147,7 @@
     "pp": 10,
     "type": "flying",
     "damage_class": "physical",
-    "description": "Power: 40\nAccuracy: 90\nPP: 10\n\nHas a high criti\u00ad cal hit ratio."
+    "description": "Power: 40\nAccuracy: 90\nPP: 10\n\nThe user slams the target with its wings. The target is hit twice in a row."
   },
   {
     "id": 178,
@@ -1157,7 +1157,7 @@
     "pp": 10,
     "type": "ground",
     "damage_class": "special",
-    "description": "Power: 70\nAccuracy: 100\nPP: 10\n\nSharply reduces the foe's SPEED."
+    "description": "Power: 70\nAccuracy: 100\nPP: 10\n\nThe user throws scorching sand at the target to attack. This may also leave the target with a burn."
   },
   {
     "id": 179,
@@ -1167,7 +1167,7 @@
     "pp": 15,
     "type": "dragon",
     "damage_class": "status",
-    "description": "Power: -\nAccuracy: -\nPP: 15\n\nStronger if the user's HP is low."
+    "description": "Power: -\nAccuracy: -\nPP: 15\n\nThe user raises its allies\u2019 morale with a draconic cry so that their future attacks have a heightened chance of landing critical hits. This rouses Dragon types more."
   },
   {
     "id": 180,
@@ -1177,7 +1177,7 @@
     "pp": 15,
     "type": "ice",
     "damage_class": "physical",
-    "description": "Power: 75\nAccuracy: 100\nPP: 15\n\nCuts the PP of the foe's last move."
+    "description": "Power: 75\nAccuracy: 100\nPP: 15\n\nAn icy punch. May cause freezing."
   },
   {
     "id": 183,
@@ -1187,7 +1187,7 @@
     "pp": 25,
     "type": "water",
     "damage_class": "special",
-    "description": "Power: 40\nAccuracy: 100\nPP: 25\n\nA fast punch that lands first."
+    "description": "Power: 40\nAccuracy: 100\nPP: 25\n\nSquirts water to attack."
   },
   {
     "id": 184,
@@ -1197,7 +1197,7 @@
     "pp": 5,
     "type": "water",
     "damage_class": "special",
-    "description": "Power: 110\nAccuracy: 80\nPP: 5\n\nSharply reduces the foe's SPEED."
+    "description": "Power: 110\nAccuracy: 80\nPP: 5\n\nA powerful water- type attack."
   },
   {
     "id": 185,
@@ -1207,7 +1207,7 @@
     "pp": 15,
     "type": "water",
     "damage_class": "special",
-    "description": "Power: 90\nAccuracy: 100\nPP: 15\n\nAn attack that never misses."
+    "description": "Power: 90\nAccuracy: 100\nPP: 15\n\nA strong water- type attack."
   },
   {
     "id": 186,
@@ -1217,7 +1217,7 @@
     "pp": 10,
     "type": "ice",
     "damage_class": "special",
-    "description": "Power: 90\nAccuracy: 100\nPP: 10\n\nA move that causes confusion."
+    "description": "Power: 90\nAccuracy: 100\nPP: 10\n\nAn attack that may freeze the foe."
   },
   {
     "id": 187,
@@ -1227,7 +1227,7 @@
     "pp": 5,
     "type": "ice",
     "damage_class": "special",
-    "description": "Power: 110\nAccuracy: 70\nPP: 5\n\nReduces own HP to maximize ATTACK."
+    "description": "Power: 110\nAccuracy: 70\nPP: 5\n\nAn attack that may freeze the foe."
   },
   {
     "id": 188,
@@ -1237,7 +1237,7 @@
     "pp": 20,
     "type": "water",
     "damage_class": "special",
-    "description": "Power: 65\nAccuracy: 100\nPP: 20\n\nAn attack that may poison the foe."
+    "description": "Power: 65\nAccuracy: 100\nPP: 20\n\nAn attack that may lower SPEED."
   },
   {
     "id": 189,
@@ -1247,7 +1247,7 @@
     "pp": 25,
     "type": "psychic",
     "damage_class": "special",
-    "description": "Power: 50\nAccuracy: 100\nPP: 25\n\nReduces the foe's accuracy."
+    "description": "Power: 50\nAccuracy: 100\nPP: 25\n\nThe foe is hit by a weak telekinetic force. It may also leave the foe confused."
   },
   {
     "id": 192,
@@ -1257,7 +1257,7 @@
     "pp": 15,
     "type": "water",
     "damage_class": "physical",
-    "description": "Power: 80\nAccuracy: 100\nPP: 15\n\nAn attack that always paralyzes."
+    "description": "Power: 80\nAccuracy: 100\nPP: 15\n\nAn aquatic charge attack."
   },
   {
     "id": 193,
@@ -1267,7 +1267,7 @@
     "pp": 30,
     "type": "water",
     "damage_class": "special",
-    "description": "Power: 40\nAccuracy: 100\nPP: 30\n\nNegates accuracy reduction moves."
+    "description": "Power: 40\nAccuracy: 100\nPP: 30\n\nAn attack that may reduce SPEED."
   },
   {
     "id": 196,
@@ -1287,7 +1287,7 @@
     "pp": 20,
     "type": "rock",
     "damage_class": "physical",
-    "description": "Power: 30\nAccuracy: 90\nPP: 20\n\nEvades attack that turn. It may fail."
+    "description": "Power: 30\nAccuracy: 90\nPP: 20\n\nAttacks 5 turns with rising power."
   },
   {
     "id": 198,
@@ -1297,7 +1297,7 @@
     "pp": 40,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 50\nAccuracy: 100\nPP: 40\n\nAn attack that hits 2-5 times."
+    "description": "Power: 50\nAccuracy: 100\nPP: 40\n\nA high-speed spinning attack."
   },
   {
     "id": 201,
@@ -1307,7 +1307,7 @@
     "pp": 15,
     "type": "water",
     "damage_class": "special",
-    "description": "Power: 35\nAccuracy: 85\nPP: 15\n\nInflicts damage every turn."
+    "description": "Power: 35\nAccuracy: 85\nPP: 15\n\nTraps the foe for 2-5 turns."
   },
   {
     "id": 202,
@@ -1317,7 +1317,7 @@
     "pp": 10,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 40\nAccuracy: 100\nPP: 10\n\nSteals 1/2 of the damage inflicted."
+    "description": "Power: 40\nAccuracy: 100\nPP: 10\n\nA 1st-turn, 1st-strike move that causes flinching."
   },
   {
     "id": 207,
@@ -1327,7 +1327,7 @@
     "pp": 10,
     "type": "water",
     "damage_class": "physical",
-    "description": "Power: 80\nAccuracy: 100\nPP: 10\n\nCauses confusion and raises ATTACK."
+    "description": "Power: 80\nAccuracy: 100\nPP: 10\n\nDives underwater the first turn and strikes next turn."
   },
   {
     "id": 209,
@@ -1337,7 +1337,7 @@
     "pp": 5,
     "type": "water",
     "damage_class": "special",
-    "description": "Power: 150\nAccuracy: 100\nPP: 5\n\nAn attack that may cause paralysis."
+    "description": "Power: 150\nAccuracy: 100\nPP: 5\n\nInflicts more damage if the user\u2019s HP is high."
   },
   {
     "id": 210,
@@ -1347,7 +1347,7 @@
     "pp": 10,
     "type": "water",
     "damage_class": "special",
-    "description": "Power: 90\nAccuracy: 85\nPP: 10\n\nSuccessive hits raise power."
+    "description": "Power: 90\nAccuracy: 85\nPP: 10\n\nAttacks with muddy water. May lower accuracy."
   },
   {
     "id": 212,
@@ -1357,7 +1357,7 @@
     "pp": 15,
     "type": "ground",
     "damage_class": "special",
-    "description": "Power: 55\nAccuracy: 95\nPP: 15\n\nPrevents fleeing or switching."
+    "description": "Power: 55\nAccuracy: 95\nPP: 15\n\nHurls mud at the foe and reduces SPEED."
   },
   {
     "id": 213,
@@ -1367,7 +1367,7 @@
     "pp": 20,
     "type": "water",
     "damage_class": "special",
-    "description": "Power: 60\nAccuracy: 100\nPP: 20\n\nMakes the opposite gender infatuated."
+    "description": "Power: 60\nAccuracy: 100\nPP: 20\n\nAttacks with ultrasonic waves. May confuse the foe"
   },
   {
     "id": 215,
@@ -1377,7 +1377,7 @@
     "pp": 10,
     "type": "water",
     "damage_class": "special",
-    "description": "Power: 65\nAccuracy: 100\nPP: 10\n\nEliminates all status problems."
+    "description": "Power: 65\nAccuracy: 100\nPP: 10\n\nIf the foe\u2019s HP is down to about half, this attack will hit with double the power."
   },
   {
     "id": 217,
@@ -1387,7 +1387,7 @@
     "pp": 20,
     "type": "fighting",
     "damage_class": "special",
-    "description": "Power: 80\nAccuracy: -\nPP: 20\n\nA bomb that may restore HP."
+    "description": "Power: 80\nAccuracy: -\nPP: 20\n\nThe user looses a blast of aura power from deep within its body. This move is certain to hit."
   },
   {
     "id": 218,
@@ -1397,7 +1397,7 @@
     "pp": 10,
     "type": "water",
     "damage_class": "physical",
-    "description": "Power: 90\nAccuracy: 90\nPP: 10\n\nAn attack based on lack of loyalty."
+    "description": "Power: 90\nAccuracy: 90\nPP: 10\n\nThe user attacks by swinging its tail as if it were a vicious wave in a raging storm. "
   },
   {
     "id": 219,
@@ -1407,7 +1407,7 @@
     "pp": 15,
     "type": "psychic",
     "damage_class": "physical",
-    "description": "Power: 80\nAccuracy: 90\nPP: 15\n\nPrevents all status problems."
+    "description": "Power: 80\nAccuracy: 90\nPP: 15\n\nThe user focuses its willpower to its head and rams the foe. It may also make the target flinch."
   },
   {
     "id": 220,
@@ -1417,7 +1417,7 @@
     "pp": 20,
     "type": "water",
     "damage_class": "physical",
-    "description": "Power: 40\nAccuracy: 100\nPP: 20\n\nAdds user & foe's HPs. Shares total."
+    "description": "Power: 40\nAccuracy: 100\nPP: 20\n\nThe user lunges at the foe at a speed that makes it almost invisible. It is sure to strike first."
   },
   {
     "id": 221,
@@ -1427,7 +1427,7 @@
     "pp": 15,
     "type": "water",
     "damage_class": "special",
-    "description": "Power: 80\nAccuracy: 100\nPP: 15\n\nAn attack that may inflict a burn."
+    "description": "Power: 80\nAccuracy: 100\nPP: 15\n\nThe user shoots boiling hot water at its target. It may also leave the target with a burn."
   },
   {
     "id": 223,
@@ -1437,7 +1437,7 @@
     "pp": 10,
     "type": "water",
     "damage_class": "special",
-    "description": "Power: 80\nAccuracy: 100\nPP: 10\n\nAn attack that always confuses."
+    "description": "Power: 80\nAccuracy: 100\nPP: 10\n\nA column of water strikes the target. When combined with its fire equivalent, the damage increases and a rainbow appears."
   },
   {
     "id": 224,
@@ -1447,7 +1447,7 @@
     "pp": 10,
     "type": "water",
     "damage_class": "physical",
-    "description": "Power: 85\nAccuracy: 100\nPP: 10\n\nA powerful charge attack."
+    "description": "Power: 85\nAccuracy: 100\nPP: 10\n\nThe user slams into the target using a full-force blast of water. This may also lower the target\u2019s Defense stat."
   },
   {
     "id": 226,
@@ -1457,7 +1457,7 @@
     "pp": 20,
     "type": "water",
     "damage_class": "physical",
-    "description": "Power: 60\nAccuracy: 100\nPP: 20\n\nSwitches while keeping effects."
+    "description": "Power: 60\nAccuracy: 100\nPP: 20\n\nAfter making its attack, the user rushes back to switch places with a party Pok\u00e9mon in waiting."
   },
   {
     "id": 227,
@@ -1467,7 +1467,7 @@
     "pp": 10,
     "type": "water",
     "damage_class": "physical",
-    "description": "Power: 120\nAccuracy: 100\nPP: 10\n\nMakes the foe re\u00ad peat 2-6 times."
+    "description": "Power: 120\nAccuracy: 100\nPP: 10\n\nThe user shrouds itself in water and slams into the target with its whole body to inflict damage. This also damages the user and raises the user\u2019s action speed."
   },
   {
     "id": 228,
@@ -1477,7 +1477,7 @@
     "pp": 15,
     "type": "ice",
     "damage_class": "physical",
-    "description": "Power: 80\nAccuracy: 100\nPP: 15\n\nHeavily strikes switching POK\u00e9MON."
+    "description": "Power: 80\nAccuracy: 100\nPP: 15\n\nThe user covers its feet in thin ice and twirls around, slamming into the target. This move's spinning motion also destroys the terrain."
   },
   {
     "id": 229,
@@ -1487,7 +1487,7 @@
     "pp": 20,
     "type": "water",
     "damage_class": "special",
-    "description": "Power: 50\nAccuracy: 100\nPP: 20\n\nA high-speed spinning attack."
+    "description": "Power: 50\nAccuracy: 100\nPP: 20\n\nThe user attacks the target by showering it with water that's so cold it saps the target's power. This also lowers the target's Attack stat."
   },
   {
     "id": 230,
@@ -1497,7 +1497,7 @@
     "pp": 5,
     "type": "water",
     "damage_class": "special",
-    "description": "Power: 150\nAccuracy: 90\nPP: 5\n\nReduces the foe's evasiveness."
+    "description": "Power: 150\nAccuracy: 90\nPP: 5\n\nPowerful, but leaves the user immobile the next turn."
   },
   {
     "id": 231,
@@ -1507,7 +1507,7 @@
     "pp": 15,
     "type": "bug",
     "damage_class": "special",
-    "description": "Power: 75\nAccuracy: 100\nPP: 15\n\nAn attack that may reduce DEFENSE."
+    "description": "Power: 75\nAccuracy: 100\nPP: 15\n\nA strange beam attack that may confuse the foe."
   },
   {
     "id": 232,
@@ -1517,7 +1517,7 @@
     "pp": 15,
     "type": "dark",
     "damage_class": "special",
-    "description": "Power: 80\nAccuracy: 100\nPP: 15\n\nAn attack that may up user's ATTACK."
+    "description": "Power: 80\nAccuracy: 100\nPP: 15\n\nThe user releases a horrible aura imbued with dark thoughts. It may also make the target flinch."
   },
   {
     "id": 233,
@@ -1527,7 +1527,7 @@
     "pp": 10,
     "type": "ice",
     "damage_class": "physical",
-    "description": "Power: 60\nAccuracy: 100\nPP: 10\n\nA 2nd-strike move that never misses."
+    "description": "Power: 60\nAccuracy: 100\nPP: 10\n\nAn attack move that inflicts double the damage if the user has been hurt by the foe in the same turn."
   },
   {
     "id": 234,
@@ -1537,7 +1537,7 @@
     "pp": 10,
     "type": "steel",
     "damage_class": "special",
-    "description": "Power: 80\nAccuracy: 100\nPP: 10\n\nRestores HP (varies by time)."
+    "description": "Power: 80\nAccuracy: 100\nPP: 10\n\nThe user gathers all its light energy and releases it at once. It may also lower the foe\u2019s Sp. Def stat."
   },
   {
     "id": 235,
@@ -1547,7 +1547,7 @@
     "pp": 15,
     "type": "rock",
     "damage_class": "physical",
-    "description": "Power: 50\nAccuracy: 100\nPP: 15\n\nRestores HP (varies by time)."
+    "description": "Power: 50\nAccuracy: 100\nPP: 15\n\nThe user throws a stone or projectile to attack an opponent. A flying Pok\u00e9mon will fall to the ground when hit."
   },
   {
     "id": 236,
@@ -1557,7 +1557,7 @@
     "pp": 10,
     "type": "fighting",
     "damage_class": "physical",
-    "description": "Power: 80\nAccuracy: 100\nPP: 10\n\nRestores HP (varies by time)."
+    "description": "Power: 80\nAccuracy: 100\nPP: 10\n\nThe user attacks by slamming its body into the target. The higher the user\u2019s Defense, the more damage it can inflict on the target."
   },
   {
     "id": 237,
@@ -1567,7 +1567,7 @@
     "pp": 20,
     "type": "bug",
     "damage_class": "physical",
-    "description": "Power: 60\nAccuracy: 100\nPP: 20\n\nThe power varies with the POK\u00e9MON."
+    "description": "Power: 60\nAccuracy: 100\nPP: 20\n\nThe user bites the foe. If the foe is holding a Berry, the user eats it and gains its effect."
   },
   {
     "id": 238,
@@ -1577,7 +1577,7 @@
     "pp": 15,
     "type": "electric",
     "damage_class": "special",
-    "description": "Power: 55\nAccuracy: 95\nPP: 15\n\nHas a high criti\u00ad cal hit ratio."
+    "description": "Power: 55\nAccuracy: 95\nPP: 15\n\nThe user captures and attacks opposing Pok\u00e9mon by using an electric net. It reduces the targets\u2019 Speed stat."
   },
   {
     "id": 240,
@@ -1587,7 +1587,7 @@
     "pp": 35,
     "type": "flying",
     "damage_class": "special",
-    "description": "Power: 40\nAccuracy: 100\nPP: 35\n\nBoosts the power of WATER- type moves for 5 turns."
+    "description": "Power: 40\nAccuracy: 100\nPP: 35\n\nWhips up a strong gust of wind."
   },
   {
     "id": 243,
@@ -1597,7 +1597,7 @@
     "pp": 20,
     "type": "psychic",
     "damage_class": "special",
-    "description": "Power: 65\nAccuracy: 100\nPP: 20\n\nCounters a SPCL. ATK. move double."
+    "description": "Power: 65\nAccuracy: 100\nPP: 20\n\nAn attack that may confuse the foe."
   },
   {
     "id": 245,
@@ -1607,7 +1607,7 @@
     "pp": 10,
     "type": "psychic",
     "damage_class": "special",
-    "description": "Power: 90\nAccuracy: 100\nPP: 10\n\nA powerful first- strike move."
+    "description": "Power: 90\nAccuracy: 100\nPP: 10\n\nAn attack that may lower SPCL.DEF."
   },
   {
     "id": 247,
@@ -1617,7 +1617,7 @@
     "pp": 15,
     "type": "psychic",
     "damage_class": "special",
-    "description": "Power: 100\nAccuracy: 100\nPP: 15\n\nAn attack that may lower SPCL.DEF."
+    "description": "Power: 100\nAccuracy: 100\nPP: 15\n\nSteals HP from a sleeping victim."
   },
   {
     "id": 249,
@@ -1627,7 +1627,7 @@
     "pp": 25,
     "type": "dark",
     "damage_class": "physical",
-    "description": "Power: 60\nAccuracy: 100\nPP: 25\n\nAn attack that may lower DEFENSE."
+    "description": "Power: 60\nAccuracy: 100\nPP: 25\n\nWhile attacking, it may steal the foe\u2019s held item."
   },
   {
     "id": 253,
@@ -1637,7 +1637,7 @@
     "pp": 15,
     "type": "ghost",
     "damage_class": "special",
-    "description": "Power: 80\nAccuracy: 100\nPP: 15\n\nCauses an uproar for 2 to 5 turns and prevents sleep."
+    "description": "Power: 80\nAccuracy: 100\nPP: 15\n\nAn attack that may lower SPCL.DEF."
   },
   {
     "id": 255,
@@ -1647,7 +1647,7 @@
     "pp": 5,
     "type": "bug",
     "damage_class": "special",
-    "description": "Power: 60\nAccuracy: 100\nPP: 5\n\nReleases stockpiled power (the more the better)."
+    "description": "Power: 60\nAccuracy: 100\nPP: 5\n\nA powdery attack that may raise abilities."
   },
   {
     "id": 256,
@@ -1657,7 +1657,7 @@
     "pp": 20,
     "type": "bug",
     "damage_class": "physical",
-    "description": "Power: 70\nAccuracy: 100\nPP: 20\n\nAbsorbs stockpiled power and restores HP."
+    "description": "Power: 70\nAccuracy: 100\nPP: 20\n\nAfter making its attack, the user rushes back to switch places with a party Pok\u00e9mon in waiting."
   },
   {
     "id": 257,
@@ -1667,7 +1667,7 @@
     "pp": 10,
     "type": "bug",
     "damage_class": "special",
-    "description": "Power: 90\nAccuracy: 100\nPP: 10\n\nExhales a hot breath on the foe. May inflict a burn."
+    "description": "Power: 90\nAccuracy: 100\nPP: 10\n\nThe user vibrates its wings to generate a damaging sound wave. It may also lower the foe\u2019s Sp. Def stat."
   },
   {
     "id": 260,
@@ -1677,7 +1677,7 @@
     "pp": 20,
     "type": "bug",
     "damage_class": "special",
-    "description": "Power: 50\nAccuracy: 100\nPP: 20\n\nConfuses the foe, but raises its SP. ATK."
+    "description": "Power: 50\nAccuracy: 100\nPP: 20\n\nWhile resisting, the user attacks the opposing Pok\u00e9mon. The targets\u2019 Sp. Atk stat is reduced."
   },
   {
     "id": 261,
@@ -1687,7 +1687,7 @@
     "pp": 10,
     "type": "fairy",
     "damage_class": "special",
-    "description": "Power: 50\nAccuracy: 100\nPP: 10\n\nInflicts a burn on the foe with intense fire."
+    "description": "Power: 50\nAccuracy: 100\nPP: 10\n\nThe user steals the target\u2019s energy with a kiss. The user\u2019s HP is restored by over half of the damage taken by the target."
   },
   {
     "id": 262,
@@ -1697,7 +1697,7 @@
     "pp": 20,
     "type": "bug",
     "damage_class": "special",
-    "description": "Power: 20\nAccuracy: 100\nPP: 20\n\nThe user faints and lowers the foe\u2019s abilities."
+    "description": "Power: 20\nAccuracy: 100\nPP: 20\n\nThe target is infested and attacked for four to five turns. The target can\u2019t flee during this time."
   },
   {
     "id": 263,
@@ -1707,7 +1707,7 @@
     "pp": 15,
     "type": "bug",
     "damage_class": "special",
-    "description": "Power: 90\nAccuracy: 100\nPP: 15\n\nBoosts ATTACK when burned, paralyzed, or poisoned."
+    "description": "Power: 90\nAccuracy: 100\nPP: 15\n\nThe user attacks the enemy with a pollen puff that explodes. If the target is an ally, it gives the ally a pollen puff that restores its HP instead."
   },
   {
     "id": 264,
@@ -1717,7 +1717,7 @@
     "pp": 35,
     "type": "poison",
     "damage_class": "physical",
-    "description": "Power: 15\nAccuracy: 100\nPP: 35\n\nA powerful loyalty attack. The user flinches if hit."
+    "description": "Power: 15\nAccuracy: 100\nPP: 35\n\nAn attack that may poison the target."
   },
   {
     "id": 265,
@@ -1727,7 +1727,7 @@
     "pp": 20,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 15\nAccuracy: 85\nPP: 20\n\nPowerful against paralyzed foes, but also heals them."
+    "description": "Power: 15\nAccuracy: 85\nPP: 20\n\nJabs the target 2-5 times."
   },
   {
     "id": 266,
@@ -1737,7 +1737,7 @@
     "pp": 20,
     "type": "bug",
     "damage_class": "physical",
-    "description": "Power: 25\nAccuracy: 100\nPP: 20\n\nDraws attention to make foes attack only the user."
+    "description": "Power: 25\nAccuracy: 100\nPP: 20\n\nJabs the foe twice using stingers."
   },
   {
     "id": 267,
@@ -1747,7 +1747,7 @@
     "pp": 20,
     "type": "bug",
     "damage_class": "physical",
-    "description": "Power: 25\nAccuracy: 95\nPP: 20\n\nThe type of attack varies depending on the location."
+    "description": "Power: 25\nAccuracy: 95\nPP: 20\n\nFires pins that strike 2-5 times."
   },
   {
     "id": 268,
@@ -1757,7 +1757,7 @@
     "pp": 35,
     "type": "flying",
     "damage_class": "physical",
-    "description": "Power: 35\nAccuracy: 100\nPP: 35\n\nCharges power to boost the electric move used next."
+    "description": "Power: 35\nAccuracy: 100\nPP: 35\n\nJabs the foe with a beak, etc."
   },
   {
     "id": 271,
@@ -1767,7 +1767,7 @@
     "pp": 20,
     "type": "dark",
     "damage_class": "physical",
-    "description": "Power: 40\nAccuracy: 100\nPP: 20\n\nTricks the foe into trading held items."
+    "description": "Power: 40\nAccuracy: 100\nPP: 20\n\nHeavily strikes switching POK\u00e9MON."
   },
   {
     "id": 273,
@@ -1777,7 +1777,7 @@
     "pp": 10,
     "type": "dark",
     "damage_class": "physical",
-    "description": "Power: 50\nAccuracy: 100\nPP: 10\n\nA wish that restores HP. It takes time to work."
+    "description": "Power: 50\nAccuracy: 100\nPP: 10\n\nIf the user can use this attack after the foe attacks, its power is doubled. "
   },
   {
     "id": 274,
@@ -1787,7 +1787,7 @@
     "pp": 10,
     "type": "dark",
     "damage_class": "physical",
-    "description": "Power: 60\nAccuracy: 100\nPP: 10\n\nAttacks randomly with one of the partner\u2019s moves."
+    "description": "Power: 60\nAccuracy: 100\nPP: 10\n\nIf the foe has already taken some damage in the same turn, this attack\u2019s power is doubled."
   },
   {
     "id": 276,
@@ -1797,7 +1797,7 @@
     "pp": 15,
     "type": "bug",
     "damage_class": "physical",
-    "description": "Power: 80\nAccuracy: 100\nPP: 15\n\nBoosts strength sharply, but lowers abilities."
+    "description": "Power: 80\nAccuracy: 100\nPP: 15\n\nThe user slashes at the foe by crossing its scythes or claws as if they were a pair of scissors."
   },
   {
     "id": 277,
@@ -1807,7 +1807,7 @@
     "pp": 10,
     "type": "ground",
     "damage_class": "physical",
-    "description": "Power: 80\nAccuracy: 95\nPP: 10\n\nReflects special effects back to the attacker."
+    "description": "Power: 80\nAccuracy: 95\nPP: 10\n\nThe user crashes into its target while rotating its body like a drill. Critical hits land more easily."
   },
   {
     "id": 278,
@@ -1817,7 +1817,7 @@
     "pp": 25,
     "type": "bug",
     "damage_class": "physical",
-    "description": "Power: 50\nAccuracy: 100\nPP: 25\n\nRecycles a used item for one more use."
+    "description": "Power: 50\nAccuracy: 100\nPP: 25\n\nWhen the user knocks out a target with this move, the user\u2019s Attack stat rises sharply."
   },
   {
     "id": 280,
@@ -1827,7 +1827,7 @@
     "pp": 15,
     "type": "dark",
     "damage_class": "physical",
-    "description": "Power: 80\nAccuracy: 100\nPP: 15\n\nDestroys barriers such as REFLECT and causes damage."
+    "description": "Power: 80\nAccuracy: 100\nPP: 15\n\nThe user attacks the target\u2019s throat, and the resultant suffering prevents the target from using moves that emit sound for two turns."
   },
   {
     "id": 282,
@@ -1837,7 +1837,7 @@
     "pp": 30,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 40\nAccuracy: 100\nPP: 30\n\nKnocks down the foe\u2019s held item to prevent its use."
+    "description": "Power: 40\nAccuracy: 100\nPP: 30\n\nLets the user get in the first hit."
   },
   {
     "id": 284,
@@ -1847,7 +1847,7 @@
     "pp": 5,
     "type": "flying",
     "damage_class": "physical",
-    "description": "Power: 140\nAccuracy: 90\nPP: 5\n\nThe higher the user\u2019s HP, the more damage caused."
+    "description": "Power: 140\nAccuracy: 90\nPP: 5\n\n1st turn: Prepare 2nd turn: Attack"
   },
   {
     "id": 285,
@@ -1857,7 +1857,7 @@
     "pp": 20,
     "type": "dark",
     "damage_class": "physical",
-    "description": "Power: 60\nAccuracy: -\nPP: 20\n\nThe user swaps special abilities with the target."
+    "description": "Power: 60\nAccuracy: -\nPP: 20\n\nAn attack that never misses."
   },
   {
     "id": 287,
@@ -1867,7 +1867,7 @@
     "pp": 10,
     "type": "normal",
     "damage_class": "special",
-    "description": "Power: 90\nAccuracy: 100\nPP: 10\n\nHeals poisoning, paralysis, or a burn."
+    "description": "Power: 90\nAccuracy: 100\nPP: 10\n\nCauses an uproar for 2 to 5 turns and prevents sleep."
   },
   {
     "id": 289,
@@ -1877,7 +1877,7 @@
     "pp": 20,
     "type": "flying",
     "damage_class": "physical",
-    "description": "Power: 60\nAccuracy: 100\nPP: 20\n\nSteals the effects of the move the foe uses next."
+    "description": "Power: 60\nAccuracy: 100\nPP: 20\n\nThe user pecks the foe. If the foe is holding a Berry, the user plucks it and gains its effect."
   },
   {
     "id": 290,
@@ -1887,7 +1887,7 @@
     "pp": 15,
     "type": "flying",
     "damage_class": "physical",
-    "description": "Power: 120\nAccuracy: 100\nPP: 15\n\nAn attack with effects that vary by location."
+    "description": "Power: 120\nAccuracy: 100\nPP: 15\n\nThe user tucks in its wings and charges from a low altitude. The user also takes serious damage."
   },
   {
     "id": 291,
@@ -1897,7 +1897,7 @@
     "pp": 15,
     "type": "electric",
     "damage_class": "special",
-    "description": "Power: 90\nAccuracy: 100\nPP: 15\n\nDives underwater the first turn and strikes next turn."
+    "description": "Power: 90\nAccuracy: 100\nPP: 15\n\nAn attack that may cause paralysis."
   },
   {
     "id": 293,
@@ -1907,7 +1907,7 @@
     "pp": 10,
     "type": "electric",
     "damage_class": "special",
-    "description": "Power: 110\nAccuracy: 70\nPP: 10\n\nAlters the POK\u00e9MON\u2019s type depending on the location."
+    "description": "Power: 110\nAccuracy: 70\nPP: 10\n\nAn attack that may cause paralysis."
   },
   {
     "id": 295,
@@ -1917,7 +1917,7 @@
     "pp": 15,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 80\nAccuracy: 90\nPP: 15\n\nAttacks with a burst of light. May lower SP. DEF."
+    "description": "Power: 80\nAccuracy: 90\nPP: 15\n\nAn attack that may cause flinching."
   },
   {
     "id": 297,
@@ -1927,7 +1927,7 @@
     "pp": 25,
     "type": "fire",
     "damage_class": "physical",
-    "description": "Power: 60\nAccuracy: 100\nPP: 25\n\nEnvelops the foe with down to sharply reduce ATTACK."
+    "description": "Power: 60\nAccuracy: 100\nPP: 25\n\nAn attack that may cause a burn."
   },
   {
     "id": 300,
@@ -1937,7 +1937,7 @@
     "pp": 10,
     "type": "fighting",
     "damage_class": "physical",
-    "description": "Power: 60\nAccuracy: 100\nPP: 10\n\nCovers the user in mud to raise electrical resistance."
+    "description": "Power: 60\nAccuracy: 100\nPP: 10\n\nAn attack that gains power if injured by the foe."
   },
   {
     "id": 301,
@@ -1947,7 +1947,7 @@
     "pp": 25,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 60\nAccuracy: 100\nPP: 25\n\nA 5-turn attack that gains power on successive hits."
+    "description": "Power: 60\nAccuracy: 100\nPP: 25\n\nCutely begs to obtain an item held by the foe."
   },
   {
     "id": 302,
@@ -1957,7 +1957,7 @@
     "pp": 20,
     "type": "electric",
     "damage_class": "special",
-    "description": "Power: 60\nAccuracy: -\nPP: 20\n\nAttacks with thorny arms. May cause flinching."
+    "description": "Power: 60\nAccuracy: -\nPP: 20\n\nA fast and unavoidable electric attack."
   },
   {
     "id": 304,
@@ -1967,7 +1967,7 @@
     "pp": 5,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 140\nAccuracy: 100\nPP: 5\n\nA loud attack that uses sound waves to injure."
+    "description": "Power: 140\nAccuracy: 100\nPP: 5\n\nThis move can be used only after the user has used all the other moves it knows in the battle."
   },
   {
     "id": 305,
@@ -1977,7 +1977,7 @@
     "pp": 5,
     "type": "dark",
     "damage_class": "physical",
-    "description": "Power: 70\nAccuracy: 100\nPP: 5\n\nA sharp-fanged attack. May badly poison the foe."
+    "description": "Power: 70\nAccuracy: 100\nPP: 5\n\nThis move enables the user to attack first. It fails if the foe is not readying an attack, however."
   },
   {
     "id": 306,
@@ -1987,7 +1987,7 @@
     "pp": 10,
     "type": "electric",
     "damage_class": "special",
-    "description": "Power: 50\nAccuracy: 90\nPP: 10\n\nTears at the foe with sharp claws. May lower DEFENSE."
+    "description": "Power: 50\nAccuracy: 90\nPP: 10\n\nThe user fires a concentrated bundle of electricity. It may also raise the user\u2019s Sp. Atk stat."
   },
   {
     "id": 307,
@@ -1997,7 +1997,7 @@
     "pp": 5,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 70\nAccuracy: 100\nPP: 5\n\nPowerful, but leaves the user immobile the next turn."
+    "description": "Power: 70\nAccuracy: 100\nPP: 5\n\nThe user gets revenge for a fainted ally. If an ally fainted in the previous turn, this attack\u2019s damage increases."
   },
   {
     "id": 309,
@@ -2007,7 +2007,7 @@
     "pp": 15,
     "type": "electric",
     "damage_class": "physical",
-    "description": "Power: 90\nAccuracy: 100\nPP: 15\n\nFires a meteor-like punch. May raise ATTACK."
+    "description": "Power: 90\nAccuracy: 100\nPP: 15\n\nThe user shrouds itself in electricity and smashes into its target. It also damages the user a little."
   },
   {
     "id": 310,
@@ -2017,7 +2017,7 @@
     "pp": 20,
     "type": "flying",
     "damage_class": "physical",
-    "description": "Power: 80\nAccuracy: 100\nPP: 20\n\nAn attack that may shock the foe into flinching."
+    "description": "Power: 80\nAccuracy: 100\nPP: 20\n\nA strong, spin\u00ad ning-peck attack."
   },
   {
     "id": 311,
@@ -2027,7 +2027,7 @@
     "pp": 10,
     "type": "normal",
     "damage_class": "special",
-    "description": "Power: 80\nAccuracy: 100\nPP: 10\n\nThe move\u2019s type and power change with the weather."
+    "description": "Power: 80\nAccuracy: 100\nPP: 10\n\nFires three kinds of beams at once."
   },
   {
     "id": 312,
@@ -2037,7 +2037,7 @@
     "pp": 15,
     "type": "ghost",
     "damage_class": "physical",
-    "description": "Power: 30\nAccuracy: 100\nPP: 15\n\nHeals all status problems with a soothing scent."
+    "description": "Power: 30\nAccuracy: 100\nPP: 15\n\nAn attack that may shock the foe into flinching."
   },
   {
     "id": 313,
@@ -2047,7 +2047,7 @@
     "pp": 20,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 80\nAccuracy: 75\nPP: 20\n\nFeigns crying to sharply lower the foe\u2019s SP. DEF."
+    "description": "Power: 80\nAccuracy: 75\nPP: 20\n\nSlams the foe with a tail, vine, etc."
   },
   {
     "id": 314,
@@ -2057,7 +2057,7 @@
     "pp": 20,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 15\nAccuracy: 90\nPP: 20\n\nHacks with razorlike wind. High critical-hit ratio."
+    "description": "Power: 15\nAccuracy: 90\nPP: 20\n\nSqueezes the foe for 2-5 turns."
   },
   {
     "id": 316,
@@ -2067,7 +2067,7 @@
     "pp": 30,
     "type": "poison",
     "damage_class": "special",
-    "description": "Power: 40\nAccuracy: 100\nPP: 30\n\nNegates the foe\u2019s efforts to heighten evasiveness."
+    "description": "Power: 40\nAccuracy: 100\nPP: 30\n\nAn attack that may lower DEFENSE."
   },
   {
     "id": 318,
@@ -2077,7 +2077,7 @@
     "pp": 10,
     "type": "bug",
     "damage_class": "physical",
-    "description": "Power: 80\nAccuracy: 100\nPP: 10\n\nA powdery attack that may raise abilities."
+    "description": "Power: 80\nAccuracy: 100\nPP: 10\n\nSteals 1/2 of the damage inflicted."
   },
   {
     "id": 325,
@@ -2087,7 +2087,7 @@
     "pp": 15,
     "type": "poison",
     "damage_class": "physical",
-    "description": "Power: 50\nAccuracy: 100\nPP: 15\n\nAn unavoidable punch that is thrown from shadows."
+    "description": "Power: 50\nAccuracy: 100\nPP: 15\n\nA sharp-fanged attack. May badly poison the foe."
   },
   {
     "id": 326,
@@ -2097,7 +2097,7 @@
     "pp": 25,
     "type": "poison",
     "damage_class": "physical",
-    "description": "Power: 50\nAccuracy: 100\nPP: 25\n\nAttacks with a peculiar power. May cause flinching."
+    "description": "Power: 50\nAccuracy: 100\nPP: 25\n\nHas a high critical-hit ratio. May also poison."
   },
   {
     "id": 329,
@@ -2107,7 +2107,7 @@
     "pp": 10,
     "type": "ground",
     "damage_class": "special",
-    "description": "Power: 65\nAccuracy: 85\nPP: 10\n\nA chilling attack that causes fainting if it hits."
+    "description": "Power: 65\nAccuracy: 85\nPP: 10\n\nThe user launches a hard-packed mud ball to attack. It may also lower the target\u2019s accuracy."
   },
   {
     "id": 330,
@@ -2117,7 +2117,7 @@
     "pp": 5,
     "type": "poison",
     "damage_class": "physical",
-    "description": "Power: 120\nAccuracy: 80\nPP: 5\n\nAttacks with muddy water. May lower accuracy."
+    "description": "Power: 120\nAccuracy: 80\nPP: 5\n\nThe user shoots filthy garbage at the foe to attack. It may also poison the target."
   },
   {
     "id": 331,
@@ -2127,7 +2127,7 @@
     "pp": 10,
     "type": "poison",
     "damage_class": "special",
-    "description": "Power: 95\nAccuracy: 100\nPP: 10\n\nShoots 2 to 5 seeds in a row to strike the foe."
+    "description": "Power: 95\nAccuracy: 100\nPP: 10\n\nIt swamps the area around the user with a giant sludge wave. It may also poison those hit."
   },
   {
     "id": 333,
@@ -2137,7 +2137,7 @@
     "pp": 15,
     "type": "dark",
     "damage_class": "special",
-    "description": "Power: 55\nAccuracy: 95\nPP: 15\n\nAttacks the foe by firing 2 to 5 icicles in a row."
+    "description": "Power: 55\nAccuracy: 95\nPP: 15\n\nThe user yells as if it is ranting about something, making the target\u2019s Sp. Atk stat decrease."
   },
   {
     "id": 334,
@@ -2147,7 +2147,7 @@
     "pp": 10,
     "type": "poison",
     "damage_class": "special",
-    "description": "Power: 120\nAccuracy: 90\nPP: 10\n\nHardens the body\u2019s surface to sharply raise DEFENSE."
+    "description": "Power: 120\nAccuracy: 90\nPP: 10\n\nThe user lets out a damaging belch at the target. The user must eat a held Berry to use this move."
   },
   {
     "id": 335,
@@ -2157,7 +2157,7 @@
     "pp": 10,
     "type": "psychic",
     "damage_class": "physical",
-    "description": "Power: 85\nAccuracy: 100\nPP: 10\n\nBlocks the foe\u2019s way to prevent escape."
+    "description": "Power: 85\nAccuracy: 100\nPP: 10\n\nThe user bites the target with its psychic capabilities. This can also destroy Light Screen and Reflect."
   },
   {
     "id": 336,
@@ -2167,7 +2167,7 @@
     "pp": 10,
     "type": "bug",
     "damage_class": "physical",
-    "description": "Power: 70\nAccuracy: 90\nPP: 10\n\nHowls to raise the spirit and boosts ATTACK."
+    "description": "Power: 70\nAccuracy: 90\nPP: 10\n\nThe user skitters behind the target to attack. This also lowers the target\u2019s Sp. Atk stat."
   },
   {
     "id": 337,
@@ -2177,7 +2177,7 @@
     "pp": 5,
     "type": "dark",
     "damage_class": "physical",
-    "description": "Power: 75\nAccuracy: 100\nPP: 5\n\nSlashes the foe with sharp claws."
+    "description": "Power: 75\nAccuracy: 100\nPP: 5\n\nThe user lashes out to vent its frustration toward the target. If the user\u2019s stats were lowered during this turn, the power of this move is doubled."
   },
   {
     "id": 339,
@@ -2187,7 +2187,7 @@
     "pp": 15,
     "type": "electric",
     "damage_class": "physical",
-    "description": "Power: 65\nAccuracy: 95\nPP: 15\n\nBulks up the body to boost both ATTACK and DEFENSE."
+    "description": "Power: 65\nAccuracy: 95\nPP: 15\n\nThe user bites with electrified fangs. It may also make the foe flinch or become paralyzed."
   },
   {
     "id": 340,
@@ -2197,7 +2197,7 @@
     "pp": 15,
     "type": "ice",
     "damage_class": "physical",
-    "description": "Power: 65\nAccuracy: 95\nPP: 15\n\nBounces up, then down the next turn. May paralyze."
+    "description": "Power: 65\nAccuracy: 95\nPP: 15\n\nThe user bites with cold-infused fangs. It may also make the foe flinch or freeze. "
   },
   {
     "id": 341,
@@ -2207,7 +2207,7 @@
     "pp": 20,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 40\nAccuracy: 100\nPP: 20\n\nHurls mud at the foe and reduces SPEED."
+    "description": "Power: 40\nAccuracy: 100\nPP: 20\n\nThrows coins. Gets them back later."
   },
   {
     "id": 342,
@@ -2217,7 +2217,7 @@
     "pp": 30,
     "type": "fighting",
     "damage_class": "physical",
-    "description": "Power: 30\nAccuracy: 100\nPP: 30\n\nHas a high critical-hit ratio. May also poison."
+    "description": "Power: 30\nAccuracy: 100\nPP: 30\n\nA double kicking attack."
   },
   {
     "id": 343,
@@ -2227,7 +2227,7 @@
     "pp": 30,
     "type": "electric",
     "damage_class": "special",
-    "description": "Power: 40\nAccuracy: 100\nPP: 30\n\nCutely begs to obtain an item held by the foe."
+    "description": "Power: 40\nAccuracy: 100\nPP: 30\n\nAn electrical attack that may paralyze the foe."
   },
   {
     "id": 345,
@@ -2237,7 +2237,7 @@
     "pp": 5,
     "type": "electric",
     "damage_class": "special",
-    "description": "Power: 120\nAccuracy: 50\nPP: 5\n\nAttacks with a strange leaf that cannot be evaded."
+    "description": "Power: 120\nAccuracy: 50\nPP: 5\n\nAn attack that always paralyzes."
   },
   {
     "id": 346,
@@ -2247,7 +2247,7 @@
     "pp": 20,
     "type": "electric",
     "damage_class": "physical",
-    "description": "Power: 65\nAccuracy: 100\nPP: 20\n\nThe user becomes soaked to raise resistance to fire."
+    "description": "Power: 65\nAccuracy: 100\nPP: 20\n\nAn attack that may cause paralysis."
   },
   {
     "id": 350,
@@ -2257,7 +2257,7 @@
     "pp": 15,
     "type": "electric",
     "damage_class": "physical",
-    "description": "Power: 120\nAccuracy: 100\nPP: 15\n\nHurls boulders at the foe 2 to 5 times in a row."
+    "description": "Power: 120\nAccuracy: 100\nPP: 15\n\nA life-risking tackle that slightly hurts the user."
   },
   {
     "id": 352,
@@ -2267,7 +2267,7 @@
     "pp": 10,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 30\nAccuracy: 100\nPP: 10\n\nAttacks with ultrasonic waves. May confuse the foe"
+    "description": "Power: 30\nAccuracy: 100\nPP: 10\n\nAn attack that hits a foe using Protect or Detect. It also lifts the effects of those moves."
   },
   {
     "id": 355,
@@ -2277,7 +2277,7 @@
     "pp": 15,
     "type": "electric",
     "damage_class": "special",
-    "description": "Power: 80\nAccuracy: 100\nPP: 15\n\nThe user lands and rests its body. It restores the user\u2019s HP by up to half of its max HP."
+    "description": "Power: 80\nAccuracy: 100\nPP: 15\n\nA flare of electricity is loosed to strike all Pok\u00e9mon in battle. It may also cause paralysis."
   },
   {
     "id": 357,
@@ -2287,7 +2287,7 @@
     "pp": 20,
     "type": "electric",
     "damage_class": "special",
-    "description": "Power: 70\nAccuracy: 100\nPP: 20\n\nEnables a Dark-type target to be hit by Psychic-type attacks. This also enables an evasive target to be hit."
+    "description": "Power: 70\nAccuracy: 100\nPP: 20\n\nAfter making its attack, the user rushes back to switch places with a party Pok\u00e9mon in waiting."
   },
   {
     "id": 358,
@@ -2297,7 +2297,7 @@
     "pp": 15,
     "type": "fairy",
     "damage_class": "special",
-    "description": "Power: 40\nAccuracy: -\nPP: 15\n\nThis attack inflicts high damage on a sleeping foe. It also wakes the foe up, however."
+    "description": "Power: 40\nAccuracy: -\nPP: 15\n\nLetting out a charming cry, the user does emotional damage to opposing Pok\u00e9mon. This attack never misses."
   },
   {
     "id": 359,
@@ -2307,7 +2307,7 @@
     "pp": 10,
     "type": "fairy",
     "damage_class": "physical",
-    "description": "Power: 90\nAccuracy: 90\nPP: 10\n\nThe user swings and hits with its strong and heavy fist. It lowers the user\u2019s Speed, however."
+    "description": "Power: 90\nAccuracy: 90\nPP: 10\n\nThe user plays rough with the target and attacks it. This may also lower the target\u2019s Attack stat."
   },
   {
     "id": 363,
@@ -2317,7 +2317,7 @@
     "pp": 20,
     "type": "electric",
     "damage_class": "physical",
-    "description": "Power: 20\nAccuracy: 100\nPP: 20\n\nThe user draws power to attack by using its held Berry. The Berry determines its type and power."
+    "description": "Power: 20\nAccuracy: 100\nPP: 20\n\nThe user attacks by nuzzling its electrified cheeks against the target. This also leaves the target with paralysis."
   },
   {
     "id": 364,
@@ -2327,7 +2327,7 @@
     "pp": 20,
     "type": "electric",
     "damage_class": "special",
-    "description": "Power: 70\nAccuracy: 100\nPP: 20\n\nAn attack that hits a foe using Protect or Detect. It also lifts the effects of those moves."
+    "description": "Power: 70\nAccuracy: 100\nPP: 20\n\nThe user attacks with electric voltage rising from the ground. This move\u2019s power doubles when the target is on Electric Terrain."
   },
   {
     "id": 365,
@@ -2337,7 +2337,7 @@
     "pp": 10,
     "type": "fairy",
     "damage_class": "special",
-    "description": "Power: 80\nAccuracy: 100\nPP: 10\n\nThe user pecks the foe. If the foe is holding a Berry, the user plucks it and gains its effect."
+    "description": "Power: 80\nAccuracy: 100\nPP: 10\n\nThe user attacks the target using its angelic voice. This also confuses the target if its stats have been boosted during the turn."
   },
   {
     "id": 366,
@@ -2347,7 +2347,7 @@
     "pp": 15,
     "type": "fighting",
     "damage_class": "physical",
-    "description": "Power: 65\nAccuracy: 100\nPP: 15\n\nThe user whips up a turbulent whirlwind that ups the Speed of all party Pok\u00e9mon for three turns."
+    "description": "Power: 65\nAccuracy: 100\nPP: 15\n\nThe user reacts to the target's movement and strikes with the heel of its palm, making the target flinch. This move fails if the target is not readying a priority move."
   },
   {
     "id": 371,
@@ -2357,7 +2357,7 @@
     "pp": 10,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 75\nAccuracy: 95\nPP: 10\n\nIf the user can use this attack after the foe attacks, its power is doubled. "
+    "description": "Power: 75\nAccuracy: 95\nPP: 10\n\nTears at the foe with sharp claws. May lower DEFENSE."
   },
   {
     "id": 372,
@@ -2367,7 +2367,7 @@
     "pp": 15,
     "type": "ground",
     "damage_class": "physical",
-    "description": "Power: 35\nAccuracy: 85\nPP: 15\n\nIf the foe has already taken some damage in the same turn, this attack\u2019s power is doubled."
+    "description": "Power: 35\nAccuracy: 85\nPP: 15\n\nTraps and hurts the foe in quicksand for 2 to 5 turns."
   },
   {
     "id": 373,
@@ -2377,7 +2377,7 @@
     "pp": 15,
     "type": "dark",
     "damage_class": "physical",
-    "description": "Power: 70\nAccuracy: 100\nPP: 15\n\nIt prevents the foe from using its held item. Its Trainer is also prevented from using items on it."
+    "description": "Power: 70\nAccuracy: 100\nPP: 15\n\nThe user slashes the foe the instant an opportunity arises. It has a high critical-hit ratio."
   },
   {
     "id": 374,
@@ -2387,7 +2387,7 @@
     "pp": 5,
     "type": "rock",
     "damage_class": "physical",
-    "description": "Power: 100\nAccuracy: 80\nPP: 5\n\nThe user flings its held item at the foe to attack. Its power and effects depend on the item."
+    "description": "Power: 100\nAccuracy: 80\nPP: 5\n\nThe user stabs the foe with a sharpened stone. It has a high critical-hit ratio. "
   },
   {
     "id": 376,
@@ -2397,7 +2397,7 @@
     "pp": 20,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 70\nAccuracy: 100\nPP: 20\n\nThe fewer PP this move has, the more power it has for attack. "
+    "description": "Power: 70\nAccuracy: 100\nPP: 20\n\nLooking for an opening, the user strikes continually. The target\u2019s stat changes don\u2019t affect this attack\u2019s damage."
   },
   {
     "id": 378,
@@ -2407,7 +2407,7 @@
     "pp": 10,
     "type": "ground",
     "damage_class": "physical",
-    "description": "Power: 95\nAccuracy: 95\nPP: 10\n\nThe user powerfully wrings the foe. The more HP the foe has, the greater this attack\u2019s power."
+    "description": "Power: 95\nAccuracy: 95\nPP: 10\n\nThe user fiercely attacks the target using its entire body."
   },
   {
     "id": 379,
@@ -2417,7 +2417,7 @@
     "pp": 5,
     "type": "steel",
     "damage_class": "physical",
-    "description": "Power: 130\nAccuracy: 100\nPP: 5\n\nThe user employs its psychic power to switch its Attack stat with its Defense stat."
+    "description": "Power: 130\nAccuracy: 100\nPP: 5\n\nThe user attacks while destroying the terrain. This move fails when the ground hasn\u2019t turned into a terrain."
   },
   {
     "id": 383,
@@ -2427,7 +2427,7 @@
     "pp": 5,
     "type": "fighting",
     "damage_class": "physical",
-    "description": "Power: 120\nAccuracy: 100\nPP: 5\n\nThe user mimics the move used immediately before it. The move fails if no other move has been used yet."
+    "description": "Power: 120\nAccuracy: 100\nPP: 5\n\nBoosts strength sharply, but lowers abilities."
   },
   {
     "id": 384,
@@ -2437,7 +2437,7 @@
     "pp": 10,
     "type": "rock",
     "damage_class": "physical",
-    "description": "Power: 25\nAccuracy: 90\nPP: 10\n\nThe user employs its psychic power to switch changes to its Attack and Sp. Atk with the foe."
+    "description": "Power: 25\nAccuracy: 90\nPP: 10\n\nHurls boulders at the foe 2 to 5 times in a row."
   },
   {
     "id": 385,
@@ -2447,7 +2447,7 @@
     "pp": 10,
     "type": "ghost",
     "damage_class": "special",
-    "description": "Power: 65\nAccuracy: 100\nPP: 10\n\nThe user employs its psychic power to switch changes to its Defense and Sp. Def with the foe."
+    "description": "Power: 65\nAccuracy: 100\nPP: 10\n\nThis relentless attack does massive damage to a target affected by status problems."
   },
   {
     "id": 387,
@@ -2457,7 +2457,7 @@
     "pp": 25,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 65\nAccuracy: 100\nPP: 25\n\nThis move can be used only after the user has used all the other moves it knows in the battle."
+    "description": "Power: 65\nAccuracy: 100\nPP: 25\n\nAn attack using a horn to jab."
   },
   {
     "id": 388,
@@ -2467,7 +2467,7 @@
     "pp": 10,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 120\nAccuracy: 100\nPP: 10\n\nA seed that causes worry is planted on the foe. It prevents sleep by making its ability Insomnia."
+    "description": "Power: 120\nAccuracy: 100\nPP: 10\n\nWorks 2-3 turns and confuses user."
   },
   {
     "id": 389,
@@ -2477,7 +2477,7 @@
     "pp": 5,
     "type": "rock",
     "damage_class": "physical",
-    "description": "Power: 150\nAccuracy: 80\nPP: 5\n\nThis move enables the user to attack first. It fails if the foe is not readying an attack, however."
+    "description": "Power: 150\nAccuracy: 80\nPP: 5\n\nThe user delivers a life-endangering head butt at full power. The user also takes terrible damage."
   },
   {
     "id": 390,
@@ -2487,7 +2487,7 @@
     "pp": 10,
     "type": "steel",
     "damage_class": "physical",
-    "description": "Power: 70\nAccuracy: -\nPP: 10\n\nThe user lays a trap of poison spikes at the foe\u2019s feet. They poison foes that switch into battle."
+    "description": "Power: 70\nAccuracy: -\nPP: 10\n\nThe user stabs the target with a sharp horn. This attack never misses."
   },
   {
     "id": 391,
@@ -2497,7 +2497,7 @@
     "pp": 10,
     "type": "bug",
     "damage_class": "physical",
-    "description": "Power: 120\nAccuracy: 85\nPP: 10\n\nThe user employs its psychic power to switch stat changes with the foe. "
+    "description": "Power: 120\nAccuracy: 85\nPP: 10\n\nA powerful charge attack."
   },
   {
     "id": 392,
@@ -2507,7 +2507,7 @@
     "pp": 35,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 40\nAccuracy: 100\nPP: 35\n\nThe user envelops itself in a veil made of water. It regains some HP on every turn."
+    "description": "Power: 40\nAccuracy: 100\nPP: 35\n\nPounds with fore\u00ad legs or tail."
   },
   {
     "id": 393,
@@ -2517,7 +2517,7 @@
     "pp": 10,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 15\nAccuracy: 85\nPP: 10\n\nThe user levitates using electrically generated magnetism for five turns."
+    "description": "Power: 15\nAccuracy: 85\nPP: 10\n\nRepeatedly slaps 2-5 times."
   },
   {
     "id": 409,
@@ -2527,7 +2527,7 @@
     "pp": 10,
     "type": "normal",
     "damage_class": "special",
-    "description": "Power: 90\nAccuracy: 100\nPP: 10\n\nAn energy-draining punch. The user\u2019s HP is restored by half the damage taken by the target."
+    "description": "Power: 90\nAccuracy: 100\nPP: 10\n\nA loud attack that uses sound waves to injure."
   },
   {
     "id": 410,
@@ -2537,7 +2537,7 @@
     "pp": 10,
     "type": "steel",
     "damage_class": "physical",
-    "description": "Power: 90\nAccuracy: 90\nPP: 10\n\nThe user whirls its fists to send a wave of pure vacuum at the foe. This move always goes first."
+    "description": "Power: 90\nAccuracy: 90\nPP: 10\n\nFires a meteor-like punch. May raise ATTACK."
   },
   {
     "id": 413,
@@ -2547,7 +2547,7 @@
     "pp": 5,
     "type": "flying",
     "damage_class": "physical",
-    "description": "Power: 85\nAccuracy: 85\nPP: 5\n\nThe user tucks in its wings and charges from a low altitude. The user also takes serious damage."
+    "description": "Power: 85\nAccuracy: 85\nPP: 5\n\nBounces up, then down the next turn. May paralyze."
   },
   {
     "id": 415,
@@ -2557,7 +2557,7 @@
     "pp": 10,
     "type": "fighting",
     "damage_class": "physical",
-    "description": "Power: 70\nAccuracy: 100\nPP: 10\n\nThe user trades held items with the foe faster than the eye can follow. "
+    "description": "Power: 70\nAccuracy: 100\nPP: 10\n\nThis attack inflicts high damage on a sleeping foe. It also wakes the foe up, however."
   },
   {
     "id": 419,
@@ -2567,7 +2567,7 @@
     "pp": 10,
     "type": "fighting",
     "damage_class": "physical",
-    "description": "Power: 75\nAccuracy: 100\nPP: 10\n\nAn attack move that inflicts double the damage if the user has been hurt by the foe in the same turn."
+    "description": "Power: 75\nAccuracy: 100\nPP: 10\n\nAn energy-draining punch. The user\u2019s HP is restored by half the damage taken by the target."
   },
   {
     "id": 421,
@@ -2577,7 +2577,7 @@
     "pp": 10,
     "type": "psychic",
     "damage_class": "special",
-    "description": "Power: 80\nAccuracy: 100\nPP: 10\n\nThe user slashes with a sharp claw made from shadows. It has a high critical-hit ratio."
+    "description": "Power: 80\nAccuracy: 100\nPP: 10\n\nThe user materializes an odd psychic wave to attack the target. This attack does physical damage."
   },
   {
     "id": 424,
@@ -2587,7 +2587,7 @@
     "pp": 10,
     "type": "psychic",
     "damage_class": "special",
-    "description": "Power: 20\nAccuracy: 100\nPP: 10\n\nThe user bites with flame-cloaked fangs. It may also make the foe flinch or sustain a burn."
+    "description": "Power: 20\nAccuracy: 100\nPP: 10\n\nThe user attacks the target with stored power. The more the user\u2019s stats are raised, the greater the damage."
   },
   {
     "id": 429,
@@ -2597,7 +2597,7 @@
     "pp": 30,
     "type": "fairy",
     "damage_class": "special",
-    "description": "Power: 40\nAccuracy: 100\nPP: 30\n\nThe user looses a flash of energy from its polished body. It may also lower the target\u2019s accuracy."
+    "description": "Power: 40\nAccuracy: 100\nPP: 30\n\nThe user stirs up a fairy wind and strikes the target with it."
   },
   {
     "id": 430,
@@ -2607,7 +2607,7 @@
     "pp": 15,
     "type": "fairy",
     "damage_class": "special",
-    "description": "Power: 95\nAccuracy: 100\nPP: 15\n\nThe user gathers all its light energy and releases it at once. It may also lower the foe\u2019s Sp. Def stat."
+    "description": "Power: 95\nAccuracy: 100\nPP: 15\n\nBorrowing the power of the moon, the user attacks the target. This may also lower the target\u2019s Sp. Atk stat."
   },
   {
     "id": 431,
@@ -2617,7 +2617,7 @@
     "pp": 10,
     "type": "fairy",
     "damage_class": "special",
-    "description": "Power: 80\nAccuracy: 100\nPP: 10\n\nA charging attack that may also leave the foe confused. It can also be used to scale rocky walls."
+    "description": "Power: 80\nAccuracy: 100\nPP: 10\n\nThe user damages opposing Pok\u00e9mon by emitting a powerful flash."
   },
   {
     "id": 434,
@@ -2627,7 +2627,7 @@
     "pp": 10,
     "type": "rock",
     "damage_class": "special",
-    "description": "Power: 120\nAccuracy: 90\nPP: 10\n\nComets are summoned down from the sky. The attack\u2019s recoil sharply reduces the user\u2019s Sp. Atk stat."
+    "description": "Power: 120\nAccuracy: 90\nPP: 10\n\nIn this two-turn attack, the user gathers space power and boosts its Sp. Atk stat, then attacks the target on the next turn."
   },
   {
     "id": 435,
@@ -2637,7 +2637,7 @@
     "pp": 5,
     "type": "fairy",
     "damage_class": "special",
-    "description": "Power: 100\nAccuracy: 100\nPP: 5\n\nA flare of electricity is loosed to strike all Pok\u00e9mon in battle. It may also cause paralysis."
+    "description": "Power: 100\nAccuracy: 100\nPP: 5\n\nThe user attacks everything around it and faints upon using this move. This move\u2019s power is increased on Misty Terrain."
   },
   {
     "id": 436,
@@ -2647,7 +2647,7 @@
     "pp": 10,
     "type": "psychic",
     "damage_class": "special",
-    "description": "Power: 120\nAccuracy: 100\nPP: 10\n\nAn inferno of scarlet flames washes over all Pok\u00e9mon in battle. It may also inflict burns."
+    "description": "Power: 120\nAccuracy: 100\nPP: 10\n\nAn attack that hits on 3rd turn."
   },
   {
     "id": 441,
@@ -2657,7 +2657,7 @@
     "pp": 20,
     "type": "psychic",
     "damage_class": "special",
-    "description": "Power: 80\nAccuracy: 100\nPP: 20\n\nThe user shoots filthy garbage at the foe to attack. It may also poison the target."
+    "description": "Power: 80\nAccuracy: 100\nPP: 20\n\nAttacks with a peculiar power. May cause flinching."
   },
   {
     "id": 444,
@@ -2667,7 +2667,7 @@
     "pp": 15,
     "type": "dark",
     "damage_class": "physical",
-    "description": "Power: 95\nAccuracy: 100\nPP: 15\n\nThe user stabs the foe with a sharpened stone. It has a high critical-hit ratio. "
+    "description": "Power: 95\nAccuracy: 100\nPP: 15\n\nThe user turns the target\u2019s power against it. The higher the target\u2019s Attack stat, the greater the damage."
   },
   {
     "id": 445,
@@ -2677,7 +2677,7 @@
     "pp": 10,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 25\nAccuracy: 85\nPP: 10\n\nIf it is the opposite gender of the user, the foe is charmed into sharply lowering its Sp. Atk stat."
+    "description": "Power: 25\nAccuracy: 85\nPP: 10\n\nThe user attacks by striking the target with its hard tail. It hits the target two to five times in a row."
   },
   {
     "id": 446,
@@ -2687,7 +2687,7 @@
     "pp": 5,
     "type": "fire",
     "damage_class": "special",
-    "description": "Power: 70\nAccuracy: 100\nPP: 5\n\nThe user lays a trap of levitating stones around the foe. The trap hurts foes that switch into battle."
+    "description": "Power: 70\nAccuracy: 100\nPP: 5\n\nThe user attacks with energy from jealousy. This leaves all opposing Pok\u00e9mon that have had their stats boosted during the turn with a burn."
   },
   {
     "id": 447,
@@ -2697,7 +2697,7 @@
     "pp": 5,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 200\nAccuracy: 100\nPP: 5\n\nThe user snares the foe with grass and trips it. The heavier the foe, the greater the damage."
+    "description": "Power: 200\nAccuracy: 100\nPP: 5\n\nPowerful but makes the user faint."
   },
   {
     "id": 448,
@@ -2707,7 +2707,7 @@
     "pp": 10,
     "type": "psychic",
     "damage_class": "special",
-    "description": "Power: 75\nAccuracy: 100\nPP: 10\n\nThe user attacks using a sound wave based on words it has learned. It may also confuse the foe."
+    "description": "Power: 75\nAccuracy: 100\nPP: 10\n\nThe user attacks the target with unpleasant sound waves. For two turns, the target is prevented from recovering HP through moves, Abilities, or held items."
   },
   {
     "id": 450,
@@ -2717,7 +2717,7 @@
     "pp": 10,
     "type": "psychic",
     "damage_class": "special",
-    "description": "Power: 80\nAccuracy: 100\nPP: 10\n\nThe user bites the foe. If the foe is holding a Berry, the user eats it and gains its effect."
+    "description": "Power: 80\nAccuracy: 100\nPP: 10\n\nThe user attacks the target with its psychic power. This move\u2019s power goes up and damages all opposing Pok\u00e9mon on Psychic Terrain."
   },
   {
     "id": 451,
@@ -2727,7 +2727,7 @@
     "pp": 25,
     "type": "grass",
     "damage_class": "special",
-    "description": "Power: 20\nAccuracy: 100\nPP: 25\n\nThe user fires a concentrated bundle of electricity. It may also raise the user\u2019s Sp. Atk stat."
+    "description": "Power: 20\nAccuracy: 100\nPP: 25\n\nSteals 1/2 of the damage inflicted."
   },
   {
     "id": 453,
@@ -2737,7 +2737,7 @@
     "pp": 20,
     "type": "poison",
     "damage_class": "physical",
-    "description": "Power: 70\nAccuracy: 100\nPP: 20\n\nThe user lunges at the foe at a speed that makes it almost invisible. It is sure to strike first."
+    "description": "Power: 70\nAccuracy: 100\nPP: 20\n\nA slashing attack that may also leave the target poisoned. It has a high critical-hit ratio."
   },
   {
     "id": 458,
@@ -2747,7 +2747,7 @@
     "pp": 10,
     "type": "grass",
     "damage_class": "physical",
-    "description": "Power: 125\nAccuracy: 100\nPP: 10\n\nThe user slams the foe with a tail, etc. The target is hit twice in a row. "
+    "description": "Power: 125\nAccuracy: 100\nPP: 10\n\nIn this two-turn attack, the user gathers light and fills a blade with the light\u2019s energy, attacking the target on the next turn."
   },
   {
     "id": 463,
@@ -2757,7 +2757,7 @@
     "pp": 15,
     "type": "bug",
     "damage_class": "physical",
-    "description": "Power: 80\nAccuracy: 100\nPP: 15\n\nThe foe becomes trapped within a maelstrom of fire that rages for two to five turns."
+    "description": "Power: 80\nAccuracy: 100\nPP: 15\n\nThe user makes a lunge at the target, attacking with full force. This also lowers the target\u2019s Attack stat."
   },
   {
     "id": 464,
@@ -2767,7 +2767,7 @@
     "pp": 20,
     "type": "bug",
     "damage_class": "physical",
-    "description": "Power: 50\nAccuracy: 100\nPP: 20\n\nThe foe is dragged into a world of total darkness that puts it to sleep. "
+    "description": "Power: 50\nAccuracy: 100\nPP: 20\n\nThe user attacks by pouncing on the target. This also lowers the target's Speed stat."
   },
   {
     "id": 468,
@@ -2777,7 +2777,7 @@
     "pp": 20,
     "type": "rock",
     "damage_class": "special",
-    "description": "Power: 80\nAccuracy: 100\nPP: 20\n\nThe user sharpens its claws to boost its Attack stat and accuracy."
+    "description": "Power: 80\nAccuracy: 100\nPP: 20\n\nThe user attacks with a ray of light that sparkles as if it were made of gemstones. "
   },
   {
     "id": 470,
@@ -2787,7 +2787,7 @@
     "pp": 5,
     "type": "fighting",
     "damage_class": "physical",
-    "description": "Power: 100\nAccuracy: 80\nPP: 5\n\nThe user employs its psychic power to average its Defense and Sp. Def stats with those of its target\u2019s."
+    "description": "Power: 100\nAccuracy: 80\nPP: 5\n\nHas a high criti\u00ad cal hit ratio."
   },
   {
     "id": 472,
@@ -2797,7 +2797,7 @@
     "pp": 30,
     "type": "fighting",
     "damage_class": "special",
-    "description": "Power: 40\nAccuracy: 100\nPP: 30\n\nThe user creates a bizarre area in which Pok\u00e9mon\u2019s Defense and Sp. Def stats are swapped for five turns."
+    "description": "Power: 40\nAccuracy: 100\nPP: 30\n\nThe user whirls its fists to send a wave of pure vacuum at the foe. This move always goes first."
   },
   {
     "id": 473,
@@ -2807,7 +2807,7 @@
     "pp": 10,
     "type": "psychic",
     "damage_class": "special",
-    "description": "Power: 120\nAccuracy: 100\nPP: 10\n\nThe user materializes an odd psychic wave to attack the target. This attack does physical damage."
+    "description": "Power: 120\nAccuracy: 100\nPP: 10\n\nUsing an odd shock wave, the user inflicts damage on any Pok\u00e9mon of the same type in the area around it."
   },
   {
     "id": 475,
@@ -2817,7 +2817,7 @@
     "pp": 20,
     "type": "fighting",
     "damage_class": "physical",
-    "description": "Power: 65\nAccuracy: 100\nPP: 20\n\nThe user sheds part of its body to make itself lighter and sharply raise its Speed stat."
+    "description": "Power: 65\nAccuracy: 100\nPP: 20\n\nThe user attacks the target\u2019s legs swiftly, reducing the target\u2019s Speed stat."
   },
   {
     "id": 477,
@@ -2827,7 +2827,7 @@
     "pp": 15,
     "type": "poison",
     "damage_class": "special",
-    "description": "Power: 50\nAccuracy: -\nPP: 15\n\nThe user makes the target float with its psychic power. The target is easier to hit for three turns."
+    "description": "Power: 50\nAccuracy: -\nPP: 15\n\nThe user attacks by throwing a clump of special mud. All status changes are returned to normal."
   },
   {
     "id": 478,
@@ -2837,7 +2837,7 @@
     "pp": 25,
     "type": "fighting",
     "damage_class": "physical",
-    "description": "Power: 50\nAccuracy: 100\nPP: 25\n\nThe user creates a bizarre area in which Pok\u00e9mon\u2019s held items lose their effects for five turns."
+    "description": "Power: 50\nAccuracy: 100\nPP: 25\n\nHas a high criti\u00ad cal hit ratio."
   },
   {
     "id": 480,
@@ -2847,7 +2847,7 @@
     "pp": 10,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 70\nAccuracy: 100\nPP: 10\n\nThe user strikes the target with a fierce blow. This attack always results in a critical hit."
+    "description": "Power: 70\nAccuracy: 100\nPP: 10\n\nPowerful against paralyzed foes, but also heals them."
   },
   {
     "id": 482,
@@ -2857,7 +2857,7 @@
     "pp": 5,
     "type": "fighting",
     "damage_class": "physical",
-    "description": "Power: 120\nAccuracy: 100\nPP: 5\n\nIt swamps the area around the user with a giant sludge wave. It may also poison those hit."
+    "description": "Power: 120\nAccuracy: 100\nPP: 5\n\nThe user fights the foe in close without guarding itself. It also cuts the user\u2019s Defense and Sp. Def."
   },
   {
     "id": 483,
@@ -2867,7 +2867,7 @@
     "pp": 15,
     "type": "dragon",
     "damage_class": "physical",
-    "description": "Power: 40\nAccuracy: 90\nPP: 15\n\nThe user lightly performs a beautiful, mystic dance. It boosts the user\u2019s Sp. Atk, Sp. Def, and Speed stats."
+    "description": "Power: 40\nAccuracy: 90\nPP: 15\n\nThe user attacks its target by hitting it with brutal strikes. The target is hit twice in a row."
   },
   {
     "id": 484,
@@ -2877,7 +2877,7 @@
     "pp": 10,
     "type": "dark",
     "damage_class": "physical",
-    "description": "Power: 20\nAccuracy: 100\nPP: 10\n\nThe user slams into the target with its heavy body. The more the user outweighs the target, the greater its damage."
+    "description": "Power: 20\nAccuracy: 100\nPP: 10\n\nThe user boasts its strength and attacks the target. The more the user\u2019s stats are raised, the greater the move\u2019s power."
   },
   {
     "id": 485,
@@ -2887,7 +2887,7 @@
     "pp": 10,
     "type": "ghost",
     "damage_class": "physical",
-    "description": "Power: 50\nAccuracy: 100\nPP: 10\n\nUsing an odd shock wave, the user inflicts damage on any Pok\u00e9mon of the same type in the area around it."
+    "description": "Power: 50\nAccuracy: 100\nPP: 10\n\nThe user converts its rage into energy to attack. The more times the user has been hit by attacks, the greater the move's power."
   },
   {
     "id": 486,
@@ -2897,7 +2897,7 @@
     "pp": 5,
     "type": "fire",
     "damage_class": "special",
-    "description": "Power: 130\nAccuracy: 100\nPP: 5\n\nThe user hurls an electric orb at the target. The faster the user is than the target, the greater the damage."
+    "description": "Power: 130\nAccuracy: 100\nPP: 5\n\nTo inflict massive damage, the user burns itself out. After using this move, the user will no longer be Fire type."
   },
   {
     "id": 487,
@@ -2907,7 +2907,7 @@
     "pp": 10,
     "type": "fire",
     "damage_class": "physical",
-    "description": "Power: 120\nAccuracy: 100\nPP: 10\n\nThe user shoots a torrent of water at the target and changes the target\u2019s type to Water."
+    "description": "Power: 120\nAccuracy: 100\nPP: 10\n\nThe user rampages and spews vicious flames to inflict damage on the target, then becomes fixated on using this move."
   },
   {
     "id": 488,
@@ -2917,7 +2917,7 @@
     "pp": 5,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 80\nAccuracy: 100\nPP: 5\n\nThe user cloaks itself with flame and attacks. Building up more power, it raises the user\u2019s Speed stat."
+    "description": "Power: 80\nAccuracy: 100\nPP: 5\n\nA powerful first- strike move."
   },
   {
     "id": 489,
@@ -2927,7 +2927,7 @@
     "pp": 15,
     "type": "steel",
     "damage_class": "physical",
-    "description": "Power: 80\nAccuracy: 100\nPP: 15\n\nThe user coils up and concentrates. This raises its Attack and Defense stats as well as its accuracy."
+    "description": "Power: 80\nAccuracy: 100\nPP: 15\n\nThe foe slams the target with its steel-hard head. It may also make the target flinch."
   },
   {
     "id": 491,
@@ -2937,7 +2937,7 @@
     "pp": 20,
     "type": "ice",
     "damage_class": "physical",
-    "description": "Power: 30\nAccuracy: 90\nPP: 20\n\nThe user spits fluid that works to melt the target. This harshly reduces the target\u2019s Sp. Def stat."
+    "description": "Power: 30\nAccuracy: 90\nPP: 20\n\nA 5-turn attack that gains power on successive hits."
   },
   {
     "id": 492,
@@ -2947,7 +2947,7 @@
     "pp": 10,
     "type": "fighting",
     "damage_class": "physical",
-    "description": "Power: 60\nAccuracy: 90\nPP: 10\n\nThe user turns the target\u2019s power against it. The higher the target\u2019s Attack stat, the greater the damage."
+    "description": "Power: 60\nAccuracy: 90\nPP: 10\n\nThe user throws the target and drags out another Pok\u00e9mon in its party. In the wild, the battle ends."
   },
   {
     "id": 493,
@@ -2957,7 +2957,7 @@
     "pp": 10,
     "type": "dark",
     "damage_class": "physical",
-    "description": "Power: 85\nAccuracy: 100\nPP: 10\n\nThe user\u2019s mysterious psychic wave changes the target\u2019s Ability to Simple."
+    "description": "Power: 85\nAccuracy: 100\nPP: 10\n\nThe user swings both arms and hits the target. The target\u2019s stat changes don\u2019t affect this attack\u2019s damage."
   },
   {
     "id": 505,
@@ -2967,7 +2967,7 @@
     "pp": 20,
     "type": "psychic",
     "damage_class": "physical",
-    "description": "Power: 70\nAccuracy: 100\nPP: 20\n\nThe user emits a healing pulse which restores the target\u2019s HP by up to half of its max HP."
+    "description": "Power: 70\nAccuracy: 100\nPP: 20\n\nThe user tears at the foe with blades formed by psychic power. It has a high critical-hit ratio."
   },
   {
     "id": 506,
@@ -2977,7 +2977,7 @@
     "pp": 15,
     "type": "fighting",
     "damage_class": "physical",
-    "description": "Power: 60\nAccuracy: 85\nPP: 15\n\nThis relentless attack does massive damage to a target affected by status problems."
+    "description": "Power: 60\nAccuracy: 85\nPP: 15\n\nA fast, spinning kick."
   },
   {
     "id": 507,
@@ -2987,7 +2987,7 @@
     "pp": 30,
     "type": "fighting",
     "damage_class": "physical",
-    "description": "Power: 40\nAccuracy: 100\nPP: 30\n\nThe user takes the target into the sky, then drops it during the next turn. The target cannot attack while in the sky."
+    "description": "Power: 40\nAccuracy: 100\nPP: 30\n\nA fast punch that lands first."
   },
   {
     "id": 508,
@@ -2997,7 +2997,7 @@
     "pp": 10,
     "type": "fighting",
     "damage_class": "physical",
-    "description": "Power: 70\nAccuracy: -\nPP: 10\n\nThe user rotates its gears, raising its Attack and sharply raising its Speed."
+    "description": "Power: 70\nAccuracy: -\nPP: 10\n\nA 2nd-strike move that never misses."
   },
   {
     "id": 509,
@@ -3007,7 +3007,7 @@
     "pp": 30,
     "type": "steel",
     "damage_class": "physical",
-    "description": "Power: 40\nAccuracy: 100\nPP: 30\n\nThe user throws the target and drags out another Pok\u00e9mon in its party. In the wild, the battle ends."
+    "description": "Power: 40\nAccuracy: 100\nPP: 30\n\nThe user strikes with a tough punch as fast as a bullet. This move always goes first."
   },
   {
     "id": 510,
@@ -3017,7 +3017,7 @@
     "pp": 10,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 35\nAccuracy: 90\nPP: 10\n\nThe user attacks the target with fire. If the target is holding a Berry, the Berry becomes burnt up and unusable."
+    "description": "Power: 35\nAccuracy: 90\nPP: 10\n\nThe user slams the foe with a tail, etc. The target is hit twice in a row. "
   },
   {
     "id": 513,
@@ -3027,7 +3027,7 @@
     "pp": 15,
     "type": "grass",
     "damage_class": "physical",
-    "description": "Power: 90\nAccuracy: 100\nPP: 15\n\nThe user reflects the target\u2019s type, making it the same type as the target."
+    "description": "Power: 90\nAccuracy: 100\nPP: 15\n\nSlashes with a sharp leaf. High critical-hit ratio."
   },
   {
     "id": 514,
@@ -3037,7 +3037,7 @@
     "pp": 10,
     "type": "grass",
     "damage_class": "special",
-    "description": "Power: 65\nAccuracy: 90\nPP: 10\n\nThe user gets revenge for a fainted ally. If an ally fainted in the previous turn, this attack\u2019s damage increases."
+    "description": "Power: 65\nAccuracy: 90\nPP: 10\n\nThe user attacks its target by encircling it in sharp leaves. This attack may also lower the target\u2019s accuracy."
   },
   {
     "id": 515,
@@ -3047,7 +3047,7 @@
     "pp": 20,
     "type": "ice",
     "damage_class": "special",
-    "description": "Power: 65\nAccuracy: 100\nPP: 20\n\nThe user risks everything to attack its target. The user faints but does damage equal to the user\u2019s HP."
+    "description": "Power: 65\nAccuracy: 100\nPP: 20\n\nAn attack that may lower ATTACK."
   },
   {
     "id": 516,
@@ -3057,7 +3057,7 @@
     "pp": 35,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 10\nAccuracy: 100\nPP: 35\n\nThe user passes its held item to the target when the target isn\u2019t holding an item."
+    "description": "Power: 10\nAccuracy: 100\nPP: 35\n\nAn attack that may lower SPEED."
   },
   {
     "id": 520,
@@ -3067,7 +3067,7 @@
     "pp": 15,
     "type": "rock",
     "damage_class": "physical",
-    "description": "Power: 50\nAccuracy: 90\nPP: 15\n\nA column of grass hits opposing Pok\u00e9mon. When used with its water equivalent, its damage increases into a vast swamp."
+    "description": "Power: 50\nAccuracy: 90\nPP: 15\n\nDrops rocks on the enemy."
   },
   {
     "id": 521,
@@ -3077,7 +3077,7 @@
     "pp": 5,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 250\nAccuracy: 100\nPP: 5\n\nAfter making its attack, the user rushes back to switch places with a party Pok\u00e9mon in waiting."
+    "description": "Power: 250\nAccuracy: 100\nPP: 5\n\nVery powerful but makes user faint."
   },
   {
     "id": 522,
@@ -3087,7 +3087,7 @@
     "pp": 10,
     "type": "fighting",
     "damage_class": "physical",
-    "description": "Power: 100\nAccuracy: 90\nPP: 10\n\nWhile resisting, the user attacks the opposing Pok\u00e9mon. The targets\u2019 Sp. Atk stat is reduced."
+    "description": "Power: 100\nAccuracy: 90\nPP: 10\n\nThe user swings and hits with its strong and heavy fist. It lowers the user\u2019s Speed, however."
   },
   {
     "id": 525,
@@ -3097,7 +3097,7 @@
     "pp": 10,
     "type": "steel",
     "damage_class": "physical",
-    "description": "Power: -\nAccuracy: 100\nPP: 10\n\nThe user knocks away the target and drags out another Pok\u00e9mon in its party. In the wild, the battle ends."
+    "description": "Power: -\nAccuracy: 100\nPP: 10\n\nThe target is crushed with an arm, a claw, or the like to inflict damage. The more HP the target has left, the greater the move's power."
   },
   {
     "id": 526,
@@ -3107,7 +3107,7 @@
     "pp": 20,
     "type": "bug",
     "damage_class": "physical",
-    "description": "Power: 65\nAccuracy: 100\nPP: 20\n\nThe user is roused, and its Attack and Sp. Atk stats increase."
+    "description": "Power: 65\nAccuracy: 100\nPP: 20\n\nThe user crushes its targets by rolling over them with its rolled-up body. This attack may make the target flinch."
   },
   {
     "id": 527,
@@ -3117,7 +3117,7 @@
     "pp": 20,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 65\nAccuracy: 100\nPP: 20\n\nThe user captures and attacks opposing Pok\u00e9mon by using an electric net. It reduces the targets\u2019 Speed stat."
+    "description": "Power: 65\nAccuracy: 100\nPP: 20\n\nAn attack that may cause flinching."
   },
   {
     "id": 529,
@@ -3127,7 +3127,7 @@
     "pp": 10,
     "type": "ice",
     "damage_class": "status",
-    "description": "Power: -\nAccuracy: -\nPP: 10\n\nThe user crashes into its target while rotating its body like a drill. Critical hits land more easily."
+    "description": "Power: -\nAccuracy: -\nPP: 10\n\nThe user summons a snowstorm lasting five turns. This boosts the Defense stats of Ice types."
   },
   {
     "id": 530,
@@ -3137,7 +3137,7 @@
     "pp": 10,
     "type": "water",
     "damage_class": "physical",
-    "description": "Power: 75\nAccuracy: 95\nPP: 10\n\nThe user attacks its target by hitting it with brutal strikes. The target is hit twice in a row."
+    "description": "Power: 75\nAccuracy: 95\nPP: 10\n\nThe user cuts its target with sharp shells. This attack may also lower the target\u2019s Defense stat."
   },
   {
     "id": 534,
@@ -3147,7 +3147,7 @@
     "pp": 10,
     "type": "steel",
     "damage_class": "special",
-    "description": "Power: 65\nAccuracy: 85\nPP: 10\n\nThe user cuts its target with sharp shells. This attack may also lower the target\u2019s Defense stat."
+    "description": "Power: 65\nAccuracy: 85\nPP: 10\n\nThe user looses a flash of energy from its polished body. It may also lower the target\u2019s accuracy."
   },
   {
     "id": 535,
@@ -3157,7 +3157,7 @@
     "pp": 20,
     "type": "steel",
     "damage_class": "physical",
-    "description": "Power: 60\nAccuracy: -\nPP: 20\n\nThe user slams its target with its flame- covered body. The more the user outweighs the target, the greater the damage."
+    "description": "Power: 60\nAccuracy: -\nPP: 20\n\nThe user launches a steel bomb that sticks to the target. This attack will not miss."
   },
   {
     "id": 536,
@@ -3167,7 +3167,7 @@
     "pp": 5,
     "type": "steel",
     "damage_class": "special",
-    "description": "Power: 140\nAccuracy: 95\nPP: 5\n\nThe user attacks its target by encircling it in sharp leaves. This attack may also lower the target\u2019s accuracy."
+    "description": "Power: 140\nAccuracy: 95\nPP: 5\n\nThe user fires a beam of steel that it collected from its entire body. This also damages the user."
   },
   {
     "id": 538,
@@ -3177,7 +3177,7 @@
     "pp": 10,
     "type": "bug",
     "damage_class": "physical",
-    "description": "Power: 90\nAccuracy: 100\nPP: 10\n\nThe user protects itself by wrapping its body in soft cotton, drastically raising the user\u2019s Defense stat."
+    "description": "Power: 90\nAccuracy: 100\nPP: 10\n\nAlthough this move has great power, it only works the first turn the user is in battle."
   },
   {
     "id": 539,
@@ -3187,7 +3187,7 @@
     "pp": 10,
     "type": "fighting",
     "damage_class": "physical",
-    "description": "Power: 100\nAccuracy: 95\nPP: 10\n\nThe user lets loose a pitch-black shock wave at its target. It may also lower the target\u2019s accuracy."
+    "description": "Power: 100\nAccuracy: 95\nPP: 10\n\nMay miss, damaging the user."
   },
   {
     "id": 540,
@@ -3197,7 +3197,7 @@
     "pp": 30,
     "type": "ghost",
     "damage_class": "physical",
-    "description": "Power: 30\nAccuracy: 100\nPP: 30\n\nThe user materializes an odd psychic wave to attack the target. This attack does physical damage."
+    "description": "Power: 30\nAccuracy: 100\nPP: 30\n\nAn attack that may cause paralysis."
   },
   {
     "id": 542,
@@ -3207,7 +3207,7 @@
     "pp": 30,
     "type": "ice",
     "damage_class": "physical",
-    "description": "Power: 25\nAccuracy: 100\nPP: 30\n\nThe user attacks by wrapping its opponent in a fierce wind that flies up into the sky. It may also confuse the target."
+    "description": "Power: 25\nAccuracy: 100\nPP: 30\n\nAttacks the foe by firing 2 to 5 icicles in a row."
   },
   {
     "id": 543,
@@ -3217,7 +3217,7 @@
     "pp": 30,
     "type": "ice",
     "damage_class": "physical",
-    "description": "Power: 40\nAccuracy: 100\nPP: 30\n\nThe user charges its head into its target, using its powerful guard hair. It also damages the user a little."
+    "description": "Power: 40\nAccuracy: 100\nPP: 30\n\nThe user flash freezes chunks of ice and hurls them. This move always goes first."
   },
   {
     "id": 545,
@@ -3227,7 +3227,7 @@
     "pp": 10,
     "type": "ice",
     "damage_class": "physical",
-    "description": "Power: 20\nAccuracy: 90\nPP: 10\n\nAn inferno of scarlet flames torches everything around the user. It may leave targets with a burn."
+    "description": "Power: 20\nAccuracy: 90\nPP: 10\n\nA consecutive three-kick attack that becomes more powerful with each successful hit."
   },
   {
     "id": 547,
@@ -3237,7 +3237,7 @@
     "pp": 10,
     "type": "ice",
     "damage_class": "special",
-    "description": "Power: 60\nAccuracy: 90\nPP: 10\n\nThe user sings an ancient song and attacks by appealing to the hearts of those listening. It may also induce sleep."
+    "description": "Power: 60\nAccuracy: 90\nPP: 10\n\nThe user blows a cold breath on the target. This attack always results in a critical hit."
   },
   {
     "id": 548,
@@ -3247,7 +3247,7 @@
     "pp": 20,
     "type": "poison",
     "damage_class": "special",
-    "description": "Power: 30\nAccuracy: 70\nPP: 20\n\nThe user cuts with its long horn. The odd power contained in the horn does physical damage to the target."
+    "description": "Power: 30\nAccuracy: 70\nPP: 20\n\nAn attack that may poison the foe."
   },
   {
     "id": 550,
@@ -3257,7 +3257,7 @@
     "pp": 20,
     "type": "ghost",
     "damage_class": "physical",
-    "description": "Power: 60\nAccuracy: -\nPP: 20\n\nThe user charges its target, surrounding itself with a great amount of electricity. It may leave the target with paralysis."
+    "description": "Power: 60\nAccuracy: -\nPP: 20\n\nAn unavoidable punch that is thrown from shadows."
   },
   {
     "id": 551,
@@ -3267,7 +3267,7 @@
     "pp": 30,
     "type": "ghost",
     "damage_class": "physical",
-    "description": "Power: 40\nAccuracy: 100\nPP: 30\n\nThe user attacks by engulfing the target in an intense, yet beautiful, blue flame. It may leave the target with a burn."
+    "description": "Power: 40\nAccuracy: 100\nPP: 30\n\nThe user extends its shadow and attacks the foe from behind. This move always goes first."
   },
   {
     "id": 552,
@@ -3277,7 +3277,7 @@
     "pp": 15,
     "type": "water",
     "damage_class": "physical",
-    "description": "Power: 35\nAccuracy: 85\nPP: 15\n\nCloaked in flames, the user dances and flaps its wings. It may also raise the user\u2019s Sp. Atk stat."
+    "description": "Power: 35\nAccuracy: 85\nPP: 15\n\nTraps the foe for 2-5 turns."
   },
   {
     "id": 553,
@@ -3287,7 +3287,7 @@
     "pp": 15,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 20\nAccuracy: 100\nPP: 15\n\nOn the second turn, the user hits the target with electrically charged ice. It may leave the target with paralysis."
+    "description": "Power: 20\nAccuracy: 100\nPP: 15\n\nFires spikes to hit 2-5 times."
   },
   {
     "id": 554,
@@ -3297,7 +3297,7 @@
     "pp": 10,
     "type": "ice",
     "damage_class": "physical",
-    "description": "Power: 85\nAccuracy: 90\nPP: 10\n\nOn the second turn, an ultracold, freezing wind surrounds the target. This may leave the target with a burn."
+    "description": "Power: 85\nAccuracy: 90\nPP: 10\n\nThe user attacks by harshly dropping an icicle onto the target. It may also make the target flinch."
   },
   {
     "id": 556,
@@ -3307,7 +3307,7 @@
     "pp": 5,
     "type": "ghost",
     "damage_class": "physical",
-    "description": "Power: 110\nAccuracy: 90\nPP: 5\n\nThe user attacks by harshly dropping an icicle onto the target. It may also make the target flinch."
+    "description": "Power: 110\nAccuracy: 90\nPP: 5\n\nThe user attacks the target by controlling the target\u2019s item. The move fails if the target doesn\u2019t have an item."
   },
   {
     "id": 557,
@@ -3317,7 +3317,7 @@
     "pp": 10,
     "type": "ghost",
     "damage_class": "physical",
-    "description": "Power: 90\nAccuracy: 100\nPP: 10\n\nWith a hot flame on its forehead, the user hurls itself at its target. It lowers the user\u2019s Defense, Sp. Def, and Speed stats."
+    "description": "Power: 90\nAccuracy: 100\nPP: 10\n\nThe user vanishes somewhere, then strikes the target on the next turn. This move hits even if the target protects itself."
   },
   {
     "id": 559,
@@ -3327,7 +3327,7 @@
     "pp": 30,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 55\nAccuracy: 100\nPP: 30\n\nThe user throws down a giant thunderbolt. This attack does greater damage when influenced by an enormous flame."
+    "description": "Power: 55\nAccuracy: 100\nPP: 30\n\nGrips with power\u00ad ful pincers."
   },
   {
     "id": 561,
@@ -3337,7 +3337,7 @@
     "pp": 10,
     "type": "water",
     "damage_class": "physical",
-    "description": "Power: 100\nAccuracy: 90\nPP: 10\n\nUsing a pulled-up mat as a shield, the user protects itself and its allies from damaging moves. This does not stop status moves."
+    "description": "Power: 100\nAccuracy: 90\nPP: 10\n\nHas a high criti\u00ad cal hit ratio."
   },
   {
     "id": 563,
@@ -3347,7 +3347,7 @@
     "pp": 15,
     "type": "electric",
     "damage_class": "physical",
-    "description": "Power: 100\nAccuracy: 95\nPP: 15\n\nTilling the soil, the user makes it easier for plants to grow. This raises the Attack and Sp. Atk stats of Grass-type Pok\u00e9mon."
+    "description": "Power: 100\nAccuracy: 95\nPP: 15\n\nThe user electrifies its body and drops onto the target to inflict damage. If this move misses, the user takes damage instead."
   },
   {
     "id": 564,
@@ -3357,7 +3357,7 @@
     "pp": 10,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 100\nAccuracy: 75\nPP: 10\n\nThe user weaves a sticky net around the opposing team, which lowers their Speed stat upon switching into battle."
+    "description": "Power: 100\nAccuracy: 75\nPP: 10\n\nEggs are hurled at the foe."
   },
   {
     "id": 565,
@@ -3367,7 +3367,7 @@
     "pp": 20,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 15\nAccuracy: 85\nPP: 20\n\nWhen the user knocks out a target with this move, the user\u2019s Attack stat rises sharply."
+    "description": "Power: 15\nAccuracy: 85\nPP: 20\n\nThrows orbs to hit 2-5 times."
   },
   {
     "id": 566,
@@ -3377,7 +3377,7 @@
     "pp": 15,
     "type": "grass",
     "damage_class": "physical",
-    "description": "Power: 120\nAccuracy: 100\nPP: 15\n\nThe user vanishes somewhere, then strikes the target on the next turn. This move hits even if the target protects itself."
+    "description": "Power: 120\nAccuracy: 100\nPP: 15\n\nThe user slams its rugged body into the foe to attack. The user also sustains serious damage."
   },
   {
     "id": 567,
@@ -3387,7 +3387,7 @@
     "pp": 20,
     "type": "ground",
     "damage_class": "physical",
-    "description": "Power: 65\nAccuracy: 85\nPP: 20\n\nThe user takes the target trick-or-treating. This adds Ghost type to the target\u2019s type."
+    "description": "Power: 65\nAccuracy: 85\nPP: 20\n\nAn attack that may cause flinching."
   },
   {
     "id": 568,
@@ -3397,7 +3397,7 @@
     "pp": 10,
     "type": "ground",
     "damage_class": "physical",
-    "description": "Power: 50\nAccuracy: 90\nPP: 10\n\nLetting out a noble roar, the user intimidates the target and lowers its Attack and Sp. Atk stats."
+    "description": "Power: 50\nAccuracy: 90\nPP: 10\n\nAn attack that strikes twice."
   },
   {
     "id": 569,
@@ -3407,7 +3407,7 @@
     "pp": 10,
     "type": "ground",
     "damage_class": "physical",
-    "description": "Power: 25\nAccuracy: 90\nPP: 10\n\nThe user disperses electrically charged particles, which changes Normal-type moves to Electric-type moves."
+    "description": "Power: 25\nAccuracy: 90\nPP: 10\n\nAn attack that hits 2-5 times."
   },
   {
     "id": 570,
@@ -3417,7 +3417,7 @@
     "pp": 10,
     "type": "fighting",
     "damage_class": "physical",
-    "description": "Power: 130\nAccuracy: 90\nPP: 10\n\nThe user attacks everything around it. The user\u2019s HP is restored by half the damage taken by those hit."
+    "description": "Power: 130\nAccuracy: 90\nPP: 10\n\nMay miss and hurt the user."
   },
   {
     "id": 571,
@@ -3427,7 +3427,7 @@
     "pp": 10,
     "type": "fighting",
     "damage_class": "physical",
-    "description": "Power: 120\nAccuracy: 90\nPP: 10\n\nThe user puts a forest curse on the target. Afflicted targets are now Grass type as well."
+    "description": "Power: 120\nAccuracy: 90\nPP: 10\n\nThe user attacks by kicking up into the air and slamming its heel down upon the target. This may also confuse the target. If it misses, the user takes damage instead."
   },
   {
     "id": 572,
@@ -3437,7 +3437,7 @@
     "pp": 15,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 18\nAccuracy: 85\nPP: 15\n\nThe user stirs up a violent petal blizzard and attacks everything around it."
+    "description": "Power: 18\nAccuracy: 85\nPP: 15\n\nRepeatedly punches 2-5 times."
   },
   {
     "id": 573,
@@ -3447,7 +3447,7 @@
     "pp": 10,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 70\nAccuracy: 100\nPP: 10\n\nThe user rapidly cools the target. This may also leave the target frozen. This move is super effective on Water types."
+    "description": "Power: 70\nAccuracy: 100\nPP: 10\n\nAn attack that may cause confusion."
   },
   {
     "id": 574,
@@ -3457,7 +3457,7 @@
     "pp": 15,
     "type": "fighting",
     "damage_class": "physical",
-    "description": "Power: 85\nAccuracy: 90\nPP: 15\n\nLetting out a charming cry, the user does emotional damage to opposing Pok\u00e9mon. This attack never misses."
+    "description": "Power: 85\nAccuracy: 90\nPP: 15\n\nAn uppercut thrown as if leaping into the sky."
   },
   {
     "id": 576,
@@ -3467,7 +3467,7 @@
     "pp": 10,
     "type": "water",
     "damage_class": "special",
-    "description": "Power: 65\nAccuracy: 85\nPP: 10\n\nAll stat changes affecting the target turn topsy-turvy and become the opposite of what they were."
+    "description": "Power: 65\nAccuracy: 85\nPP: 10\n\nAn attack that may reduce accuracy."
   },
   {
     "id": 579,
@@ -3477,7 +3477,7 @@
     "pp": 25,
     "type": "ice",
     "damage_class": "special",
-    "description": "Power: 40\nAccuracy: 100\nPP: 25\n\nThe user raises the Defense stat of all Grass-type Pok\u00e9mon in battle with a mysterious power."
+    "description": "Power: 40\nAccuracy: 100\nPP: 25\n\nAn attack that may cause freezing."
   },
   {
     "id": 580,
@@ -3487,7 +3487,7 @@
     "pp": 25,
     "type": "psychic",
     "damage_class": "physical",
-    "description": "Power: 60\nAccuracy: 100\nPP: 25\n\nThe user turns the ground under everyone\u2019s feet to grass for five turns. This restores the HP of Pok\u00e9mon on the ground a little every turn."
+    "description": "Power: 60\nAccuracy: 100\nPP: 25\n\nThe user unleashes a vicious blow after its cute act makes the target less wary. It may also make the target flinch."
   },
   {
     "id": 582,
@@ -3497,7 +3497,7 @@
     "pp": 15,
     "type": "fire",
     "damage_class": "special",
-    "description": "Power: 80\nAccuracy: 100\nPP: 15\n\nIf the target is electrified before it uses a move during that turn, the target\u2019s move becomes Electric type."
+    "description": "Power: 80\nAccuracy: 100\nPP: 15\n\nAn inferno of scarlet flames washes over all Pok\u00e9mon in battle. It may also inflict burns."
   },
   {
     "id": 583,
@@ -3507,7 +3507,7 @@
     "pp": 10,
     "type": "fighting",
     "damage_class": "physical",
-    "description": "Power: 60\nAccuracy: 100\nPP: 10\n\nThe user plays rough with the target and attacks it. This may also lower the target\u2019s Attack stat."
+    "description": "Power: 60\nAccuracy: 100\nPP: 10\n\nThe user strikes the target with a fierce blow. This attack always results in a critical hit."
   },
   {
     "id": 584,
@@ -3517,7 +3517,7 @@
     "pp": 10,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 90\nAccuracy: 100\nPP: 10\n\nThe user stirs up a fairy wind and strikes the target with it."
+    "description": "Power: 90\nAccuracy: 100\nPP: 10\n\nThe user performs a tackle like a raging bull. This move's type depends on the user's form. It can also break barriers, such as Light Screen and Reflect."
   },
   {
     "id": 585,
@@ -3527,7 +3527,7 @@
     "pp": 20,
     "type": "ice",
     "damage_class": "special",
-    "description": "Power: 70\nAccuracy: 100\nPP: 20\n\nBorrowing the power of the moon, the user attacks the target. This may also lower the target\u2019s Sp. Atk stat."
+    "description": "Power: 70\nAccuracy: 100\nPP: 20\n\nThe user rapidly cools the target. This may also leave the target frozen. This move is super effective on Water types."
   },
   {
     "id": 586,
@@ -3537,7 +3537,7 @@
     "pp": 10,
     "type": "water",
     "damage_class": "special",
-    "description": "Power: 90\nAccuracy: 100\nPP: 10\n\nThe user attacks everything around it with the destructive power of a terrible, explosive sound."
+    "description": "Power: 90\nAccuracy: 100\nPP: 10\n\nThe user bursts into song, emitting many bubbles. Any Pok\u00e9mon suffering from a burn will be healed by the touch of these bubbles."
   },
   {
     "id": 591,
@@ -3547,7 +3547,7 @@
     "pp": 5,
     "type": "dragon",
     "damage_class": "special",
-    "description": "Power: 130\nAccuracy: 90\nPP: 5\n\nThe user whips up a storm of diamonds to damage opposing Pok\u00e9mon. This may also raise the user\u2019s Defense stat."
+    "description": "Power: 130\nAccuracy: 90\nPP: 5\n\nComets are summoned down from the sky. The attack\u2019s recoil sharply reduces the user\u2019s Sp. Atk stat."
   },
   {
     "id": 592,
@@ -3557,7 +3557,7 @@
     "pp": 10,
     "type": "psychic",
     "damage_class": "special",
-    "description": "Power: 100\nAccuracy: 100\nPP: 10\n\nThe user immerses the target in superheated steam. This may also leave the target with a burn."
+    "description": "Power: 100\nAccuracy: 100\nPP: 10\n\nThe user materializes an odd psychic wave to attack the target. This attack does physical damage."
   },
   {
     "id": 593,
@@ -3567,7 +3567,7 @@
     "pp": 5,
     "type": "fire",
     "damage_class": "special",
-    "description": "Power: 150\nAccuracy: 100\nPP: 5\n\nUsing a hyperspace hole, the user appears right next to the target and strikes. This also hits a target using Protect or Detect."
+    "description": "Power: 150\nAccuracy: 100\nPP: 5\n\nThe higher the user\u2019s HP, the more damage caused."
   },
   {
     "id": 594,
@@ -3577,7 +3577,7 @@
     "pp": 10,
     "type": "normal",
     "damage_class": "status",
-    "description": "Power: -\nAccuracy: -\nPP: 10\n\nThe user hits the target with throwing stars two to five times in a row. This move always goes first."
+    "description": "Power: -\nAccuracy: -\nPP: 10\n\nThe user tidies up and removes the effects of Spikes, Stealth Rock, Sticky Web, Toxic Spikes, and Substitute. This also boosts the user\u2019s Attack and Speed stats."
   },
   {
     "id": 603,
@@ -3587,7 +3587,7 @@
     "pp": 10,
     "type": "ice",
     "damage_class": "status",
-    "description": "Power: -\nAccuracy: -\nPP: 10\n\nUsing Happy Hour doubles the amount of prize money received after battle."
+    "description": "Power: -\nAccuracy: -\nPP: 10\n\nThe user tells a chillingly bad joke before switching places with a party Pok\u00e9mon in waiting. This summons a snowstorm lasting five turns."
   },
   {
     "id": 604,
@@ -3597,7 +3597,7 @@
     "pp": 10,
     "type": "psychic",
     "damage_class": "special",
-    "description": "Power: 40\nAccuracy: 100\nPP: 10\n\nThe user electrifies the ground under everyone\u2019s feet for five turns. Pok\u00e9mon on the ground no longer fall asleep."
+    "description": "Power: 40\nAccuracy: 100\nPP: 10\n\nThe user shoots mystical beams from its eyes to inflict damage. The target is hit twice in a row."
   },
   {
     "id": 605,
@@ -3607,7 +3607,7 @@
     "pp": 5,
     "type": "normal",
     "damage_class": "physical",
-    "description": "Power: 100\nAccuracy: 100\nPP: 5\n\nThe user damages opposing Pok\u00e9mon by emitting a powerful flash."
+    "description": "Power: 100\nAccuracy: 100\nPP: 5\n\nThe user spins the pointed part of its body at high speed to pierce the target. This attack can hit a target using a move such as Protect or Detect."
   },
   {
     "id": 606,
@@ -3617,7 +3617,7 @@
     "pp": 10,
     "type": "poison",
     "damage_class": "physical",
-    "description": "Power: 60\nAccuracy: 100\nPP: 10\n\nThe Pok\u00e9mon congratulates you on your special day!"
+    "description": "Power: 60\nAccuracy: 100\nPP: 10\n\nThe user launches countless toxic barbs to inflict damage. This may also poison the target. This move\u2019s power is doubled if the target has a status condition."
   },
   {
     "id": 607,
@@ -3627,7 +3627,7 @@
     "pp": 20,
     "type": "fighting",
     "damage_class": "physical",
-    "description": "Power: 15\nAccuracy: 100\nPP: 20\n\nThe user and an ally hold hands. This makes them very happy."
+    "description": "Power: 15\nAccuracy: 100\nPP: 20\n\nStraight-arm punches that strike the foe 2 to 5 times."
   },
   {
     "id": 608,
@@ -3637,7 +3637,7 @@
     "pp": 10,
     "type": "dark",
     "damage_class": "physical",
-    "description": "Power: 1\nAccuracy: 100\nPP: 10\n\nThe user stares at the target with its baby-doll eyes, which lowers its Attack stat. This move always goes first."
+    "description": "Power: 1\nAccuracy: 100\nPP: 10\n\nThe user retaliates with much greater force against the opponent that last inflicted damage on it."
   },
   {
     "id": 609,
@@ -3647,7 +3647,7 @@
     "pp": 10,
     "type": "psychic",
     "damage_class": "physical",
-    "description": "Power: 70\nAccuracy: 90\nPP: 10\n\nThe user attacks by nuzzling its electrified cheeks against the target. This also leaves the target with paralysis."
+    "description": "Power: 70\nAccuracy: 90\nPP: 10\n\nCloaking itself in psychic energy, the user slams into the target. This may also raise the user\u2019s defensive stats."
   },
   {
     "id": 611,
@@ -3657,7 +3657,7 @@
     "pp": 10,
     "type": "fighting",
     "damage_class": "physical",
-    "description": "Power: 10\nAccuracy: 90\nPP: 10\n\nThe target is infested and attacked for four to five turns. The target can\u2019t flee during this time."
+    "description": "Power: 10\nAccuracy: 90\nPP: 10\n\nHits three times with rising power."
   },
   {
     "id": 613,
@@ -3667,7 +3667,7 @@
     "pp": 5,
     "type": "fire",
     "damage_class": "physical",
-    "description": "Power: 100\nAccuracy: 95\nPP: 5\n\nThe user absorbs its target\u2019s HP. The user\u2019s HP is restored by over half of the damage taken by the target."
+    "description": "Power: 100\nAccuracy: 95\nPP: 5\n\nAn attack that may inflict a burn."
   },
   {
     "id": 614,
@@ -3677,7 +3677,7 @@
     "pp": 5,
     "type": "flying",
     "damage_class": "special",
-    "description": "Power: 100\nAccuracy: 95\nPP: 5\n\nThis move also hits opposing Pok\u00e9mon that are in the air. Those Pok\u00e9mon are knocked down to the ground."
+    "description": "Power: 100\nAccuracy: 95\nPP: 5\n\nHas a high criti\u00ad cal hit ratio."
   },
   {
     "id": 616,
@@ -3687,7 +3687,7 @@
     "pp": 40,
     "type": "grass",
     "damage_class": "physical",
-    "description": "Power: 40\nAccuracy: 100\nPP: 40\n\nThe user gathers the energy of the land and focuses that power on opposing Pok\u00e9mon to damage them."
+    "description": "Power: 40\nAccuracy: 100\nPP: 40\n\nThe user attacks by pelting the target with leaves."
   },
   {
     "id": 617,
@@ -3697,7 +3697,7 @@
     "pp": 10,
     "type": "normal",
     "damage_class": "status",
-    "description": "Power: -\nAccuracy: -\nPP: 10\n\nDrawing power from the Eternal Flower, the user fires a powerful beam of light. This also damages the user quite a lot."
+    "description": "Power: -\nAccuracy: -\nPP: 10\n\nThe user creates a substitute for itself using its own HP before switching places with a party Pok\u00e9mon in waiting."
   },
   {
     "id": 618,
@@ -3707,7 +3707,7 @@
     "pp": 10,
     "type": "normal",
     "damage_class": "special",
-    "description": "Power: 140\nAccuracy: 100\nPP: 10\n\nThe user attacks opposing Pok\u00e9mon with countless beams of light that glow a deep and brilliant blue."
+    "description": "Power: 140\nAccuracy: 100\nPP: 10\n\nThe user attacks everything around it with the destructive power of a terrible, explosive sound."
   },
   {
     "id": 619,
@@ -3717,7 +3717,7 @@
     "pp": 10,
     "type": "fighting",
     "damage_class": "physical",
-    "description": "Power: 60\nAccuracy: 100\nPP: 10\n\nThe user attacks opposing Pok\u00e9mon by manifesting the power of the land in fearsome blades of stone."
+    "description": "Power: 60\nAccuracy: 100\nPP: 10\n\nThe foe is attacked with a shock wave. It may also leave the target paralyzed. "
   },
   {
     "id": 620,
@@ -3727,7 +3727,7 @@
     "pp": 5,
     "type": "ground",
     "damage_class": "physical",
-    "description": "Power: 120\nAccuracy: 100\nPP: 5\n\nAfter soaring upward, the user attacks its target by dropping out of the sky at high speeds, although it lowers its own Defense and Sp. Def in the process."
+    "description": "Power: 120\nAccuracy: 100\nPP: 5\n\nThe user smashes into the target in a full-body tackle. This also lowers the user\u2019s defensive stats."
   },
   {
     "id": 624,
@@ -3737,7 +3737,7 @@
     "pp": 15,
     "type": "grass",
     "damage_class": "physical",
-    "description": "Power: 60\nAccuracy: 100\nPP: 15\n\nThe user rams an energy orb created by its Z-Power into the target with full force. The power varies, depending on the original move."
+    "description": "Power: 60\nAccuracy: 100\nPP: 15\n\nAttacks with thorny arms. May cause flinching."
   },
   {
     "id": 626,
@@ -3747,7 +3747,7 @@
     "pp": 15,
     "type": "dragon",
     "damage_class": "physical",
-    "description": "Power: 90\nAccuracy: 100\nPP: 15\n\nThe user soars up with its Z-Power and plummets toward the target at full speed. The power varies, depending on the original move."
+    "description": "Power: 90\nAccuracy: 100\nPP: 15\n\nThe user uses its body like a hammer to attack the target and inflict damage."
   },
   {
     "id": 628,
@@ -3757,7 +3757,7 @@
     "pp": 5,
     "type": "psychic",
     "damage_class": "special",
-    "description": "Power: 95\nAccuracy: 100\nPP: 5\n\nThe user creates a poisonous swamp using its Z-Power and sinks the target into it at full force. The power varies, depending on the original move."
+    "description": "Power: 95\nAccuracy: 100\nPP: 5\n\nAttacks with a flurry of down. May lower SP. ATK."
   },
   {
     "id": 629,
@@ -3767,7 +3767,7 @@
     "pp": 5,
     "type": "psychic",
     "damage_class": "special",
-    "description": "Power: 95\nAccuracy: 100\nPP: 5\n\nDummy Data"
+    "description": "Power: 95\nAccuracy: 100\nPP: 5\n\nAttacks with a burst of light. May lower SP. DEF."
   },
   {
     "id": 630,
@@ -3777,7 +3777,7 @@
     "pp": 10,
     "type": "water",
     "damage_class": "special",
-    "description": "Power: 110\nAccuracy: 85\nPP: 10\n\nThe user burrows deep into the ground and slams into the target with the full force of its Z-Power. The power varies, depending on the original move."
+    "description": "Power: 110\nAccuracy: 85\nPP: 10\n\nThe user attacks opposing Pok\u00e9mon with countless beams of light that glow a deep and brilliant blue."
   },
   {
     "id": 631,
@@ -3787,7 +3787,7 @@
     "pp": 10,
     "type": "ground",
     "damage_class": "physical",
-    "description": "Power: 120\nAccuracy: 85\nPP: 10\n\nDummy Data"
+    "description": "Power: 120\nAccuracy: 85\nPP: 10\n\nThe user attacks opposing Pok\u00e9mon by manifesting the power of the land in fearsome blades of stone."
   },
   {
     "id": 632,
@@ -3797,7 +3797,7 @@
     "pp": 5,
     "type": "flying",
     "damage_class": "physical",
-    "description": "Power: 120\nAccuracy: 100\nPP: 5\n\nThe user summons a huge rock mountain using its Z-Power and drops it onto the target with full force. The power varies, depending on the original move."
+    "description": "Power: 120\nAccuracy: 100\nPP: 5\n\nAfter soaring upward, the user attacks its target by dropping out of the sky at high speeds, although it lowers its own Defense and Sp. Def in the process."
   },
   {
     "id": 633,
@@ -3807,7 +3807,7 @@
     "pp": 5,
     "type": "steel",
     "damage_class": "special",
-    "description": "Power: 140\nAccuracy: 100\nPP: 5\n\nDummy Data"
+    "description": "Power: 140\nAccuracy: 100\nPP: 5\n\nSummons strong sunlight to attack 2 turns later."
   },
   {
     "id": 634,
@@ -3817,7 +3817,7 @@
     "pp": 5,
     "type": "psychic",
     "damage_class": "special",
-    "description": "Power: 140\nAccuracy: 90\nPP: 5\n\nThe user binds the target with full force with threads of silk that the user spits using its Z-Power. The power varies, depending on the original move."
+    "description": "Power: 140\nAccuracy: 90\nPP: 5\n\nAllows a full-power attack, but sharply lowers SP. ATK."
   },
   {
     "id": 635,
@@ -3827,7 +3827,7 @@
     "pp": 15,
     "type": "bug",
     "damage_class": "physical",
-    "description": "Power: 90\nAccuracy: 100\nPP: 15\n\nDummy Data"
+    "description": "Power: 90\nAccuracy: 100\nPP: 15\n\nThe user calls out its underlings to pummel the target. Critical hits land more easily."
   },
   {
     "id": 639,
@@ -3837,7 +3837,7 @@
     "pp": 20,
     "type": "flying",
     "damage_class": "special",
-    "description": "Power: 65\nAccuracy: 100\nPP: 20\n\nDummy Data"
+    "description": "Power: 65\nAccuracy: 100\nPP: 20\n\nThe user attacks using a sound wave based on words it has learned. It may also confuse the foe."
   },
   {
     "id": 641,
@@ -3847,7 +3847,7 @@
     "pp": 5,
     "type": "rock",
     "damage_class": "physical",
-    "description": "Power: 150\nAccuracy: 90\nPP: 5\n\nDummy Data"
+    "description": "Power: 150\nAccuracy: 90\nPP: 5\n\nThe user launches a huge boulder at the foe to attack. It must rest on the next turn, however."
   },
   {
     "id": 642,
@@ -3857,7 +3857,7 @@
     "pp": 15,
     "type": "fighting",
     "damage_class": "physical",
-    "description": "Power: 90\nAccuracy: 100\nPP: 15\n\nThe user creates a huge whirling current using its Z-Power to swallow the target with full force. The power varies, depending on the original move."
+    "description": "Power: 90\nAccuracy: 100\nPP: 15\n\nThe user attacks by slicing with its long horns. The target\u2019s stat changes don\u2019t affect this attack\u2019s damage."
   },
   {
     "id": 643,
@@ -3867,7 +3867,7 @@
     "pp": 20,
     "type": "water",
     "damage_class": "physical",
-    "description": "Power: 70\nAccuracy: 100\nPP: 20\n\nDummy Data"
+    "description": "Power: 70\nAccuracy: 100\nPP: 20\n\nThe user expels pressurized water to cut at the target like a blade. This move has a heightened chance of landing a critical hit."
   },
   {
     "id": 644,
@@ -3877,7 +3877,7 @@
     "pp": 10,
     "type": "psychic",
     "damage_class": "special",
-    "description": "Power: 70\nAccuracy: 90\nPP: 10\n\nThe user collects energy from plants using its Z-Power and attacks the target with full force. The power varies, depending on the original move."
+    "description": "Power: 70\nAccuracy: 90\nPP: 10\n\nThe user strengthens itself with a mysterious power. If it excels in offense, its offensive stats are raised. If it excels in defense, its defensive stats are raised."
   },
   {
     "id": 645,
@@ -3887,7 +3887,7 @@
     "pp": 5,
     "type": "dragon",
     "damage_class": "special",
-    "description": "Power: 150\nAccuracy: 90\nPP: 5\n\nDummy Data"
+    "description": "Power: 150\nAccuracy: 90\nPP: 5\n\nThe user blasts the foe with power that distorts even time. The user must rest on the next turn."
   },
   {
     "id": 646,
@@ -3897,7 +3897,7 @@
     "pp": 5,
     "type": "dragon",
     "damage_class": "special",
-    "description": "Power: 100\nAccuracy: 95\nPP: 5\n\nThe user hits the target with a powerful electric current collected by its Z-Power. The power varies, depending on the original move."
+    "description": "Power: 100\nAccuracy: 95\nPP: 5\n\nThe user tears the foe along with the space around it. This move has a high critical-hit ratio."
   },
   {
     "id": 647,
@@ -3907,7 +3907,7 @@
     "pp": 5,
     "type": "fire",
     "damage_class": "special",
-    "description": "Power: 100\nAccuracy: 75\nPP: 5\n\nDummy Data"
+    "description": "Power: 100\nAccuracy: 75\nPP: 5\n\nThe foe becomes trapped within a maelstrom of fire that rages for two to five turns."
   },
   {
     "id": 649,
@@ -3917,7 +3917,7 @@
     "pp": 5,
     "type": "ghost",
     "damage_class": "physical",
-    "description": "Power: 120\nAccuracy: 100\nPP: 5\n\nDummy Data"
+    "description": "Power: 120\nAccuracy: 100\nPP: 5\n\nThe user disappears, then strikes the foe on the second turn. It hits even if the foe used Protect."
   },
   {
     "id": 651,
@@ -3927,7 +3927,7 @@
     "pp": 5,
     "type": "psychic",
     "damage_class": "status",
-    "description": "Power: -\nAccuracy: -\nPP: 5\n\nDummy Data"
+    "description": "Power: -\nAccuracy: -\nPP: 5\n\nThe user heals its own status conditions and restores its HP. Incoming moves also become more likely to miss."
   },
   {
     "id": 652,
@@ -3937,7 +3937,7 @@
     "pp": 10,
     "type": "psychic",
     "damage_class": "status",
-    "description": "Power: -\nAccuracy: -\nPP: 10\n\nThe user materializes its aura using its Z-Power and attacks the target with full force. The power varies, depending on the original move."
+    "description": "Power: -\nAccuracy: -\nPP: 10\n\nThe user lifts its spirits, healing its own status conditions and raising its offensive and defensive stats."
   },
   {
     "id": 655,
@@ -3947,7 +3947,7 @@
     "pp": 5,
     "type": "grass",
     "damage_class": "special",
-    "description": "Power: 120\nAccuracy: 85\nPP: 5\n\nDummy Data"
+    "description": "Power: 120\nAccuracy: 85\nPP: 5\n\nThe user generates a shock wave from within its body. It may also lower the target\u2019s Sp. Def."
   },
   {
     "id": 656,
@@ -3957,6 +3957,6 @@
     "pp": 10,
     "type": "normal",
     "damage_class": "special",
-    "description": "Power: 100\nAccuracy: 100\nPP: 10\n\nThe user creates a very charming space using its Z-Power and totally toys with the target. The power varies, depending on the original move."
+    "description": "Power: 100\nAccuracy: 100\nPP: 10\n\nThe user releases countless shots of light. Its type varies with the kind of Plate the user is holding."
   }
 ]

@@ -273,7 +273,7 @@ public class Battle {
                         * atkStat / (double) defStat) / 50.0 + 2.0;
 
         // Apply type effectiveness
-        float effectiveness = getTypeEffectiveness(move.getType(), defender.getTypes());
+        float effectiveness = getTypeEffectivenessMultiplier(move.getType(), defender.getTypes());
         damage *= effectiveness;
 
         // Add randomness (85-100% of calculated damage)
@@ -286,7 +286,7 @@ public class Battle {
     /**
      * Get type effectiveness multiplier
      */
-    private float getTypeEffectiveness(String attackType, List<String> defendTypes) {
+    public static float getTypeEffectivenessMultiplier(String attackType, List<String> defendTypes) {
         PokemonType atkType = PokemonType.fromString(attackType);
         
         float effectiveness = 1.0f;
@@ -417,7 +417,7 @@ public class Battle {
             double score = move.getPower();
 
             // Type effectiveness multiplier
-            float effectiveness = getTypeEffectiveness(move.getType(), defenderTypes);
+            float effectiveness = getTypeEffectivenessMultiplier(move.getType(), defenderTypes);
             score *= effectiveness;
 
             // STAB (Same Type Attack Bonus) — 1.5× if move type matches attacker type
