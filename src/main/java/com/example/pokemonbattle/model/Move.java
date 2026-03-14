@@ -11,6 +11,7 @@ public class Move {
     private int pp;
     private String type;
     private String damage_class;
+    private String description;
 
     public Move() {}
 
@@ -45,9 +46,13 @@ public class Move {
     public String getDamage_class() { return damage_class; }
     public void setDamage_class(String damage_class) { this.damage_class = damage_class; }
 
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+
     @Override
     public String toString() {
-        return String.format("Move[id=%d,name=%s,power=%s,pp=%d,type=%s,dc=%s]",
-                id, name, power == null ? "null" : power.toString(), pp, type, damage_class);
+        return String.format("Move[id=%d,name=%s,power=%s,pp=%d,type=%s,dc=%s,description=%s]",
+            id, name, power == null ? "null" : power.toString(), pp, type, damage_class,
+            description == null ? "null" : description);
     }
 }

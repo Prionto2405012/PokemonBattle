@@ -1,0 +1,28 @@
+Psychic-type moves
+Source: src/main/resources/com/example/pokemonbattle/database/moves_gen4.json
+Count: 24
+
+confusion
+dream-eater
+expanding-force
+extrasensory
+future-sight
+heart-stamp
+lunar-blessing
+luster-purge
+mist-ball
+mystical-power
+psybeam
+psychic
+psychic-fangs
+psychic-noise
+psycho-boost
+psycho-cut
+psyshield-bash
+psyshock
+psystrike
+stored-power
+synchronoise
+take-heart
+twin-beam
+zen-headbutt

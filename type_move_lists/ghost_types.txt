@@ -1,0 +1,16 @@
+Ghost-type moves
+Source: src/main/resources/com/example/pokemonbattle/database/moves_gen4.json
+Count: 12
+
+astonish
+hex
+lick
+ominous-wind
+phantom-force
+poltergeist
+rage-fist
+shadow-ball
+shadow-claw
+shadow-force
+shadow-punch
+shadow-sneak

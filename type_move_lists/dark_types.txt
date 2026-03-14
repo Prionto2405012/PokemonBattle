@@ -1,0 +1,23 @@
+Dark-type moves
+Source: src/main/resources/com/example/pokemonbattle/database/moves_gen4.json
+Count: 19
+
+assurance
+bite
+brutal-swing
+comeuppance
+crunch
+darkest-lariat
+dark-pulse
+feint-attack
+foul-play
+knock-off
+lash-out
+night-slash
+payback
+power-trip
+pursuit
+snarl
+sucker-punch
+thief
+throat-chop

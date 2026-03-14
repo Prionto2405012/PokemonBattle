@@ -1,0 +1,21 @@
+Ground-type moves
+Source: src/main/resources/com/example/pokemonbattle/database/moves_gen4.json
+Count: 17
+
+bone-club
+bonemerang
+bone-rush
+bulldoze
+dig
+drill-run
+earth-power
+earthquake
+headlong-rush
+high-horsepower
+mud-bomb
+mud-shot
+mud-slap
+precipice-blades
+sand-tomb
+scorching-sands
+stomping-tantrum

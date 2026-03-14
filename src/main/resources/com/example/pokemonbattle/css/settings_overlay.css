@@ -86,8 +86,9 @@
     -fx-max-width: 18px;
     -fx-max-height: 18px;
     -fx-background-radius: 100em;
-    -fx-background-color: white;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 4, 0, 0, 1);
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+    -fx-alignment: CENTER;
 }
 
 .option-btn {
@@ -294,27 +295,26 @@
 
 /* Thumb */
 .volume-slider .thumb {
-    -fx-background-color: linear-gradient(to bottom, #42f5ef, #15c0af);
+    -fx-background-color: transparent;
     -fx-background-radius: 100em;
     -fx-pref-width: 16px;
     -fx-pref-height: 16px;
     -fx-min-width: 16px;
     -fx-min-height: 16px;
-    -fx-effect: dropshadow(gaussian, rgba(66, 245, 215, 0.5), 6, 0, 0, 0);
+    -fx-effect: none;
     -fx-cursor: hand;
 }
 
 .volume-slider .thumb:hover {
-    -fx-background-color: linear-gradient(to bottom, #5af8f3, #20e8d6);
-    -fx-effect: dropshadow(gaussian, rgba(66, 245, 215, 0.8), 10, 0, 0, 0);
-    -fx-scale-x: 1.18;
-    -fx-scale-y: 1.18;
+    -fx-background-color: transparent;
+    -fx-scale-x: 1.08;
+    -fx-scale-y: 1.08;
 }
 
 .volume-slider .thumb:pressed {
-    -fx-background-color: linear-gradient(to bottom, #15c0af, #0fa898);
-    -fx-scale-x: 0.95;
-    -fx-scale-y: 0.95;
+    -fx-background-color: transparent;
+    -fx-scale-x: 0.96;
+    -fx-scale-y: 0.96;
 }
 
 /* Dim + lock the whole slider when game sound is disabled */

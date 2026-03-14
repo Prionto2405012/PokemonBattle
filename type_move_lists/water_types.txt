@@ -1,0 +1,32 @@
+Water-type moves
+Source: src/main/resources/com/example/pokemonbattle/database/moves_gen4.json
+Count: 28
+
+aqua-cutter
+aqua-jet
+aqua-tail
+brine
+bubble
+bubble-beam
+chilling-water
+clamp
+crabhammer
+dive
+flip-turn
+hydro-cannon
+hydro-pump
+liquidation
+muddy-water
+octazooka
+origin-pulse
+razor-shell
+scald
+sparkling-aria
+surf
+waterfall
+water-gun
+water-pledge
+water-pulse
+water-spout
+wave-crash
+whirlpool

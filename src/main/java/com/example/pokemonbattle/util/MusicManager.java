@@ -32,7 +32,7 @@ public class MusicManager {
     private final AtomicReference<MediaPlayer> bgmRef = new AtomicReference<>();
     private AudioClip clickClip;
     private AudioClip victoryClip;
-    private volatile double  masterVolume  = 0.5;
+    private volatile double  masterVolume  = 0.2;
     private volatile boolean soundEnabled  = true;
     private volatile String  currentTrackPath;
 
