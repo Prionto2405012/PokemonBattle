@@ -6,6 +6,9 @@ import java.util.Random;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.Node;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -41,6 +44,7 @@ public class ElectricEffects {
             spark.setEndX(startX + offsetX + Math.cos(angle) * length);
             spark.setEndY(startY + Math.sin(angle) * length);
             spark.setOpacity(0);
+            prepareTransientNode(spark);
             
             battleField.getChildren().add(spark);
             
@@ -58,8 +62,7 @@ public class ElectricEffects {
             
             timeline.getKeyFrames().addAll(flash1, flash2, flash3, flash4, flash5);
             
-            final Line s = spark;
-            timeline.setOnFinished(e -> battleField.getChildren().remove(s));
+            registerCleanup(timeline, spark);
         }
     }
     
@@ -70,11 +73,11 @@ public class ElectricEffects {
         boolean isFangMove = moveName.contains("fang");
         
         if (isFangMove) {
-            addFangVisual(x, y, "electric", timeline);
+            addFangVisual(x, y, timeline);
         }
         
         // Electric zaps - bigger and scaled to power
-        int zapCount = Math.min(4 + movePower / 25, 12);
+        int zapCount = Math.min(14 + movePower / 20, 20);
         
         for (int i = 0; i < zapCount; i++) {
             Line zap = new Line();
@@ -90,6 +93,7 @@ public class ElectricEffects {
             zap.setEndX(x + Math.cos(angle) * length);
             zap.setEndY(y + Math.sin(angle) * length);
             zap.setOpacity(0);
+            prepareTransientNode(zap);
             
             battleField.getChildren().add(zap);
             
@@ -107,12 +111,11 @@ public class ElectricEffects {
             
             timeline.getKeyFrames().addAll(flash1, flash2, flash3, flash4, flash5);
             
-            final Line z = zap;
-            timeline.setOnFinished(e -> battleField.getChildren().remove(z));
+            registerCleanup(timeline, zap);
         }
     }
     
-    private void addFangVisual(double x, double y, String type, Timeline timeline) {
+    private void addFangVisual(double x, double y, Timeline timeline) {
         // Create two fangs
         for (int i = 0; i < 2; i++) {
             Polygon fang = new Polygon();
@@ -133,6 +136,7 @@ public class ElectricEffects {
             fang.setLayoutY(y);
             fang.setOpacity(0);
             fang.setRotate(i == 0 ? -20 : 20);
+            prepareTransientNode(fang);
             
             battleField.getChildren().add(fang);
             
@@ -148,8 +152,22 @@ public class ElectricEffects {
             
             timeline.getKeyFrames().addAll(appear, bite, disappear);
             
-            final Polygon f = fang;
-            timeline.setOnFinished(e -> battleField.getChildren().remove(f));
+            registerCleanup(timeline, fang);
         }
+    }
+
+    private void prepareTransientNode(Node node) {
+        node.setManaged(false);
+        node.setMouseTransparent(true);
+    }
+
+    private void registerCleanup(Timeline timeline, Node node) {
+        EventHandler<ActionEvent> previousOnFinished = timeline.getOnFinished();
+        timeline.setOnFinished(e -> {
+            battleField.getChildren().remove(node);
+            if (previousOnFinished != null) {
+                previousOnFinished.handle(e);
+            }
+        });
     }
 }

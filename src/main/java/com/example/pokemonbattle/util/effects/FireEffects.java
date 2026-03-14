@@ -1,11 +1,12 @@
 // FireEffects.java
 package com.example.pokemonbattle.util.effects;
 
-import java.util.Random;
-
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.Node;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.layout.Pane;
@@ -15,7 +16,6 @@ import javafx.util.Duration;
 
 public class FireEffects {
     private final Pane battleField;
-    private final Random random = new Random();
     
     public FireEffects(Pane battleField) {
         this.battleField = battleField;
@@ -29,15 +29,15 @@ public class FireEffects {
         }
         
         // Fire particles
-        int flameCount = Math.min(6 + movePower / 20, 12);
+        int flameCount = Math.min(20 + movePower / 20, 30);
         
         for (int i = 0; i < flameCount; i++) {
             Polygon flame = new Polygon();
             flame.getPoints().addAll(
                 0.0, 0.0,
-                -6.0, -18.0,
-                0.0, -30.0,
-                6.0, -18.0
+                -12.0, -18.0,
+                0.0, -40.0,
+                12.0, -18.0
             );
             
             Color flameColor = i % 2 == 0 ? Color.ORANGERED : Color.ORANGE;
@@ -51,6 +51,7 @@ public class FireEffects {
             flame.setLayoutY(y + Math.sin(angle) * radius);
             flame.setOpacity(0);
             flame.setRotate(Math.toDegrees(angle));
+            prepareTransientNode(flame);
             
             battleField.getChildren().add(flame);
             
@@ -66,8 +67,7 @@ public class FireEffects {
             
             timeline.getKeyFrames().addAll(appear, grow, fade);
             
-            final Polygon f = flame;
-            timeline.setOnFinished(e -> battleField.getChildren().remove(f));
+            registerCleanup(timeline, flame);
         }
     }
     
@@ -76,21 +76,22 @@ public class FireEffects {
             Polygon fang = new Polygon();
             fang.getPoints().addAll(
                 0.0, 0.0,
-                -8.0, -25.0,
-                0.0, -35.0,
-                8.0, -25.0
+                -18.0, -25.0,
+                0.0, -55.0,
+                18.0, -25.0
             );
             
             fang.setFill(Color.ORANGERED);
             fang.setStroke(Color.ORANGE);
-            fang.setStrokeWidth(2);
-            fang.setEffect(new DropShadow(10, Color.DARKORANGE));
+            fang.setStrokeWidth(5);
+            fang.setEffect(new DropShadow(20, Color.DARKORANGE));
             
             double xOffset = i == 0 ? -15 : 15;
             fang.setLayoutX(x + xOffset);
             fang.setLayoutY(y);
             fang.setOpacity(0);
             fang.setRotate(i == 0 ? -20 : 20);
+            prepareTransientNode(fang);
             
             battleField.getChildren().add(fang);
             
@@ -104,8 +105,22 @@ public class FireEffects {
             
             timeline.getKeyFrames().addAll(appear, bite, disappear);
             
-            final Polygon f = fang;
-            timeline.setOnFinished(e -> battleField.getChildren().remove(f));
+            registerCleanup(timeline, fang);
         }
+    }
+
+    private void prepareTransientNode(Node node) {
+        node.setManaged(false);
+        node.setMouseTransparent(true);
+    }
+
+    private void registerCleanup(Timeline timeline, Node node) {
+        EventHandler<ActionEvent> previousOnFinished = timeline.getOnFinished();
+        timeline.setOnFinished(e -> {
+            battleField.getChildren().remove(node);
+            if (previousOnFinished != null) {
+                previousOnFinished.handle(e);
+            }
+        });
     }
 }
