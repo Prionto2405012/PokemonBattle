@@ -1,21 +1,163 @@
-Ground-type moves
+﻿Ground-type moves
 Source: src/main/resources/com/example/pokemonbattle/database/moves_gen4.json
 Count: 17
 
-bone-club
-bonemerang
-bone-rush
-bulldoze
-dig
-drill-run
-earth-power
-earthquake
-headlong-rush
-high-horsepower
-mud-bomb
-mud-shot
-mud-slap
-precipice-blades
-sand-tomb
-scorching-sands
-stomping-tantrum
+Format:
+- Move: move-id
+  Description: from moves_gen4.json description
+  Suggested animation style: visual direction for this move
+  Implementation notes: where and how to implement in this codebase
+
+Move: bone-club
+Description: Power: 65
+Accuracy: 85
+PP: 20
+
+An attack that may cause flinching.
+Suggested animation style: Earthen spike or bone projectile with dust burst
+Implementation notes: Current status: no dedicated type handler. This move uses BattleAnimationManager.createDefaultImpact only. To implement: (1) create a new type effect class in util/effects, (2) initialize and dispatch it from BattleAnimationManager.createTypeSpecificImpact, (3) add ranged routing in isRangedMove/playRangedAnimation if needed, (4) add a moveName switch helper for this move.
+
+Move: bonemerang
+Description: Power: 50
+Accuracy: 90
+PP: 10
+
+An attack that strikes twice.
+Suggested animation style: Earthen spike or bone projectile with dust burst
+Implementation notes: Current status: no dedicated type handler. This move uses BattleAnimationManager.createDefaultImpact only. To implement: (1) create a new type effect class in util/effects, (2) initialize and dispatch it from BattleAnimationManager.createTypeSpecificImpact, (3) add ranged routing in isRangedMove/playRangedAnimation if needed, (4) add a moveName switch helper for this move.
+
+Move: bone-rush
+Description: Power: 25
+Accuracy: 90
+PP: 10
+
+An attack that hits 2-5 times.
+Suggested animation style: Earthen spike or bone projectile with dust burst
+Implementation notes: Current status: no dedicated type handler. This move uses BattleAnimationManager.createDefaultImpact only. To implement: (1) create a new type effect class in util/effects, (2) initialize and dispatch it from BattleAnimationManager.createTypeSpecificImpact, (3) add ranged routing in isRangedMove/playRangedAnimation if needed, (4) add a moveName switch helper for this move.
+
+Move: bulldoze
+Description: Power: 60
+Accuracy: 100
+PP: 20
+
+The user stomps down on the ground and attacks everything in the area. Hit Pokémon’s Speed stat is reduced.
+Suggested animation style: Ground crack waves that travel under defender
+Implementation notes: Current status: no dedicated type handler. This move uses BattleAnimationManager.createDefaultImpact only. To implement: (1) create a new type effect class in util/effects, (2) initialize and dispatch it from BattleAnimationManager.createTypeSpecificImpact, (3) add ranged routing in isRangedMove/playRangedAnimation if needed, (4) add a moveName switch helper for this move.
+
+Move: dig
+Description: Power: 80
+Accuracy: 100
+PP: 10
+
+1st turn: Burrow 2nd turn: Attack
+Suggested animation style: Submerge and emerge sequence with dirt burst
+Implementation notes: Current status: no dedicated type handler. This move uses BattleAnimationManager.createDefaultImpact only. To implement: (1) create a new type effect class in util/effects, (2) initialize and dispatch it from BattleAnimationManager.createTypeSpecificImpact, (3) add ranged routing in isRangedMove/playRangedAnimation if needed, (4) add a moveName switch helper for this move.
+
+Move: drill-run
+Description: Power: 80
+Accuracy: 95
+PP: 10
+
+The user crashes into its target while rotating its body like a drill. Critical hits land more easily.
+Suggested animation style: Earthen spike or bone projectile with dust burst
+Implementation notes: Current status: no dedicated type handler. This move uses BattleAnimationManager.createDefaultImpact only. To implement: (1) create a new type effect class in util/effects, (2) initialize and dispatch it from BattleAnimationManager.createTypeSpecificImpact, (3) add ranged routing in isRangedMove/playRangedAnimation if needed, (4) add a moveName switch helper for this move.
+
+Move: earth-power
+Description: Power: 90
+Accuracy: 100
+PP: 10
+
+The user makes the ground under the foe erupt with power. It may also lower the target’s Sp. Def.
+Suggested animation style: Stone shards and dust plume impact
+Implementation notes: Current status: no dedicated type handler. This move uses BattleAnimationManager.createDefaultImpact only. To implement: (1) create a new type effect class in util/effects, (2) initialize and dispatch it from BattleAnimationManager.createTypeSpecificImpact, (3) add ranged routing in isRangedMove/playRangedAnimation if needed, (4) add a moveName switch helper for this move.
+
+Move: earthquake
+Description: Power: 100
+Accuracy: 100
+PP: 10
+
+Tough but useless vs. flying foes.
+Suggested animation style: Ground crack waves that travel under defender
+Implementation notes: Current status: no dedicated type handler. This move uses BattleAnimationManager.createDefaultImpact only. To implement: (1) create a new type effect class in util/effects, (2) initialize and dispatch it from BattleAnimationManager.createTypeSpecificImpact, (3) add ranged routing in isRangedMove/playRangedAnimation if needed, (4) add a moveName switch helper for this move.
+
+Move: headlong-rush
+Description: Power: 120
+Accuracy: 100
+PP: 5
+
+The user smashes into the target in a full-body tackle. This also lowers the user’s defensive stats.
+Suggested animation style: Ground crack waves that travel under defender
+Implementation notes: Current status: no dedicated type handler. This move uses BattleAnimationManager.createDefaultImpact only. To implement: (1) create a new type effect class in util/effects, (2) initialize and dispatch it from BattleAnimationManager.createTypeSpecificImpact, (3) add ranged routing in isRangedMove/playRangedAnimation if needed, (4) add a moveName switch helper for this move.
+
+Move: high-horsepower
+Description: Power: 95
+Accuracy: 95
+PP: 10
+
+The user fiercely attacks the target using its entire body.
+Suggested animation style: Stone shards and dust plume impact
+Implementation notes: Current status: no dedicated type handler. This move uses BattleAnimationManager.createDefaultImpact only. To implement: (1) create a new type effect class in util/effects, (2) initialize and dispatch it from BattleAnimationManager.createTypeSpecificImpact, (3) add ranged routing in isRangedMove/playRangedAnimation if needed, (4) add a moveName switch helper for this move.
+
+Move: mud-bomb
+Description: Power: 65
+Accuracy: 85
+PP: 10
+
+The user launches a hard-packed mud ball to attack. It may also lower the target’s accuracy.
+Suggested animation style: Mud or sand projectile with debris splash on hit
+Implementation notes: Current status: no dedicated type handler. This move uses BattleAnimationManager.createDefaultImpact only. To implement: (1) create a new type effect class in util/effects, (2) initialize and dispatch it from BattleAnimationManager.createTypeSpecificImpact, (3) add ranged routing in isRangedMove/playRangedAnimation if needed, (4) add a moveName switch helper for this move.
+
+Move: mud-shot
+Description: Power: 55
+Accuracy: 95
+PP: 15
+
+Hurls mud at the foe and reduces SPEED.
+Suggested animation style: Mud or sand projectile with debris splash on hit
+Implementation notes: Current status: no dedicated type handler. This move uses BattleAnimationManager.createDefaultImpact only. To implement: (1) create a new type effect class in util/effects, (2) initialize and dispatch it from BattleAnimationManager.createTypeSpecificImpact, (3) add ranged routing in isRangedMove/playRangedAnimation if needed, (4) add a moveName switch helper for this move.
+
+Move: mud-slap
+Description: Power: 20
+Accuracy: 100
+PP: 10
+
+Reduces the foe's accuracy.
+Suggested animation style: Mud or sand projectile with debris splash on hit
+Implementation notes: Current status: no dedicated type handler. This move uses BattleAnimationManager.createDefaultImpact only. To implement: (1) create a new type effect class in util/effects, (2) initialize and dispatch it from BattleAnimationManager.createTypeSpecificImpact, (3) add ranged routing in isRangedMove/playRangedAnimation if needed, (4) add a moveName switch helper for this move.
+
+Move: precipice-blades
+Description: Power: 120
+Accuracy: 85
+PP: 10
+
+The user attacks opposing Pokémon by manifesting the power of the land in fearsome blades of stone.
+Suggested animation style: Earthen spike or bone projectile with dust burst
+Implementation notes: Current status: no dedicated type handler. This move uses BattleAnimationManager.createDefaultImpact only. To implement: (1) create a new type effect class in util/effects, (2) initialize and dispatch it from BattleAnimationManager.createTypeSpecificImpact, (3) add ranged routing in isRangedMove/playRangedAnimation if needed, (4) add a moveName switch helper for this move.
+
+Move: sand-tomb
+Description: Power: 35
+Accuracy: 85
+PP: 15
+
+Traps and hurts the foe in quicksand for 2 to 5 turns.
+Suggested animation style: Mud or sand projectile with debris splash on hit
+Implementation notes: Current status: no dedicated type handler. This move uses BattleAnimationManager.createDefaultImpact only. To implement: (1) create a new type effect class in util/effects, (2) initialize and dispatch it from BattleAnimationManager.createTypeSpecificImpact, (3) add ranged routing in isRangedMove/playRangedAnimation if needed, (4) add a moveName switch helper for this move.
+
+Move: scorching-sands
+Description: Power: 70
+Accuracy: 100
+PP: 10
+
+The user throws scorching sand at the target to attack. This may also leave the target with a burn.
+Suggested animation style: Mud or sand projectile with debris splash on hit
+Implementation notes: Current status: no dedicated type handler. This move uses BattleAnimationManager.createDefaultImpact only. To implement: (1) create a new type effect class in util/effects, (2) initialize and dispatch it from BattleAnimationManager.createTypeSpecificImpact, (3) add ranged routing in isRangedMove/playRangedAnimation if needed, (4) add a moveName switch helper for this move.
+
+Move: stomping-tantrum
+Description: Power: 75
+Accuracy: 100
+PP: 10
+
+Driven by frustration, the user attacks the target. If the user’s previous move has failed, the power of this move doubles.
+Suggested animation style: Ground crack waves that travel under defender
+Implementation notes: Current status: no dedicated type handler. This move uses BattleAnimationManager.createDefaultImpact only. To implement: (1) create a new type effect class in util/effects, (2) initialize and dispatch it from BattleAnimationManager.createTypeSpecificImpact, (3) add ranged routing in isRangedMove/playRangedAnimation if needed, (4) add a moveName switch helper for this move.
+

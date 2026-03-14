@@ -1,16 +1,118 @@
-Rock-type moves
+﻿Rock-type moves
 Source: src/main/resources/com/example/pokemonbattle/database/moves_gen4.json
 Count: 12
 
-ancient-power
-head-smash
-meteor-beam
-power-gem
-rock-blast
-rock-slide
-rock-throw
-rock-tomb
-rock-wrecker
-rollout
-smack-down
-stone-edge
+Format:
+- Move: move-id
+  Description: from moves_gen4.json description
+  Suggested animation style: visual direction for this move
+  Implementation notes: where and how to implement in this codebase
+
+Move: ancient-power
+Description: Power: 60
+Accuracy: 100
+PP: 5
+
+An attack that may raise all stats.
+Suggested animation style: Crystal or meteor strike with sharp shard bloom
+Implementation notes: Current status: no dedicated type handler. This move uses BattleAnimationManager.createDefaultImpact only. To implement: (1) create a new type effect class in util/effects, (2) initialize and dispatch it from BattleAnimationManager.createTypeSpecificImpact, (3) add ranged routing in isRangedMove/playRangedAnimation if needed, (4) add a moveName switch helper for this move.
+
+Move: head-smash
+Description: Power: 150
+Accuracy: 80
+PP: 5
+
+The user delivers a life-endangering head butt at full power. The user also takes terrible damage.
+Suggested animation style: Heavy body slam with debris and screen shake
+Implementation notes: Current status: no dedicated type handler. This move uses BattleAnimationManager.createDefaultImpact only. To implement: (1) create a new type effect class in util/effects, (2) initialize and dispatch it from BattleAnimationManager.createTypeSpecificImpact, (3) add ranged routing in isRangedMove/playRangedAnimation if needed, (4) add a moveName switch helper for this move.
+
+Move: meteor-beam
+Description: Power: 120
+Accuracy: 90
+PP: 10
+
+In this two-turn attack, the user gathers space power and boosts its Sp. Atk stat, then attacks the target on the next turn.
+Suggested animation style: Crystal or meteor strike with sharp shard bloom
+Implementation notes: Current status: no dedicated type handler. This move uses BattleAnimationManager.createDefaultImpact only. To implement: (1) create a new type effect class in util/effects, (2) initialize and dispatch it from BattleAnimationManager.createTypeSpecificImpact, (3) add ranged routing in isRangedMove/playRangedAnimation if needed, (4) add a moveName switch helper for this move.
+
+Move: power-gem
+Description: Power: 80
+Accuracy: 100
+PP: 20
+
+The user attacks with a ray of light that sparkles as if it were made of gemstones. 
+Suggested animation style: Crystal or meteor strike with sharp shard bloom
+Implementation notes: Current status: no dedicated type handler. This move uses BattleAnimationManager.createDefaultImpact only. To implement: (1) create a new type effect class in util/effects, (2) initialize and dispatch it from BattleAnimationManager.createTypeSpecificImpact, (3) add ranged routing in isRangedMove/playRangedAnimation if needed, (4) add a moveName switch helper for this move.
+
+Move: rock-blast
+Description: Power: 25
+Accuracy: 90
+PP: 10
+
+Hurls boulders at the foe 2 to 5 times in a row.
+Suggested animation style: Rock projectile burst with fragment scatter
+Implementation notes: Current status: no dedicated type handler. This move uses BattleAnimationManager.createDefaultImpact only. To implement: (1) create a new type effect class in util/effects, (2) initialize and dispatch it from BattleAnimationManager.createTypeSpecificImpact, (3) add ranged routing in isRangedMove/playRangedAnimation if needed, (4) add a moveName switch helper for this move.
+
+Move: rock-slide
+Description: Power: 75
+Accuracy: 90
+PP: 10
+
+An attack that may cause flinching.
+Suggested animation style: Rock projectile burst with fragment scatter
+Implementation notes: Current status: no dedicated type handler. This move uses BattleAnimationManager.createDefaultImpact only. To implement: (1) create a new type effect class in util/effects, (2) initialize and dispatch it from BattleAnimationManager.createTypeSpecificImpact, (3) add ranged routing in isRangedMove/playRangedAnimation if needed, (4) add a moveName switch helper for this move.
+
+Move: rock-throw
+Description: Power: 50
+Accuracy: 90
+PP: 15
+
+Drops rocks on the enemy.
+Suggested animation style: Rock projectile burst with fragment scatter
+Implementation notes: Current status: no dedicated type handler. This move uses BattleAnimationManager.createDefaultImpact only. To implement: (1) create a new type effect class in util/effects, (2) initialize and dispatch it from BattleAnimationManager.createTypeSpecificImpact, (3) add ranged routing in isRangedMove/playRangedAnimation if needed, (4) add a moveName switch helper for this move.
+
+Move: rock-tomb
+Description: Power: 60
+Accuracy: 95
+PP: 15
+
+Stops the foe from moving with rocks and cuts SPEED.
+Suggested animation style: Rock projectile burst with fragment scatter
+Implementation notes: Current status: no dedicated type handler. This move uses BattleAnimationManager.createDefaultImpact only. To implement: (1) create a new type effect class in util/effects, (2) initialize and dispatch it from BattleAnimationManager.createTypeSpecificImpact, (3) add ranged routing in isRangedMove/playRangedAnimation if needed, (4) add a moveName switch helper for this move.
+
+Move: rock-wrecker
+Description: Power: 150
+Accuracy: 90
+PP: 5
+
+The user launches a huge boulder at the foe to attack. It must rest on the next turn, however.
+Suggested animation style: Rock projectile burst with fragment scatter
+Implementation notes: Current status: no dedicated type handler. This move uses BattleAnimationManager.createDefaultImpact only. To implement: (1) create a new type effect class in util/effects, (2) initialize and dispatch it from BattleAnimationManager.createTypeSpecificImpact, (3) add ranged routing in isRangedMove/playRangedAnimation if needed, (4) add a moveName switch helper for this move.
+
+Move: rollout
+Description: Power: 30
+Accuracy: 90
+PP: 20
+
+Attacks 5 turns with rising power.
+Suggested animation style: Heavy body slam with debris and screen shake
+Implementation notes: Current status: no dedicated type handler. This move uses BattleAnimationManager.createDefaultImpact only. To implement: (1) create a new type effect class in util/effects, (2) initialize and dispatch it from BattleAnimationManager.createTypeSpecificImpact, (3) add ranged routing in isRangedMove/playRangedAnimation if needed, (4) add a moveName switch helper for this move.
+
+Move: smack-down
+Description: Power: 50
+Accuracy: 100
+PP: 15
+
+The user throws a stone or projectile to attack an opponent. A flying Pokémon will fall to the ground when hit.
+Suggested animation style: Heavy body slam with debris and screen shake
+Implementation notes: Current status: no dedicated type handler. This move uses BattleAnimationManager.createDefaultImpact only. To implement: (1) create a new type effect class in util/effects, (2) initialize and dispatch it from BattleAnimationManager.createTypeSpecificImpact, (3) add ranged routing in isRangedMove/playRangedAnimation if needed, (4) add a moveName switch helper for this move.
+
+Move: stone-edge
+Description: Power: 100
+Accuracy: 80
+PP: 5
+
+The user stabs the foe with a sharpened stone. It has a high critical-hit ratio. 
+Suggested animation style: Crystal or meteor strike with sharp shard bloom
+Implementation notes: Current status: no dedicated type handler. This move uses BattleAnimationManager.createDefaultImpact only. To implement: (1) create a new type effect class in util/effects, (2) initialize and dispatch it from BattleAnimationManager.createTypeSpecificImpact, (3) add ranged routing in isRangedMove/playRangedAnimation if needed, (4) add a moveName switch helper for this move.
+

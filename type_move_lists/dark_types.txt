@@ -1,23 +1,181 @@
-Dark-type moves
+﻿Dark-type moves
 Source: src/main/resources/com/example/pokemonbattle/database/moves_gen4.json
 Count: 19
 
-assurance
-bite
-brutal-swing
-comeuppance
-crunch
-darkest-lariat
-dark-pulse
-feint-attack
-foul-play
-knock-off
-lash-out
-night-slash
-payback
-power-trip
-pursuit
-snarl
-sucker-punch
-thief
-throat-chop
+Format:
+- Move: move-id
+  Description: from moves_gen4.json description
+  Suggested animation style: visual direction for this move
+  Implementation notes: where and how to implement in this codebase
+
+Move: assurance
+Description: Power: 60
+Accuracy: 100
+PP: 10
+
+If the foe has already taken some damage in the same turn, this attack’s power is doubled.
+Suggested animation style: Delayed retaliation burst: dark aura then impact burst
+Implementation notes: Current status: no dedicated type handler. This move uses BattleAnimationManager.createDefaultImpact only. To implement: (1) create a new type effect class in util/effects, (2) initialize and dispatch it from BattleAnimationManager.createTypeSpecificImpact, (3) add ranged routing in isRangedMove/playRangedAnimation if needed, (4) add a moveName switch helper for this move.
+
+Move: bite
+Description: Power: 60
+Accuracy: 100
+PP: 25
+
+An attack that may cause flinching.
+Suggested animation style: Fast melee lunge with black-purple slash trails
+Implementation notes: Current status: no dedicated type handler. This move uses BattleAnimationManager.createDefaultImpact only. To implement: (1) create a new type effect class in util/effects, (2) initialize and dispatch it from BattleAnimationManager.createTypeSpecificImpact, (3) add ranged routing in isRangedMove/playRangedAnimation if needed, (4) add a moveName switch helper for this move.
+
+Move: brutal-swing
+Description: Power: 60
+Accuracy: 100
+PP: 20
+
+The user swings its body around violently to inflict damage on everything in its vicinity.
+Suggested animation style: Dark aura burst with drifting smoke particles
+Implementation notes: Current status: no dedicated type handler. This move uses BattleAnimationManager.createDefaultImpact only. To implement: (1) create a new type effect class in util/effects, (2) initialize and dispatch it from BattleAnimationManager.createTypeSpecificImpact, (3) add ranged routing in isRangedMove/playRangedAnimation if needed, (4) add a moveName switch helper for this move.
+
+Move: comeuppance
+Description: Power: 1
+Accuracy: 100
+PP: 10
+
+The user retaliates with much greater force against the opponent that last inflicted damage on it.
+Suggested animation style: Delayed retaliation burst: dark aura then impact burst
+Implementation notes: Current status: no dedicated type handler. This move uses BattleAnimationManager.createDefaultImpact only. To implement: (1) create a new type effect class in util/effects, (2) initialize and dispatch it from BattleAnimationManager.createTypeSpecificImpact, (3) add ranged routing in isRangedMove/playRangedAnimation if needed, (4) add a moveName switch helper for this move.
+
+Move: crunch
+Description: Power: 80
+Accuracy: 100
+PP: 15
+
+An attack that may lower SPCL.DEF.
+Suggested animation style: Dark aura burst with drifting smoke particles
+Implementation notes: Current status: no dedicated type handler. This move uses BattleAnimationManager.createDefaultImpact only. To implement: (1) create a new type effect class in util/effects, (2) initialize and dispatch it from BattleAnimationManager.createTypeSpecificImpact, (3) add ranged routing in isRangedMove/playRangedAnimation if needed, (4) add a moveName switch helper for this move.
+
+Move: darkest-lariat
+Description: Power: 85
+Accuracy: 100
+PP: 10
+
+The user swings both arms and hits the target. The target’s stat changes don’t affect this attack’s damage.
+Suggested animation style: Dark aura burst with drifting smoke particles
+Implementation notes: Current status: no dedicated type handler. This move uses BattleAnimationManager.createDefaultImpact only. To implement: (1) create a new type effect class in util/effects, (2) initialize and dispatch it from BattleAnimationManager.createTypeSpecificImpact, (3) add ranged routing in isRangedMove/playRangedAnimation if needed, (4) add a moveName switch helper for this move.
+
+Move: dark-pulse
+Description: Power: 80
+Accuracy: 100
+PP: 15
+
+The user releases a horrible aura imbued with dark thoughts. It may also make the target flinch.
+Suggested animation style: Shadow pulse ring with smoky shockwave at target
+Implementation notes: Current status: no dedicated type handler. This move uses BattleAnimationManager.createDefaultImpact only. To implement: (1) create a new type effect class in util/effects, (2) initialize and dispatch it from BattleAnimationManager.createTypeSpecificImpact, (3) add ranged routing in isRangedMove/playRangedAnimation if needed, (4) add a moveName switch helper for this move.
+
+Move: feint-attack
+Description: Power: 60
+Accuracy: -
+PP: 20
+
+An attack that never misses.
+Suggested animation style: Dark aura burst with drifting smoke particles
+Implementation notes: Current status: no dedicated type handler. This move uses BattleAnimationManager.createDefaultImpact only. To implement: (1) create a new type effect class in util/effects, (2) initialize and dispatch it from BattleAnimationManager.createTypeSpecificImpact, (3) add ranged routing in isRangedMove/playRangedAnimation if needed, (4) add a moveName switch helper for this move.
+
+Move: foul-play
+Description: Power: 95
+Accuracy: 100
+PP: 15
+
+The user turns the target’s power against it. The higher the target’s Attack stat, the greater the damage.
+Suggested animation style: Fast melee lunge with black-purple slash trails
+Implementation notes: Current status: no dedicated type handler. This move uses BattleAnimationManager.createDefaultImpact only. To implement: (1) create a new type effect class in util/effects, (2) initialize and dispatch it from BattleAnimationManager.createTypeSpecificImpact, (3) add ranged routing in isRangedMove/playRangedAnimation if needed, (4) add a moveName switch helper for this move.
+
+Move: knock-off
+Description: Power: 65
+Accuracy: 100
+PP: 20
+
+Knocks down the foe’s held item to prevent its use.
+Suggested animation style: Fast melee lunge with black-purple slash trails
+Implementation notes: Current status: no dedicated type handler. This move uses BattleAnimationManager.createDefaultImpact only. To implement: (1) create a new type effect class in util/effects, (2) initialize and dispatch it from BattleAnimationManager.createTypeSpecificImpact, (3) add ranged routing in isRangedMove/playRangedAnimation if needed, (4) add a moveName switch helper for this move.
+
+Move: lash-out
+Description: Power: 75
+Accuracy: 100
+PP: 5
+
+The user lashes out to vent its frustration toward the target. If the user’s stats were lowered during this turn, the power of this move is doubled.
+Suggested animation style: Fast melee lunge with black-purple slash trails
+Implementation notes: Current status: no dedicated type handler. This move uses BattleAnimationManager.createDefaultImpact only. To implement: (1) create a new type effect class in util/effects, (2) initialize and dispatch it from BattleAnimationManager.createTypeSpecificImpact, (3) add ranged routing in isRangedMove/playRangedAnimation if needed, (4) add a moveName switch helper for this move.
+
+Move: night-slash
+Description: Power: 70
+Accuracy: 100
+PP: 15
+
+The user slashes the foe the instant an opportunity arises. It has a high critical-hit ratio.
+Suggested animation style: Fast melee lunge with black-purple slash trails
+Implementation notes: Current status: no dedicated type handler. This move uses BattleAnimationManager.createDefaultImpact only. To implement: (1) create a new type effect class in util/effects, (2) initialize and dispatch it from BattleAnimationManager.createTypeSpecificImpact, (3) add ranged routing in isRangedMove/playRangedAnimation if needed, (4) add a moveName switch helper for this move.
+
+Move: payback
+Description: Power: 50
+Accuracy: 100
+PP: 10
+
+If the user can use this attack after the foe attacks, its power is doubled. 
+Suggested animation style: Delayed retaliation burst: dark aura then impact burst
+Implementation notes: Current status: no dedicated type handler. This move uses BattleAnimationManager.createDefaultImpact only. To implement: (1) create a new type effect class in util/effects, (2) initialize and dispatch it from BattleAnimationManager.createTypeSpecificImpact, (3) add ranged routing in isRangedMove/playRangedAnimation if needed, (4) add a moveName switch helper for this move.
+
+Move: power-trip
+Description: Power: 20
+Accuracy: 100
+PP: 10
+
+The user boasts its strength and attacks the target. The more the user’s stats are raised, the greater the move’s power.
+Suggested animation style: Delayed retaliation burst: dark aura then impact burst
+Implementation notes: Current status: no dedicated type handler. This move uses BattleAnimationManager.createDefaultImpact only. To implement: (1) create a new type effect class in util/effects, (2) initialize and dispatch it from BattleAnimationManager.createTypeSpecificImpact, (3) add ranged routing in isRangedMove/playRangedAnimation if needed, (4) add a moveName switch helper for this move.
+
+Move: pursuit
+Description: Power: 40
+Accuracy: 100
+PP: 20
+
+Heavily strikes switching POKéMON.
+Suggested animation style: Fast melee lunge with black-purple slash trails
+Implementation notes: Current status: no dedicated type handler. This move uses BattleAnimationManager.createDefaultImpact only. To implement: (1) create a new type effect class in util/effects, (2) initialize and dispatch it from BattleAnimationManager.createTypeSpecificImpact, (3) add ranged routing in isRangedMove/playRangedAnimation if needed, (4) add a moveName switch helper for this move.
+
+Move: snarl
+Description: Power: 55
+Accuracy: 95
+PP: 15
+
+The user yells as if it is ranting about something, making the target’s Sp. Atk stat decrease.
+Suggested animation style: Shadow pulse ring with smoky shockwave at target
+Implementation notes: Current status: no dedicated type handler. This move uses BattleAnimationManager.createDefaultImpact only. To implement: (1) create a new type effect class in util/effects, (2) initialize and dispatch it from BattleAnimationManager.createTypeSpecificImpact, (3) add ranged routing in isRangedMove/playRangedAnimation if needed, (4) add a moveName switch helper for this move.
+
+Move: sucker-punch
+Description: Power: 70
+Accuracy: 100
+PP: 5
+
+This move enables the user to attack first. It fails if the foe is not readying an attack, however.
+Suggested animation style: Fast melee lunge with black-purple slash trails
+Implementation notes: Current status: no dedicated type handler. This move uses BattleAnimationManager.createDefaultImpact only. To implement: (1) create a new type effect class in util/effects, (2) initialize and dispatch it from BattleAnimationManager.createTypeSpecificImpact, (3) add ranged routing in isRangedMove/playRangedAnimation if needed, (4) add a moveName switch helper for this move.
+
+Move: thief
+Description: Power: 60
+Accuracy: 100
+PP: 25
+
+While attacking, it may steal the foe’s held item.
+Suggested animation style: Fast melee lunge with black-purple slash trails
+Implementation notes: Current status: no dedicated type handler. This move uses BattleAnimationManager.createDefaultImpact only. To implement: (1) create a new type effect class in util/effects, (2) initialize and dispatch it from BattleAnimationManager.createTypeSpecificImpact, (3) add ranged routing in isRangedMove/playRangedAnimation if needed, (4) add a moveName switch helper for this move.
+
+Move: throat-chop
+Description: Power: 80
+Accuracy: 100
+PP: 15
+
+The user attacks the target’s throat, and the resultant suffering prevents the target from using moves that emit sound for two turns.
+Suggested animation style: Fast melee lunge with black-purple slash trails
+Implementation notes: Current status: no dedicated type handler. This move uses BattleAnimationManager.createDefaultImpact only. To implement: (1) create a new type effect class in util/effects, (2) initialize and dispatch it from BattleAnimationManager.createTypeSpecificImpact, (3) add ranged routing in isRangedMove/playRangedAnimation if needed, (4) add a moveName switch helper for this move.
+
