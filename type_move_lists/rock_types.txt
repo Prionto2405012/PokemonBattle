@@ -1,0 +1,16 @@
+Rock-type moves
+Source: src/main/resources/com/example/pokemonbattle/database/moves_gen4.json
+Count: 12
+
+ancient-power
+head-smash
+meteor-beam
+power-gem
+rock-blast
+rock-slide
+rock-throw
+rock-tomb
+rock-wrecker
+rollout
+smack-down
+stone-edge

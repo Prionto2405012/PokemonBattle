@@ -31,9 +31,9 @@ public class FightingEffects {
         this.battleField = battleField;
     }
 
-    // -----------------------------------------------------------------------
+    // -
     // Public API
-    // -----------------------------------------------------------------------
+    // -
 
     /**
      * Full fighting-type impact: punch image + white impact starburst.
@@ -63,10 +63,7 @@ public class FightingEffects {
         }
         // Other punch types (psychic-punch variants, etc.) just get the image
     }
-
-    // -----------------------------------------------------------------------
     // Punch image
-    // -----------------------------------------------------------------------
 
     /**
      * Loads punch.png once (cached), places it centred on (x, y), pops in fast
@@ -78,12 +75,12 @@ public class FightingEffects {
             if (img == null) return;
 
             ImageView iv = new ImageView(img);
-            iv.setFitWidth(82);
-            iv.setFitHeight(82);
+            iv.setFitWidth(135);
+            iv.setFitHeight(135);
             iv.setPreserveRatio(true);
             // Centre the image on the impact coordinate; offset slightly upward
-            iv.setLayoutX(x - 41);
-            iv.setLayoutY(y - 52);
+            iv.setLayoutX(x - 67.5);
+            iv.setLayoutY(y - 67.5);
             iv.setOpacity(0);
             iv.setScaleX(0.35);
             iv.setScaleY(0.35);
@@ -121,11 +118,7 @@ public class FightingEffects {
         }
         return punchImageCache;
     }
-
-    // -----------------------------------------------------------------------
     // Fighting-type: impact starburst
-    // -----------------------------------------------------------------------
-
     /** White starburst that pops at the impact location — comic-book "POW". */
     private void addImpactStarburst(double x, double y, int movePower,
                                     Timeline timeline) {
@@ -164,9 +157,9 @@ public class FightingEffects {
         registerCleanup(timeline, star);
     }
 
-    // -----------------------------------------------------------------------
+    // -
     // Elemental overlays — appear around the punch impact moment
-    // -----------------------------------------------------------------------
+    // -
 
     /** 7 small ember polygons that burst outward from the punch point. */
     private void addFirePunchEmbers(double x, double y, Timeline timeline) {
@@ -295,9 +288,9 @@ public class FightingEffects {
         }
     }
 
-    // -----------------------------------------------------------------------
+    // -
     // Helpers (same pattern as sibling effect classes)
-    // -----------------------------------------------------------------------
+    // -
 
     private void prepareTransientNode(Node node) {
         node.setManaged(false);

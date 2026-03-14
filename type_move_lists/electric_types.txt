@@ -1,0 +1,21 @@
+Electric-type moves
+Source: src/main/resources/com/example/pokemonbattle/database/moves_gen4.json
+Count: 17
+
+charge-beam
+discharge
+electroweb
+nuzzle
+rising-voltage
+shock-wave
+spark
+supercell-slam
+thunder
+thunderbolt
+thunder-fang
+thunder-punch
+thunder-shock
+volt-switch
+volt-tackle
+wild-charge
+zap-cannon

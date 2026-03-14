@@ -108,6 +108,7 @@ public class IceEffects {
     public void createImpactEffect(double startX, double startY, double endX, double endY,
             String moveName, int movePower, Timeline timeline) {
         boolean isFangMove = moveName.contains("fang");
+        boolean isBallMove = moveName.contains("ball");
         boolean isWindMove = moveName.contains("wind") || moveName.contains("blizzard") || moveName.contains("avalanche");
         boolean isBreathMove = moveName.contains("breath") || moveName.contains("reception") || 
                               moveName.contains("freeze") || moveName.contains("powder");
@@ -115,6 +116,8 @@ public class IceEffects {
         
         if (isFangMove) {
             addFangVisual(endX, endY, timeline);
+        } else if (isBallMove) {
+            addIceBallEffect(startX, startY, endX, endY, movePower, timeline);
         } else if (isWindMove) {
             addWindEffect(startX, startY, endX, endY, movePower, timeline);
         } else if (isBreathMove) {
@@ -165,6 +168,59 @@ public class IceEffects {
         }
         
         addIceShardsAndSnowflakes(x - 90, y, x, y, 65, timeline);
+    }
+
+    private void addIceBallEffect(double startX, double startY, double endX, double endY, int movePower,
+            Timeline timeline) {
+        double orbRadius = 20 + Math.min(movePower / 10.0, 10);
+
+        Circle orb = new Circle(orbRadius, Color.web("#CFF6FF"));
+        orb.setStroke(Color.WHITE);
+        orb.setStrokeWidth(4);
+        orb.setEffect(new DropShadow(22, Color.web("#7FDBFF")));
+        orb.setCenterX(startX);
+        orb.setCenterY(startY);
+        orb.setOpacity(0);
+        prepareTransientNode(orb);
+        battleField.getChildren().add(orb);
+
+        Circle halo = new Circle(orbRadius * 1.45, Color.color(0.8, 0.95, 1.0, 0.22));
+        halo.setStroke(Color.web("#DDFBFF"));
+        halo.setStrokeWidth(2.5);
+        halo.setCenterX(startX);
+        halo.setCenterY(startY);
+        halo.setOpacity(0);
+        halo.setEffect(new GaussianBlur(8));
+        prepareTransientNode(halo);
+        battleField.getChildren().add(halo);
+
+        double midX = (startX + endX) / 2.0;
+        double midY = Math.min(startY, endY) - 70;
+
+        KeyFrame appear = new KeyFrame(Duration.millis(40),
+            new KeyValue(orb.opacityProperty(), 1.0),
+            new KeyValue(halo.opacityProperty(), 0.95));
+        KeyFrame arcMid = new KeyFrame(Duration.millis(150),
+            new KeyValue(orb.centerXProperty(), midX),
+            new KeyValue(orb.centerYProperty(), midY),
+            new KeyValue(halo.centerXProperty(), midX),
+            new KeyValue(halo.centerYProperty(), midY));
+        KeyFrame impact = new KeyFrame(Duration.millis(280),
+            new KeyValue(orb.centerXProperty(), endX),
+            new KeyValue(orb.centerYProperty(), endY),
+            new KeyValue(halo.centerXProperty(), endX),
+            new KeyValue(halo.centerYProperty(), endY),
+            new KeyValue(halo.radiusProperty(), halo.getRadius() * 1.7));
+        KeyFrame fade = new KeyFrame(Duration.millis(360),
+            new KeyValue(orb.opacityProperty(), 0),
+            new KeyValue(halo.opacityProperty(), 0),
+            new KeyValue(orb.radiusProperty(), orb.getRadius() * 0.7));
+
+        timeline.getKeyFrames().addAll(appear, arcMid, impact, fade);
+        registerCleanup(timeline, orb);
+        registerCleanup(timeline, halo);
+
+        addIceShardsAndSnowflakes(startX, startY, endX, endY, movePower + 15, timeline);
     }
     
     private void addWindEffect(double startX, double startY, double endX, double endY, int movePower,
