@@ -115,6 +115,8 @@ public class OnlineBattleController {
     @FXML
     private VBox actionButtonsBox;
     @FXML
+    private Button startBattleButton;
+    @FXML
     private Button attackButton;
     @FXML
     private Button changePokemonMainButton;
@@ -195,8 +197,8 @@ public class OnlineBattleController {
     private VBox pokemonInfoStats, pokemonInfoMoves;
 
     // Pokemon selection constants
-    private static final double POKEMON_BTN_HEIGHT = 60.0;
-    private static final double POKEMON_SPRITE_SIZE = 50.0;
+    private static final double POKEMON_BTN_HEIGHT = 70.0;
+    private static final double POKEMON_SPRITE_SIZE = 60.0;
     private static final double POKEMON_INFO_BTN_SIZE = 16.0;
 
     private final List<String> battleLog = new ArrayList<>();
@@ -269,16 +271,19 @@ public class OnlineBattleController {
         serverConnection.setMessageListener(this::handleServerMessage);
         serverConnection.setOnDisconnect(() -> Platform.runLater(this::handleDisconnect));
 
+        if (startBattleButton != null)
+            startBattleButton.setOnAction(e -> onRunClicked());
         attackButton.setOnAction(e -> onFightClicked());
         changePokemonMainButton.setOnAction(e -> onChangePokemonClicked());
         backButton.setOnAction(e -> onRunClicked());
         if (itemsButton != null)
-            itemsButton.setOnAction(e -> battleStatusLabel.setText("No items in online battle."));
+            itemsButton.setOnAction(e -> onItemsClicked());
 
         setVisible(waitingLabel, false);
         drawOptionsPanelPattern();
         setupInfoOverlay();
         setupPokemonInfoOverlay();
+        SceneManager.enableCoordDebug(rootPane);
 
         battleStatusLabel.setText("Online Battle! " + cap(player.getCurrentPokemon().getName()) +
                 " vs " + cap(opponent.getCurrentPokemon().getName()));
@@ -474,7 +479,7 @@ public class OnlineBattleController {
             case "dragon" -> "#7038F8";
             case "dark" -> "#705848";
             case "fairy" -> "#EE99AC";
-            case "normal" -> "#9ba5a4";
+            case "normal" -> "#A8A878";
             case "fighting" -> "#C03028";
             case "flying" -> "#A890F0";
             case "poison" -> "#A040A0";
@@ -891,6 +896,10 @@ public class OnlineBattleController {
         showActionButtons();
     }
 
+    private void onItemsClicked() {
+        battleStatusLabel.setText("No items in online battle.");
+    }
+
     private void onMoveSelected(Move move) {
         if (moveSent || battleEnded)
             return;
@@ -1070,7 +1079,7 @@ public class OnlineBattleController {
         if (type == null)
             return "linear-gradient(to bottom,#546e7a,#37474f)";
         return switch (type.toLowerCase()) {
-            case "normal" -> "linear-gradient(to bottom,#cbe3e5,a5b4bc)";
+            case "normal" -> "linear-gradient(to bottom,#b5c1d4,#bdd9e1)";
             case "fire" -> "linear-gradient(to bottom,#F08030,#A84820)";
             case "water" -> "linear-gradient(to bottom,#6890F0,#3860C0)";
             case "electric" -> "linear-gradient(to bottom,#C8A800,#906800)";
@@ -1096,7 +1105,7 @@ public class OnlineBattleController {
         if (type == null)
             return "#263238";
         return switch (type.toLowerCase()) {
-            case "normal" -> "#a5b1bc";
+            case "normal" -> "#b5c1d4";
             case "fire" -> "#7A2800";
             case "water" -> "#183890";
             case "electric" -> "#604800";
@@ -1271,12 +1280,14 @@ public class OnlineBattleController {
                         true);
                 if (!gif.isError()) {
                     sprite.setImage(gif);
+                } else {
+                    loadPokemonPngSprite(sprite, pokemon.getId(), POKEMON_SPRITE_SIZE);
                 }
             } catch (Exception e) {
-                loadPokemonPngSprite(sprite, pokemon.getId());
+                loadPokemonPngSprite(sprite, pokemon.getId(), POKEMON_SPRITE_SIZE);
             }
         } else {
-            loadPokemonPngSprite(sprite, pokemon.getId());
+            loadPokemonPngSprite(sprite, pokemon.getId(), POKEMON_SPRITE_SIZE);
         }
 
         if (isFainted) {
@@ -1344,12 +1355,12 @@ public class OnlineBattleController {
         return row;
     }
 
-    private void loadPokemonPngSprite(ImageView sprite, int pokemonId) {
+    private void loadPokemonPngSprite(ImageView sprite, int pokemonId, double size) {
         String pngPath = "/com/example/pokemonbattle/sprites/front/" + pokemonId + ".png";
         try {
             var pngStream = getClass().getResourceAsStream(pngPath);
             if (pngStream != null) {
-                Image png = new Image(pngStream, POKEMON_SPRITE_SIZE, POKEMON_SPRITE_SIZE, true, true);
+                Image png = new Image(pngStream, size, size, true, true);
                 if (!png.isError()) {
                     sprite.setImage(png);
                 }

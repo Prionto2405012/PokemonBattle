@@ -35,149 +35,40 @@ public class Battle {
             try {
                 return PokemonType.valueOf(type.toUpperCase());
             } catch (IllegalArgumentException e) {
-                return NORMAL; // Default type
+                return NORMAL;
             }
         }
     }
 
-    /**
-     * Initialize type effectiveness chart
-     * Each row represents attacking type, each column represents defending type
-     * Values: <1.0 = not very effective, 1.0 = neutral, >1.0 = super effective
-     */
     private static float[][] initTypeEffectiveness() {
         float[][] chart = new float[18][18];
-        
-        // Initialize all as neutral (1.0)
-        for (int i = 0; i < 18; i++) {
-            for (int j = 0; j < 18; j++) {
+        for (int i = 0; i < 18; i++)
+            for (int j = 0; j < 18; j++)
                 chart[i][j] = 1.0f;
-            }
-        }
 
-        // Normal type effectiveness
-        chart[0][12] = 0.5f; // Normal vs Rock
-        chart[0][13] = 0.0f; // Normal vs Ghost
-
-        // Fire type
-        chart[1][4] = 2.0f;  // Fire vs Grass
-        chart[1][5] = 2.0f;  // Fire vs Ice
-        chart[1][11] = 2.0f; // Fire vs Bug
-        chart[1][12] = 0.5f; // Fire vs Rock
-        chart[1][16] = 2.0f; // Fire vs Steel
-        chart[1][2] = 0.5f;  // Fire vs Water
-        chart[1][3] = 0.5f;  // Fire vs Electric
-        chart[1][8] = 0.5f;  // Fire vs Ground
-
-        // Water type
-        chart[2][1] = 2.0f;  // Water vs Fire
-        chart[2][8] = 2.0f;  // Water vs Ground
-        chart[2][12] = 2.0f; // Water vs Rock
-        chart[2][4] = 0.5f;  // Water vs Grass
-        chart[2][3] = 0.5f;  // Water vs Electric
-
-        // Electric type
-        chart[3][2] = 2.0f;  // Electric vs Water
-        chart[3][9] = 2.0f;  // Electric vs Flying
-        chart[3][4] = 0.5f;  // Electric vs Grass
-
-        // Grass type
-        chart[4][2] = 2.0f;  // Grass vs Water
-        chart[4][8] = 2.0f;  // Grass vs Ground
-        chart[4][12] = 2.0f; // Grass vs Rock
-        chart[4][1] = 0.5f;  // Grass vs Fire
-        chart[4][7] = 0.5f;  // Grass vs Poison
-        chart[4][9] = 0.5f;  // Grass vs Flying
-
-        // Ice type
-        chart[5][8] = 2.0f;  // Ice vs Ground
-        chart[5][9] = 2.0f;  // Ice vs Flying
-        chart[5][4] = 2.0f;  // Ice vs Grass
-        chart[5][14] = 2.0f; // Ice vs Dragon
-        chart[5][1] = 0.5f;  // Ice vs Fire
-        chart[5][3] = 0.5f;  // Ice vs Electric
-        chart[5][5] = 0.5f;  // Ice vs Ice
-
-        // Fighting type
-        chart[6][0] = 2.0f;  // Fighting vs Normal
-        chart[6][12] = 2.0f; // Fighting vs Rock
-        chart[6][15] = 2.0f; // Fighting vs Dark
-        chart[6][9] = 0.5f;  // Fighting vs Flying
-        chart[6][7] = 0.5f;  // Fighting vs Poison
-        chart[6][13] = 0.0f; // Fighting vs Ghost
-
-        // Poison type
-        chart[7][4] = 2.0f;  // Poison vs Grass
-        chart[7][17] = 2.0f; // Poison vs Fairy
-        chart[7][12] = 0.5f; // Poison vs Rock
-
-        // Ground type
-        chart[8][1] = 2.0f;  // Ground vs Fire
-        chart[8][3] = 2.0f;  // Ground vs Electric
-        chart[8][7] = 2.0f;  // Ground vs Poison
-        chart[8][12] = 2.0f; // Ground vs Rock
-        chart[8][4] = 0.5f;  // Ground vs Grass
-        chart[8][9] = 0.0f;  // Ground vs Flying
-
-        // Flying type
-        chart[9][6] = 2.0f;  // Flying vs Fighting
-        chart[9][11] = 2.0f; // Flying vs Bug
-        chart[9][4] = 2.0f;  // Flying vs Grass
-        chart[9][12] = 0.5f; // Flying vs Rock
-
-        // Psychic type
-        chart[10][6] = 2.0f; // Psychic vs Fighting
-        chart[10][7] = 2.0f; // Psychic vs Poison
-        chart[10][15] = 0.5f; // Psychic vs Dark
-
-        // Bug type
-        chart[11][4] = 2.0f; // Bug vs Grass
-        chart[11][7] = 0.5f; // Bug vs Poison
-        chart[11][15] = 2.0f; // Bug vs Dark
-        chart[11][1] = 0.5f; // Bug vs Fire
-        chart[11][9] = 0.5f; // Bug vs Flying
-
-        // Rock type
-        chart[12][1] = 2.0f; // Rock vs Fire
-        chart[12][5] = 2.0f; // Rock vs Ice
-        chart[12][9] = 2.0f; // Rock vs Flying
-        chart[12][11] = 2.0f; // Rock vs Bug
-        chart[12][6] = 0.5f; // Rock vs Fighting
-        chart[12][8] = 0.5f; // Rock vs Ground
-
-        // Ghost type
-        chart[13][13] = 2.0f; // Ghost vs Ghost
-        chart[13][10] = 2.0f; // Ghost vs Psychic
-        chart[13][0] = 0.0f; // Ghost vs Normal
-
-        // Dragon type
-        chart[14][14] = 2.0f; // Dragon vs Dragon
-
-        // Dark type
-        chart[15][10] = 2.0f; // Dark vs Psychic
-        chart[15][13] = 2.0f; // Dark vs Ghost
-        chart[15][6] = 0.5f; // Dark vs Fighting
-
-        // Steel type
-        chart[16][5] = 2.0f; // Steel vs Ice
-        chart[16][12] = 2.0f; // Steel vs Rock
-        chart[16][17] = 2.0f; // Steel vs Fairy
-        chart[16][1] = 0.5f; // Steel vs Fire
-        chart[16][3] = 0.5f; // Steel vs Electric
-        chart[16][8] = 0.5f; // Steel vs Ground
-
-        // Fairy type
-        chart[17][6] = 2.0f; // Fairy vs Fighting
-        chart[17][15] = 2.0f; // Fairy vs Dark
-        chart[17][14] = 2.0f; // Fairy vs Dragon
-        chart[17][7] = 0.5f; // Fairy vs Poison
+        chart[0][12] = 0.5f; chart[0][13] = 0.0f;
+        chart[1][4] = 2.0f; chart[1][5] = 2.0f; chart[1][11] = 2.0f; chart[1][12] = 0.5f;
+        chart[1][16] = 2.0f; chart[1][2] = 0.5f; chart[1][3] = 0.5f; chart[1][8] = 0.5f;
+        chart[2][1] = 2.0f; chart[2][8] = 2.0f; chart[2][12] = 2.0f; chart[2][4] = 0.5f; chart[2][3] = 0.5f;
+        chart[3][2] = 2.0f; chart[3][9] = 2.0f; chart[3][4] = 0.5f;
+        chart[4][2] = 2.0f; chart[4][8] = 2.0f; chart[4][12] = 2.0f; chart[4][1] = 0.5f; chart[4][7] = 0.5f; chart[4][9] = 0.5f;
+        chart[5][8] = 2.0f; chart[5][9] = 2.0f; chart[5][4] = 2.0f; chart[5][14] = 2.0f; chart[5][1] = 0.5f; chart[5][3] = 0.5f; chart[5][5] = 0.5f;
+        chart[6][0] = 2.0f; chart[6][12] = 2.0f; chart[6][15] = 2.0f; chart[6][9] = 0.5f; chart[6][7] = 0.5f; chart[6][13] = 0.0f;
+        chart[7][4] = 2.0f; chart[7][17] = 2.0f; chart[7][12] = 0.5f;
+        chart[8][1] = 2.0f; chart[8][3] = 2.0f; chart[8][7] = 2.0f; chart[8][12] = 2.0f; chart[8][4] = 0.5f; chart[8][9] = 0.0f;
+        chart[9][6] = 2.0f; chart[9][11] = 2.0f; chart[9][4] = 2.0f; chart[9][12] = 0.5f;
+        chart[10][6] = 2.0f; chart[10][7] = 2.0f; chart[10][15] = 0.5f;
+        chart[11][4] = 2.0f; chart[11][7] = 0.5f; chart[11][15] = 2.0f; chart[11][1] = 0.5f; chart[11][9] = 0.5f;
+        chart[12][1] = 2.0f; chart[12][5] = 2.0f; chart[12][9] = 2.0f; chart[12][11] = 2.0f; chart[12][6] = 0.5f; chart[12][8] = 0.5f;
+        chart[13][13] = 2.0f; chart[13][10] = 2.0f; chart[13][0] = 0.0f;
+        chart[14][14] = 2.0f;
+        chart[15][10] = 2.0f; chart[15][13] = 2.0f; chart[15][6] = 0.5f;
+        chart[16][5] = 2.0f; chart[16][12] = 2.0f; chart[16][17] = 2.0f; chart[16][1] = 0.5f; chart[16][3] = 0.5f; chart[16][8] = 0.5f;
+        chart[17][6] = 2.0f; chart[17][15] = 2.0f; chart[17][14] = 2.0f; chart[17][7] = 0.5f;
 
         return chart;
     }
 
-    /**
-     * Constructor - initialize battle with two players
-     */
     public Battle(Player player1, Player player2) {
         this.player1 = player1;
         this.player2 = player2;
@@ -186,16 +77,10 @@ public class Battle {
         this.winner = null;
     }
 
-    /**
-     * Add a listener for battle events
-     */
     public void addListener(BattleListener listener) {
         listeners.add(listener);
     }
 
-    /**
-     * Execute a single round of battle
-     */
     public void executeRound(Move player1Move, Move player2Move) {
         if (finished) return;
 
@@ -208,7 +93,6 @@ public class Battle {
             return;
         }
 
-        // Determine who attacks first (based on speed)
         boolean player1First = p1Pokemon.getSpeed() >= p2Pokemon.getSpeed();
 
         if (player1First) {
@@ -223,111 +107,87 @@ public class Battle {
             }
         }
 
-        // Handle fainted Pokemon - auto switch if needed
-        handleFaintedPokemon(player1);
-        handleFaintedPokemon(player2);
+        // AI (player2) auto-switches; player1 switch is handled by the controller via the overlay
+        handleFaintedAI(player2);
 
-        // Check if battle is finished
+        // Check if player1's pokemon fainted — notify controller to show switch overlay
+        PokemonInstance current1 = player1.getCurrentPokemon();
+        if (current1 != null && current1.isFainted()) {
+            notifyPlayerPokemonFaintedNeedsSwitch(player1.getName());
+        }
+
         checkBattleEnd();
     }
 
-    /**
-     * Execute a single move
-     */
     private void executeMove(PokemonInstance attacker, Move move, PokemonInstance defender) {
         if (move == null || attacker.isFainted()) return;
-
-        // Calculate damage
         int damage = calculateDamage(move, attacker, defender);
-
-        // Apply damage
         defender.takeDamage(damage);
-
-        // Notify listeners
         notifyDamageDealt(attacker.getName(), move.getName(), defender.getName(), damage);
-
         if (defender.isFainted()) {
             notifyPokemonFainted(defender.getName());
         }
     }
 
-    /**
-     * Calculate damage with type effectiveness.
-     * Returns 0 for status moves or zero-power moves.
-     * Uses special attack/defense stats for special moves.
-     */
     private int calculateDamage(Move move, PokemonInstance attacker, PokemonInstance defender) {
         if (move.getPower() == null || move.getPower() == 0
                 || "status".equals(move.getDamage_class())) {
-            return 0; // Status move or zero-power move — no damage
+            return 0;
         }
-
-        // Use the correct attacking/defending stats based on damage class
         int atkStat = "special".equals(move.getDamage_class())
                 ? attacker.getSpAttack() : attacker.getAttack();
         int defStat = "special".equals(move.getDamage_class())
                 ? defender.getSpDefense() : defender.getDefense();
-
-        // Base damage formula (simplified)
         double damage = ((2.0 * attacker.getLevel() / 5.0 + 2.0) * move.getPower()
                         * atkStat / (double) defStat) / 50.0 + 2.0;
-
-        // Apply type effectiveness
         float effectiveness = getTypeEffectivenessMultiplier(move.getType(), defender.getTypes());
         damage *= effectiveness;
-
-        // Add randomness (85-100% of calculated damage)
         double randomFactor = 0.85 + (random.nextDouble() * 0.15);
         damage *= randomFactor;
-
         return Math.max(1, (int) damage);
     }
 
-    /**
-     * Get type effectiveness multiplier
-     */
     public static float getTypeEffectivenessMultiplier(String attackType, List<String> defendTypes) {
         PokemonType atkType = PokemonType.fromString(attackType);
-        
         float effectiveness = 1.0f;
         for (String defType : defendTypes) {
             PokemonType defTypeEnum = PokemonType.fromString(defType);
             effectiveness *= TYPE_EFFECTIVENESS[atkType.index][defTypeEnum.index];
         }
-        
         return effectiveness;
     }
 
     /**
-     * Handle fainted Pokemon - auto switch to next available
+     * Auto-switch for the AI player only.
      */
-    private void handleFaintedPokemon(Player player) {
-        PokemonInstance current = player.getCurrentPokemon();
-        
+    private void handleFaintedAI(Player aiPlayer) {
+        PokemonInstance current = aiPlayer.getCurrentPokemon();
         if (current != null && current.isFainted()) {
-            // Auto switch to first available (non-fainted) Pokemon
-            PokemonInstance next = player.getFirstAvailablePokemon();
-            
+            PokemonInstance next = aiPlayer.getFirstAvailablePokemon();
             if (next != null) {
-                player.setCurrentPokemon(next);
-                notifyPokemonSwitched(player.getName(), next.getName());
+                aiPlayer.setCurrentPokemon(next);
+                notifyPokemonSwitched(aiPlayer.getName(), next.getName());
             }
         }
     }
 
     /**
-     * Check if battle has ended
+     * Called by the controller after the player manually picks a replacement.
+     * Switches the player's active Pokemon and continues the battle check.
      */
+    public void playerSwitchAfterFaint(PokemonInstance chosen) {
+        player1.setCurrentPokemon(chosen);
+        notifyPokemonSwitched(player1.getName(), chosen.getName());
+        checkBattleEnd();
+    }
+
     private void checkBattleEnd() {
-        // Check if player1 has no available Pokemon
         if (!player1.hasTeamRemaining()) {
             finished = true;
             winner = player2;
             notifyBattleEnd(winner.getName());
             return;
         }
-
-        // Check if player2 has no available Pokemon
         if (!player2.hasTeamRemaining()) {
             finished = true;
             winner = player1;
@@ -335,55 +195,16 @@ public class Battle {
         }
     }
 
-    /**
-     * Check if battle is finished
-     */
-    public boolean isFinished() {
-        return finished;
-    }
+    public boolean isFinished() { return finished; }
+    public Player getWinner() { return winner; }
+    public int getTurn() { return turn; }
+    public Player getPlayer1() { return player1; }
+    public Player getPlayer2() { return player2; }
 
-    /**
-     * Get the winner of the battle
-     */
-    public Player getWinner() {
-        return winner;
-    }
-
-    /**
-     * Get current turn number
-     */
-    public int getTurn() {
-        return turn;
-    }
-
-    /**
-     * Get player 1
-     */
-    public Player getPlayer1() {
-        return player1;
-    }
-
-    /**
-     * Get player 2
-     */
-    public Player getPlayer2() {
-        return player2;
-    }
-
-    /**
-     * Get a move for the AI opponent.
-     * Scores each offensive move by estimated damage (power × type effectiveness × STAB)
-     * and picks the highest-scoring one. Falls back to a random move if no
-     * offensive moves are available. 20% chance to pick a random offensive move
-     * for variety so the AI isn't perfectly predictable.
-     */
     public Move getAIMove(PokemonInstance aiPokemon, PokemonInstance target) {
         List<PokemonInstance.MoveSlot> battleMoves = aiPokemon.getBattleMoves();
-        if (battleMoves.isEmpty()) {
-            return null;
-        }
+        if (battleMoves.isEmpty()) return null;
 
-        // Filter to offensive moves with PP remaining
         List<PokemonInstance.MoveSlot> offensiveMoves = battleMoves.stream()
                 .filter(ms -> ms.getMove() != null
                         && ms.getMove().getPower() != null
@@ -393,94 +214,69 @@ public class Battle {
                 .toList();
 
         if (offensiveMoves.isEmpty()) {
-            // No offensive moves — pick any move with PP
             List<PokemonInstance.MoveSlot> usable = battleMoves.stream()
                     .filter(ms -> ms.getCurrentPp() > 0).toList();
             if (usable.isEmpty()) usable = battleMoves;
             return usable.get(random.nextInt(usable.size())).getMove();
         }
 
-        // 20% chance to pick randomly for unpredictability
         if (random.nextDouble() < 0.2) {
             return offensiveMoves.get(random.nextInt(offensiveMoves.size())).getMove();
         }
 
-        // Score each offensive move and pick the best
         Move bestMove = null;
         double bestScore = -1;
-
         List<String> aiTypes = aiPokemon.getTypes();
         List<String> defenderTypes = target.getTypes();
 
         for (PokemonInstance.MoveSlot slot : offensiveMoves) {
             Move move = slot.getMove();
             double score = move.getPower();
-
-            // Type effectiveness multiplier
             float effectiveness = getTypeEffectivenessMultiplier(move.getType(), defenderTypes);
             score *= effectiveness;
-
-            // STAB (Same Type Attack Bonus) — 1.5× if move type matches attacker type
             if (aiTypes != null && move.getType() != null) {
                 for (String t : aiTypes) {
-                    if (t.equalsIgnoreCase(move.getType())) {
-                        score *= 1.5;
-                        break;
-                    }
+                    if (t.equalsIgnoreCase(move.getType())) { score *= 1.5; break; }
                 }
             }
-
-            // Prefer the correct attack stat category
-            if ("special".equals(move.getDamage_class())) {
-                score *= aiPokemon.getSpAttack() / 100.0;
-            } else {
-                score *= aiPokemon.getAttack() / 100.0;
-            }
-
-            if (score > bestScore) {
-                bestScore = score;
-                bestMove = move;
-            }
+            if ("special".equals(move.getDamage_class())) score *= aiPokemon.getSpAttack() / 100.0;
+            else score *= aiPokemon.getAttack() / 100.0;
+            if (score > bestScore) { bestScore = score; bestMove = move; }
         }
 
         return bestMove != null ? bestMove : offensiveMoves.get(0).getMove();
     }
 
-    // ==================== Listener Notifications ====================
+    // Listener Notifications
 
     private void notifyDamageDealt(String attacker, String move, String defender, int damage) {
-        for (BattleListener listener : listeners) {
-            listener.onDamageDealt(attacker, move, defender, damage);
-        }
+        for (BattleListener l : listeners) l.onDamageDealt(attacker, move, defender, damage);
     }
 
     private void notifyPokemonFainted(String pokemonName) {
-        for (BattleListener listener : listeners) {
-            listener.onPokemonFainted(pokemonName);
-        }
+        for (BattleListener l : listeners) l.onPokemonFainted(pokemonName);
     }
 
     private void notifyPokemonSwitched(String playerName, String pokemonName) {
-        for (BattleListener listener : listeners) {
-            listener.onPokemonSwitched(playerName, pokemonName);
-        }
+        for (BattleListener l : listeners) l.onPokemonSwitched(playerName, pokemonName);
     }
 
     private void notifyBattleEnd(String winnerName) {
-        for (BattleListener listener : listeners) {
-            listener.onBattleEnd(winnerName);
-        }
+        for (BattleListener l : listeners) l.onBattleEnd(winnerName);
     }
 
-    // ==================== Battle Listener Interface ====================
+    private void notifyPlayerPokemonFaintedNeedsSwitch(String playerName) {
+        for (BattleListener l : listeners) l.onPlayerPokemonFaintedNeedsSwitch(playerName);
+    }
 
-    /**
-     * Interface for battles events
-     */
+    // Battle Listener Interface
+
     public interface BattleListener {
         void onDamageDealt(String attacker, String move, String defender, int damage);
         void onPokemonFainted(String pokemonName);
         void onPokemonSwitched(String playerName, String pokemonName);
         void onBattleEnd(String winnerName);
+        /** Called when player1's active pokemon faints — controller must show switch overlay. */
+        void onPlayerPokemonFaintedNeedsSwitch(String playerName);
     }
 }

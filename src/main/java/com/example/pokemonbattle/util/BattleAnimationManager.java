@@ -3,8 +3,10 @@ package com.example.pokemonbattle.util;
 
 import com.example.pokemonbattle.model.Move;
 import com.example.pokemonbattle.util.effects.ElectricEffects;
+import com.example.pokemonbattle.util.effects.FightingEffects;
 import com.example.pokemonbattle.util.effects.FireEffects;
 import com.example.pokemonbattle.util.effects.IceEffects;
+import com.example.pokemonbattle.util.effects.WaterEffects;
 
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
@@ -40,7 +42,8 @@ public class BattleAnimationManager {
     private final ElectricEffects electricEffects;
     private final IceEffects iceEffects;
     private final FireEffects fireEffects;
-    
+    private final FightingEffects fightingEffects;
+    private final WaterEffects waterEffects;
     public BattleAnimationManager(ImageView playerSprite, ImageView opponentSprite, Pane battleField) {
         this.playerSprite = playerSprite;
         this.opponentSprite = opponentSprite;
@@ -49,6 +52,8 @@ public class BattleAnimationManager {
         this.electricEffects = new ElectricEffects(battleField);
         this.iceEffects = new IceEffects(battleField);
         this.fireEffects = new FireEffects(battleField);
+        this.fightingEffects = new FightingEffects(battleField);
+        this.waterEffects = new WaterEffects(battleField);
     }
     
     public void playAttackAnimation(ImageView attacker, ImageView defender, Move move, Runnable onComplete) {
@@ -73,9 +78,8 @@ public class BattleAnimationManager {
         attackDistance = attackingRight ? attackDistance : -attackDistance;
         
         // Check if we need special handling (ranged attacks)
-        if (isRangedMove(moveName)) {
-                playRangedAnimation(attacker, defender, moveName, moveType, movePower,
-                    defenderOriginalX, defenderOriginalY, defenderOriginalScaleX, defenderOriginalScaleY, onComplete);
+        if (isRangedMove(moveName, moveType)) {
+            playRangedAnimation(attacker, defender, moveName, moveType, movePower, defenderOriginalX, defenderOriginalY, defenderOriginalScaleX, defenderOriginalScaleY, onComplete);
             return;
         }
         
@@ -100,19 +104,11 @@ public class BattleAnimationManager {
         retreat.setInterpolator(Interpolator.EASE_OUT);
         
         // Recovery
-        ParallelTransition recovery = createRecoveryEffect(
-            defender,
-            defenderOriginalX,
-            defenderOriginalY,
-            defenderOriginalScaleX,
-            defenderOriginalScaleY);
+        ParallelTransition recovery = createRecoveryEffect(defender, defenderOriginalX, defenderOriginalY, defenderOriginalScaleX, defenderOriginalScaleY);
         
         // Combine: movement + movement effect → impact → retreat & recovery
         SequentialTransition sequence = new SequentialTransition(
-            new ParallelTransition(rush, movementEffect),
-            impact,
-            new ParallelTransition(retreat, recovery)
-        );
+            new ParallelTransition(rush, movementEffect),impact, new ParallelTransition(retreat, recovery));
         
         sequence.setOnFinished(e -> {
             attacker.setTranslateX(attackerOriginalX);
@@ -123,30 +119,32 @@ public class BattleAnimationManager {
             defender.setScaleY(defenderOriginalScaleY);
             defender.setTranslateX(defenderOriginalX);
             defender.setTranslateY(defenderOriginalY);
-            if (onComplete != null) {
-                onComplete.run();
-            }
+            if (onComplete != null) onComplete.run();
         });
         
         sequence.play();
     }
     
     private double getAttackDistance(String moveType, String moveName) {
-        // Ice moves only move slightly
-        if (moveType.equals("ice")) {
+        // Ice moves only move slightly, but ice-punch is melee so it uses full distance
+        if (moveType.equals("ice") && !moveName.contains("punch")) {
+            return ATTACK_DISTANCE_SLIGHT;
+        }
+        if(moveType.equals("water")) {
+            if(moveName.equals("crabhammer")) return ATTACK_DISTANCE_FULL;
             return ATTACK_DISTANCE_SLIGHT;
         }
         // Ranged moves don't move at all (handled separately)
-        if (isRangedMove(moveName)) {
-            return 0;
-        }
+        if (isRangedMove(moveName, moveType)) return 0;
         // Normal melee moves
         return ATTACK_DISTANCE_FULL;
     }
     
-    private boolean isRangedMove(String moveName) {
+    private boolean isRangedMove(String moveName, String moveType) {
         // Ice beam-type moves
-        return moveName.contains("beam") || moveName.contains("spear");
+        if(moveName.contains("beam") || moveName.contains("spear")) return true;
+        if(moveType.equals("water") && !moveName.equals("crabhammer")) return true;
+        return false;
     }
     private void playRangedAnimation(ImageView attacker, ImageView defender,
             String moveName, String moveType, int movePower,
@@ -163,7 +161,14 @@ public class BattleAnimationManager {
         if (moveType.equals("ice")) {
             beamEffect = iceEffects.createBeamEffect(attackerX, attackerY, defenderX, defenderY, moveName, movePower);
         }
-        
+        else if (moveType.equals("water")) {
+            // Water ranged moves: build a standalone timeline, fire impact inline
+            Timeline waterTimeline = new Timeline();
+            waterEffects.createImpactEffect(
+                    attackerX, attackerY, defenderX, defenderY,
+                    moveName, movePower, waterTimeline);
+            beamEffect = waterTimeline;
+        }
         if (beamEffect != null) {
             EventHandler<ActionEvent> previousOnFinished = beamEffect.getOnFinished();
             beamEffect.setOnFinished(e -> {
@@ -173,30 +178,20 @@ public class BattleAnimationManager {
 
                 ParallelTransition impact = createImpactEffect(defender, attackerX, attackerY,
                     moveName, moveType, movePower, defenderOriginalX);
-                ParallelTransition recovery = createRecoveryEffect(
-                        defender,
-                        defenderOriginalX,
-                        defenderOriginalY,
-                        defenderOriginalScaleX,
-                        defenderOriginalScaleY);
-                
+                ParallelTransition recovery = createRecoveryEffect( defender, defenderOriginalX, defenderOriginalY, defenderOriginalScaleX, defenderOriginalScaleY);
                 SequentialTransition impactSeq = new SequentialTransition(impact, recovery);
                 impactSeq.setOnFinished(ev -> {
                     defender.setScaleX(defenderOriginalScaleX);
                     defender.setScaleY(defenderOriginalScaleY);
                     defender.setTranslateX(defenderOriginalX);
                     defender.setTranslateY(defenderOriginalY);
-                    if (onComplete != null) {
-                        onComplete.run();
-                    }
+                    if(onComplete != null) onComplete.run();
                 });
                 impactSeq.play();
             });
             beamEffect.play();
         } else {
-            if (onComplete != null) {
-                onComplete.run();
-            }
+            if(onComplete != null) onComplete.run();
         }
     }
     
@@ -214,8 +209,7 @@ public class BattleAnimationManager {
         return effect;
     }
     
-        private ParallelTransition createImpactEffect(ImageView defender, double attackerX, double attackerY,
-            String moveName, String moveType, int movePower, double defenderBaseTranslateX) {
+    private ParallelTransition createImpactEffect(ImageView defender, double attackerX, double attackerY, String moveName, String moveType, int movePower, double defenderBaseTranslateX) {
         // Base shake
         Timeline shake = createShakeEffect(defender, movePower, defenderBaseTranslateX);
         
@@ -291,16 +285,24 @@ public class BattleAnimationManager {
         
         switch (moveType) {
             case "electric" -> electricEffects.createImpactEffect(endX, endY, moveName, movePower, effect);
-            case "ice" -> iceEffects.createImpactEffect(startX, startY, endX, endY, moveName, movePower, effect);
-            case "fire" -> fireEffects.createImpactEffect(endX, endY, moveName, movePower, effect);
-            default -> createDefaultImpact(endX, endY, movePower, effect);
+            case "ice"      -> iceEffects.createImpactEffect(startX, startY, endX, endY, moveName, movePower, effect);
+            case "fire"     -> fireEffects.createImpactEffect(endX, endY, moveName, movePower, effect);
+            case "fighting" -> fightingEffects.createImpactEffect(endX, endY, moveName, movePower, effect);
+            case "water"    -> waterEffects.createImpactEffect(startX, startY, endX, endY, moveName, movePower, effect);
+            default         -> createDefaultImpact(endX, endY, movePower, effect);
         }
-        
+
+        // For non-fighting punch moves overlay punch image + elemental particles
+        // on top of the type effect already applied above
+        if (!moveType.equals("fighting") && moveName.contains("punch")) {
+            fightingEffects.addPunchImageAndOverlay(endX, endY, moveName, moveType, effect);
+        }
+
         return effect;
     }
     
     private void createDefaultImpact(double x, double y, int movePower, Timeline timeline) {
-        int particleCount = Math.min(3 + movePower / 20, 10);
+        int particleCount = Math.min(10 + movePower / 20, 10);
         
         for (int i = 0; i < particleCount; i++) {
             Circle particle = new Circle(6, javafx.scene.paint.Color.WHITE);
@@ -343,7 +345,7 @@ public class BattleAnimationManager {
         
         return new ParallelTransition(scaleBack, slideBack);
     }
-
+    //helpers
     private void prepareTransientNode(javafx.scene.Node node) {
         node.setManaged(false);
         node.setMouseTransparent(true);
