@@ -6,6 +6,7 @@ import com.example.pokemonbattle.util.effects.ElectricEffects;
 import com.example.pokemonbattle.util.effects.FightingEffects;
 import com.example.pokemonbattle.util.effects.FireEffects;
 import com.example.pokemonbattle.util.effects.IceEffects;
+import com.example.pokemonbattle.util.effects.RockEffects;
 import com.example.pokemonbattle.util.effects.WaterEffects;
 
 import javafx.animation.Interpolator;
@@ -43,6 +44,7 @@ public class BattleAnimationManager {
     private final IceEffects      iceEffects;
     private final FireEffects     fireEffects;
     private final FightingEffects fightingEffects;
+    private final RockEffects     rockEffects;
     private final WaterEffects    waterEffects;
 
     public BattleAnimationManager(ImageView playerSprite, ImageView opponentSprite, Pane battleField) {
@@ -54,6 +56,7 @@ public class BattleAnimationManager {
         this.iceEffects      = new IceEffects(battleField);
         this.fireEffects     = new FireEffects(battleField);
         this.fightingEffects = new FightingEffects(battleField);
+        this.rockEffects     = new RockEffects(battleField);
         this.waterEffects    = new WaterEffects(battleField);
     }
 
@@ -184,6 +187,12 @@ public class BattleAnimationManager {
             };
             case "water" -> !moveName.equals("crabhammer");
             case "electric" -> damageClass.equals("special");
+            case "rock" -> switch (moveName) {
+                case "rock-blast", "rock-slide", "rock-throw", "rock-tomb",
+                     "rock-wrecker", "power-gem", "meteor-beam",
+                     "ancient-power", "smack-down" -> true;
+                default -> false;
+            };
             default -> false;
         };
     }
@@ -221,6 +230,12 @@ public class BattleAnimationManager {
             fireEffects.createImpactEffect(
                 attackerX, attackerY, defenderX, defenderY, moveName, movePower, ft);
             leadEffect = ft;
+            }
+            case "rock" -> {
+            Timeline rt = new Timeline();
+            rockEffects.createRangedEffect(
+                attackerX, attackerY, defenderX, defenderY, moveName, movePower, rt);
+            leadEffect = rt;
             }
             default -> {
             }
@@ -367,6 +382,7 @@ public class BattleAnimationManager {
             case "fire"     -> fireEffects.createImpactEffect(startX, startY, endX, endY, moveName, movePower, effect);
             case "fighting" -> fightingEffects.createImpactEffect(endX, endY, moveName, movePower, effect);
             case "water"    -> waterEffects.createImpactEffect(startX, startY, endX, endY, moveName, movePower, effect);
+            case "rock"     -> rockEffects.createImpactEffect(startX, startY, endX, endY, moveName, movePower, effect);
             default         -> createDefaultImpact(endX, endY, movePower, effect);
         }
 
