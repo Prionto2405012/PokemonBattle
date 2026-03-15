@@ -30,8 +30,7 @@ public class IceEffects {
     /**
      * Create beam effect for ice beam moves
      */
-    public Timeline createBeamEffect(double startX, double startY, double endX, double endY, 
-                                    String moveName, int movePower) {
+    public Timeline createBeamEffect(double startX, double startY, double endX, double endY, String moveName, int movePower) {
         Timeline beamTimeline = new Timeline();
         
         // Calculate beam width based on power

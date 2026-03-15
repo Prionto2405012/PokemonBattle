@@ -2,15 +2,22 @@
 package com.example.pokemonbattle.util;
 
 import com.example.pokemonbattle.model.Move;
+import com.example.pokemonbattle.util.effects.BugEffects;
 import com.example.pokemonbattle.util.effects.DarkEffects;
+import com.example.pokemonbattle.util.effects.DragonEffects;
 import com.example.pokemonbattle.util.effects.ElectricEffects;
+import com.example.pokemonbattle.util.effects.FairyEffects;
 import com.example.pokemonbattle.util.effects.FightingEffects;
 import com.example.pokemonbattle.util.effects.FireEffects;
+import com.example.pokemonbattle.util.effects.FlyingEffects;
 import com.example.pokemonbattle.util.effects.GhostEffects;
+import com.example.pokemonbattle.util.effects.GrassEffects;
 import com.example.pokemonbattle.util.effects.GroundEffects;
 import com.example.pokemonbattle.util.effects.IceEffects;
+import com.example.pokemonbattle.util.effects.PoisonEffects;
 import com.example.pokemonbattle.util.effects.PsychicEffects;
 import com.example.pokemonbattle.util.effects.RockEffects;
+import com.example.pokemonbattle.util.effects.SteelEffects;
 import com.example.pokemonbattle.util.effects.WaterEffects;
 
 import javafx.animation.Animation;
@@ -55,6 +62,13 @@ public class BattleAnimationManager {
     private final PsychicEffects  psychicEffects;
     private final DarkEffects     darkEffects;
     private final GroundEffects   groundEffects;
+    private final FlyingEffects   flyingEffects;
+    private final PoisonEffects   poisonEffects;
+    private final FairyEffects    fairyEffects;
+    private final SteelEffects    steelEffects;
+    private final DragonEffects   dragonEffects;
+    private final BugEffects      bugEffects;
+    private final GrassEffects    grassEffects;
 
     public BattleAnimationManager(ImageView playerSprite, ImageView opponentSprite, Pane battleField) {
         this.playerSprite   = playerSprite;
@@ -71,6 +85,13 @@ public class BattleAnimationManager {
         this.psychicEffects  = new PsychicEffects(battleField);
         this.darkEffects     = new DarkEffects(battleField);
         this.groundEffects   = new GroundEffects(battleField);
+        this.flyingEffects   = new FlyingEffects(battleField);
+        this.poisonEffects   = new PoisonEffects(battleField);
+        this.fairyEffects    = new FairyEffects(battleField);
+        this.steelEffects    = new SteelEffects(battleField);
+        this.dragonEffects   = new DragonEffects(battleField);
+        this.bugEffects      = new BugEffects(battleField);
+        this.grassEffects    = new GrassEffects(battleField);
     }
 
     // =
@@ -213,6 +234,68 @@ public class BattleAnimationManager {
             };
         }
 
+        // Flying: melee dive/wing moves close gap; wind/beam moves slight
+        if (moveType.equals("flying")) {
+            return switch (moveName) {
+                case "wing-attack", "aerial-ace", "fly", "sky-attack", "bounce",
+                     "brave-bird", "dual-wingbeat", "peck", "drill-peck" -> ATTACK_DISTANCE_FULL;
+                default -> ATTACK_DISTANCE_SLIGHT;
+            };
+        }
+
+        // Poison: physical contact moves close gap; sludge/projectile slight
+        if (moveType.equals("poison")) {
+            return switch (moveName) {
+                case "poison-jab", "cross-poison", "poison-fang",
+                     "venom-drench", "poison-tail" -> ATTACK_DISTANCE_FULL;
+                default -> ATTACK_DISTANCE_SLIGHT;
+            };
+        }
+
+        // Fairy: play-rough and draining-kiss close gap; sparkle/beam slight
+        if (moveType.equals("fairy")) {
+            return switch (moveName) {
+                case "play-rough", "spirit-break", "draining-kiss" -> ATTACK_DISTANCE_FULL;
+                default -> ATTACK_DISTANCE_SLIGHT;
+            };
+        }
+
+        // Steel: heavy iron-head style moves close gap; cannon/projectile slight
+        if (moveType.equals("steel")) {
+            return switch (moveName) {
+                case "iron-head", "iron-tail", "bullet-punch", "meteor-mash",
+                     "smart-strike", "steel-wing", "heavy-slam" -> ATTACK_DISTANCE_FULL;
+                default -> ATTACK_DISTANCE_SLIGHT;
+            };
+        }
+
+        // Dragon: claw/rush moves close gap; pulse/meteor slight
+        if (moveType.equals("dragon")) {
+            return switch (moveName) {
+                case "dragon-claw", "spacial-rend", "dual-chop", "breaking-swipe",
+                     "dragon-rush", "outrage" -> ATTACK_DISTANCE_FULL;
+                default -> ATTACK_DISTANCE_SLIGHT;
+            };
+        }
+
+        // Bug: x-scissor and physical bite/leech moves close gap; buzz/beam slight
+        if (moveType.equals("bug")) {
+            return switch (moveName) {
+                case "x-scissor", "fury-cutter", "twineedle", "lunge",
+                     "bug-bite", "leech-life" -> ATTACK_DISTANCE_FULL;
+                default -> ATTACK_DISTANCE_SLIGHT;
+            };
+        }
+
+        // Grass: vine/leaf/wood melee moves close gap; beam/seed slight
+        if (moveType.equals("grass")) {
+            return switch (moveName) {
+                case "vine-whip", "power-whip", "wood-hammer", "leaf-blade",
+                     "petal-dance" -> ATTACK_DISTANCE_FULL;
+                default -> ATTACK_DISTANCE_SLIGHT;
+            };
+        }
+
         // Rock: rock-tomb uses a slight advance (rocks fall from above, not from attacker)
         if (moveType.equals("rock")) {
             return switch (moveName) {
@@ -282,6 +365,51 @@ public class BattleAnimationManager {
                      "precipice-blades", "mud-bomb", "mud-shot",
                      "sand-attack", "sand-tomb", "sandstorm",
                      "scorching-sands", "earthquake" -> true;
+                default -> false;
+            };
+            // Flying: wind/beam/dive ranged moves
+            case "flying" -> switch (moveName) {
+                case "air-slash", "air-cutter", "hurricane", "gust",
+                     "tailwind", "oblivion-wing", "bleakwind-storm" -> true;
+                default -> false;
+            };
+            // Poison: sludge/acid/toxic ranged moves
+            case "poison" -> switch (moveName) {
+                case "sludge", "sludge-bomb", "sludge-wave", "acid",
+                     "acid-spray", "gunk-shot", "toxic-spikes",
+                     "clear-smog", "belch" -> true;
+                default -> false;
+            };
+            // Fairy: sparkle/moonblast/gleam ranged moves
+            case "fairy" -> switch (moveName) {
+                case "moonblast", "dazzling-gleam", "disarming-voice",
+                     "moongeist-beam", "misty-explosion", "sparkling-aria",
+                     "strange-steam", "fairy-wind", "charm" -> true;
+                default -> false;
+            };
+            // Steel: flash-cannon/gyro-ball/magnet-bomb ranged moves
+            case "steel" -> switch (moveName) {
+                case "flash-cannon", "magnet-bomb", "anchor-shot",
+                     "gyro-ball", "gear-grind" -> true;
+                default -> false;
+            };
+            // Dragon: pulse/breath/meteor ranged moves
+            case "dragon" -> switch (moveName) {
+                case "dragon-pulse", "dragon-breath", "dragon-rage",
+                     "draco-meteor", "scale-shot" -> true;
+                default -> false;
+            };
+            // Bug: buzz/signal/silver-wind ranged moves
+            case "bug" -> switch (moveName) {
+                case "bug-buzz", "signal-beam", "silver-wind",
+                     "pollen-puff", "infestation", "attack-order" -> true;
+                default -> false;
+            };
+            // Grass: seed/beam/leaf ranged moves
+            case "grass" -> switch (moveName) {
+                case "razor-leaf", "bullet-seed", "seed-bomb", "magical-leaf",
+                     "petal-blizzard", "energy-ball", "leaf-storm",
+                     "solar-beam", "seed-flare", "frenzy-plant" -> true;
                 default -> false;
             };
             default -> false;
@@ -395,6 +523,48 @@ public class BattleAnimationManager {
             groundEffects.createRangedEffect(
                 attackerX, attackerY, defenderX, defenderY, moveName, movePower, grt);
             leadEffect = grt;
+            }
+            case "flying" -> {
+            Timeline flyingTimeline = new Timeline();
+            flyingEffects.createRangedEffect(
+                attackerX, attackerY, defenderX, defenderY, moveName, movePower, flyingTimeline);
+            leadEffect = flyingTimeline;
+            }
+            case "poison" -> {
+            Timeline poisonTimeline = new Timeline();
+            poisonEffects.createRangedEffect(
+                attackerX, attackerY, defenderX, defenderY, moveName, movePower, poisonTimeline);
+            leadEffect = poisonTimeline;
+            }
+            case "fairy" -> {
+            Timeline fairyTimeline = new Timeline();
+            fairyEffects.createRangedEffect(
+                attackerX, attackerY, defenderX, defenderY, moveName, movePower, fairyTimeline);
+            leadEffect = fairyTimeline;
+            }
+            case "steel" -> {
+            Timeline steelTimeline = new Timeline();
+            steelEffects.createRangedEffect(
+                attackerX, attackerY, defenderX, defenderY, moveName, movePower, steelTimeline);
+            leadEffect = steelTimeline;
+            }
+            case "dragon" -> {
+            Timeline dragonTimeline = new Timeline();
+            dragonEffects.createRangedEffect(
+                attackerX, attackerY, defenderX, defenderY, moveName, movePower, dragonTimeline);
+            leadEffect = dragonTimeline;
+            }
+            case "bug" -> {
+            Timeline bugTimeline = new Timeline();
+            bugEffects.createRangedEffect(
+                attackerX, attackerY, defenderX, defenderY, moveName, movePower, bugTimeline);
+            leadEffect = bugTimeline;
+            }
+            case "grass" -> {
+            Timeline grassTimeline = new Timeline();
+            grassEffects.createRangedEffect(
+                attackerX, attackerY, defenderX, defenderY, moveName, movePower, grassTimeline);
+            leadEffect = grassTimeline;
             }
             default -> {
             }
@@ -546,6 +716,13 @@ public class BattleAnimationManager {
             case "psychic"  -> psychicEffects.createImpactEffect(startX, startY, endX, endY, moveName, movePower, effect);
             case "dark"     -> darkEffects.createImpactEffect(startX, startY, endX, endY, moveName, movePower, effect);
             case "ground"   -> groundEffects.createImpactEffect(startX, startY, endX, endY, moveName, movePower, effect);
+            case "flying"   -> flyingEffects.createImpactEffect(startX, startY, endX, endY, moveName, movePower, effect);
+            case "poison"   -> poisonEffects.createImpactEffect(startX, startY, endX, endY, moveName, movePower, effect);
+            case "fairy"    -> fairyEffects.createImpactEffect(startX, startY, endX, endY, moveName, movePower, effect);
+            case "steel"    -> steelEffects.createImpactEffect(startX, startY, endX, endY, moveName, movePower, effect);
+            case "dragon"   -> dragonEffects.createImpactEffect(startX, startY, endX, endY, moveName, movePower, effect);
+            case "bug"      -> bugEffects.createImpactEffect(startX, startY, endX, endY, moveName, movePower, effect);
+            case "grass"    -> grassEffects.createImpactEffect(startX, startY, endX, endY, moveName, movePower, effect);
             default         -> createDefaultImpact(endX, endY, movePower, effect);
         }
 

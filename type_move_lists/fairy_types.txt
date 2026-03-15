@@ -1,0 +1,68 @@
+TYPE: FAIRY
+TARGET EFFECT CLASS: FairyEffects
+SOURCE DATA: src/main/resources/com/example/pokemonbattle/database/moves_gen4.json
+
+MOVE LIST WITH DESCRIPTION
+Format: [id] move-name | class | power | acc | pp
+[365] alluring-voice | special | power=80 | acc=100 | pp=10
+  Description: Power: 80 Accuracy: 100 PP: 10 The user attacks the target using its angelic voice. This also confuses the target if its stats have been boosted during the turn.
+[431] dazzling-gleam | special | power=80 | acc=100 | pp=10
+  Description: Power: 80 Accuracy: 100 PP: 10 The user damages opposing Pokmon by emitting a powerful flash.
+[358] disarming-voice | special | power=40 | acc=null | pp=15
+  Description: Power: 40 Accuracy: - PP: 15 Letting out a charming cry, the user does emotional damage to opposing Pokmon. This attack never misses.
+[261] draining-kiss | special | power=50 | acc=100 | pp=10
+  Description: Power: 50 Accuracy: 100 PP: 10 The user steals the targets energy with a kiss. The users HP is restored by over half of the damage taken by the target.
+[429] fairy-wind | special | power=40 | acc=100 | pp=30
+  Description: Power: 40 Accuracy: 100 PP: 30 The user stirs up a fairy wind and strikes the target with it.
+[435] misty-explosion | special | power=100 | acc=100 | pp=5
+  Description: Power: 100 Accuracy: 100 PP: 5 The user attacks everything around it and faints upon using this move. This moves power is increased on Misty Terrain.
+[430] moonblast | special | power=95 | acc=100 | pp=15
+  Description: Power: 95 Accuracy: 100 PP: 15 Borrowing the power of the moon, the user attacks the target. This may also lower the targets Sp. Atk stat.
+[359] play-rough | physical | power=90 | acc=90 | pp=10
+  Description: Power: 90 Accuracy: 90 PP: 10 The user plays rough with the target and attacks it. This may also lower the targets Attack stat.
+
+PROFESSIONAL ANIMATION IMPLEMENTATION PLAN
+1) Build a dedicated effect class in src/main/java/com/example/pokemonbattle/util/effects/.
+   File: FairyEffects.java
+   Required public APIs (match existing Rock/Ghost/Psychic pattern):
+   - createImpactEffect(double x, double y, String moveName, int movePower, Timeline timeline)
+   - createImpactEffect(double startX, double startY, double endX, double endY, String moveName, int movePower, Timeline timeline)
+   - createRangedEffect(double startX, double startY, double endX, double endY, String moveName, int movePower, Timeline timeline)
+   Add helpers: prepareTransientNode, registerCleanup, clamp, random jitter helpers, flash helpers.
+
+2) Art direction for this type (keep consistent across all moves):
+   Palette: Rose pink #F48FB1, moon glow #FFF9C4, lilac #CE93D8
+   Motifs: Glitter motes, hearts, crescent flares, ribbon spirals
+   Rule: intensity = clamp(movePower/100.0, 0.8, 2.4) and drive particle count, radius, speed from intensity.
+
+3) Implement move families first, then map all moves to a family animation.
+   Contact family: play-rough
+   Projectile/beam family: dazzling-gleam, moonblast, draining-kiss
+   Charge/delayed family: moonlight charge burst
+   Area burst family: dazzling radial prism
+   In createImpactEffect/createRangedEffect use switch(moveName) and route each move to a family helper; never leave critical moves on default effect.
+
+4) Wire into BattleAnimationManager (mandatory touchpoints):
+   - Add import for the new type effect class.
+   - Add private final field and instantiate it in constructor.
+   - Update isRangedMove(...) for projectile/beam moves of this type.
+   - Update getAttackDistance(...) for heavy contact moves vs slight lunge moves.
+   - Update createTypeSpecificImpact(...) switch with this type.
+   - Update playRangedAnimation(...) switch to call createRangedEffect for this type.
+   - Optional: add movement aura in createMovementEffect(...) for signature rush moves.
+
+5) Production quality rules (commercial polish):
+   - Readability first: attacker intent in first 80ms, impact beat at 180-320ms, cleanup by <=700ms for normal moves.
+   - Use layered timing: source flare -> travel trail -> target burst -> residual particles.
+   - Add hit-stop illusion: 30-60ms brightness spike + shake + tiny knockback sync on impact frame.
+   - Keep node lifecycle clean: every transient node must be removed via registerCleanup to prevent memory leaks.
+   - Avoid frame spikes: cap particles on weak moves and stagger spawn with small delays.
+
+6) Verification checklist before merge:
+   - Every move in this file has an explicit switch case or documented family fallback.
+   - No orphan nodes remain in battleField after animation ends.
+   - Animations look correct from both player->opponent and opponent->player directions.
+   - Ranged moves do not force full melee rush.
+   - Contact moves still feel impactful with shake/flash/knockback.
+   - Run mvnw -q -DskipTests compile successfully after integration.
+
