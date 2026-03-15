@@ -28,7 +28,7 @@ public class WaterEffects {
     private final Pane battleField;
     private final Random random = new Random();
 
-    // ── Water colour palette ──────────────────────────────────────────────────
+    // Water colour palette
     private static final Color WATER_DEEP   = Color.web("#1565C0");
     private static final Color WATER_MID    = Color.web("#1E88E5");
     private static final Color WATER_LIGHT  = Color.web("#64B5F6");
@@ -40,10 +40,7 @@ public class WaterEffects {
     public WaterEffects(Pane battleField) {
         this.battleField = battleField;
     }
-
-    // =========================================================================
     // PUBLIC ENTRY POINT
-    // =========================================================================
 
     /**
      * Called from BattleAnimationManager.createTypeSpecificImpact for water moves.
@@ -53,85 +50,82 @@ public class WaterEffects {
             String moveName, int movePower, Timeline timeline) {
 
         switch (moveName) {
-            // ── Wave moves ────────────────────────────────────────────────────
+            // Wave moves
             case "surf", "liquidation", "waterfall", "water-pledge",
                  "brine", "scald", "wave-crash" ->
                     addWaveEffect(startX, startY, endX, endY, movePower, false, false, timeline);
 
-            // ── Dive: wave + attacker dives underground ───────────────────────
+            // Dive: wave + attacker dives underground
             case "dive" ->
                     addDiveEffect(startX, startY, endX, endY, movePower, timeline);
 
-            // ── Aqua Jet: attacker rides the wave ─────────────────────────────
+            // Aqua Jet: attacker rides the wave
             // (movement handled separately; here we just do the visual wave)
             case "aqua-jet" ->
                     addWaveEffect(startX, startY, endX, endY, movePower, false, true, timeline);
 
-            // ── Beam moves ────────────────────────────────────────────────────
+            // Beam moves
             case "water-gun", "hydro-pump", "muddy-water", "hydro-cannon" ->
                     addWaterBeam(startX, startY, endX, endY, movePower, timeline);
 
-            // ── Bubble moves ──────────────────────────────────────────────────
+            // Bubble moves
             case "bubble", "bubble-beam" ->
                     addBubbleBeam(startX, startY, endX, endY, movePower, timeline);
 
-            // ── Whirlpool ─────────────────────────────────────────────────────
+            // Whirlpool
             case "whirlpool" ->
                     addWhirlpool(startX, startY, endX, endY, movePower, timeline);
 
-            // ── Water Pulse ───────────────────────────────────────────────────
+            // Water Pulse
             case "water-pulse" ->
                     addWaterPulse(startX, startY, endX, endY, movePower, timeline);
 
-            // ── Aqua Tail ─────────────────────────────────────────────────────
+            // Aqua Tail
             case "aqua-tail" ->
                     addAquaTail(startX, startY, endX, endY, movePower, timeline);
 
-            // ── Chilling Water ────────────────────────────────────────────────
+            // Chilling Water
             case "chilling-water" ->
                     addChillingWater(startX, startY, endX, endY, movePower, timeline);
 
-            // ── Razor Shell / Aqua Cutter ─────────────────────────────────────
+            // Razor Shell / Aqua Cutter
             case "razor-shell", "aqua-cutter" ->
                     addRazorShell(startX, startY, endX, endY, movePower, timeline);
 
-            // ── Sparkling Aria ────────────────────────────────────────────────
+            // Sparkling Aria
             case "sparkling-aria" ->
                     addSparklingAria(startX, startY, endX, endY, movePower, timeline);
 
-            // ── Origin Pulse ──────────────────────────────────────────────────
+            // Origin Pulse
             case "origin-pulse" ->
                     addOriginPulse(startX, startY, endX, endY, movePower, timeline);
 
-            // ── Crabhammer: melee — no extra effect needed here ───────────────
+            // Crabhammer: melee — no extra effect needed here
             case "crabhammer" ->
                     addFallbackBeam(startX, startY, endX, endY, movePower, timeline);
 
-            // ── Clamp ─────────────────────────────────────────────────────────
+            // Clamp
             case "clamp" ->
                     addClampEffect(startX, startY, endX, endY, movePower, timeline);
 
-            // ── Flip Turn ─────────────────────────────────────────────────────
+            // Flip Turn
             case "flip-turn" ->
                     addFlipTurn(startX, startY, endX, endY, movePower, timeline);
 
-            // ── Octazooka ─────────────────────────────────────────────────────
+            // Octazooka
             case "octazooka" ->
                     addOctazooka(startX, startY, endX, endY, movePower, timeline);
 
-            // ── Water Spout ───────────────────────────────────────────────────
+            // Water Spout
             case "water-spout" ->
                     addWaterSpout(startX, startY, endX, endY, movePower, timeline);
 
-            // ── Fallback ──────────────────────────────────────────────────────
+            // Fallback
             default ->
                     addFallbackBeam(startX, startY, endX, endY, movePower, timeline);
         }
     }
-
-    // =========================================================================
     // WAVE (surf, liquidation, waterfall, water-pledge, brine, scald, wave-crash)
-    // =========================================================================
 
     /**
      * A towering wave emerges from the base of the defender and crashes over them.
@@ -144,10 +138,10 @@ public class WaterEffects {
 
         // Wave base sits at defender's feet (bottom of sprite region = endY + ~80)
         double waveBaseX = endX;
-        double waveBaseY = endY + 80;
+        double waveBaseY = endY + 100;
 
-        // ── Wave body: a rounded rectangle that scales up from the ground ────
-        int layerCount = 5;
+        // Wave body: a rounded rectangle that scales up from the ground
+        int layerCount = 15;
         for (int i = 0; i < layerCount; i++) {
             double w  = 90 + i * 28 + movePower / 8.0;
             double h0 = 0;
@@ -158,8 +152,8 @@ public class WaterEffects {
                     new Stop(0, WATER_FOAM.deriveColor(0, 1, 1, 0.7)),
                     new Stop(0.4, WATER_LIGHT.deriveColor(0, 1, 1, 0.85)),
                     new Stop(1, WATER_DEEP.deriveColor(0, 1, 1, 0.9))));
-            waveLayer.setArcWidth(w * 0.6);
-            waveLayer.setArcHeight(w * 0.4);
+            waveLayer.setArcWidth(w * 0.8);
+            waveLayer.setArcHeight(w * 0.6);
             waveLayer.setEffect(new GaussianBlur(4 + i));
             waveLayer.setOpacity(0);
             waveLayer.setX(waveBaseX - w / 2.0);
@@ -183,10 +177,10 @@ public class WaterEffects {
             registerCleanup(timeline, waveLayer);
         }
 
-        // ── Foam droplets scatter around the crest ───────────────────────────
-        int dropCount = 14 + movePower / 10;
+        // Foam droplets scatter around the crest
+        int dropCount = 24 + movePower / 10;
         for (int i = 0; i < dropCount; i++) {
-            Circle drop = new Circle(3 + random.nextDouble() * 4, WATER_FOAM);
+            Circle drop = new Circle(8 + random.nextDouble() * 4, WATER_FOAM);
             drop.setOpacity(0);
             drop.setEffect(new DropShadow(6, WATER_LIGHT));
             double ox = (random.nextDouble() - 0.5) * 80;
@@ -211,9 +205,7 @@ public class WaterEffects {
         }
     }
 
-    // =========================================================================
     // DIVE
-    // =========================================================================
 
     /**
      * Attacker sinks below the battleField floor then re-emerges near the defender
@@ -224,9 +216,9 @@ public class WaterEffects {
     private void addDiveEffect(double startX, double startY, double endX, double endY,
             int movePower, Timeline timeline) {
 
-        // ── Ripple at attacker's feet (dive-in) ──────────────────────────────
+        // Ripple at attacker's feet (dive-in)
         for (int r = 0; r < 3; r++) {
-            Ellipse ripple = new Ellipse(20 + r * 18, 6 + r * 4);
+            Ellipse ripple = new Ellipse(27 + r * 18, 12 + r * 4);
             ripple.setCenterX(startX);
             ripple.setCenterY(startY + 60);
             ripple.setFill(Color.TRANSPARENT);
@@ -247,8 +239,8 @@ public class WaterEffects {
             registerCleanup(timeline, ripple);
         }
 
-        // ── Underground travel: a dark water trail along the bottom ──────────
-        int trailCount = 10;
+        // Underground travel: a dark water trail along the bottom
+        int trailCount = 20;
         double dx = endX - startX;
         double dy = endY - startY;
         double dist = Math.max(1, Math.hypot(dx, dy));
@@ -271,9 +263,9 @@ public class WaterEffects {
             registerCleanup(timeline, bubble);
         }
 
-        // ── Emerge ripple near defender ───────────────────────────────────────
+        // Emerge ripple near defender
         for (int r = 0; r < 3; r++) {
-            Ellipse ripple = new Ellipse(18 + r * 16, 5 + r * 3);
+            Ellipse ripple = new Ellipse(27 + r * 16, 12 + r * 3);
             ripple.setCenterX(endX);
             ripple.setCenterY(endY + 60);
             ripple.setFill(Color.TRANSPARENT);
@@ -294,22 +286,20 @@ public class WaterEffects {
             registerCleanup(timeline, ripple);
         }
 
-        // ── Wave crash at defender ────────────────────────────────────────────
+        // Wave crash at defender
         addWaveEffect(startX, startY, endX, endY, movePower, true, false, timeline);
     }
 
-    // =========================================================================
     // WATER BEAM  (water-gun, hydro-pump, muddy-water, hydro-cannon)
-    // =========================================================================
 
     private void addWaterBeam(double startX, double startY, double endX, double endY,
             int movePower, Timeline timeline) {
 
         double angle  = Math.toDegrees(Math.atan2(endY - startY, endX - startX));
         double dist   = Math.hypot(endX - startX, endY - startY);
-        double beamW  = Math.min(18 + movePower / 8.0, 38);
+        double beamW  = Math.min(28 + movePower / 8.0, 40);
 
-        // ── Core beam ────────────────────────────────────────────────────────
+        // Core beam
         Rectangle beam = new Rectangle(0, beamW);
         beam.setFill(new LinearGradient(0, 0, 1, 0, true, CycleMethod.NO_CYCLE,
                 new Stop(0, WATER_FOAM.deriveColor(0, 1, 1, 0.95)),
@@ -336,8 +326,8 @@ public class WaterEffects {
         timeline.getKeyFrames().addAll(show, shoot, hold, fade);
         registerCleanup(timeline, beam);
 
-        // ── Water droplets along beam ─────────────────────────────────────────
-        int dropCount = 12 + movePower / 12;
+        // Water droplets along beam
+        int dropCount = 22 + movePower / 12;
         for (int i = 0; i < dropCount; i++) {
             double t  = (i + random.nextDouble()) / dropCount;
             double px = startX + (endX - startX) * t;
@@ -360,13 +350,11 @@ public class WaterEffects {
             registerCleanup(timeline, drop);
         }
 
-        // ── Splash at impact ──────────────────────────────────────────────────
+        // Splash at impact
         addImpactSplash(endX, endY, movePower, 180, timeline);
     }
 
-    // =========================================================================
     // BUBBLE BEAM  (bubble, bubble-beam)
-    // =========================================================================
 
     private void addBubbleBeam(double startX, double startY, double endX, double endY,
             int movePower, Timeline timeline) {
@@ -379,7 +367,7 @@ public class WaterEffects {
         double px   = -uy;
         double py   =  ux;
 
-        int bubbleCount = 22 + movePower / 8;
+        int bubbleCount = 35 + movePower / 8;
         for (int i = 0; i < bubbleCount; i++) {
             double t   = (i + random.nextDouble() * 0.5) / bubbleCount;
             double bx  = startX + ux * dist * t;
@@ -388,7 +376,7 @@ public class WaterEffects {
             bx += px * off;
             by += py * off;
 
-            double radius = 7 + random.nextDouble() * 7;
+            double radius = 10 + random.nextDouble() * 7;
             Circle bubble = new Circle(radius);
             bubble.setFill(BUBBLE_COLOR.deriveColor(0, 1, 1, 0.35));
             bubble.setStroke(WATER_LIGHT);
@@ -413,13 +401,11 @@ public class WaterEffects {
             registerCleanup(timeline, bubble);
         }
 
-        // ── Small pop splash at impact ────────────────────────────────────────
+        // Small pop splash at impact
         addImpactSplash(endX, endY, movePower / 2, 300, timeline);
     }
 
-    // =========================================================================
     // WHIRLPOOL
-    // =========================================================================
 
     private void addWhirlpool(double startX, double startY, double endX, double endY,
             int movePower, Timeline timeline) {
@@ -432,8 +418,8 @@ public class WaterEffects {
         double px   = -uy;
         double py   =  ux;
 
-        // ── Tornado body: stacked ellipses that travel toward opponent ────────
-        int rings = 8;
+        // Tornado body: stacked ellipses that travel toward opponent
+        int rings = 18;
         for (int r = 0; r < rings; r++) {
             double progress = r / (double) rings;
             double ringW    = 60 + r * 8;
@@ -465,8 +451,8 @@ public class WaterEffects {
             registerCleanup(timeline, ring);
         }
 
-        // ── Water spray around the tornado ────────────────────────────────────
-        int sprayCount = 16 + movePower / 10;
+        // Water spray around the tornado
+        int sprayCount = 26 + movePower / 10;
         for (int i = 0; i < sprayCount; i++) {
             double t  = (i + random.nextDouble()) / sprayCount;
             double bx = startX + ux * dist * t + (random.nextDouble() - 0.5) * 40;
@@ -490,9 +476,7 @@ public class WaterEffects {
         }
     }
 
-    // =========================================================================
     // WATER PULSE
-    // =========================================================================
 
     private void addWaterPulse(double startX, double startY, double endX, double endY,
             int movePower, Timeline timeline) {
@@ -503,10 +487,10 @@ public class WaterEffects {
         double ux   = dx / dist;
         double uy   = dy / dist;
 
-        int pulseCount = 4 + movePower / 30;
+        int pulseCount = 10 + movePower / 20;
         for (int p = 0; p < pulseCount; p++) {
-            double ringW = 44 + movePower / 10.0;
-            double ringH = 22 + movePower / 20.0;
+            double ringW = 50 + movePower / 10.0;
+            double ringH = 30 + movePower / 20.0;
             Ellipse ring = new Ellipse(ringW / 2, ringH / 2);
             ring.setFill(WATER_LIGHT.deriveColor(0, 1, 1, 0.18));
             ring.setStroke(WATER_MID);
@@ -531,24 +515,22 @@ public class WaterEffects {
             registerCleanup(timeline, ring);
         }
 
-        // ── Small splash at impact ────────────────────────────────────────────
+        // Small splash at impact
         addImpactSplash(endX, endY, movePower / 2, pulseCount * 80 + 120, timeline);
     }
 
-    // =========================================================================
     // AQUA TAIL
-    // =========================================================================
 
     private void addAquaTail(double startX, double startY, double endX, double endY,
             int movePower, Timeline timeline) {
 
-        // ── Semi-elliptical tail arc to the attacker's right (attacker's POV) ─
+        // Semi-elliptical tail arc to the attacker's right (attacker's POV)
         // In screen space, attacker is on the left, so "right of attacker" means
         // the arc bows upward (above the line between attacker and defender).
         double midX = (startX + endX) / 2.0;
         double midY = Math.min(startY, endY) - 60;   // arc peak above midpoint
 
-        int arcPoints = 18;
+        int arcPoints = 25;
         for (int i = 0; i < arcPoints - 1; i++) {
             double t0 = i / (double)(arcPoints - 1);
             double t1 = (i + 1) / (double)(arcPoints - 1);
@@ -576,8 +558,8 @@ public class WaterEffects {
             registerCleanup(timeline, seg);
         }
 
-        // ── Short wave crest that hits receiver ──────────────────────────────
-        int layerCount = 3;
+        // Short wave crest that hits receiver
+        int layerCount = 10;
         for (int i = 0; i < layerCount; i++) {
             double w = 55 + i * 18 + movePower / 12.0;
             Rectangle waveLayer = new Rectangle(w, 0);
@@ -605,9 +587,7 @@ public class WaterEffects {
         }
     }
 
-    // =========================================================================
     // CHILLING WATER
-    // =========================================================================
 
     private void addChillingWater(double startX, double startY, double endX, double endY,
             int movePower, Timeline timeline) {
@@ -615,8 +595,8 @@ public class WaterEffects {
         double fieldW = safeBattleWidth();
         double fieldH = safeBattleHeight();
 
-        // ── Raindrops ─────────────────────────────────────────────────────────
-        int rainCount = 40 + movePower / 5;
+        // Raindrops
+        int rainCount = 50 + movePower / 5;
         for (int i = 0; i < rainCount; i++) {
             double rx = endX + (random.nextDouble() - 0.5) * 160;
             double ry = -20 - random.nextDouble() * 80;
@@ -639,8 +619,8 @@ public class WaterEffects {
             registerCleanup(timeline, raindrop);
         }
 
-        // ── Ice cubes scattered within the rain ───────────────────────────────
-        int iceCount = 8 + movePower / 15;
+        // Ice cubes scattered within the rain
+        int iceCount = 20 + movePower / 15;
         for (int i = 0; i < iceCount; i++) {
             double cx = endX + (random.nextDouble() - 0.5) * 140;
             double cy = -15 - random.nextDouble() * 60;
@@ -669,9 +649,7 @@ public class WaterEffects {
         }
     }
 
-    // =========================================================================
     // RAZOR SHELL / AQUA CUTTER
-    // =========================================================================
 
     private void addRazorShell(double startX, double startY, double endX, double endY,
             int movePower, Timeline timeline) {
@@ -680,7 +658,7 @@ public class WaterEffects {
         double dist  = Math.hypot(endX - startX, endY - startY);
         double beamH = 12;
 
-        // ── Thin beam ────────────────────────────────────────────────────────
+        // Thin beam
         Rectangle beam = new Rectangle(0, beamH);
         beam.setFill(new LinearGradient(0, 0, 1, 0, true, CycleMethod.NO_CYCLE,
                 new Stop(0, WATER_FOAM.deriveColor(0, 1, 1, 0.9)),
@@ -706,8 +684,8 @@ public class WaterEffects {
         timeline.getKeyFrames().addAll(show, shoot, hold, fade);
         registerCleanup(timeline, beam);
 
-        // ── Shell/blade triangles riding along the beam ───────────────────────
-        int shellCount = 6 + movePower / 18;
+        // Shell/blade triangles riding along the beam
+        int shellCount = 12 + movePower / 18;
         double ux = (endX - startX) / dist;
         double uy = (endY - startY) / dist;
         double perpX = -uy;
@@ -743,9 +721,7 @@ public class WaterEffects {
         }
     }
 
-    // =========================================================================
     // SPARKLING ARIA
-    // =========================================================================
 
     private void addSparklingAria(double startX, double startY, double endX, double endY,
             int movePower, Timeline timeline) {
@@ -753,12 +729,12 @@ public class WaterEffects {
         double fieldW = safeBattleWidth();
         double fieldH = safeBattleHeight();
 
-        // ── Bubbles filling entire field, then drifting toward opponent ───────
-        int bubbleCount = 30 + movePower / 6;
+        // Bubbles filling entire field, then drifting toward opponent
+        int bubbleCount = 50 + movePower / 6;
         for (int i = 0; i < bubbleCount; i++) {
             double bx = random.nextDouble() * fieldW;
             double by = random.nextDouble() * fieldH;
-            double radius = 8 + random.nextDouble() * 12;
+            double radius = 10 + random.nextDouble() * 12;
             Circle bubble = new Circle(radius);
             bubble.setFill(BUBBLE_COLOR.deriveColor(0, 1, 1, 0.3));
             bubble.setStroke(WATER_LIGHT);
@@ -787,12 +763,12 @@ public class WaterEffects {
             registerCleanup(timeline, bubble);
         }
 
-        // ── Sparkle stars around the opponent ────────────────────────────────
+        // Sparkle stars around the opponent
         int starCount = 10 + movePower / 15;
         for (int i = 0; i < starCount; i++) {
             double angle  = Math.PI * 2 * i / starCount;
             double radius = 50 + random.nextDouble() * 30;
-            Circle star   = new Circle(3 + random.nextDouble() * 3, WATER_WHITE);
+            Circle star   = new Circle(10 + random.nextDouble() * 3, WATER_WHITE);
             star.setEffect(new DropShadow(8, WATER_CYAN));
             star.setCenterX(endX + Math.cos(angle) * radius);
             star.setCenterY(endY + Math.sin(angle) * radius);
@@ -811,14 +787,12 @@ public class WaterEffects {
         }
     }
 
-    // =========================================================================
     // ORIGIN PULSE — countless deep brilliant blue light beams
-    // =========================================================================
 
     private void addOriginPulse(double startX, double startY, double endX, double endY,
             int movePower, Timeline timeline) {
 
-        int beamCount = 28 + movePower / 5;
+        int beamCount = 38 + movePower / 5;
         double baseAngle = Math.atan2(endY - startY, endX - startX);
 
         for (int i = 0; i < beamCount; i++) {
@@ -827,7 +801,7 @@ public class WaterEffects {
             double beamAngle = baseAngle + spread;
 
             double beamLen  = 80 + random.nextDouble() * 200;
-            double beamW    = 2 + random.nextDouble() * 5;
+            double beamW    = 10 + random.nextDouble() * 5;
             Color  beamCol  = Color.color(
                     0.05 + random.nextDouble() * 0.1,
                     0.3  + random.nextDouble() * 0.3,
@@ -859,7 +833,7 @@ public class WaterEffects {
             registerCleanup(timeline, beam);
         }
 
-        // ── Deep blue shockwave at impact ─────────────────────────────────────
+        // Deep blue shockwave at impact
         for (int r = 0; r < 4; r++) {
             Ellipse wave = new Ellipse(10, 6);
             wave.setCenterX(endX);
@@ -884,9 +858,7 @@ public class WaterEffects {
         }
     }
 
-    // =========================================================================
     // CLAMP — two shell-like ellipses close around the defender
-    // =========================================================================
 
     private void addClampEffect(double startX, double startY, double endX, double endY,
             int movePower, Timeline timeline) {
@@ -894,7 +866,7 @@ public class WaterEffects {
         double shellW = 70 + movePower / 4.0;
         double shellH = 45 + movePower / 6.0;
 
-        // ── Top shell (starts above defender, closes downward) ───────────────
+        // Top shell (starts above defender, closes downward)
         Ellipse topShell = new Ellipse(shellW / 2, shellH / 2);
         topShell.setCenterX(endX);
         topShell.setCenterY(endY - 80);
@@ -906,7 +878,7 @@ public class WaterEffects {
         prepareTransientNode(topShell);
         battleField.getChildren().add(topShell);
 
-        // ── Bottom shell (starts below defender, closes upward) ──────────────
+        // Bottom shell (starts below defender, closes upward)
         Ellipse bottomShell = new Ellipse(shellW / 2, shellH / 2);
         bottomShell.setCenterX(endX);
         bottomShell.setCenterY(endY + 80);
@@ -935,10 +907,10 @@ public class WaterEffects {
         registerCleanup(timeline, topShell);
         registerCleanup(timeline, bottomShell);
 
-        // ── Water droplets spraying out on impact ────────────────────────────
-        int dropCount = 12 + movePower / 8;
+        // Water droplets spraying out on impact
+        int dropCount = 25 + movePower / 8;
         for (int i = 0; i < dropCount; i++) {
-            Circle drop = new Circle(2.5 + random.nextDouble() * 3, WATER_FOAM);
+            Circle drop = new Circle(5.5 + random.nextDouble() * 3, WATER_FOAM);
             drop.setCenterX(endX + (random.nextDouble() - 0.5) * 30);
             drop.setCenterY(endY + (random.nextDouble() - 0.5) * 10);
             drop.setEffect(new DropShadow(4, WATER_LIGHT));
@@ -960,9 +932,7 @@ public class WaterEffects {
         }
     }
 
-    // =========================================================================
     // FLIP TURN — quick arcing water trail, then retreat
-    // =========================================================================
 
     private void addFlipTurn(double startX, double startY, double endX, double endY,
             int movePower, Timeline timeline) {
@@ -971,8 +941,8 @@ public class WaterEffects {
         double midX = (startX + endX) / 2.0;
         double midY = Math.min(startY, endY) - 40;
 
-        // ── Arcing water trail ───────────────────────────────────────────────
-        int arcPoints = 14;
+        // Arcing water trail
+        int arcPoints = 25;
         for (int i = 0; i < arcPoints - 1; i++) {
             double t0 = i / (double)(arcPoints - 1);
             double t1 = (i + 1) / (double)(arcPoints - 1);
@@ -984,7 +954,7 @@ public class WaterEffects {
 
             Line seg = new Line(ax0, ay0, ax1, ay1);
             seg.setStroke(WATER_LIGHT.deriveColor(0, 1, 1, 0.9 - i * 0.03));
-            seg.setStrokeWidth(4 + (Math.sin(t0 * Math.PI) * 5));
+            seg.setStrokeWidth(10 + (Math.sin(t0 * Math.PI) * 5));
             seg.setEffect(new DropShadow(6, WATER_CYAN));
             seg.setOpacity(0);
             prepareTransientNode(seg);
@@ -999,9 +969,9 @@ public class WaterEffects {
             registerCleanup(timeline, seg);
         }
 
-        // ── Small wave crest at impact ───────────────────────────────────────
+        // Small wave crest at impact
         for (int i = 0; i < 2; i++) {
-            double w = 40 + i * 14 + movePower / 10.0;
+            double w = 50 + i * 14 + movePower / 10.0;
             Rectangle waveCrest = new Rectangle(w, 0);
             waveCrest.setFill(WATER_MID.deriveColor(0, 1, 1, 0.8 - i * 0.15));
             waveCrest.setArcWidth(w * 0.5);
@@ -1026,13 +996,11 @@ public class WaterEffects {
             registerCleanup(timeline, waveCrest);
         }
 
-        // ── Splash droplets ──────────────────────────────────────────────────
+        // Splash droplets
         addImpactSplash(endX, endY, movePower / 2, 140, timeline);
     }
 
-    // =========================================================================
     // OCTAZOOKA — dark ink blob projectile that splatters on impact
-    // =========================================================================
 
     private void addOctazooka(double startX, double startY, double endX, double endY,
             int movePower, Timeline timeline) {
@@ -1040,8 +1008,8 @@ public class WaterEffects {
         Color inkDark   = Color.web("#1A237E");
         Color inkMid    = Color.web("#283593");
 
-        // ── Main ink blob projectile ─────────────────────────────────────────
-        double blobR = 16 + movePower / 10.0;
+        // Main ink blob projectile
+        double blobR = 26 + movePower / 10.0;
         Circle inkBlob = new Circle(blobR);
         inkBlob.setFill(new LinearGradient(0, 0, 1, 1, true, CycleMethod.NO_CYCLE,
                 new Stop(0, inkDark),
@@ -1065,15 +1033,15 @@ public class WaterEffects {
         timeline.getKeyFrames().addAll(blobAppear, blobTravel, blobHit);
         registerCleanup(timeline, inkBlob);
 
-        // ── Smaller trailing ink drops along the path ────────────────────────
-        int trailCount = 8 + movePower / 12;
+        // Smaller trailing ink drops along the path
+        int trailCount = 20 + movePower / 12;
         double dx = endX - startX;
         double dy = endY - startY;
         for (int i = 0; i < trailCount; i++) {
             double t = (i + random.nextDouble() * 0.5) / trailCount;
             double px = startX + dx * t;
             double py = startY + dy * t;
-            Circle trail = new Circle(3 + random.nextDouble() * 4,
+            Circle trail = new Circle(8 + random.nextDouble() * 4,
                     (i % 2 == 0) ? inkDark : inkMid);
             trail.setCenterX(px + (random.nextDouble() - 0.5) * 14);
             trail.setCenterY(py + (random.nextDouble() - 0.5) * 14);
@@ -1091,10 +1059,10 @@ public class WaterEffects {
             registerCleanup(timeline, trail);
         }
 
-        // ── Ink splatter at impact ───────────────────────────────────────────
-        int splatCount = 10 + movePower / 8;
+        // Ink splatter at impact
+        int splatCount = 20 + movePower / 8;
         for (int i = 0; i < splatCount; i++) {
-            double splatR = 4 + random.nextDouble() * 8;
+            double splatR = 10 + random.nextDouble() * 8;
             Color splatCol = (i % 3 == 0) ? inkDark
                            : (i % 3 == 1) ? inkMid
                            : WATER_DEEP;
@@ -1121,9 +1089,7 @@ public class WaterEffects {
         }
     }
 
-    // =========================================================================
     // WATER SPOUT — massive geyser erupting from below the defender
-    // =========================================================================
 
     private void addWaterSpout(double startX, double startY, double endX, double endY,
             int movePower, Timeline timeline) {
@@ -1131,8 +1097,8 @@ public class WaterEffects {
         double geyserBaseY = endY + 80;
         double geyserPeakY = endY - 180 - movePower / 3.0;
 
-        // ── Geyser column: layered rectangles erupting upward ────────────────
-        int columnLayers = 7;
+        // Geyser column: layered rectangles erupting upward
+        int columnLayers = 17;
         for (int i = 0; i < columnLayers; i++) {
             double w = 50 + i * 12 + movePower / 6.0;
             Rectangle column = new Rectangle(w, 0);
@@ -1168,8 +1134,8 @@ public class WaterEffects {
             registerCleanup(timeline, column);
         }
 
-        // ── Spray droplets erupting from the top ─────────────────────────────
-        int sprayCount = 24 + movePower / 6;
+        // Spray droplets erupting from the top
+        int sprayCount = 30 + movePower / 6;
         for (int i = 0; i < sprayCount; i++) {
             Circle drop = new Circle(3 + random.nextDouble() * 5,
                     (i % 3 == 0) ? WATER_FOAM
@@ -1196,8 +1162,8 @@ public class WaterEffects {
             registerCleanup(timeline, drop);
         }
 
-        // ── Cascading water falling back down ────────────────────────────────
-        int cascadeCount = 18 + movePower / 8;
+        // Cascading water falling back down
+        int cascadeCount = 25 + movePower / 8;
         for (int i = 0; i < cascadeCount; i++) {
             Circle drop = new Circle(3.5 + random.nextDouble() * 4, WATER_MID);
             double ox = (random.nextDouble() - 0.5) * 70;
@@ -1220,9 +1186,9 @@ public class WaterEffects {
             registerCleanup(timeline, drop);
         }
 
-        // ── Expanding ripple rings at the base ───────────────────────────────
+        // Expanding ripple rings at the base
         for (int r = 0; r < 4; r++) {
-            Ellipse ripple = new Ellipse(15 + r * 8, 6 + r * 3);
+            Ellipse ripple = new Ellipse(25 + r * 8, 15 + r * 3);
             ripple.setCenterX(endX);
             ripple.setCenterY(geyserBaseY);
             ripple.setFill(Color.TRANSPARENT);
@@ -1245,16 +1211,14 @@ public class WaterEffects {
         }
     }
 
-    // =========================================================================
     // FALLBACK BEAM  (generic water, and crabhammer impact)
-    // =========================================================================
 
     private void addFallbackBeam(double startX, double startY, double endX, double endY,
             int movePower, Timeline timeline) {
 
         double angle = Math.toDegrees(Math.atan2(endY - startY, endX - startX));
         double dist  = Math.hypot(endX - startX, endY - startY);
-        double beamW = 20 + movePower / 9.0;
+        double beamW = 30 + movePower / 9.0;
 
         Rectangle beam = new Rectangle(0, beamW);
         beam.setFill(new LinearGradient(0, 0, 1, 0, true, CycleMethod.NO_CYCLE,
@@ -1285,15 +1249,13 @@ public class WaterEffects {
         addImpactSplash(endX, endY, movePower / 2, 200, timeline);
     }
 
-    // =========================================================================
     // SHARED HELPERS
-    // =========================================================================
 
     /** Small splash of droplets at the impact point. */
     private void addImpactSplash(double x, double y, int movePower, int startDelay, Timeline timeline) {
-        int dropCount = 8 + movePower / 12;
+        int dropCount = 20 + movePower / 12;
         for (int i = 0; i < dropCount; i++) {
-            Circle drop = new Circle(3 + random.nextDouble() * 3.5, WATER_FOAM);
+            Circle drop = new Circle(8 + random.nextDouble() * 4, WATER_FOAM);
             drop.setCenterX(x);
             drop.setCenterY(y);
             drop.setOpacity(0);
@@ -1329,8 +1291,8 @@ public class WaterEffects {
     }
 
     private void prepareTransientNode(Node node) {
-        node.setManaged(false);
-        node.setMouseTransparent(true);
+                node.setManaged(false);
+                node.setMouseTransparent(true);
     }
 
     private void registerCleanup(Timeline timeline, Node node) {

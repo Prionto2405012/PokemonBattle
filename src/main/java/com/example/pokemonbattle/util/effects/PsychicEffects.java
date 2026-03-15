@@ -38,25 +38,20 @@ public class PsychicEffects {
         this.battleField = battleField;
     }
 
-    // -----------------------------------------------------------------
     // Public API – single-point overload (melee / contact moves)
-    // -----------------------------------------------------------------
 
-    public void createImpactEffect(double x, double y, String moveName,
-                                   int movePower, Timeline timeline) {
+    public void createImpactEffect(double x, double y, String moveName, int movePower, Timeline timeline) {
         createImpactEffect(x, y, x, y, moveName, movePower, timeline);
     }
 
-    // -----------------------------------------------------------------
     // Public API – full signature (all psychic moves)
-    // -----------------------------------------------------------------
 
     public void createImpactEffect(double startX, double startY,
                                    double endX, double endY,
                                    String moveName, int movePower,
                                    Timeline timeline) {
 
-        double intensity = clamp(movePower / 100.0, 0.3, 1.8);
+        double intensity = clamp(movePower / 100.0, 0.8, 2.4);
 
         switch (moveName) {
             // Concentric psychic rings
@@ -95,34 +90,28 @@ public class PsychicEffects {
         }
     }
 
-    // -----------------------------------------------------------------
     // Public API – ranged lead effect (projectile from attacker to target)
-    // -----------------------------------------------------------------
 
     public void createRangedEffect(double startX, double startY,
                                    double endX, double endY,
                                    String moveName, int movePower,
                                    Timeline timeline) {
-        double intensity = clamp(movePower / 100.0, 0.4, 1.8);
+        double intensity = clamp(movePower / 100.0, 0.8, 2.4);
         addPsionicBeam(startX, startY, endX, endY, intensity, timeline);
     }
 
-    // =================================================================
-    // Concentric psychic rings – expanding rings of pink/purple energy
-    // with mindwave distortion particles
-    // =================================================================
+    // Concentric psychic rings – expanding rings of pink/purple energy with mindwave distortion particles
 
-    private void addConcentricRings(double x, double y, double intensity,
-                                    Timeline timeline) {
-        int ringCount = (int) (4 + 4 * intensity);
+    private void addConcentricRings(double x, double y, double intensity, Timeline timeline) {
+        int ringCount = (int) (14 + 4 * intensity);
 
         for (int i = 0; i < ringCount; i++) {
-            double maxRadius = 25 + 30 * intensity;
+            double maxRadius = 30 + 30 * intensity;
             Circle ring = new Circle(0);
             Color color = i % 3 == 0 ? PSY_PINK : i % 3 == 1 ? PSY_PURPLE : PSY_LIGHT;
             ring.setFill(Color.TRANSPARENT);
             ring.setStroke(color.deriveColor(0, 1, 1, 0.75));
-            ring.setStrokeWidth(2.5 + intensity);
+            ring.setStrokeWidth(4.5 + intensity);
             ring.setCenterX(x);
             ring.setCenterY(y);
             ring.setOpacity(0);
@@ -145,13 +134,13 @@ public class PsychicEffects {
         }
 
         // Mindwave distortion particles – small warping ellipses drifting outward
-        int particleCount = (int) (6 + 5 * intensity);
+        int particleCount = (int) (16 + 5 * intensity);
         for (int i = 0; i < particleCount; i++) {
             double angle = (i / (double) particleCount) * 2 * Math.PI + random.nextDouble() * 0.4;
             double dist = 10 + random.nextDouble() * 15;
             double endDist = 35 + 25 * intensity + random.nextDouble() * 15;
 
-            Ellipse mote = new Ellipse(3 + random.nextDouble() * 3, 5 + random.nextDouble() * 4);
+            Ellipse mote = new Ellipse(10 + random.nextDouble() * 3, 15 + random.nextDouble() * 4);
             Color moteColor = i % 2 == 0 ? PSY_CYAN : PSY_INDIGO;
             mote.setFill(moteColor.deriveColor(0, 1, 1, 0.6));
             mote.setStroke(null);
@@ -179,16 +168,12 @@ public class PsychicEffects {
         }
 
         // Central pulse flash
-        addPsychicFlash(x, y, 20 * intensity, PSY_PINK, 0, 220, timeline);
+        addPsychicFlash(x, y, 30 * intensity, PSY_PINK, 0, 220, timeline);
     }
 
-    // =================================================================
-    // Psionic beam – chromatic rainbow-tinted beam from attacker to
-    // defender with prismatic trail particles
-    // =================================================================
+    // Psionic beam – chromatic rainbow-tinted beam from attacker to defender with prismatic trail particles
 
-    private void addPsionicBeam(double sx, double sy, double ex, double ey,
-                                double intensity, Timeline timeline) {
+    private void addPsionicBeam(double sx, double sy, double ex, double ey, double intensity, Timeline timeline) {
         double dx = ex - sx;
         double dy = ey - sy;
         double distance = Math.hypot(dx, dy);
@@ -206,7 +191,7 @@ public class PsychicEffects {
                     sx + px * offset, sy + py * offset,
                     sx + px * offset, sy + py * offset);
             beam.setStroke(beamColors[b].deriveColor(0, 1, 1, 0.7));
-            beam.setStrokeWidth(3 + 2 * intensity);
+            beam.setStrokeWidth(5 + 2 * intensity);
             beam.setOpacity(0);
             beam.setEffect(new GaussianBlur(4 + intensity));
             prepareTransientNode(beam);
@@ -227,14 +212,14 @@ public class PsychicEffects {
         }
 
         // Prismatic trail particles along the beam path
-        int trailCount = (int) (8 + 6 * intensity);
+        int trailCount = (int) (18 + 6 * intensity);
         for (int i = 0; i < trailCount; i++) {
             double t = (i + 0.5) / trailCount;
             double spread = (random.nextDouble() - 0.5) * (12 + 8 * intensity);
             double cx = sx + dx * t + px * spread;
             double cy = sy + dy * t + py * spread;
 
-            Circle sparkle = new Circle(2 + random.nextDouble() * 2.5, PSY_WHITE);
+            Circle sparkle = new Circle(10 + random.nextDouble() * 2.5, PSY_WHITE);
             sparkle.setCenterX(cx);
             sparkle.setCenterY(cy);
             sparkle.setOpacity(0);
@@ -257,20 +242,17 @@ public class PsychicEffects {
         }
 
         // Impact flash at target
-        addPsychicFlash(ex, ey, 18 * intensity, PSY_PURPLE, 230, 180, timeline);
+        addPsychicFlash(ex, ey, 25 * intensity, PSY_PURPLE, 230, 180, timeline);
     }
 
-    // =================================================================
     // Telekinetic slash – purple slash marks and energy edges at impact
-    // =================================================================
 
-    private void addTelekineticSlash(double x, double y, double intensity,
-                                     Timeline timeline) {
-        int slashCount = (int) (3 + 3 * intensity);
+    private void addTelekineticSlash(double x, double y, double intensity, Timeline timeline) {
+        int slashCount = (int) (13 + 3 * intensity);
 
         for (int i = 0; i < slashCount; i++) {
             double angle = random.nextDouble() * Math.PI - Math.PI / 2;
-            double len = 18 + 14 * intensity;
+            double len = 22 + 14 * intensity;
 
             // Slash line – a bold stroke cutting across the impact area
             Line slash = new Line(
@@ -278,7 +260,7 @@ public class PsychicEffects {
                     x - Math.cos(angle) * len, y - Math.sin(angle) * len);
             Color slashColor = i % 2 == 0 ? PSY_PURPLE : PSY_DEEP;
             slash.setStroke(slashColor.deriveColor(0, 1, 1, 0.85));
-            slash.setStrokeWidth(3 + 1.5 * intensity);
+            slash.setStrokeWidth(5 + 2 * intensity);
             slash.setOpacity(0);
             slash.setEffect(new DropShadow(8, PSY_PINK));
             prepareTransientNode(slash);
@@ -298,10 +280,10 @@ public class PsychicEffects {
         }
 
         // Energy edge fragments – small diamond-shaped polygons bursting outward
-        int edgeCount = (int) (5 + 4 * intensity);
+        int edgeCount = (int) (15 + 4 * intensity);
         for (int i = 0; i < edgeCount; i++) {
             double angle = (i / (double) edgeCount) * 2 * Math.PI;
-            double size = 5 + random.nextDouble() * 4 * intensity;
+            double size = 10 + random.nextDouble() * 4 * intensity;
 
             Polygon diamond = buildDiamondPolygon(size,
                     i % 3 == 0 ? PSY_PURPLE : i % 3 == 1 ? PSY_PINK : PSY_INDIGO);
@@ -313,7 +295,7 @@ public class PsychicEffects {
             prepareTransientNode(diamond);
             battleField.getChildren().add(diamond);
 
-            double burstR = 20 + 18 * intensity;
+            double burstR = 28 + 18 * intensity;
             int delay = 30 + i * 25;
             KeyFrame appear = new KeyFrame(Duration.millis(delay),
                     new KeyValue(diamond.opacityProperty(), 0.9));
@@ -329,23 +311,19 @@ public class PsychicEffects {
         }
 
         // Purple impact ripple
-        addPsychicFlash(x, y, 16 * intensity, PSY_DEEP, 0, 200, timeline);
+        addPsychicFlash(x, y, 22 * intensity, PSY_DEEP, 0, 200, timeline);
     }
 
-    // =================================================================
-    // Aura burst – charging glow at caster position, then delayed burst
-    // at the target
-    // =================================================================
+    // Aura burst – charging glow at caster position, then delayed burst at the target
 
-    private void addAuraBurst(double sx, double sy, double ex, double ey,
-                              double intensity, Timeline timeline) {
+    private void addAuraBurst(double sx, double sy, double ex, double ey, double intensity, Timeline timeline) {
         // Phase 1: Charge-up aura at caster position
-        int chargeCount = (int) (5 + 4 * intensity);
+        int chargeCount = (int) (15 + 4 * intensity);
         for (int i = 0; i < chargeCount; i++) {
             double angle = (i / (double) chargeCount) * 2 * Math.PI;
-            double orbitR = 22 + 12 * intensity;
+            double orbitR = 25 + 12 * intensity;
 
-            Circle aura = new Circle(4 + random.nextDouble() * 3 * intensity);
+            Circle aura = new Circle(10 + random.nextDouble() * 3 * intensity);
             Color auraColor = i % 3 == 0 ? PSY_PINK : i % 3 == 1 ? PSY_LIGHT : PSY_CYAN;
             aura.setFill(auraColor.deriveColor(0, 1, 1, 0.65));
             aura.setCenterX(sx + Math.cos(angle) * orbitR);
@@ -395,7 +373,7 @@ public class PsychicEffects {
         int burstDelay = 320;
 
         // Travelling orb from caster to target
-        Circle orb = new Circle(6 + 4 * intensity, PSY_PURPLE.deriveColor(0, 1, 1, 0.8));
+        Circle orb = new Circle(12 + 4 * intensity, PSY_PURPLE.deriveColor(0, 1, 1, 0.8));
         orb.setCenterX(sx);
         orb.setCenterY(sy);
         orb.setOpacity(0);
@@ -414,12 +392,12 @@ public class PsychicEffects {
         registerCleanup(timeline, orb);
 
         // Burst particles at target upon arrival
-        int burstCount = (int) (6 + 5 * intensity);
+        int burstCount = (int) (16 + 5 * intensity);
         for (int i = 0; i < burstCount; i++) {
             double angle = (i / (double) burstCount) * 2 * Math.PI;
-            double burstR = 24 + 20 * intensity;
+            double burstR = 28 + 20 * intensity;
 
-            Circle particle = new Circle(3 + random.nextDouble() * 3);
+            Circle particle = new Circle(10 + random.nextDouble() * 3);
             Color pColor = i % 3 == 0 ? PSY_PINK : i % 3 == 1 ? PSY_PURPLE : PSY_CYAN;
             particle.setFill(pColor.deriveColor(0, 1, 1, 0.7));
             particle.setCenterX(ex);
@@ -445,24 +423,20 @@ public class PsychicEffects {
         }
 
         // Impact flash at target
-        addPsychicFlash(ex, ey, 22 * intensity, PSY_PURPLE, burstDelay + 200, 200, timeline);
+        addPsychicFlash(ex, ey, 28 * intensity, PSY_PURPLE, burstDelay + 200, 200, timeline);
     }
 
-    // =================================================================
-    // Default psychic burst – generic fallback with expanding rings and
-    // scattering motes
-    // =================================================================
+    // Default psychic burst – generic fallback with expanding rings and scattering motes
 
-    private void addDefaultPsychicBurst(double x, double y, double intensity,
-                                        Timeline timeline) {
+    private void addDefaultPsychicBurst(double x, double y, double intensity, Timeline timeline) {
         // Two concentric pulse rings
         for (int r = 0; r < 2; r++) {
-            double maxR = (18 + 16 * intensity) * (r + 1);
+            double maxR = (22 + 16 * intensity) * (r + 1);
             Circle ring = new Circle(0);
             ring.setFill(Color.TRANSPARENT);
             ring.setStroke(r == 0 ? PSY_PINK.deriveColor(0, 1, 1, 0.7)
                                   : PSY_PURPLE.deriveColor(0, 1, 1, 0.6));
-            ring.setStrokeWidth(2 + intensity);
+            ring.setStrokeWidth(5 + intensity);
             ring.setCenterX(x);
             ring.setCenterY(y);
             ring.setOpacity(0);
@@ -484,10 +458,10 @@ public class PsychicEffects {
         }
 
         // Scattering motes
-        int moteCount = (int) (5 + 4 * intensity);
+        int moteCount = (int) (15 + 4 * intensity);
         for (int i = 0; i < moteCount; i++) {
             double angle = (i / (double) moteCount) * 2 * Math.PI;
-            Circle mote = new Circle(2 + random.nextDouble() * 2,
+            Circle mote = new Circle(8 + random.nextDouble() * 2,
                     i % 2 == 0 ? PSY_LIGHT : PSY_CYAN);
             mote.setCenterX(x);
             mote.setCenterY(y);
@@ -510,32 +484,26 @@ public class PsychicEffects {
             registerCleanup(timeline, mote);
         }
 
-        addPsychicFlash(x, y, 14 * intensity, PSY_PINK, 0, 180, timeline);
+        addPsychicFlash(x, y, 20 * intensity, PSY_PINK, 0, 180, timeline);
     }
 
-    // =================================================================
     // Shape builder – diamond polygon for energy edge fragments
-    // =================================================================
 
     private Polygon buildDiamondPolygon(double size, Color fill) {
         Polygon diamond = new Polygon(
                 0, -size,
-                size * 0.5, 0,
+                size * 0.75, 0,
                 0, size,
-                -size * 0.5, 0);
+                -size * 0.75, 0);
         diamond.setFill(fill);
         diamond.setStroke(PSY_LIGHT.deriveColor(0, 1, 1, 0.5));
-        diamond.setStrokeWidth(1);
+        diamond.setStrokeWidth(4);
         return diamond;
     }
 
-    // =================================================================
     // Shared helper – expanding psychic flash circle
-    // =================================================================
 
-    private void addPsychicFlash(double x, double y, double radius, Color color,
-                                 int startDelay, int fadeDuration,
-                                 Timeline timeline) {
+    private void addPsychicFlash(double x, double y, double radius, Color color, int startDelay, int fadeDuration, Timeline timeline) {
         Circle flash = new Circle(0, color.deriveColor(0, 1, 1, 0.7));
         flash.setCenterX(x);
         flash.setCenterY(y);
@@ -553,9 +521,7 @@ public class PsychicEffects {
         registerCleanup(timeline, flash);
     }
 
-    // =================================================================
     // Utilities
-    // =================================================================
 
     private double clamp(double v, double min, double max) {
         return Math.max(min, Math.min(max, v));

@@ -75,15 +75,15 @@ public class FightingEffects {
             if (img == null) return;
 
             ImageView iv = new ImageView(img);
-            iv.setFitWidth(135);
-            iv.setFitHeight(135);
+            iv.setFitWidth(160);
+            iv.setFitHeight(160);
             iv.setPreserveRatio(true);
             // Centre the image on the impact coordinate; offset slightly upward
-            iv.setLayoutX(x - 67.5);
-            iv.setLayoutY(y - 67.5);
+            iv.setLayoutX(x - 80);
+            iv.setLayoutY(y - 80);
             iv.setOpacity(0);
-            iv.setScaleX(0.35);
-            iv.setScaleY(0.35);
+            iv.setScaleX(0.55);
+            iv.setScaleY(0.55);
             prepareTransientNode(iv);
             battleField.getChildren().add(iv);
 
@@ -122,7 +122,7 @@ public class FightingEffects {
     /** White starburst that pops at the impact location — comic-book "POW". */
     private void addImpactStarburst(double x, double y, int movePower,
                                     Timeline timeline) {
-        int points = 8;
+        int points = 20;
         Polygon star = new Polygon();
         double outer = 26 + movePower / 6.0;
         double inner = outer * 0.42;
@@ -133,7 +133,7 @@ public class FightingEffects {
         }
         star.setFill(Color.WHITE);
         star.setStroke(Color.color(1.0, 0.95, 0.5));
-        star.setStrokeWidth(2);
+        star.setStrokeWidth(5);
         star.setEffect(new GaussianBlur(3));
         star.setLayoutX(x);
         star.setLayoutY(y);
@@ -163,7 +163,7 @@ public class FightingEffects {
 
     /** 7 small ember polygons that burst outward from the punch point. */
     private void addFirePunchEmbers(double x, double y, Timeline timeline) {
-        int count = 7;
+        int count = 17;
         for (int i = 0; i < count; i++) {
             Polygon ember = new Polygon(0.0, 0.0, -5.0, -9.0, 0.0, -18.0, 5.0, -9.0);
             Color col = (i % 2 == 0) ? Color.ORANGERED : Color.color(1.0, 0.55, 0.0);
@@ -194,11 +194,11 @@ public class FightingEffects {
 
     /** 9 yellow spark lines that flash outward from the punch point. */
     private void addThunderPunchSparks(double x, double y, Timeline timeline) {
-        int count = 9;
+        int count = 17;
         for (int i = 0; i < count; i++) {
             Line spark = new Line();
             spark.setStroke(Color.YELLOW);
-            spark.setStrokeWidth(3 + random.nextDouble() * 2);
+            spark.setStrokeWidth(6 + random.nextDouble() * 2);
             spark.setEffect(new DropShadow(8, Color.GOLD));
 
             double angle = (i / (double) count) * 2 * Math.PI + random.nextDouble() * 0.35;
@@ -234,11 +234,11 @@ public class FightingEffects {
      */
     private void addIcePunchShards(double x, double y, Timeline timeline) {
         // Snowflakes
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 10; i++) {
             double cx = x + (random.nextDouble() - 0.5) * 44;
             double cy = y + (random.nextDouble() - 0.5) * 44;
             double len = 9 + random.nextDouble() * 6;
-            for (int j = 0; j < 3; j++) {
+            for (int j = 0; j < 6; j++) {
                 Line arm = new Line();
                 arm.setStroke(Color.LIGHTCYAN);
                 arm.setStrokeWidth(2.5);
@@ -263,12 +263,12 @@ public class FightingEffects {
         }
 
         // Ice shards flying outward
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 10; i++) {
             Polygon shard = new Polygon(0.0, 0.0, -5.0, -11.0, 0.0, -18.0, 5.0, -11.0);
             shard.setFill(Color.color(0.66, 0.92, 1.0));
             shard.setEffect(new DropShadow(5, Color.CYAN));
 
-            double angle = (i / 4.0) * 2 * Math.PI;
+            double angle = (i / 10.0) * 2 * Math.PI;
             shard.setLayoutX(x + Math.cos(angle) * 12);
             shard.setLayoutY(y + Math.sin(angle) * 12);
             shard.setRotate(Math.toDegrees(angle));

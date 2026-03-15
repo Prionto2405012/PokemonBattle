@@ -38,18 +38,14 @@ public class DarkEffects {
         this.battleField = battleField;
     }
 
-    // -----------------------------------------------------------------
     // Public API – single-point overload (melee / contact moves)
-    // -----------------------------------------------------------------
 
     public void createImpactEffect(double x, double y, String moveName,
                                    int movePower, Timeline timeline) {
         createImpactEffect(x, y, x, y, moveName, movePower, timeline);
     }
 
-    // -----------------------------------------------------------------
     // Public API – full signature (all dark moves)
-    // -----------------------------------------------------------------
 
     public void createImpactEffect(double startX, double startY,
                                    double endX, double endY,
@@ -90,9 +86,7 @@ public class DarkEffects {
         }
     }
 
-    // -----------------------------------------------------------------
     // Public API – ranged lead effect (projectile from attacker to target)
-    // -----------------------------------------------------------------
 
     public void createRangedEffect(double startX, double startY,
                                    double endX, double endY,
@@ -102,9 +96,7 @@ public class DarkEffects {
         addShadowPulseRing(startX, startY, endX, endY, intensity, timeline);
     }
 
-    // =================================================================
     // Fast melee lunge – dark slash marks at impact, purple-black trails
-    // =================================================================
 
     private void addDarkSlashLunge(double startX, double startY,
                                    double endX, double endY,
@@ -113,13 +105,13 @@ public class DarkEffects {
         double dy = endY - startY;
 
         // Purple-black energy trails along the lunge path
-        int trailCount = (int) (5 + 4 * intensity);
+        int trailCount = (int) (15 + 4 * intensity);
         for (int i = 0; i < trailCount; i++) {
             double t = (i + 0.5) / trailCount;
             double tx = startX + dx * t + (random.nextDouble() - 0.5) * 14;
             double ty = startY + dy * t + (random.nextDouble() - 0.5) * 14;
 
-            Circle trail = new Circle(3 + random.nextDouble() * 3,
+            Circle trail = new Circle(8 + random.nextDouble() * 3,
                     i % 2 == 0 ? DARK_PURPLE : DARK_BLACK);
             trail.setEffect(new GaussianBlur(4));
             trail.setCenterX(tx);
@@ -141,7 +133,7 @@ public class DarkEffects {
         }
 
         // Slash marks at impact point
-        int slashCount = (int) (2 + 2 * intensity);
+        int slashCount = (int) (8 + 2 * intensity);
         for (int i = 0; i < slashCount; i++) {
             double angle = -30 + i * (60.0 / Math.max(slashCount - 1, 1));
             double rad = Math.toRadians(angle);
@@ -153,7 +145,7 @@ public class DarkEffects {
 
             Line slash = new Line(sx, sy, ex, ey);
             slash.setStroke(i % 2 == 0 ? DARK_PURPLE : DARK_CRIMSON);
-            slash.setStrokeWidth(3 + 1.5 * intensity);
+            slash.setStrokeWidth(9 + 1.5 * intensity);
             slash.setOpacity(0);
             slash.setEffect(new DropShadow(8 + 4 * intensity, DARK_PURPLE));
             prepareTransientNode(slash);
@@ -173,19 +165,17 @@ public class DarkEffects {
         }
 
         // Dark impact flash
-        addDarkFlash(endX, endY, 16 + 10 * intensity, DARK_CRIMSON, 90, 200, timeline);
+        addDarkFlash(endX, endY, 26 + 10 * intensity, DARK_CRIMSON, 90, 200, timeline);
     }
 
-    // =================================================================
     // Dark aura burst – expanding aura circle, smoke/shadow particles
-    // =================================================================
 
     private void addDarkAuraBurst(double x, double y, double intensity,
                                   Timeline timeline) {
         // Expanding dark aura circle
         Circle aura = new Circle(0, DARK_SHADOW.deriveColor(0, 1, 1, 0.6));
         aura.setStroke(DARK_PURPLE.deriveColor(0, 1, 1, 0.7));
-        aura.setStrokeWidth(3 + 1.5 * intensity);
+        aura.setStrokeWidth(10 + 1.5 * intensity);
         aura.setCenterX(x);
         aura.setCenterY(y);
         aura.setEffect(new GaussianBlur(8 + 4 * intensity));
@@ -193,7 +183,7 @@ public class DarkEffects {
         prepareTransientNode(aura);
         battleField.getChildren().add(aura);
 
-        double auraRadius = 30 + 22 * intensity;
+        double auraRadius = 40 + 22 * intensity;
         KeyFrame aAppear = new KeyFrame(Duration.millis(0),
                 new KeyValue(aura.opacityProperty(), 0.85));
         KeyFrame aExpand = new KeyFrame(Duration.millis(200),
@@ -233,11 +223,11 @@ public class DarkEffects {
     /** Drifting dark smoke particles expanding outward from a point. */
     private void addSmokeParticles(double x, double y, double intensity,
                                    int startDelay, Timeline timeline) {
-        int count = (int) (7 + 5 * intensity);
+        int count = (int) (17 + 5 * intensity);
         for (int i = 0; i < count; i++) {
-            double r = 5 + random.nextDouble() * 5;
+            double r = 10 + random.nextDouble() * 5;
             Color smokeColor = i % 3 == 0 ? DARK_SMOKE : i % 3 == 1 ? DARK_GREY : DARK_BLACK;
-            Rectangle smoke = new Rectangle(r * 2, r * 2);
+            Rectangle smoke = new Rectangle(r * 2.5, r * 2.5);
             smoke.setFill(smokeColor.deriveColor(0, 1, 1, 0.5));
             smoke.setArcWidth(r);
             smoke.setArcHeight(r);
@@ -268,19 +258,15 @@ public class DarkEffects {
         }
     }
 
-    // =================================================================
     // Shadow pulse ring – dark ring projectile with smoky shockwave
-    // =================================================================
 
-    private void addShadowPulseRing(double startX, double startY,
-                                    double endX, double endY,
-                                    double intensity, Timeline timeline) {
+    private void addShadowPulseRing(double startX, double startY, double endX, double endY, double intensity, Timeline timeline) {
         // Dark ring projectile traveling from attacker to defender
-        double ringRadius = 10 + 6 * intensity;
+        double ringRadius = 18 + 6 * intensity;
 
         Circle ring = new Circle(ringRadius, Color.TRANSPARENT);
         ring.setStroke(DARK_PURPLE);
-        ring.setStrokeWidth(4 + 2 * intensity);
+        ring.setStrokeWidth(10 + 2 * intensity);
         ring.setEffect(new DropShadow(14 + 6 * intensity, DARK_SHADOW));
         ring.setCenterX(startX);
         ring.setCenterY(startY);
@@ -289,7 +275,7 @@ public class DarkEffects {
         battleField.getChildren().add(ring);
 
         // Inner dark fill for the ring
-        Circle ringCore = new Circle(ringRadius * 0.6, DARK_BLACK.deriveColor(0, 1, 1, 0.7));
+        Circle ringCore = new Circle(ringRadius * 0.8, DARK_BLACK.deriveColor(0, 1, 1, 0.7));
         ringCore.setEffect(new GaussianBlur(5));
         ringCore.setCenterX(startX);
         ringCore.setCenterY(startY);
@@ -321,16 +307,13 @@ public class DarkEffects {
     }
 
     /** Wispy dark particles trailing the shadow pulse ring. */
-    private void addPulseTrail(double startX, double startY,
-                               double endX, double endY,
-                               double intensity, Timeline timeline) {
-        int trailCount = (int) (7 + 5 * intensity);
+    private void addPulseTrail(double startX, double startY, double endX, double endY, double intensity, Timeline timeline) {
+        int trailCount = (int) (17 + 5 * intensity);
         double dx = endX - startX;
         double dy = endY - startY;
 
         for (int i = 0; i < trailCount; i++) {
-            Circle wisp = new Circle(3 + random.nextDouble() * 3,
-                    i % 2 == 0 ? DARK_PURPLE : DARK_SMOKE);
+            Circle wisp = new Circle(10 + random.nextDouble() * 3, i % 2 == 0 ? DARK_PURPLE : DARK_SMOKE);
             wisp.setEffect(new GaussianBlur(4));
 
             double t = (i + random.nextDouble()) / trailCount * 0.8;
@@ -356,12 +339,11 @@ public class DarkEffects {
     }
 
     /** Expanding smoky shockwave at the impact point. */
-    private void addSmokyShockwave(double x, double y, double intensity,
-                                   Timeline timeline) {
+    private void addSmokyShockwave(double x, double y, double intensity, Timeline timeline) {
         // Central dark shockwave ring
         Circle shockwave = new Circle(0, Color.TRANSPARENT);
         shockwave.setStroke(DARK_BLACK.deriveColor(0, 1, 1, 0.8));
-        shockwave.setStrokeWidth(5 + 2 * intensity);
+        shockwave.setStrokeWidth(10 + 2 * intensity);
         shockwave.setEffect(new GaussianBlur(6 + 3 * intensity));
         shockwave.setCenterX(x);
         shockwave.setCenterY(y);
@@ -369,7 +351,7 @@ public class DarkEffects {
         prepareTransientNode(shockwave);
         battleField.getChildren().add(shockwave);
 
-        double shockRadius = 35 + 20 * intensity;
+        double shockRadius = 45 + 20 * intensity;
         KeyFrame sAppear = new KeyFrame(Duration.millis(220),
                 new KeyValue(shockwave.opacityProperty(), 0.85));
         KeyFrame sExpand = new KeyFrame(Duration.millis(380),
@@ -383,21 +365,17 @@ public class DarkEffects {
         registerCleanup(timeline, shockwave);
 
         // Smoke debris from shockwave
-        addSmokeParticles(x, y, intensity * 0.7, 240, timeline);
+        addSmokeParticles(x, y, intensity * 0.8, 240, timeline);
     }
 
-    // =================================================================
     // Delayed retaliation burst – charge at user, then explosive burst
-    // =================================================================
 
-    private void addRetaliationBurst(double startX, double startY,
-                                     double endX, double endY,
-                                     double intensity, Timeline timeline) {
+    private void addRetaliationBurst(double startX, double startY, double endX, double endY, double intensity, Timeline timeline) {
         // Phase 1: Brief dark aura charging at the attacker position
-        Ellipse chargeAura = new Ellipse(16 + 8 * intensity, 20 + 10 * intensity);
+        Ellipse chargeAura = new Ellipse(20 + 8 * intensity, 24 + 10 * intensity);
         chargeAura.setFill(DARK_SHADOW.deriveColor(0, 1, 1, 0.5));
         chargeAura.setStroke(DARK_PURPLE.deriveColor(0, 1, 1, 0.6));
-        chargeAura.setStrokeWidth(2);
+        chargeAura.setStrokeWidth(5);
         chargeAura.setEffect(new GaussianBlur(8 + 3 * intensity));
         chargeAura.setCenterX(startX);
         chargeAura.setCenterY(startY);
@@ -406,14 +384,14 @@ public class DarkEffects {
         battleField.getChildren().add(chargeAura);
 
         // Charge pulses converging toward attacker
-        int pulseCount = (int) (4 + 3 * intensity);
+        int pulseCount = (int) (10 + 3 * intensity);
         for (int i = 0; i < pulseCount; i++) {
             double angle = (i / (double) pulseCount) * 2 * Math.PI;
             double orbitR = 30 + 12 * intensity;
             double px = startX + Math.cos(angle) * orbitR;
             double py = startY + Math.sin(angle) * orbitR;
 
-            Circle pulse = new Circle(3 + random.nextDouble() * 3,
+            Circle pulse = new Circle(8 + random.nextDouble() * 3,
                     i % 2 == 0 ? DARK_PURPLE : DARK_CRIMSON);
             pulse.setEffect(new DropShadow(6, DARK_PURPLE));
             pulse.setCenterX(px);
@@ -468,7 +446,7 @@ public class DarkEffects {
         prepareTransientNode(explosion);
         battleField.getChildren().add(explosion);
 
-        double burstRadius = 24 + 16 * intensity;
+        double burstRadius = 30 + 16 * intensity;
         KeyFrame eAppear = new KeyFrame(Duration.millis(startDelay),
                 new KeyValue(explosion.opacityProperty(), 0.9));
         KeyFrame eExpand = new KeyFrame(Duration.millis(startDelay + 120),
@@ -482,11 +460,9 @@ public class DarkEffects {
         registerCleanup(timeline, explosion);
 
         // Dark energy shards bursting outward
-        int shardCount = (int) (8 + 6 * intensity);
+        int shardCount = (int) (18 + 6 * intensity);
         for (int i = 0; i < shardCount; i++) {
-            Polygon shard = buildDarkShardPolygon(
-                    8 + random.nextDouble() * 6 * intensity,
-                    i % 3 == 0 ? DARK_PURPLE : i % 3 == 1 ? DARK_CRIMSON : DARK_BLACK);
+            Polygon shard = buildDarkShardPolygon(12 + random.nextDouble() * 6 * intensity, i % 3 == 0 ? DARK_PURPLE : i % 3 == 1 ? DARK_CRIMSON : DARK_BLACK);
             double angle = (i / (double) shardCount) * 2 * Math.PI;
             shard.setLayoutX(x);
             shard.setLayoutY(y);
@@ -496,7 +472,7 @@ public class DarkEffects {
             prepareTransientNode(shard);
             battleField.getChildren().add(shard);
 
-            double shardR = 30 + 20 * intensity;
+            double shardR = 40 + 20 * intensity;
             int delay = startDelay + 40 + i * 18;
             KeyFrame sAppear = new KeyFrame(Duration.millis(delay),
                     new KeyValue(shard.opacityProperty(), 0.9));
@@ -513,19 +489,15 @@ public class DarkEffects {
         }
 
         // Dark smoke aftermath
-        addSmokeParticles(x, y, intensity * 0.6, startDelay + 80, timeline);
+        addSmokeParticles(x, y, intensity * 0.8, startDelay + 80, timeline);
     }
 
-    // =================================================================
     // Default dark burst – generic fallback
-    // =================================================================
 
-    private void addDefaultDarkBurst(double x, double y, double intensity,
-                                     Timeline timeline) {
-        int count = (int) (6 + 5 * intensity);
+    private void addDefaultDarkBurst(double x, double y, double intensity, Timeline timeline) {
+        int count = (int) (16 + 5 * intensity);
         for (int i = 0; i < count; i++) {
-            Circle particle = new Circle(5 + random.nextDouble() * 5,
-                    i % 3 == 0 ? DARK_PURPLE : i % 3 == 1 ? DARK_BLACK : DARK_CRIMSON);
+            Circle particle = new Circle(8 + random.nextDouble() * 5, i % 3 == 0 ? DARK_PURPLE : i % 3 == 1 ? DARK_BLACK : DARK_CRIMSON);
             particle.setEffect(new DropShadow(8, DARK_SHADOW));
             double angle = (i / (double) count) * 2 * Math.PI;
             particle.setCenterX(x);
@@ -534,10 +506,9 @@ public class DarkEffects {
             prepareTransientNode(particle);
             battleField.getChildren().add(particle);
 
-            double burstR = 25 + 15 * intensity;
+            double burstR = 30 + 15 * intensity;
             int delay = i * 20;
-            KeyFrame appear = new KeyFrame(Duration.millis(delay),
-                    new KeyValue(particle.opacityProperty(), 0.8));
+            KeyFrame appear = new KeyFrame(Duration.millis(delay), new KeyValue(particle.opacityProperty(), 0.8));
             KeyFrame burst = new KeyFrame(Duration.millis(delay + 200),
                     new KeyValue(particle.centerXProperty(), x + Math.cos(angle) * burstR),
                     new KeyValue(particle.centerYProperty(), y + Math.sin(angle) * burstR),
@@ -547,12 +518,10 @@ public class DarkEffects {
             registerCleanup(timeline, particle);
         }
 
-        addDarkFlash(x, y, 20 + 10 * intensity, DARK_PURPLE, 0, 260, timeline);
+        addDarkFlash(x, y, 28 + 10 * intensity, DARK_PURPLE, 0, 260, timeline);
     }
 
-    // =================================================================
     // Shared helper – dark energy shard polygon
-    // =================================================================
 
     /** Builds a jagged dark energy shard polygon scaled by size. */
     private Polygon buildDarkShardPolygon(double size, Color color) {
@@ -572,13 +541,9 @@ public class DarkEffects {
         return shard;
     }
 
-    // =================================================================
     // Shared helper – expanding dark flash circle
-    // =================================================================
 
-    private void addDarkFlash(double x, double y, double radius, Color color,
-                              int startDelay, int fadeDuration,
-                              Timeline timeline) {
+    private void addDarkFlash(double x, double y, double radius, Color color, int startDelay, int fadeDuration, Timeline timeline) {
         Circle flash = new Circle(0, color.deriveColor(0, 1, 1, 0.7));
         flash.setCenterX(x);
         flash.setCenterY(y);
@@ -596,9 +561,7 @@ public class DarkEffects {
         registerCleanup(timeline, flash);
     }
 
-    // =================================================================
     // Utilities
-    // =================================================================
 
     private double clamp(double v, double min, double max) {
         return Math.max(min, Math.min(max, v));

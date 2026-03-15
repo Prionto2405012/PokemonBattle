@@ -38,25 +38,17 @@ public class GhostEffects {
         this.battleField = battleField;
     }
 
-    // -----------------------------------------------------------------
     // Public API – single-point overload (melee / contact moves)
-    // -----------------------------------------------------------------
 
-    public void createImpactEffect(double x, double y, String moveName,
-                                   int movePower, Timeline timeline) {
+    public void createImpactEffect(double x, double y, String moveName, int movePower, Timeline timeline) {
         createImpactEffect(x, y, x, y, moveName, movePower, timeline);
     }
 
-    // -----------------------------------------------------------------
     // Public API – full signature (all ghost moves)
-    // -----------------------------------------------------------------
 
-    public void createImpactEffect(double startX, double startY,
-                                   double endX, double endY,
-                                   String moveName, int movePower,
-                                   Timeline timeline) {
+    public void createImpactEffect(double startX, double startY, double endX, double endY, String moveName, int movePower, Timeline timeline) {
 
-        double intensity = clamp(movePower / 100.0, 0.3, 1.8);
+        double intensity = clamp(movePower / 100.0, 0.7, 2.4);
 
         switch (moveName) {
             // Phasing melee strikes with afterimage and ghost trail
@@ -79,40 +71,34 @@ public class GhostEffects {
             // Spectral orb projectile (also reachable via createRangedEffect)
             case "shadow-ball"    -> addSpectralOrb(startX, startY, endX, endY, intensity, timeline);
 
-            default               -> addDefaultGhostBurst(endX, endY, intensity, timeline);
+            default -> addDefaultGhostBurst(endX, endY, intensity, timeline);
         }
     }
 
-    // -----------------------------------------------------------------
     // Public API – ranged lead effect (projectile from attacker to target)
-    // -----------------------------------------------------------------
 
     public void createRangedEffect(double startX, double startY,
                                    double endX, double endY,
                                    String moveName, int movePower,
                                    Timeline timeline) {
-        double intensity = clamp(movePower / 100.0, 0.4, 1.8);
+        double intensity = clamp(movePower / 100.0, 0.8, 2.4);
         addSpectralOrb(startX, startY, endX, endY, intensity, timeline);
     }
 
-    // =================================================================
     // Phasing melee strike – ghostly afterimages that fade through
-    // =================================================================
 
-    private void addPhasingStrike(double startX, double startY,
-                                  double endX, double endY,
-                                  double intensity, Timeline timeline) {
-        int afterimageCount = (int) (4 + 4 * intensity);
+    private void addPhasingStrike(double startX, double startY, double endX, double endY, double intensity, Timeline timeline) {
+        int afterimageCount = (int) (10 + 4 * intensity);
         double dx = endX - startX;
         double dy = endY - startY;
 
         // Afterimage silhouettes phasing from attacker to defender
         for (int i = 0; i < afterimageCount; i++) {
-            Ellipse afterimage = new Ellipse(14 + 6 * intensity, 22 + 8 * intensity);
+            Ellipse afterimage = new Ellipse(20 + 6 * intensity, 28 + 8 * intensity);
             Color color = i % 3 == 0 ? GHOST_PURPLE : i % 3 == 1 ? GHOST_LAVENDER : GHOST_BLUE;
             afterimage.setFill(color.deriveColor(0, 1, 1, 0.55));
             afterimage.setStroke(GHOST_WISP.deriveColor(0, 1, 1, 0.3));
-            afterimage.setStrokeWidth(1.5);
+            afterimage.setStrokeWidth(4.5);
             afterimage.setEffect(new GaussianBlur(6 + 2 * intensity));
 
             double t = (i + 0.5) / afterimageCount;
@@ -143,22 +129,18 @@ public class GhostEffects {
         addGhostTrail(startX, startY, endX, endY, intensity, timeline);
 
         // Impact flash at defender
-        addGhostFlash(endX, endY, 18 + 12 * intensity, GHOST_GREEN, 80, 220, timeline);
+        addGhostFlash(endX, endY, 22 + 12 * intensity, GHOST_GREEN, 80, 220, timeline);
     }
 
-    // =================================================================
     // Spectral orb projectile – dark purple orb arcing with wispy trails
-    // =================================================================
 
-    private void addSpectralOrb(double startX, double startY,
-                                double endX, double endY,
-                                double intensity, Timeline timeline) {
-        double orbRadius = 14 + 8 * intensity;
+    private void addSpectralOrb(double startX, double startY, double endX, double endY, double intensity, Timeline timeline) {
+        double orbRadius = 22 + 8 * intensity;
 
         // Main orb
         Circle orb = new Circle(orbRadius, GHOST_DARK);
         orb.setStroke(GHOST_PURPLE);
-        orb.setStrokeWidth(3);
+        orb.setStrokeWidth(8);
         orb.setEffect(new DropShadow(20 + 8 * intensity, GHOST_PURPLE));
         orb.setCenterX(startX);
         orb.setCenterY(startY);
@@ -167,7 +149,7 @@ public class GhostEffects {
         battleField.getChildren().add(orb);
 
         // Inner glow
-        Circle glow = new Circle(orbRadius * 0.5, GHOST_LAVENDER.deriveColor(0, 1, 1, 0.6));
+        Circle glow = new Circle(orbRadius * 0.75, GHOST_LAVENDER.deriveColor(0, 1, 1, 0.6));
         glow.setEffect(new GaussianBlur(6));
         glow.setCenterX(startX);
         glow.setCenterY(startY);
@@ -176,9 +158,9 @@ public class GhostEffects {
         battleField.getChildren().add(glow);
 
         // Halo ring
-        Circle halo = new Circle(orbRadius * 1.5, Color.color(0.48, 0.12, 0.64, 0.18));
+        Circle halo = new Circle(orbRadius * 4.5, Color.color(0.48, 0.12, 0.64, 0.18));
         halo.setStroke(GHOST_WISP.deriveColor(0, 1, 1, 0.25));
-        halo.setStrokeWidth(2);
+        halo.setStrokeWidth(8);
         halo.setEffect(new GaussianBlur(10));
         halo.setCenterX(startX);
         halo.setCenterY(startY);
@@ -228,16 +210,13 @@ public class GhostEffects {
     }
 
     /** Trailing wisp particles behind the spectral orb. */
-    private void addOrbWisps(double startX, double startY,
-                             double endX, double endY,
-                             double intensity, Timeline timeline) {
-        int wispCount = (int) (8 + 6 * intensity);
+    private void addOrbWisps(double startX, double startY, double endX, double endY, double intensity, Timeline timeline) {
+        int wispCount = (int) (18 + 6 * intensity);
         double dx = endX - startX;
         double dy = endY - startY;
 
         for (int i = 0; i < wispCount; i++) {
-            Circle wisp = new Circle(4 + random.nextDouble() * 4,
-                    i % 2 == 0 ? GHOST_WISP : GHOST_LAVENDER);
+            Circle wisp = new Circle(10 + random.nextDouble() * 4, i % 2 == 0 ? GHOST_WISP : GHOST_LAVENDER);
             wisp.setEffect(new GaussianBlur(4));
 
             double t = (i + random.nextDouble()) / wispCount * 0.85;
@@ -263,12 +242,10 @@ public class GhostEffects {
     }
 
     /** Dark particles bursting on impact for the spectral orb. */
-    private void addShadowBurst(double x, double y, double intensity,
-                                Timeline timeline) {
-        int count = (int) (6 + 5 * intensity);
+    private void addShadowBurst(double x, double y, double intensity, Timeline timeline) {
+        int count = (int) (16 + 5 * intensity);
         for (int i = 0; i < count; i++) {
-            Circle particle = new Circle(3 + random.nextDouble() * 4,
-                    i % 2 == 0 ? GHOST_SHADOW : GHOST_DARK);
+            Circle particle = new Circle(8 + random.nextDouble() * 4, i % 2 == 0 ? GHOST_SHADOW : GHOST_DARK);
             particle.setEffect(new DropShadow(6, GHOST_PURPLE));
             double angle = (i / (double) count) * 2 * Math.PI;
             particle.setCenterX(x);
@@ -277,7 +254,7 @@ public class GhostEffects {
             prepareTransientNode(particle);
             battleField.getChildren().add(particle);
 
-            double burstR = 22 + 18 * intensity;
+            double burstR = 30 + 18 * intensity;
             int delay = 280 + i * 15;
             KeyFrame appear = new KeyFrame(Duration.millis(delay),
                     new KeyValue(particle.opacityProperty(), 0.85));
@@ -291,17 +268,14 @@ public class GhostEffects {
         }
     }
 
-    // =================================================================
     // Eerie apparition – translucent ghost shapes materializing at defender
-    // =================================================================
 
-    private void addEerieApparition(double x, double y, double intensity,
-                                    Timeline timeline) {
+    private void addEerieApparition(double x, double y, double intensity, Timeline timeline) {
         // Ghostly silhouette polygon (rough spectre shape)
         Polygon spectre = buildSpectrePolygon(intensity);
         spectre.setFill(GHOST_PURPLE.deriveColor(0, 1, 1, 0.35));
         spectre.setStroke(GHOST_LAVENDER.deriveColor(0, 1, 1, 0.45));
-        spectre.setStrokeWidth(2);
+        spectre.setStrokeWidth(8);
         spectre.setEffect(new GaussianBlur(8 + 3 * intensity));
         spectre.setLayoutX(x);
         spectre.setLayoutY(y + 20);
@@ -338,13 +312,12 @@ public class GhostEffects {
     }
 
     /** Concentric ghostly pulse rings expanding from the impact point. */
-    private void addImpactPulse(double x, double y, double intensity,
-                                Timeline timeline) {
-        int ringCount = (int) (2 + 2 * intensity);
+    private void addImpactPulse(double x, double y, double intensity, Timeline timeline) {
+        int ringCount = (int) (7 + 2 * intensity);
         for (int i = 0; i < ringCount; i++) {
-            Circle ring = new Circle(6, Color.TRANSPARENT);
+            Circle ring = new Circle(10 + random.nextDouble() * 20, Color.TRANSPARENT);
             ring.setStroke(i % 2 == 0 ? GHOST_LAVENDER : GHOST_GREEN);
-            ring.setStrokeWidth(2.5);
+            ring.setStrokeWidth(5.5);
             ring.setCenterX(x);
             ring.setCenterY(y);
             ring.setOpacity(0);
@@ -352,7 +325,7 @@ public class GhostEffects {
             prepareTransientNode(ring);
             battleField.getChildren().add(ring);
 
-            double maxRadius = 30 + 20 * intensity;
+            double maxRadius = 40 + 20 * intensity;
             int delay = 180 + i * 70;
             KeyFrame appear = new KeyFrame(Duration.millis(delay),
                     new KeyValue(ring.opacityProperty(), 0.8));
@@ -367,16 +340,15 @@ public class GhostEffects {
     }
 
     /** Wisps floating around the apparition site. */
-    private void addApparitionWisps(double x, double y, double intensity,
-                                    Timeline timeline) {
-        int count = (int) (5 + 4 * intensity);
+    private void addApparitionWisps(double x, double y, double intensity, Timeline timeline) {
+        int count = (int) (15 + 4 * intensity);
         for (int i = 0; i < count; i++) {
-            Circle wisp = new Circle(3 + random.nextDouble() * 3,
+            Circle wisp = new Circle(8 + random.nextDouble() * 3,
                     i % 3 == 0 ? GHOST_WISP : i % 3 == 1 ? GHOST_GREEN : GHOST_BLUE);
             wisp.setEffect(new GaussianBlur(4));
 
             double angle = random.nextDouble() * 2 * Math.PI;
-            double radius = 10 + random.nextDouble() * 20;
+            double radius = 17 + random.nextDouble() * 20;
             wisp.setCenterX(x + Math.cos(angle) * radius);
             wisp.setCenterY(y + Math.sin(angle) * radius);
             wisp.setOpacity(0);
@@ -396,13 +368,9 @@ public class GhostEffects {
         }
     }
 
-    // =================================================================
     // Haunted wind – spiral translucent rings with ghostly particles
-    // =================================================================
 
-    private void addHauntedWind(double startX, double startY,
-                                double endX, double endY,
-                                double intensity, Timeline timeline) {
+    private void addHauntedWind(double startX, double startY, double endX, double endY, double intensity, Timeline timeline) {
         double dx = endX - startX;
         double dy = endY - startY;
         double distance = Math.max(1.0, Math.hypot(dx, dy));
@@ -414,13 +382,13 @@ public class GhostEffects {
         double corridor = Math.max(140.0, safeBattleHeight() * 0.8);
 
         // Spiral translucent rings moving from attacker to defender
-        int ringCount = (int) (6 + 5 * intensity);
+        int ringCount = (int) (16 + 5 * intensity);
         for (int i = 0; i < ringCount; i++) {
-            Ellipse ring = new Ellipse(18 + 8 * intensity, 10 + 4 * intensity);
+            Ellipse ring = new Ellipse(22 + 8 * intensity, 18 + 4 * intensity);
             ring.setFill(Color.TRANSPARENT);
             Color ringColor = i % 3 == 0 ? GHOST_PURPLE : i % 3 == 1 ? GHOST_LAVENDER : GHOST_BLUE;
             ring.setStroke(ringColor.deriveColor(0, 1, 1, 0.5));
-            ring.setStrokeWidth(2.5);
+            ring.setStrokeWidth(5.5);
             ring.setEffect(new GaussianBlur(4));
 
             double progress = (i + random.nextDouble()) / ringCount;
@@ -451,18 +419,18 @@ public class GhostEffects {
         }
 
         // Wind lines with ghostly coloring
-        int lineCount = (int) (10 + 6 * intensity);
+        int lineCount = (int) (20 + 6 * intensity);
         for (int i = 0; i < lineCount; i++) {
             Line windLine = new Line();
             Color lineColor = i % 2 == 0 ? GHOST_WISP : GHOST_LAVENDER;
             windLine.setStroke(lineColor.deriveColor(0, 1, 1, 0.4));
-            windLine.setStrokeWidth(8 + 3 * intensity);
+            windLine.setStrokeWidth(15 + 3 * intensity);
             windLine.setOpacity(0);
             windLine.setEffect(new GaussianBlur(3));
 
             double lane = (i + random.nextDouble()) / lineCount;
             double spreadOffset = (random.nextDouble() - 0.5) * corridor;
-            double segLen = Math.min(Math.max(100.0, distance * 0.4), distance + 80.0);
+            double segLen = Math.min(Math.max(100.0, distance * 0.6), distance + 86.0);
             double jitter = (random.nextDouble() - 0.5) * 18.0;
 
             double sx = startX + ux * distance * lane + px * spreadOffset;
@@ -497,9 +465,7 @@ public class GhostEffects {
     }
 
     /** Ghostly particles carried by the haunted wind. */
-    private void addWindParticles(double startX, double startY,
-                                  double endX, double endY,
-                                  double intensity, Timeline timeline) {
+    private void addWindParticles(double startX, double startY, double endX, double endY, double intensity, Timeline timeline) {
         double dx = endX - startX;
         double dy = endY - startY;
         double distance = Math.max(1.0, Math.hypot(dx, dy));
@@ -508,9 +474,9 @@ public class GhostEffects {
         double px = -uy;
         double py = ux;
 
-        int count = (int) (12 + 8 * intensity);
+        int count = (int) (20 + 8 * intensity);
         for (int i = 0; i < count; i++) {
-            Circle particle = new Circle(3 + random.nextDouble() * 3,
+            Circle particle = new Circle(8 + random.nextDouble() * 3,
                     i % 3 == 0 ? GHOST_GREEN : i % 3 == 1 ? GHOST_WISP : GHOST_BLUE);
             particle.setEffect(new GaussianBlur(3));
 
@@ -539,22 +505,18 @@ public class GhostEffects {
         }
     }
 
-    // =================================================================
     // Ghost trail – dark smoky wisps trailing along a path
-    // =================================================================
 
-    private void addGhostTrail(double startX, double startY,
-                               double endX, double endY,
-                               double intensity, Timeline timeline) {
+    private void addGhostTrail(double startX, double startY, double endX, double endY, double intensity, Timeline timeline) {
         double dx = endX - startX;
         double dy = endY - startY;
-        int trailCount = (int) (6 + 5 * intensity);
+        int trailCount = (int) (16 + 5 * intensity);
 
         for (int i = 0; i < trailCount; i++) {
-            Rectangle smoke = new Rectangle(8 + random.nextDouble() * 6,
-                    6 + random.nextDouble() * 5);
-            smoke.setArcWidth(4);
-            smoke.setArcHeight(4);
+            Rectangle smoke = new Rectangle(12 + random.nextDouble() * 6,
+                    10 + random.nextDouble() * 5);
+            smoke.setArcWidth(7);
+            smoke.setArcHeight(7);
             Color color = i % 2 == 0 ? GHOST_SHADOW : GHOST_DARK;
             smoke.setFill(color.deriveColor(0, 1, 1, 0.45));
             smoke.setEffect(new GaussianBlur(5));
@@ -581,15 +543,12 @@ public class GhostEffects {
         }
     }
 
-    // =================================================================
     // Default ghost burst – generic fallback
-    // =================================================================
 
-    private void addDefaultGhostBurst(double x, double y, double intensity,
-                                      Timeline timeline) {
-        int count = (int) (6 + 5 * intensity);
+    private void addDefaultGhostBurst(double x, double y, double intensity, Timeline timeline) {
+        int count = (int) (18 + 5 * intensity);
         for (int i = 0; i < count; i++) {
-            Circle particle = new Circle(5 + random.nextDouble() * 5,
+            Circle particle = new Circle(8 + random.nextDouble() * 3,
                     i % 3 == 0 ? GHOST_PURPLE : i % 3 == 1 ? GHOST_LAVENDER : GHOST_DARK);
             particle.setEffect(new DropShadow(8, GHOST_PURPLE));
             double angle = (i / (double) count) * 2 * Math.PI;
@@ -599,7 +558,7 @@ public class GhostEffects {
             prepareTransientNode(particle);
             battleField.getChildren().add(particle);
 
-            double burstR = 25 + 15 * intensity;
+            double burstR = 30 + 15 * intensity;
             int delay = i * 20;
             KeyFrame appear = new KeyFrame(Duration.millis(delay),
                     new KeyValue(particle.opacityProperty(), 0.8));
@@ -612,16 +571,14 @@ public class GhostEffects {
             registerCleanup(timeline, particle);
         }
 
-        addGhostFlash(x, y, 20 + 10 * intensity, GHOST_PURPLE, 0, 260, timeline);
+        addGhostFlash(x, y, 27 + 10 * intensity, GHOST_PURPLE, 0, 260, timeline);
     }
 
-    // =================================================================
     // Shared helper – spectre polygon shape
-    // =================================================================
 
     /** Builds a rough ghost/spectre silhouette polygon scaled by intensity. */
     private Polygon buildSpectrePolygon(double intensity) {
-        double s = 0.8 + 0.4 * intensity;
+        double s = 0.8 + 0.6 * intensity;
         Polygon spectre = new Polygon();
         spectre.getPoints().addAll(
                 0.0 * s,    0.0 * s,
@@ -639,13 +596,9 @@ public class GhostEffects {
         return spectre;
     }
 
-    // =================================================================
     // Shared helper – expanding flash circle
-    // =================================================================
 
-    private void addGhostFlash(double x, double y, double radius, Color color,
-                               int startDelay, int fadeDuration,
-                               Timeline timeline) {
+    private void addGhostFlash(double x, double y, double radius, Color color, int startDelay, int fadeDuration, Timeline timeline) {
         Circle flash = new Circle(0, color.deriveColor(0, 1, 1, 0.7));
         flash.setCenterX(x);
         flash.setCenterY(y);
@@ -663,9 +616,7 @@ public class GhostEffects {
         registerCleanup(timeline, flash);
     }
 
-    // =================================================================
     // Utilities
-    // =================================================================
 
     private double safeBattleHeight() {
         double h = battleField.getHeight();

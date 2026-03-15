@@ -92,9 +92,7 @@ public class FireEffects {
         }
     }
 
-    //
     // MOVEMENT EFFECT — called from BattleAnimationManager during attacker rush
-    //
 
     /**
      * Charge trail shown while attacker rushes forward (flare-blitz, flame-wheel).
@@ -102,17 +100,15 @@ public class FireEffects {
      */
     public void addChargeTrailForMove(String moveName, double ax, double ay,
             boolean attackingRight, Timeline timeline) {
-        double intensity = moveName.equals("flare-blitz") ? 1.4 : 0.7;
+        double intensity = moveName.equals("flare-blitz") ? 3.4 : 2.7;
         addChargeFlareTrail(ax, ay, ax + (attackingRight ? 120 : -120), ay, intensity,
                 moveName.equals("flame-wheel"), timeline);
     }
 
-    // =
     // 1) FIRE PUNCH — embers + small flame pop
-    // =
 
     private void addFirePunchEmbers(double x, double y, double intensity, Timeline timeline) {
-        int count = (int)(8 * intensity);
+        int count = (int)(18 * intensity);
         for (int i = 0; i < count; i++) {
             Circle ember = new Circle(4 + random.nextDouble() * 4, i % 2 == 0 ? FIRE_ORANGE : FIRE_RED);
             ember.setEffect(new DropShadow(8, FIRE_YELLOW));
@@ -134,9 +130,7 @@ public class FireEffects {
         }
     }
 
-    // =
     // 2) EMBER — narrow cone of small particles
-    // =
 
     private void addEmberBurst(double sx, double sy, double ex, double ey,
             double intensity, Timeline timeline) {
@@ -146,14 +140,14 @@ public class FireEffects {
         double ux   = dx / dist;
         double uy   = dy / dist;
 
-        int count = (int)(10 * intensity);
+        int count = (int)(20 * intensity);
         for (int i = 0; i < count; i++) {
-            double spread  = (random.nextDouble() - 0.5) * 0.35;
+            double spread  = (random.nextDouble() - 0.5) * 0.65;
             double ax      = ux * Math.cos(spread) - uy * Math.sin(spread);
             double ay      = ux * Math.sin(spread) + uy * Math.cos(spread);
             double travelDist = dist * (0.6 + random.nextDouble() * 0.4);
 
-            Circle ember = new Circle(3 + random.nextDouble() * 3,
+            Circle ember = new Circle(7 + random.nextDouble() * 3,
                     i % 3 == 0 ? FIRE_YELLOW : i % 3 == 1 ? FIRE_ORANGE : FIRE_RED);
             ember.setCenterX(sx);
             ember.setCenterY(sy);
@@ -173,7 +167,7 @@ public class FireEffects {
         }
 
         // small flash at impact
-        addFlashCircle(ex, ey, 18 * intensity, FIRE_ORANGE, 185, 80, timeline);
+        addFlashCircle(ex, ey, 24 * intensity, FIRE_ORANGE, 185, 80, timeline);
     }
 
     // 3) FLAMETHROWER — continuous ribbon beam + side sparks
@@ -182,7 +176,7 @@ public class FireEffects {
             double intensity, Timeline timeline) {
         double angle = Math.toDegrees(Math.atan2(ey - sy, ex - sx));
         double dist  = Math.hypot(ex - sx, ey - sy);
-        double w     = 18 + 12 * intensity;
+        double w = 25 + 12 * intensity;
 
         // Core beam
         Rectangle beam = new Rectangle(0, w);
@@ -190,7 +184,8 @@ public class FireEffects {
                 new Stop(0.0, FIRE_YELLOW.deriveColor(0, 1, 1, 0.95)),
                 new Stop(0.4, FIRE_ORANGE.deriveColor(0, 1, 1, 0.9)),
                 new Stop(1.0, FIRE_RED.deriveColor(0, 1, 1, 0.7))));
-        beam.setArcWidth(w); beam.setArcHeight(w);
+        beam.setArcWidth(w); 
+        beam.setArcHeight(w);
         beam.setX(sx); beam.setY(sy - w / 2);
         beam.setRotate(angle);
         beam.setEffect(new DropShadow(w * 0.9, FIRE_ORANGE));
@@ -206,14 +201,14 @@ public class FireEffects {
         registerCleanup(timeline, beam);
 
         // Side sparks
-        int sparkCount = (int)(16 * intensity);
+        int sparkCount = (int)(28 * intensity);
         double ux = (ex - sx) / dist, uy = (ey - sy) / dist;
         double px = -uy, py = ux;
         for (int i = 0; i < sparkCount; i++) {
             double t  = (i + random.nextDouble()) / sparkCount;
             double bx = sx + ux * dist * t + px * (random.nextDouble() - 0.5) * 28;
             double by = sy + uy * dist * t + py * (random.nextDouble() - 0.5) * 28;
-            Circle spark = new Circle(2.5 + random.nextDouble() * 2, FIRE_YELLOW);
+            Circle spark = new Circle(4.5 + random.nextDouble() * 2, FIRE_YELLOW);
             spark.setCenterX(bx); spark.setCenterY(by); spark.setOpacity(0);
             prepareTransientNode(spark);
             battleField.getChildren().add(spark);
@@ -228,24 +223,22 @@ public class FireEffects {
         }
 
         // Impact bloom
-        addFlashCircle(ex, ey, 55 * intensity, FIRE_ORANGE, 240, 180, timeline);
+        addFlashCircle(ex, ey, 75 * intensity, FIRE_ORANGE, 240, 180, timeline);
     }
 
-    // =
     // 4) FIRE SPIN — two counter-rotating flame rings around defender
-    // =
 
     private void addFireVortex(double x, double y, double intensity, Timeline timeline) {
         for (int ring = 0; ring < 2; ring++) {
-            double r = 38 + ring * 22;
-            int    segCount = 12;
+            double r = 45 + ring * 22;
+            int segCount = 22;
             for (int i = 0; i < segCount; i++) {
                 double startAngle = (i / (double) segCount) * 360;
                 Arc arc = new Arc(x, y, r, r * 0.55, startAngle, 18);
                 arc.setType(ArcType.OPEN);
                 arc.setFill(Color.TRANSPARENT);
                 arc.setStroke(ring == 0 ? FIRE_ORANGE : FIRE_RED);
-                arc.setStrokeWidth(5 + ring * 2.0);
+                arc.setStrokeWidth(10 + ring * 2.0);
                 arc.setEffect(new DropShadow(10, FIRE_YELLOW));
                 arc.setOpacity(0);
                 prepareTransientNode(arc);
@@ -267,9 +260,7 @@ public class FireEffects {
         addFlashCircle(x, y, 30 * intensity, FIRE_RED, 0, 120, timeline);
     }
 
-    // =
     // 5) FIRE BLAST — large 5-spoke blast + fragments
-    // =
 
     private void addExplosionCore(double x, double y, double intensity,
             boolean fiveSpoke, Timeline timeline) {
@@ -280,8 +271,8 @@ public class FireEffects {
         int spokeCount = fiveSpoke ? 5 : 8;
         for (int s = 0; s < spokeCount; s++) {
             double angle = Math.PI * 2 * s / spokeCount;
-            double len   = (60 + 40 * intensity) * (0.8 + random.nextDouble() * 0.4);
-            Rectangle spoke = new Rectangle(0, 10 + 4 * intensity);
+            double len   = (100 + 40 * intensity) * (0.8 + random.nextDouble() * 0.4);
+            Rectangle spoke = new Rectangle(0, 16 + 4 * intensity);
             spoke.setFill(new LinearGradient(0, 0, 1, 0, true, CycleMethod.NO_CYCLE,
                     new Stop(0, FIRE_WHITE.deriveColor(0, 1, 1, 0.9)),
                     new Stop(1, FIRE_RED.deriveColor(0, 1, 1, 0.0))));
@@ -301,11 +292,11 @@ public class FireEffects {
         }
 
         // Radial fragments
-        int fragCount = (int)(14 * intensity);
+        int fragCount = (int)(20 * intensity);
         for (int i = 0; i < fragCount; i++) {
             double angle  = Math.PI * 2 * i / fragCount + (random.nextDouble() - 0.5) * 0.3;
             double radius = 55 + random.nextDouble() * 45 * intensity;
-            Circle frag   = new Circle(3 + random.nextDouble() * 4,
+            Circle frag   = new Circle(8 + random.nextDouble() * 4,
                     i % 2 == 0 ? FIRE_ORANGE : FIRE_RED);
             frag.setCenterX(x); frag.setCenterY(y); frag.setOpacity(0);
             prepareTransientNode(frag);
@@ -320,16 +311,14 @@ public class FireEffects {
         }
     }
 
-    // =
     // 6) HEAT WAVE — broad translucent wave bands with blur shimmer
-    // =
 
     private void addHeatWaveDistortion(double sx, double sy, double ex, double ey,
             double intensity, Timeline timeline) {
         double angle = Math.toDegrees(Math.atan2(ey - sy, ex - sx));
         double dist  = Math.hypot(ex - sx, ey - sy);
 
-        int bandCount = (int)(4 + 3 * intensity);
+        int bandCount = (int)(10 + 3 * intensity);
         for (int b = 0; b < bandCount; b++) {
             double h = 40 + b * 18 * intensity;
             Rectangle band = new Rectangle(0, h);
@@ -337,7 +326,7 @@ public class FireEffects {
                     new Stop(0.0, FIRE_RED.deriveColor(0, 1, 1, 0.45)),
                     new Stop(0.5, FIRE_ORANGE.deriveColor(0, 1, 1, 0.30)),
                     new Stop(1.0, FIRE_YELLOW.deriveColor(0, 1, 1, 0.0))));
-            band.setArcWidth(h * 0.4); band.setArcHeight(h * 0.4);
+            band.setArcWidth(h * 0.6); band.setArcHeight(h * 0.8);
             band.setX(sx); band.setY(sy - h / 2 + (b - bandCount / 2.0) * 14);
             band.setRotate(angle);
             band.setEffect(new GaussianBlur(8 + b * 2));
@@ -358,9 +347,7 @@ public class FireEffects {
         addFlashCircle(ex, ey, 50 * intensity, FIRE_RED.deriveColor(0, 1, 1, 0.5), 260, 160, timeline);
     }
 
-    // =
     // 7) OVERHEAT — charge sphere + huge discharge beam + violent bloom
-    // =
 
     private void addOverheatOverdrive(double sx, double sy, double ex, double ey,
             double intensity, Timeline timeline) {
@@ -383,7 +370,7 @@ public class FireEffects {
         // Discharge beam
         double angle = Math.toDegrees(Math.atan2(ey - sy, ex - sx));
         double dist  = Math.hypot(ex - sx, ey - sy);
-        double w     = 28 + 16 * intensity;
+        double w     = 35 + 16 * intensity;
         Rectangle beam = new Rectangle(0, w);
         beam.setFill(new LinearGradient(0, 0, 1, 0, true, CycleMethod.NO_CYCLE,
                 new Stop(0, FIRE_WHITE.deriveColor(0, 1, 1, 0.95)),
@@ -408,16 +395,13 @@ public class FireEffects {
         addFlashCircle(ex, ey, 80 * intensity, FIRE_WHITE, 260, 60, timeline);
         addExplosionCore(ex, ey, intensity * 0.85, false, timeline);
     }
-
-    // =
     // 8) FLARE BLITZ — handled in createImpactEffect (explosion + rebound)
-    // =
 
     private void addReboundSpark(double ax, double ay, Timeline timeline) {
-        int count = 6;
+        int count = 16;
         for (int i = 0; i < count; i++) {
             double angle = Math.PI + (random.nextDouble() - 0.5) * Math.PI * 0.8;
-            Circle spark = new Circle(3 + random.nextDouble() * 3, FIRE_YELLOW);
+            Circle spark = new Circle(8 + random.nextDouble() * 3, FIRE_YELLOW);
             spark.setCenterX(ax); spark.setCenterY(ay); spark.setOpacity(0);
             prepareTransientNode(spark);
             battleField.getChildren().add(spark);
@@ -432,9 +416,7 @@ public class FireEffects {
         }
     }
 
-    // =
     // 9) FIRE FANG — fang visual (shared) + embers at bite
-    // =
 
     public void addFangVisual(double x, double y, Timeline timeline) {
         for (int i = 0; i < 2; i++) {
@@ -442,7 +424,7 @@ public class FireEffects {
                     0.0, 0.0, -18.0, -25.0, 0.0, -55.0, 18.0, -25.0);
             fang.setFill(FIRE_RED);
             fang.setStroke(FIRE_ORANGE);
-            fang.setStrokeWidth(5);
+            fang.setStrokeWidth(10);
             fang.setEffect(new DropShadow(20, Color.DARKORANGE));
             double xOff = i == 0 ? -15 : 15;
             fang.setLayoutX(x + xOff); fang.setLayoutY(y);
@@ -461,9 +443,7 @@ public class FireEffects {
         }
     }
 
-    // =
     // 10) FLAME BURST — core bubble then radial mini-bursts
-    // =
 
     private void addBurstSplash(double x, double y, double intensity, Timeline timeline) {
         // Core
@@ -482,7 +462,7 @@ public class FireEffects {
         registerCleanup(timeline, core);
 
         // Mini bursts
-        int dir = 12;
+        int dir = 18;
         for (int i = 0; i < dir; i++) {
             double angle = Math.PI * 2 * i / dir;
             double dist  = 45 + random.nextDouble() * 30 * intensity;
@@ -502,9 +482,7 @@ public class FireEffects {
         }
     }
 
-    // =
     // 11/8b) CHARGE FLARE TRAIL — flame afterimages during movement
-    // =
 
     private void addChargeFlareTrail(double sx, double sy, double ex, double ey,
             double intensity, boolean isWheel, Timeline timeline) {
@@ -514,13 +492,13 @@ public class FireEffects {
         double ux   = dx / dist;
         double uy   = dy / dist;
 
-        int count = (int)(8 * intensity);
+        int count = (int)(18 * intensity);
         for (int i = 0; i < count; i++) {
             double t  = i / (double) count;
             double bx = sx + ux * dist * t;
             double by = sy + uy * dist * t;
             Color c   = isWheel ? FIRE_YELLOW : (i % 2 == 0 ? FIRE_ORANGE : FIRE_RED);
-            Circle ghost = new Circle(isWheel ? 14 + 8 * intensity : 8 + 5 * intensity, c);
+            Circle ghost = new Circle(isWheel ? 20 + 8 * intensity : 12 + 5 * intensity, c);
             ghost.setCenterX(bx); ghost.setCenterY(by);
             ghost.setEffect(new GaussianBlur(6));
             ghost.setOpacity(0);
@@ -538,16 +516,14 @@ public class FireEffects {
         addFlashCircle(ex, ey, isWheel ? 40 * intensity : 22 * intensity, FIRE_ORANGE, count * 22, 100, timeline);
     }
 
-    // =
     // 12) INCINERATE — hit flash + ash motes drifting up
-    // =
 
     private void addBerryIncinerateAsh(double x, double y, double intensity, Timeline timeline) {
         addFlashCircle(x, y, 30 * intensity, FIRE_RED, 0, 100, timeline);
 
-        int ashCount = (int)(18 * intensity);
+        int ashCount = (int)(28 * intensity);
         for (int i = 0; i < ashCount; i++) {
-            Circle ash = new Circle(2 + random.nextDouble() * 3, ASH_GRAY);
+            Circle ash = new Circle(7 + random.nextDouble() * 3, ASH_GRAY);
             double ox = (random.nextDouble() - 0.5) * 50;
             ash.setCenterX(x + ox);
             ash.setCenterY(y + 10);
@@ -566,14 +542,12 @@ public class FireEffects {
         }
     }
 
-    // =
     // 13) INFERNO — tall flame column
-    // =
 
     private void addInfernoPillar(double x, double y, double intensity, Timeline timeline) {
-        int layerCount = (int)(5 + 3 * intensity);
+        int layerCount = (int)(10 + 3 * intensity);
         for (int i = 0; i < layerCount; i++) {
-            double w   = 30 + i * 12 * intensity;
+            double w   = 50 + i * 12 * intensity;
             double maxH = 200 + i * 30 * intensity;
             Rectangle col = new Rectangle(w, 0);
             col.setFill(new LinearGradient(0, 1, 0, 0, true, CycleMethod.NO_CYCLE,
@@ -581,7 +555,7 @@ public class FireEffects {
                     new Stop(0.4, FIRE_RED.deriveColor(0, 1, 1, 0.85)),
                     new Stop(0.8, FIRE_ORANGE.deriveColor(0, 1, 1, 0.7)),
                     new Stop(1.0, FIRE_YELLOW.deriveColor(0, 1, 1, 0.0))));
-            col.setArcWidth(w * 0.6); col.setArcHeight(w * 0.3);
+            col.setArcWidth(w * 0.7); col.setArcHeight(w * 0.5);
             col.setX(x - w / 2);
             col.setY(y);
             col.setEffect(new DropShadow(18, FIRE_ORANGE));
@@ -606,19 +580,17 @@ public class FireEffects {
         addFlashCircle(x, y, 40 * intensity, FIRE_ORANGE, 0, 120, timeline);
     }
 
-    // =
     // 14) FIRE PLEDGE — clean vertical red-gold pillar
-    // =
 
     private void addPledgeColumn(double x, double y, double intensity, Timeline timeline) {
-        double w   = 24 + 10 * intensity;
+        double w   = 38 + 10 * intensity;
         double maxH = 160 + 40 * intensity;
         Rectangle col = new Rectangle(w, 0);
         col.setFill(new LinearGradient(0, 1, 0, 0, true, CycleMethod.NO_CYCLE,
                 new Stop(0.0, FIRE_DEEP.deriveColor(0, 1, 1, 0.95)),
                 new Stop(0.5, FIRE_ORANGE.deriveColor(0, 1, 1, 0.85)),
                 new Stop(1.0, FIRE_YELLOW.deriveColor(0, 1, 1, 0.0))));
-        col.setArcWidth(w * 0.5); col.setArcHeight(w * 0.3);
+        col.setArcWidth(w * 0.7); col.setArcHeight(w * 0.5);
         col.setX(x - w / 2); col.setY(y);
         col.setEffect(new DropShadow(14, FIRE_ORANGE));
         col.setOpacity(0);
@@ -637,9 +609,7 @@ public class FireEffects {
         addFlashCircle(x, y, 28 * intensity, FIRE_YELLOW, 0, 100, timeline);
     }
 
-    // =
     // 15) TEMPER FLARE — base burst + dark-red ring second detonation
-    // =
 
     private void addTemperFlareBacklash(double x, double y, double intensity, Timeline timeline) {
         addBurstSplash(x, y, intensity * 0.9, timeline);
@@ -648,7 +618,7 @@ public class FireEffects {
         for (int r = 0; r < 2; r++) {
             Circle ring = new Circle(0, Color.TRANSPARENT);
             ring.setStroke(LAVA_RED.deriveColor(0, 1, 0.7, 1));
-            ring.setStrokeWidth(4 - r);
+            ring.setStrokeWidth(10 - r);
             ring.setCenterX(x); ring.setCenterY(y); ring.setOpacity(0);
             prepareTransientNode(ring);
             battleField.getChildren().add(ring);
@@ -663,21 +633,19 @@ public class FireEffects {
         addFlashCircle(x, y, 35 * intensity, LAVA_RED, 90, 120, timeline);
     }
 
-    // =
     // 16) BLAZE KICK — diagonal crescent arc + foot sparks
-    // =
 
     private void addKickArcFlame(double x, double y, double intensity, Timeline timeline) {
         // Crescent made of arc segments along a diagonal sweep
-        int segments = 8;
+        int segments = 18;
         for (int i = 0; i < segments; i++) {
-            double t      = i / (double)(segments - 1);
+            double t = i / (double)(segments - 1);
             double startA = -60 + t * 120;
             Arc arc = new Arc(x, y, 50 + 8 * intensity, 50 + 8 * intensity, startA, 18);
             arc.setType(ArcType.OPEN);
             arc.setFill(Color.TRANSPARENT);
             arc.setStroke(t < 0.5 ? FIRE_ORANGE : FIRE_RED);
-            arc.setStrokeWidth(6 + 3 * intensity);
+            arc.setStrokeWidth(10 + 3 * intensity);
             arc.setEffect(new DropShadow(12, FIRE_YELLOW));
             arc.setOpacity(0);
             prepareTransientNode(arc);
@@ -692,11 +660,11 @@ public class FireEffects {
         }
 
         // Foot sparks
-        int sparkCount = (int)(10 * intensity);
+        int sparkCount = (int)(18 * intensity);
         for (int i = 0; i < sparkCount; i++) {
             double angle = (random.nextDouble() - 0.5) * Math.PI * 0.9 - Math.PI / 2;
             double dist  = 20 + random.nextDouble() * 30;
-            Circle spark = new Circle(2.5 + random.nextDouble() * 2, FIRE_YELLOW);
+            Circle spark = new Circle(5.5 + random.nextDouble() * 2, FIRE_YELLOW);
             spark.setCenterX(x); spark.setCenterY(y); spark.setOpacity(0);
             prepareTransientNode(spark);
             battleField.getChildren().add(spark);
@@ -710,9 +678,7 @@ public class FireEffects {
         }
     }
 
-    // =
     // 17) BLAST BURN — long windup then massive detonation
-    // =
 
     private void addBlastBurnDetonation(double sx, double sy, double ex, double ey,
             double intensity, Timeline timeline) {
@@ -734,7 +700,7 @@ public class FireEffects {
         // Launch streak
         double angle = Math.toDegrees(Math.atan2(ey - sy, ex - sx));
         double dist  = Math.hypot(ex - sx, ey - sy);
-        double w     = 22 + 12 * intensity;
+        double w = 30 + 12 * intensity;
         Rectangle streak = new Rectangle(0, w);
         streak.setFill(new LinearGradient(0, 0, 1, 0, true, CycleMethod.NO_CYCLE,
                 new Stop(0, FIRE_WHITE.deriveColor(0, 1, 1, 0.9)),
@@ -758,9 +724,9 @@ public class FireEffects {
         addExplosionCore(ex, ey, intensity, true, timeline);
 
         // Lingering ember rain
-        int rainCount = (int)(20 * intensity);
+        int rainCount = (int)(30 * intensity);
         for (int i = 0; i < rainCount; i++) {
-            Circle ember = new Circle(2.5 + random.nextDouble() * 3,
+            Circle ember = new Circle(5.5 + random.nextDouble() * 3,
                     i % 2 == 0 ? FIRE_ORANGE : FIRE_RED);
             double ox = (random.nextDouble() - 0.5) * 120;
             ember.setCenterX(ex + ox); ember.setCenterY(ey - 20);
@@ -777,9 +743,7 @@ public class FireEffects {
         }
     }
 
-    // =
     // 18) MYSTICAL FIRE — purple-magenta wisps spiraling into target
-    // =
 
     private void addMysticFlameSpiral(double sx, double sy, double ex, double ey,
             double intensity, Timeline timeline) {
@@ -791,15 +755,14 @@ public class FireEffects {
         double px   = -uy;
         double py   =  ux;
 
-        int wispCount = (int)(14 * intensity);
+        int wispCount = (int)(24 * intensity);
         for (int i = 0; i < wispCount; i++) {
-            double t      = (i + random.nextDouble()) / wispCount;
+            double t = (i + random.nextDouble()) / wispCount;
             double spiral = Math.sin(t * Math.PI * 3) * 35 * intensity;
-            double bx     = sx + ux * dist * t + px * spiral;
-            double by     = sy + uy * dist * t + py * spiral;
+            double bx = sx + ux * dist * t + px * spiral;
+            double by = sy + uy * dist * t + py * spiral;
 
-            Circle wisp = new Circle(6 + random.nextDouble() * 5,
-                    i % 2 == 0 ? FIRE_MAGENTA : FIRE_PURPLE);
+            Circle wisp = new Circle(10 + random.nextDouble() * 5, i % 2 == 0 ? FIRE_MAGENTA : FIRE_PURPLE);
             wisp.setCenterX(bx); wisp.setCenterY(by);
             wisp.setEffect(new GaussianBlur(5));
             wisp.setOpacity(0);
@@ -831,16 +794,14 @@ public class FireEffects {
         registerCleanup(timeline, bloom);
     }
 
-    // =
     // 19) FLAME WHEEL — rolling circular ring + burst on hit
-    // =
 
     private void addWheelSpinRing(double sx, double sy, double ex, double ey,
             double intensity, Timeline timeline) {
         // Rolling ring that travels with attacker
         Circle ring = new Circle(0, Color.TRANSPARENT);
         ring.setStroke(FIRE_ORANGE);
-        ring.setStrokeWidth(6 + 3 * intensity);
+        ring.setStrokeWidth(10 + 3 * intensity);
         ring.setCenterX(sx); ring.setCenterY(sy);
         ring.setEffect(new DropShadow(14, FIRE_YELLOW));
         ring.setOpacity(0);
@@ -864,9 +825,7 @@ public class FireEffects {
         addBurstSplash(ex, ey, intensity * 0.9, timeline);
     }
 
-    // =
     // 20) BURNING JEALOUSY — dark crimson flames + black smoke streaks
-    // =
 
     private void addJealousyDarkFlare(double x, double y, double intensity, Timeline timeline) {
         // Two-stage pulse
@@ -876,7 +835,7 @@ public class FireEffects {
             addFlashCircle(x, y, 32 * intensity, LAVA_RED.deriveColor(0, 1, 0.6, 1),
                     baseDelay, 100, timeline);
 
-            int flameCount = (int)(8 * intensity);
+            int flameCount = (int)(18 * intensity);
             for (int i = 0; i < flameCount; i++) {
                 double angle = Math.PI * 2 * i / flameCount;
                 Polygon flame = buildFlameTriangle(
@@ -899,10 +858,10 @@ public class FireEffects {
             }
 
             // Smoke streaks
-            int smokeCount = (int)(6 * intensity);
+            int smokeCount = (int)(16 * intensity);
             for (int i = 0; i < smokeCount; i++) {
                 double angle = (random.nextDouble() - 0.5) * Math.PI;
-                Circle smoke = new Circle(4 + random.nextDouble() * 4,
+                Circle smoke = new Circle(9 + random.nextDouble() * 4,
                         FIRE_DARK.deriveColor(0, 1, 1, 0.6));
                 smoke.setCenterX(x); smoke.setCenterY(y);
                 smoke.setEffect(new GaussianBlur(8));
@@ -921,14 +880,12 @@ public class FireEffects {
         }
     }
 
-    // =
     // 21) BURN UP — attacker ignites, emits blast, aura collapses
-    // =
 
     private void addBurnUpCollapse(double sx, double sy, double ex, double ey,
             double intensity, Timeline timeline) {
         // Attacker ignition aura
-        Circle aura = new Circle(35 * intensity, FIRE_ORANGE.deriveColor(0, 1, 1, 0.6));
+        Circle aura = new Circle(45 * intensity, FIRE_ORANGE.deriveColor(0, 1, 1, 0.6));
         aura.setCenterX(sx); aura.setCenterY(sy);
         aura.setEffect(new GaussianBlur(14));
         aura.setOpacity(0);
@@ -946,10 +903,10 @@ public class FireEffects {
         addOverheatOverdrive(sx, sy, ex, ey, intensity * 0.85, timeline);
 
         // Attacker side fadeout embers (loss of fire type)
-        int emberCount = (int)(12 * intensity);
+        int emberCount = (int)(20 * intensity);
         for (int i = 0; i < emberCount; i++) {
             double angle = Math.PI + (random.nextDouble() - 0.5) * Math.PI;
-            Circle ember = new Circle(3 + random.nextDouble() * 3, FIRE_ORANGE);
+            Circle ember = new Circle(8 + random.nextDouble() * 3, FIRE_ORANGE);
             ember.setCenterX(sx); ember.setCenterY(sy); ember.setOpacity(0);
             prepareTransientNode(ember);
             battleField.getChildren().add(ember);
@@ -965,23 +922,21 @@ public class FireEffects {
         }
     }
 
-    // =
     // 22) RAGING FURY — 3 rapid consecutive impact bursts
-    // =
 
     private void addRagingFuryMultiBursts(double x, double y, double intensity, Timeline timeline) {
         for (int burst = 0; burst < 3; burst++) {
-            int baseDelay = burst * 90;
+            int baseDelay = burst * 100;
             double ox = (random.nextDouble() - 0.5) * 28;
             double oy = (random.nextDouble() - 0.5) * 18;
 
             addFlashCircle(x + ox, y + oy, 38 * intensity, FIRE_ORANGE, baseDelay, 90, timeline);
 
-            int fragCount = (int)(8 * intensity);
+            int fragCount = (int)(18 * intensity);
             for (int i = 0; i < fragCount; i++) {
                 double angle = Math.PI * 2 * i / fragCount + random.nextDouble() * 0.4;
                 double dist  = 30 + random.nextDouble() * 25 * intensity;
-                Circle frag  = new Circle(3 + random.nextDouble() * 3, FIRE_RED);
+                Circle frag  = new Circle(8 + random.nextDouble() * 3, FIRE_RED);
                 frag.setCenterX(x + ox); frag.setCenterY(y + oy); frag.setOpacity(0);
                 prepareTransientNode(frag);
                 battleField.getChildren().add(frag);
@@ -997,9 +952,7 @@ public class FireEffects {
         }
     }
 
-    // =
     // 23) LAVA PLUME — ground crack glow → upward plume → ember rain
-    // =
 
     private void addLavaPlumeGroundPlume(double x, double y, double intensity, Timeline timeline) {
         // Ground crack glow
@@ -1017,9 +970,9 @@ public class FireEffects {
         registerCleanup(timeline, crack);
 
         // Upward lava plume
-        int layerCount = (int)(4 + 2 * intensity);
+        int layerCount = (int)(10 + 2 * intensity);
         for (int i = 0; i < layerCount; i++) {
-            double w   = 25 + i * 15 * intensity;
+            double w   = 35 + i * 15 * intensity;
             double maxH = 150 + i * 25 * intensity;
             Rectangle plume = new Rectangle(w, 0);
             plume.setFill(new LinearGradient(0, 1, 0, 0, true, CycleMethod.NO_CYCLE,
@@ -1047,11 +1000,10 @@ public class FireEffects {
         }
 
         // Ember rain
-        int rainCount = (int)(16 * intensity);
+        int rainCount = (int)(26 * intensity);
         for (int i = 0; i < rainCount; i++) {
             double ox = (random.nextDouble() - 0.5) * 90;
-            Circle ember = new Circle(2.5 + random.nextDouble() * 3,
-                    i % 2 == 0 ? FIRE_ORANGE : LAVA_RED);
+            Circle ember = new Circle(5.5 + random.nextDouble() * 3, i % 2 == 0 ? FIRE_ORANGE : LAVA_RED);
             ember.setCenterX(x + ox); ember.setCenterY(y - 60);
             ember.setOpacity(0);
             prepareTransientNode(ember);
@@ -1066,25 +1018,23 @@ public class FireEffects {
         }
     }
 
-    // =
     // 24) ERUPTION — multiple outward fire columns, count scales by intensity
-    // =
 
     private void addEruptionRadialColumns(double x, double y, double intensity, Timeline timeline) {
-        int colCount = (int) clamp(3 + intensity * 6, 3, 10);
+        int colCount = (int) clamp(10 + intensity * 6, 3, 10);
         for (int c = 0; c < colCount; c++) {
             double angle   = Math.PI * 2 * c / colCount;
-            double spread  = 30 + 45 * intensity;
+            double spread  = 40 + 45 * intensity;
             double colX    = x + Math.cos(angle) * spread;
             double colY    = y + Math.sin(angle) * (spread * 0.4);
-            double w       = 16 + 8 * intensity;
+            double w       = 26 + 8 * intensity;
             double maxH    = 120 + 60 * intensity;
             Rectangle col  = new Rectangle(w, 0);
             col.setFill(new LinearGradient(0, 1, 0, 0, true, CycleMethod.NO_CYCLE,
                     new Stop(0.0, LAVA_RED.deriveColor(0, 1, 1, 0.9)),
                     new Stop(0.6, FIRE_ORANGE.deriveColor(0, 1, 1, 0.8)),
                     new Stop(1.0, FIRE_YELLOW.deriveColor(0, 1, 1, 0.0))));
-            col.setArcWidth(w * 0.6); col.setArcHeight(w * 0.3);
+            col.setArcWidth(w * 0.8); col.setArcHeight(w * 0.5);
             col.setX(colX - w / 2); col.setY(colY);
             col.setEffect(new DropShadow(12, LAVA_ORANGE));
             col.setOpacity(0);
@@ -1106,9 +1056,7 @@ public class FireEffects {
         addFlashCircle(x, y, 55 * intensity, LAVA_ORANGE, 0, 140, timeline);
     }
 
-    // =
     // 25) SACRED FIRE — white-hot center, orange halo, feather-like arcs
-    // =
 
     private void addSacredFireWhiteCore(double x, double y, double intensity, Timeline timeline) {
         // Holy flash
@@ -1118,7 +1066,7 @@ public class FireEffects {
         // Orange halo
         Circle halo = new Circle(0, Color.TRANSPARENT);
         halo.setStroke(FIRE_ORANGE.deriveColor(0, 1, 1, 0.8));
-        halo.setStrokeWidth(5);
+        halo.setStrokeWidth(9);
         halo.setCenterX(x); halo.setCenterY(y); halo.setOpacity(0);
         prepareTransientNode(halo);
         battleField.getChildren().add(halo);
@@ -1130,14 +1078,14 @@ public class FireEffects {
         registerCleanup(timeline, halo);
 
         // Elegant feather arcs
-        int arcCount = 6;
+        int arcCount = 16;
         for (int a = 0; a < arcCount; a++) {
             double baseAngle = 360.0 * a / arcCount;
             Arc arc = new Arc(x, y, 38 + 10 * intensity, 38 + 10 * intensity, baseAngle, 28);
             arc.setType(ArcType.OPEN);
             arc.setFill(Color.TRANSPARENT);
             arc.setStroke(a % 2 == 0 ? FIRE_WHITE : FIRE_YELLOW);
-            arc.setStrokeWidth(4 + 2 * intensity);
+            arc.setStrokeWidth(7 + 2 * intensity);
             arc.setEffect(new DropShadow(10, FIRE_ORANGE));
             arc.setOpacity(0);
             prepareTransientNode(arc);
@@ -1152,16 +1100,14 @@ public class FireEffects {
         }
     }
 
-    // =
     // 26) MAGMA STORM — thick rotating molten ring + upward sparks, persists
-    // =
 
     private void addMagmaStormTrapRing(double x, double y, double intensity, Timeline timeline) {
         // Initial strike
-        addExplosionCore(x, y, intensity * 0.7, false, timeline);
+        addExplosionCore(x, y, intensity * 0.8, false, timeline);
 
         // Outer rotating ring segments
-        int segCount = 10;
+        int segCount = 20;
         for (int i = 0; i < segCount; i++) {
             double startAngle = (i / (double) segCount) * 360;
             Arc seg = new Arc(x, y, 55 + 15 * intensity, (55 + 15 * intensity) * 0.55,
@@ -1169,7 +1115,7 @@ public class FireEffects {
             seg.setType(ArcType.OPEN);
             seg.setFill(Color.TRANSPARENT);
             seg.setStroke(i % 2 == 0 ? LAVA_RED : LAVA_ORANGE);
-            seg.setStrokeWidth(8 + 3 * intensity);
+            seg.setStrokeWidth(15 + 3 * intensity);
             seg.setEffect(new DropShadow(14, FIRE_ORANGE));
             seg.setOpacity(0);
             prepareTransientNode(seg);
@@ -1186,10 +1132,10 @@ public class FireEffects {
         }
 
         // Upward sparks
-        int sparkCount = (int)(18 * intensity);
+        int sparkCount = (int)(28 * intensity);
         for (int i = 0; i < sparkCount; i++) {
             double ox = (random.nextDouble() - 0.5) * 80;
-            Circle spark = new Circle(2.5 + random.nextDouble() * 3,
+            Circle spark = new Circle(5.5 + random.nextDouble() * 3,
                     i % 2 == 0 ? LAVA_ORANGE : FIRE_RED);
             spark.setCenterX(x + ox); spark.setCenterY(y + 20);
             spark.setOpacity(0);
@@ -1206,17 +1152,15 @@ public class FireEffects {
         }
     }
 
-    //
     // FALLBACK — default flames for any unmatched fire move
-    //
 
     private void addDefaultFlames(double x, double y, double intensity, Timeline timeline) {
-        int flameCount = (int)(20 + 10 * intensity);
+        int flameCount = (int)(30 + 10 * intensity);
         for (int i = 0; i < flameCount; i++) {
             Polygon flame = buildFlameTriangle(
-                    i % 2 == 0 ? FIRE_RED : FIRE_ORANGE, FIRE_YELLOW, 14 + 6 * intensity);
+                    i % 2 == 0 ? FIRE_RED : FIRE_ORANGE, FIRE_YELLOW, 20 + 6 * intensity);
             double angle = (i / (double) flameCount) * 2 * Math.PI;
-            double radius = 28 + 8 * intensity;
+            double radius = 35 + 8 * intensity;
             flame.setLayoutX(x + Math.cos(angle) * radius);
             flame.setLayoutY(y + Math.sin(angle) * radius);
             flame.setRotate(Math.toDegrees(angle));
@@ -1238,9 +1182,7 @@ public class FireEffects {
         }
     }
 
-    // =
     // SHARED HELPERS
-    // =
 
     /** Expanding flash circle at a point, fading out over fadeDuration ms. */
     private void addFlashCircle(double x, double y, double radius, Color color,
@@ -1266,9 +1208,9 @@ public class FireEffects {
     private Polygon buildFlameTriangle(Color fill, Color stroke, double size) {
         Polygon p = new Polygon(
                 0.0, 0.0,
-                -size * 0.45, -size * 0.55,
-                0.0,          -size * 1.2,
-                size * 0.45,  -size * 0.55);
+                -size * 0.65, -size * 0.75,
+                0.0,          -size * 1.4,
+                size * 0.65,  -size * 0.75);
         p.setFill(fill);
         p.setStroke(stroke);
         p.setStrokeWidth(1);
