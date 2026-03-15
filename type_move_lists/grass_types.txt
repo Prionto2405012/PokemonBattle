@@ -1,0 +1,102 @@
+TYPE: GRASS
+TARGET EFFECT CLASS: GrassEffects
+SOURCE DATA: src/main/resources/com/example/pokemonbattle/database/moves_gen4.json
+
+MOVE LIST WITH DESCRIPTION
+Format: [id] move-name | class | power | acc | pp
+[451] absorb | special | power=20 | acc=100 | pp=25
+  Description: Power: 20 Accuracy: 100 PP: 25 Steals 1/2 of the damage inflicted.
+[66] bullet-seed | physical | power=25 | acc=100 | pp=30
+  Description: Power: 25 Accuracy: 100 PP: 30 Shoots 2 to 5 seeds in a row to strike the foe.
+[71] energy-ball | special | power=90 | acc=100 | pp=10
+  Description: Power: 90 Accuracy: 100 PP: 10 The user draws power from nature and fires it at the foe. It may also lower the targets Sp. Def.
+[92] frenzy-plant | special | power=150 | acc=90 | pp=5
+  Description: Power: 150 Accuracy: 90 PP: 5 Powerful, but leaves the user immobile the next turn.
+[42] giga-drain | special | power=75 | acc=100 | pp=10
+  Description: Power: 75 Accuracy: 100 PP: 10 Steals 1/2 of the damage inflicted.
+[80] grass-pledge | special | power=80 | acc=100 | pp=10
+  Description: Power: 80 Accuracy: 100 PP: 10 A column of grass hits opposing Pokmon. When used with its water equivalent, its damage increases into a vast swamp.
+[84] grassy-glide | physical | power=55 | acc=100 | pp=20
+  Description: Power: 55 Accuracy: 100 PP: 20 Gliding on the ground, the user attacks the target. This move always goes first on Grassy Terrain.
+[616] leafage | physical | power=40 | acc=100 | pp=40
+  Description: Power: 40 Accuracy: 100 PP: 40 The user attacks by pelting the target with leaves.
+[513] leaf-blade | physical | power=90 | acc=100 | pp=15
+  Description: Power: 90 Accuracy: 100 PP: 15 Slashes with a sharp leaf. High critical-hit ratio.
+[72] leaf-storm | special | power=130 | acc=90 | pp=5
+  Description: Power: 130 Accuracy: 90 PP: 5 A storm of sharp leaves is whipped up. The attacks recoil sharply reduces the users Sp. Atk stat.
+[514] leaf-tornado | special | power=65 | acc=90 | pp=10
+  Description: Power: 65 Accuracy: 90 PP: 10 The user attacks its target by encircling it in sharp leaves. This attack may also lower the targets accuracy.
+[67] magical-leaf | special | power=60 | acc=null | pp=20
+  Description: Power: 60 Accuracy: - PP: 20 Attacks with a strange leaf that cannot be evaded.
+[13] mega-drain | special | power=40 | acc=100 | pp=15
+  Description: Power: 40 Accuracy: 100 PP: 15 Steals 1/2 of the damage inflicted.
+[624] needle-arm | physical | power=60 | acc=100 | pp=15
+  Description: Power: 60 Accuracy: 100 PP: 15 Attacks with thorny arms. May cause flinching.
+[98] petal-blizzard | physical | power=90 | acc=100 | pp=15
+  Description: Power: 90 Accuracy: 100 PP: 15 The user stirs up a violent petal blizzard and attacks everything around it.
+[20] petal-dance | special | power=120 | acc=100 | pp=10
+  Description: Power: 120 Accuracy: 100 PP: 10 Works 2-3 turns and confuses user.
+[73] power-whip | physical | power=120 | acc=85 | pp=10
+  Description: Power: 120 Accuracy: 85 PP: 10 The user violently whirls its vines or tentacles to harshly lash the foe.
+[16] razor-leaf | physical | power=55 | acc=95 | pp=25
+  Description: Power: 55 Accuracy: 95 PP: 25 A sharp-edged leaf is launched to slash at the foe. It has a high critical-hit ratio.
+[70] seed-bomb | physical | power=80 | acc=100 | pp=15
+  Description: Power: 80 Accuracy: 100 PP: 15 The user slams a barrage of hard- shelled seeds down on the foe from above.
+[655] seed-flare | special | power=120 | acc=85 | pp=5
+  Description: Power: 120 Accuracy: 85 PP: 5 The user generates a shock wave from within its body. It may also lower the targets Sp. Def.
+[17] solar-beam | special | power=120 | acc=100 | pp=10
+  Description: Power: 120 Accuracy: 100 PP: 10 1st turn: Prepare 2nd turn: Attack
+[458] solar-blade | physical | power=125 | acc=100 | pp=10
+  Description: Power: 125 Accuracy: 100 PP: 10 In this two-turn attack, the user gathers light and fills a blade with the lights energy, attacking the target on the next turn.
+[86] trailblaze | physical | power=50 | acc=100 | pp=20
+  Description: Power: 50 Accuracy: 100 PP: 20 The user attacks suddenly as if leaping out from tall grass. The user's nimble footwork boosts its Speed stat.
+[5] vine-whip | physical | power=45 | acc=100 | pp=25
+  Description: Power: 45 Accuracy: 100 PP: 25 Whips the foe with slender vines.
+[566] wood-hammer | physical | power=120 | acc=100 | pp=15
+  Description: Power: 120 Accuracy: 100 PP: 15 The user slams its rugged body into the foe to attack. The user also sustains serious damage.
+
+PROFESSIONAL ANIMATION IMPLEMENTATION PLAN
+1) Build a dedicated effect class in src/main/java/com/example/pokemonbattle/util/effects/.
+   File: GrassEffects.java
+   Required public APIs (match existing Rock/Ghost/Psychic pattern):
+   - createImpactEffect(double x, double y, String moveName, int movePower, Timeline timeline)
+   - createImpactEffect(double startX, double startY, double endX, double endY, String moveName, int movePower, Timeline timeline)
+   - createRangedEffect(double startX, double startY, double endX, double endY, String moveName, int movePower, Timeline timeline)
+   Add helpers: prepareTransientNode, registerCleanup, clamp, random jitter helpers, flash helpers.
+
+2) Art direction for this type (keep consistent across all moves):
+   Palette: Leaf green #66BB6A, vine deep #2E7D32, pollen gold #FBC02D
+   Motifs: Vines, petals, spores, leaf blades, roots
+   Rule: intensity = clamp(movePower/100.0, 0.8, 2.4) and drive particle count, radius, speed from intensity.
+
+3) Implement move families first, then map all moves to a family animation.
+   Contact family: vine-whip, power-whip, leaf-blade
+   Projectile/beam family: razor-leaf, energy-ball, seed-bomb, solar-beam
+   Charge/delayed family: solar-beam, solar-blade
+   Area burst family: petal-dance cyclone, grassy field pulse
+   In createImpactEffect/createRangedEffect use switch(moveName) and route each move to a family helper; never leave critical moves on default effect.
+
+4) Wire into BattleAnimationManager (mandatory touchpoints):
+   - Add import for the new type effect class.
+   - Add private final field and instantiate it in constructor.
+   - Update isRangedMove(...) for projectile/beam moves of this type.
+   - Update getAttackDistance(...) for heavy contact moves vs slight lunge moves.
+   - Update createTypeSpecificImpact(...) switch with this type.
+   - Update playRangedAnimation(...) switch to call createRangedEffect for this type.
+   - Optional: add movement aura in createMovementEffect(...) for signature rush moves.
+
+5) Production quality rules (commercial polish):
+   - Readability first: attacker intent in first 80ms, impact beat at 180-320ms, cleanup by <=700ms for normal moves.
+   - Use layered timing: source flare -> travel trail -> target burst -> residual particles.
+   - Add hit-stop illusion: 30-60ms brightness spike + shake + tiny knockback sync on impact frame.
+   - Keep node lifecycle clean: every transient node must be removed via registerCleanup to prevent memory leaks.
+   - Avoid frame spikes: cap particles on weak moves and stagger spawn with small delays.
+
+6) Verification checklist before merge:
+   - Every move in this file has an explicit switch case or documented family fallback.
+   - No orphan nodes remain in battleField after animation ends.
+   - Animations look correct from both player->opponent and opponent->player directions.
+   - Ranged moves do not force full melee rush.
+   - Contact moves still feel impactful with shake/flash/knockback.
+   - Run mvnw -q -DskipTests compile successfully after integration.
+

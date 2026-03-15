@@ -489,8 +489,8 @@ public class WaterEffects {
 
         int pulseCount = 10 + movePower / 20;
         for (int p = 0; p < pulseCount; p++) {
-            double ringW = 50 + movePower / 10.0;
-            double ringH = 30 + movePower / 20.0;
+            double ringW = 80 + movePower / 10.0;
+            double ringH = 60 + movePower / 20.0;
             Ellipse ring = new Ellipse(ringW / 2, ringH / 2);
             ring.setFill(WATER_LIGHT.deriveColor(0, 1, 1, 0.18));
             ring.setStroke(WATER_MID);
