@@ -1103,6 +1103,8 @@ public class GroundEffects {
         int fadeDuration = (int) (300 + 120 * intensity);
         timeline.getKeyFrames().addAll(
                 new KeyFrame(Duration.millis(startDelay),
+                        new KeyValue(overlay.opacityProperty(), 0.0)),
+                new KeyFrame(Duration.millis(startDelay + 80),
                         new KeyValue(overlay.opacityProperty(), 0.7)),
                 new KeyFrame(Duration.millis(startDelay + fadeDuration),
                         new KeyValue(overlay.opacityProperty(), 0)));
