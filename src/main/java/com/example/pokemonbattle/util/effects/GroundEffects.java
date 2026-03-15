@@ -33,6 +33,7 @@ public class GroundEffects {
     private static final Color GROUND_DUST  = Color.web("#EFEBE9");
     private static final Color GROUND_MUD   = Color.web("#6D4C41");
     private static final Color GROUND_CLAY  = Color.web("#8D6E63");
+    private static final Color GROUND_KHAKI = Color.web("#C8B88A");
 
     public GroundEffects(Pane battleField) {
         this.battleField = battleField;
@@ -219,6 +220,12 @@ public class GroundEffects {
     /** bulldoze – expanding shockwave with ground cracks radiating outward. */
     private void addBulldoze(double x, double y, double intensity,
                              Timeline timeline) {
+        // ── Beige/khaki ground overlay (flattened ellipse) ───────────────────
+        addGroundOverlay(x, y, 55 + 30 * intensity, intensity, 0, timeline);
+
+        // ── Shake the battlefield ────────────────────────────────────────────
+        addBattleFieldShake(intensity * 0.7, 0, timeline);
+
         // Shockwave ring
         Ellipse wave = new Ellipse(0, 0);
         wave.setCenterX(x);
@@ -299,6 +306,12 @@ public class GroundEffects {
     /** earthquake – heavy ground vibration with extensive cracks and debris. */
     private void addEarthquake(double x, double y, double intensity,
                                Timeline timeline) {
+        // ── Beige/khaki ground overlay (larger for earthquake) ───────────────
+        addGroundOverlay(x, y, 70 + 40 * intensity, intensity * 1.3, 0, timeline);
+
+        // ── Shake the battlefield ────────────────────────────────────────────
+        addBattleFieldShake(intensity, 0, timeline);
+
         // Multiple shockwave rings
         for (int w = 0; w < 3; w++) {
             Ellipse wave = new Ellipse(0, 0);
@@ -1068,6 +1081,59 @@ public class GroundEffects {
 
     private double clamp(double v, double min, double max) {
         return Math.max(min, Math.min(max, v));
+    }
+
+    /**
+     * Temporary beige/khaki ground-colour overlay – a flattened ellipse centred on
+     * (x, y) that fades in and out quickly to convey earth disturbance.
+     */
+    private void addGroundOverlay(double x, double y, double radius,
+                                  double intensity, int startDelay,
+                                  Timeline timeline) {
+        Ellipse overlay = new Ellipse(radius, radius * 0.35);
+        overlay.setCenterX(x);
+        overlay.setCenterY(y);
+        overlay.setFill(GROUND_KHAKI.deriveColor(0, 1, 1, 0.55));
+        overlay.setStroke(Color.TRANSPARENT);
+        overlay.setEffect(new GaussianBlur(radius * 0.25));
+        overlay.setOpacity(0);
+        prepareTransientNode(overlay);
+        battleField.getChildren().add(overlay);
+
+        int fadeDuration = (int) (300 + 120 * intensity);
+        timeline.getKeyFrames().addAll(
+                new KeyFrame(Duration.millis(startDelay),
+                        new KeyValue(overlay.opacityProperty(), 0.0)),
+                new KeyFrame(Duration.millis(startDelay + 80),
+                        new KeyValue(overlay.opacityProperty(), 0.7)),
+                new KeyFrame(Duration.millis(startDelay + fadeDuration),
+                        new KeyValue(overlay.opacityProperty(), 0)));
+        registerCleanup(timeline, overlay);
+    }
+
+    /**
+     * Quick lateral shake of the entire battleField pane to simulate a
+     * ground tremor.  The pane is returned to its original translateX
+     * afterwards.
+     */
+    private void addBattleFieldShake(double intensity, int startDelay,
+                                     Timeline timeline) {
+        double origTx = battleField.getTranslateX();
+        double amp = 3 + 3 * intensity;   // shake amplitude in px
+        int step = 35;                     // ms between keyframes
+        int cycles = 4;
+
+        for (int i = 0; i < cycles; i++) {
+            double offset = (i % 2 == 0 ? amp : -amp);
+            timeline.getKeyFrames().add(
+                    new KeyFrame(Duration.millis(startDelay + i * step),
+                            new KeyValue(battleField.translateXProperty(),
+                                    origTx + offset)));
+        }
+        // Return to original position
+        timeline.getKeyFrames().add(
+                new KeyFrame(Duration.millis(startDelay + cycles * step),
+                        new KeyValue(battleField.translateXProperty(), origTx)));
     }
 
     private void prepareTransientNode(Node node) {
