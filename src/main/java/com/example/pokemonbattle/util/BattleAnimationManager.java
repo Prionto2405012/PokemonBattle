@@ -2,10 +2,14 @@
 package com.example.pokemonbattle.util;
 
 import com.example.pokemonbattle.model.Move;
+import com.example.pokemonbattle.util.effects.DarkEffects;
 import com.example.pokemonbattle.util.effects.ElectricEffects;
 import com.example.pokemonbattle.util.effects.FightingEffects;
 import com.example.pokemonbattle.util.effects.FireEffects;
+import com.example.pokemonbattle.util.effects.GhostEffects;
+import com.example.pokemonbattle.util.effects.GroundEffects;
 import com.example.pokemonbattle.util.effects.IceEffects;
+import com.example.pokemonbattle.util.effects.PsychicEffects;
 import com.example.pokemonbattle.util.effects.RockEffects;
 import com.example.pokemonbattle.util.effects.WaterEffects;
 
@@ -46,6 +50,10 @@ public class BattleAnimationManager {
     private final FightingEffects fightingEffects;
     private final RockEffects     rockEffects;
     private final WaterEffects    waterEffects;
+    private final GhostEffects    ghostEffects;
+    private final PsychicEffects  psychicEffects;
+    private final DarkEffects     darkEffects;
+    private final GroundEffects   groundEffects;
 
     public BattleAnimationManager(ImageView playerSprite, ImageView opponentSprite, Pane battleField) {
         this.playerSprite   = playerSprite;
@@ -58,6 +66,10 @@ public class BattleAnimationManager {
         this.fightingEffects = new FightingEffects(battleField);
         this.rockEffects     = new RockEffects(battleField);
         this.waterEffects    = new WaterEffects(battleField);
+        this.ghostEffects    = new GhostEffects(battleField);
+        this.psychicEffects  = new PsychicEffects(battleField);
+        this.darkEffects     = new DarkEffects(battleField);
+        this.groundEffects   = new GroundEffects(battleField);
     }
 
     // =
@@ -161,6 +173,45 @@ public class BattleAnimationManager {
             return moveName.equals("crabhammer") ? ATTACK_DISTANCE_FULL : ATTACK_DISTANCE_SLIGHT;
         }
 
+        // Ghost: phasing melee moves close gap, ranged moves stay slight
+        if (moveType.equals("ghost")) {
+            return switch (moveName) {
+                case "astonish", "lick", "phantom-force", "shadow-claw",
+                     "shadow-force", "shadow-punch", "shadow-sneak" -> ATTACK_DISTANCE_FULL;
+                default -> ATTACK_DISTANCE_SLIGHT;
+            };
+        }
+
+        // Psychic: telekinetic melee moves close gap, all others slight
+        if (moveType.equals("psychic")) {
+            return switch (moveName) {
+                case "heart-stamp", "psychic-fangs", "psycho-cut",
+                     "psyshield-bash", "psystrike", "zen-headbutt" -> ATTACK_DISTANCE_FULL;
+                default -> ATTACK_DISTANCE_SLIGHT;
+            };
+        }
+
+        // Dark: melee lunge moves close gap, ranged/delayed stay slight
+        if (moveType.equals("dark")) {
+            return switch (moveName) {
+                case "bite", "crunch", "foul-play", "knock-off", "lash-out",
+                     "night-slash", "pursuit", "sucker-punch", "thief",
+                     "throat-chop", "brutal-swing", "darkest-lariat",
+                     "feint-attack" -> ATTACK_DISTANCE_FULL;
+                default -> ATTACK_DISTANCE_SLIGHT;
+            };
+        }
+
+        // Ground: melee-like physical moves close gap, ranged stay slight
+        if (moveType.equals("ground")) {
+            return switch (moveName) {
+                case "bone-rush", "bonemerang", "bone-club", "bulldoze",
+                     "drill-run", "high-horsepower", "headlong-rush",
+                     "stomping-tantrum", "dig" -> ATTACK_DISTANCE_FULL;
+                default -> ATTACK_DISTANCE_SLIGHT;
+            };
+        }
+
         // Ranged moves don't move the attacker at all (handled via playRangedAnimation)
         if (isRangedMove(moveName, moveType, damageClass)) return 0;
 
@@ -191,6 +242,37 @@ public class BattleAnimationManager {
                 case "rock-blast", "rock-slide", "rock-throw", "rock-tomb",
                      "rock-wrecker", "power-gem", "meteor-beam",
                      "ancient-power", "smack-down" -> true;
+                default -> false;
+            };
+            // Ghost: shadow-ball and ominous-wind are ranged; hex/poltergeist/rage-fist
+            // are delayed-burst (also ranged-like)
+            case "ghost" -> switch (moveName) {
+                case "shadow-ball", "ominous-wind", "hex", "poltergeist",
+                     "rage-fist" -> true;
+                default -> false;
+            };
+            // Psychic: beam moves, ring moves, and aura-burst moves are ranged
+            case "psychic" -> switch (moveName) {
+                case "psybeam", "twin-beam", "confusion", "expanding-force",
+                     "extrasensory", "luster-purge", "mist-ball",
+                     "mystical-power", "psychic", "psychic-noise",
+                     "psycho-boost", "psyshock", "synchronoise",
+                     "dream-eater", "future-sight", "lunar-blessing",
+                     "stored-power", "take-heart" -> true;
+                default -> false;
+            };
+            // Dark: pulse/snarl and delayed-retaliation moves are ranged
+            case "dark" -> switch (moveName) {
+                case "dark-pulse", "snarl", "assurance", "comeuppance",
+                     "payback", "power-trip" -> true;
+                default -> false;
+            };
+            // Ground: ranged projectile and eruption/sand moves
+            case "ground" -> switch (moveName) {
+                case "earth-power", "lands-wrath", "land's-wrath",
+                     "precipice-blades", "mud-bomb", "mud-shot",
+                     "sand-attack", "sand-tomb", "sandstorm",
+                     "scorching-sands", "earthquake" -> true;
                 default -> false;
             };
             default -> false;
@@ -236,6 +318,30 @@ public class BattleAnimationManager {
             rockEffects.createRangedEffect(
                 attackerX, attackerY, defenderX, defenderY, moveName, movePower, rt);
             leadEffect = rt;
+            }
+            case "ghost" -> {
+            Timeline gt = new Timeline();
+            ghostEffects.createRangedEffect(
+                attackerX, attackerY, defenderX, defenderY, moveName, movePower, gt);
+            leadEffect = gt;
+            }
+            case "psychic" -> {
+            Timeline pt = new Timeline();
+            psychicEffects.createRangedEffect(
+                attackerX, attackerY, defenderX, defenderY, moveName, movePower, pt);
+            leadEffect = pt;
+            }
+            case "dark" -> {
+            Timeline dt = new Timeline();
+            darkEffects.createRangedEffect(
+                attackerX, attackerY, defenderX, defenderY, moveName, movePower, dt);
+            leadEffect = dt;
+            }
+            case "ground" -> {
+            Timeline grt = new Timeline();
+            groundEffects.createRangedEffect(
+                attackerX, attackerY, defenderX, defenderY, moveName, movePower, grt);
+            leadEffect = grt;
             }
             default -> {
             }
@@ -383,6 +489,10 @@ public class BattleAnimationManager {
             case "fighting" -> fightingEffects.createImpactEffect(endX, endY, moveName, movePower, effect);
             case "water"    -> waterEffects.createImpactEffect(startX, startY, endX, endY, moveName, movePower, effect);
             case "rock"     -> rockEffects.createImpactEffect(startX, startY, endX, endY, moveName, movePower, effect);
+            case "ghost"    -> ghostEffects.createImpactEffect(startX, startY, endX, endY, moveName, movePower, effect);
+            case "psychic"  -> psychicEffects.createImpactEffect(startX, startY, endX, endY, moveName, movePower, effect);
+            case "dark"     -> darkEffects.createImpactEffect(startX, startY, endX, endY, moveName, movePower, effect);
+            case "ground"   -> groundEffects.createImpactEffect(startX, startY, endX, endY, moveName, movePower, effect);
             default         -> createDefaultImpact(endX, endY, movePower, effect);
         }
 
