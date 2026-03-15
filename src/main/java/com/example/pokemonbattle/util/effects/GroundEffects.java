@@ -60,7 +60,7 @@ public class GroundEffects {
 
         switch (moveName) {
             // Screen shake + ground cracks
-            case "bone-rush", "bonemerang"
+            case "bone-rush", "bonemerang", "bone-club"
                          -> addBoneStrike(startX, startY, endX, endY, intensity, timeline);
             case "bulldoze"
                          -> addBulldoze(endX, endY, intensity, timeline);
@@ -68,7 +68,7 @@ public class GroundEffects {
                          -> addDrillRun(startX, startY, endX, endY, intensity, timeline);
             case "earthquake"
                          -> addEarthquake(endX, endY, intensity, timeline);
-            case "high-horsepower"
+            case "high-horsepower", "headlong-rush"
                          -> addHighHorsepower(endX, endY, intensity, timeline);
             case "stomping-tantrum"
                          -> addStompingTantrum(endX, endY, intensity, timeline);
@@ -84,7 +84,7 @@ public class GroundEffects {
             // Mud projectile impact at target
             case "mud-bomb"
                          -> addMudSplatter(endX, endY, intensity, timeline);
-            case "mud-shot"
+            case "mud-shot", "mud-slap"
                          -> addMudSplatter(endX, endY, intensity * 0.8, timeline);
             case "sand-attack"
                          -> addSandSplatter(endX, endY, intensity, timeline);
