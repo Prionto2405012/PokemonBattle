@@ -60,9 +60,9 @@ public class BattleAnimationManager {
         this.waterEffects    = new WaterEffects(battleField);
     }
 
-    // =========================================================================
+    // =
     // PUBLIC API
-    // =========================================================================
+    // =
 
     public void playAttackAnimation(ImageView attacker, ImageView defender, Move move, Runnable onComplete) {
         double attackerOriginalX      = attacker.getTranslateX();
@@ -136,9 +136,9 @@ public class BattleAnimationManager {
         sequence.play();
     }
 
-    // =========================================================================
+    // =
     // DISTANCE / RANGED ROUTING
-    // =========================================================================
+    // =
 
     private double getAttackDistance(String moveType, String moveName, String damageClass) {
         // Ice: melee punch closes gap fully, everything else lunges slightly
@@ -197,9 +197,9 @@ public class BattleAnimationManager {
         };
     }
 
-    // =========================================================================
+    // =
     // RANGED ANIMATION PATH
-    // =========================================================================
+    // =
 
     private void playRangedAnimation(ImageView attacker, ImageView defender,
             String moveName, String moveType, int movePower,
@@ -269,9 +269,9 @@ public class BattleAnimationManager {
         }
     }
 
-    // =========================================================================
+    // =
     // MOVEMENT EFFECT (during attacker rush)
-    // =========================================================================
+    // =
 
     private Timeline createMovementEffect(ImageView attacker, String moveType,
             boolean attackingRight, String moveName) {
@@ -290,9 +290,9 @@ public class BattleAnimationManager {
         return effect;
     }
 
-    // =========================================================================
+    // =
     // IMPACT EFFECT
-    // =========================================================================
+    // =
 
     private ParallelTransition createImpactEffect(ImageView defender,
             double attackerX, double attackerY,
@@ -332,9 +332,9 @@ public class BattleAnimationManager {
         return impact;
     }
 
-    // =========================================================================
+    // =
     // SHAKE / FLASH
-    // =========================================================================
+    // =
 
     private Timeline createShakeEffect(ImageView defender, int movePower, double defenderBaseTranslateX) {
         double shakeIntensity = Math.min(IMPACT_SHAKE_DISTANCE * (movePower / 80.0), 15.0);
@@ -366,9 +366,9 @@ public class BattleAnimationManager {
                         new KeyValue(flash.brightnessProperty(), 0)));
     }
 
-    // =========================================================================
+    // =
     // TYPE-SPECIFIC IMPACT DISPATCH
-    // =========================================================================
+    // =
 
     private Timeline createTypeSpecificImpact(double startX, double startY,
             double endX, double endY,
@@ -395,9 +395,9 @@ public class BattleAnimationManager {
         return effect;
     }
 
-    // =========================================================================
+    // =
     // DEFAULT IMPACT (white particles)
-    // =========================================================================
+    // =
 
     private void createDefaultImpact(double x, double y, int movePower, Timeline timeline) {
         int particleCount = Math.min(3 + movePower / 20, 10);
@@ -429,9 +429,7 @@ public class BattleAnimationManager {
         }
     }
 
-    // =========================================================================
     // RECOVERY
-    // =========================================================================
 
     private ParallelTransition createRecoveryEffect(ImageView defender,
             double baseTranslateX, double baseTranslateY,
@@ -448,9 +446,9 @@ public class BattleAnimationManager {
         return new ParallelTransition(scaleBack, slideBack);
     }
 
-    // =========================================================================
+    // =
     // HELPERS
-    // =========================================================================
+    // =
 
     private void prepareTransientNode(javafx.scene.Node node) {
         node.setManaged(false);
