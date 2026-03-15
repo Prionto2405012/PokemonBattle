@@ -373,22 +373,24 @@ public class RockEffects {
             Polygon rock = buildRockPolygon(size,
                     i % 2 == 0 ? ROCK_DARK : ROCK_BROWN);
             double angle = (i / (double) count) * 2 * Math.PI;
-            double startRadius = 50 + random.nextDouble() * 20;
-            rock.setLayoutX(x + Math.cos(angle) * startRadius);
-            rock.setLayoutY(y - 50 - random.nextDouble() * 20);
+            // Rocks start from above the battlefield, spread horizontally around
+            // the target but originate from the top of the screen
+            double spreadX = (random.nextDouble() - 0.5) * 40;
+            rock.setLayoutX(x + spreadX);
+            rock.setLayoutY(-20 - random.nextDouble() * 40);   // above the viewport
             rock.setOpacity(0);
             rock.setEffect(new DropShadow(5, ROCK_DARK));
             prepareTransientNode(rock);
             battleField.getChildren().add(rock);
 
             double endR = 12 + random.nextDouble() * 10;
-            int delay = i * 40;
+            int delay = i * 50;
             KeyFrame appear = new KeyFrame(Duration.millis(delay),
                     new KeyValue(rock.opacityProperty(), 0.95));
-            KeyFrame land = new KeyFrame(Duration.millis(delay + 220),
+            KeyFrame land = new KeyFrame(Duration.millis(delay + 300),
                     new KeyValue(rock.layoutXProperty(), x + Math.cos(angle) * endR),
                     new KeyValue(rock.layoutYProperty(), y + Math.sin(angle) * endR * 0.5));
-            KeyFrame settle = new KeyFrame(Duration.millis(delay + 450),
+            KeyFrame settle = new KeyFrame(Duration.millis(delay + 500),
                     new KeyValue(rock.opacityProperty(), 0));
 
             timeline.getKeyFrames().addAll(appear, land, settle);
