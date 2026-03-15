@@ -1,32 +1,262 @@
-Water-type moves
+﻿Water-type moves
 Source: src/main/resources/com/example/pokemonbattle/database/moves_gen4.json
 Count: 28
 
-aqua-cutter
-aqua-jet
-aqua-tail
-brine
-bubble
-bubble-beam
-chilling-water
-clamp
-crabhammer
-dive
-flip-turn
-hydro-cannon
-hydro-pump
-liquidation
-muddy-water
-octazooka
-origin-pulse
-razor-shell
-scald
-sparkling-aria
-surf
-waterfall
-water-gun
-water-pledge
-water-pulse
-water-spout
-wave-crash
-whirlpool
+Format:
+- Move: move-id
+  Description: from moves_gen4.json description
+  Suggested animation style: visual direction for this move
+  Implementation notes: where and how to implement in this codebase
+
+Move: aqua-cutter
+Description: Power: 70
+Accuracy: 100
+PP: 20
+
+The user expels pressurized water to cut at the target like a blade. This move has a heightened chance of landing a critical hit.
+Suggested animation style: Ranged water effect (wave, beam, bubbles, or pulse) based on move case
+Implementation notes: Implemented: WaterEffects.createImpactEffect -> addRazorShell. Add helper-level moveName sub-branch only if you want a unique signature look.
+
+Move: aqua-jet
+Description: Power: 40
+Accuracy: 100
+PP: 20
+
+The user lunges at the foe at a speed that makes it almost invisible. It is sure to strike first.
+Suggested animation style: Ranged water effect (wave, beam, bubbles, or pulse) based on move case
+Implementation notes: Implemented: WaterEffects.createImpactEffect -> addWaveEffect (aquaJetRide=true). Add helper-level moveName sub-branch only if you want a unique signature look.
+
+Move: aqua-tail
+Description: Power: 90
+Accuracy: 90
+PP: 10
+
+The user attacks by swinging its tail as if it were a vicious wave in a raging storm. 
+Suggested animation style: Ranged water effect (wave, beam, bubbles, or pulse) based on move case
+Implementation notes: Implemented: WaterEffects.createImpactEffect -> addAquaTail. Add helper-level moveName sub-branch only if you want a unique signature look.
+
+Move: brine
+Description: Power: 65
+Accuracy: 100
+PP: 10
+
+If the foe’s HP is down to about half, this attack will hit with double the power.
+Suggested animation style: Ranged water effect (wave, beam, bubbles, or pulse) based on move case
+Implementation notes: Implemented: WaterEffects.createImpactEffect -> addWaveEffect. Keep this route; tune wave height and foam count by movePower.
+
+Move: bubble
+Description: Power: 40
+Accuracy: 100
+PP: 30
+
+An attack that may reduce SPEED.
+Suggested animation style: Ranged water effect (wave, beam, bubbles, or pulse) based on move case
+Implementation notes: Implemented: WaterEffects.createImpactEffect -> addBubbleBeam. Keep bubble stream and tweak bubble count or radius.
+
+Move: bubble-beam
+Description: Power: 65
+Accuracy: 100
+PP: 20
+
+An attack that may lower SPEED.
+Suggested animation style: Ranged water effect (wave, beam, bubbles, or pulse) based on move case
+Implementation notes: Implemented: WaterEffects.createImpactEffect -> addBubbleBeam. Keep bubble stream and tweak bubble count or radius.
+
+Move: chilling-water
+Description: Power: 50
+Accuracy: 100
+PP: 20
+
+The user attacks the target by showering it with water that's so cold it saps the target's power. This also lowers the target's Attack stat.
+Suggested animation style: Ranged water effect (wave, beam, bubbles, or pulse) based on move case
+Implementation notes: Implemented: WaterEffects.createImpactEffect -> addChillingWater. Add helper-level moveName sub-branch only if you want a unique signature look.
+
+Move: clamp
+Description: Power: 35
+Accuracy: 85
+PP: 15
+
+Traps the foe for 2-5 turns.
+Suggested animation style: Ranged water effect (wave, beam, bubbles, or pulse) based on move case
+Implementation notes: Currently falls back to addFallbackBeam in WaterEffects. To implement a unique animation: add a moveName case in WaterEffects.createImpactEffect and create a dedicated helper Timeline method.
+
+Move: crabhammer
+Description: Power: 100
+Accuracy: 90
+PP: 10
+
+Has a high criti­ cal hit ratio.
+Suggested animation style: Melee strike; optional claw-water splash overlay
+Implementation notes: Implemented: WaterEffects.createImpactEffect -> fallback branch currently used (consider dedicated melee splash effect). Add helper-level moveName sub-branch only if you want a unique signature look.
+
+Move: dive
+Description: Power: 80
+Accuracy: 100
+PP: 10
+
+Dives underwater the first turn and strikes next turn.
+Suggested animation style: Ranged water effect (wave, beam, bubbles, or pulse) based on move case
+Implementation notes: Implemented: WaterEffects.createImpactEffect -> addDiveEffect. Add helper-level moveName sub-branch only if you want a unique signature look.
+
+Move: flip-turn
+Description: Power: 60
+Accuracy: 100
+PP: 20
+
+After making its attack, the user rushes back to switch places with a party Pokémon in waiting.
+Suggested animation style: Ranged water effect (wave, beam, bubbles, or pulse) based on move case
+Implementation notes: Currently falls back to addFallbackBeam in WaterEffects. To implement a unique animation: add a moveName case in WaterEffects.createImpactEffect and create a dedicated helper Timeline method.
+
+Move: hydro-cannon
+Description: Power: 150
+Accuracy: 90
+PP: 5
+
+Powerful, but leaves the user immobile the next turn.
+Suggested animation style: Ranged water effect (wave, beam, bubbles, or pulse) based on move case
+Implementation notes: Implemented: WaterEffects.createImpactEffect -> addWaterBeam. Keep as ranged beam; adjust width and speed per movePower.
+
+Move: hydro-pump
+Description: Power: 110
+Accuracy: 80
+PP: 5
+
+A powerful water- type attack.
+Suggested animation style: Ranged water effect (wave, beam, bubbles, or pulse) based on move case
+Implementation notes: Implemented: WaterEffects.createImpactEffect -> addWaterBeam. Keep as ranged beam; adjust width and speed per movePower.
+
+Move: liquidation
+Description: Power: 85
+Accuracy: 100
+PP: 10
+
+The user slams into the target using a full-force blast of water. This may also lower the target’s Defense stat.
+Suggested animation style: Ranged water effect (wave, beam, bubbles, or pulse) based on move case
+Implementation notes: Implemented: WaterEffects.createImpactEffect -> addWaveEffect. Keep this route; tune wave height and foam count by movePower.
+
+Move: muddy-water
+Description: Power: 90
+Accuracy: 85
+PP: 10
+
+Attacks with muddy water. May lower accuracy.
+Suggested animation style: Ranged water effect (wave, beam, bubbles, or pulse) based on move case
+Implementation notes: Implemented: WaterEffects.createImpactEffect -> addWaterBeam. Keep as ranged beam; adjust width and speed per movePower.
+
+Move: octazooka
+Description: Power: 65
+Accuracy: 85
+PP: 10
+
+An attack that may reduce accuracy.
+Suggested animation style: Ranged water effect (wave, beam, bubbles, or pulse) based on move case
+Implementation notes: Currently falls back to addFallbackBeam in WaterEffects. To implement a unique animation: add a moveName case in WaterEffects.createImpactEffect and create a dedicated helper Timeline method.
+
+Move: origin-pulse
+Description: Power: 110
+Accuracy: 85
+PP: 10
+
+The user attacks opposing Pokémon with countless beams of light that glow a deep and brilliant blue.
+Suggested animation style: Ranged water effect (wave, beam, bubbles, or pulse) based on move case
+Implementation notes: Implemented: WaterEffects.createImpactEffect -> addOriginPulse. Add helper-level moveName sub-branch only if you want a unique signature look.
+
+Move: razor-shell
+Description: Power: 75
+Accuracy: 95
+PP: 10
+
+The user cuts its target with sharp shells. This attack may also lower the target’s Defense stat.
+Suggested animation style: Ranged water effect (wave, beam, bubbles, or pulse) based on move case
+Implementation notes: Implemented: WaterEffects.createImpactEffect -> addRazorShell. Add helper-level moveName sub-branch only if you want a unique signature look.
+
+Move: scald
+Description: Power: 80
+Accuracy: 100
+PP: 15
+
+The user shoots boiling hot water at its target. It may also leave the target with a burn.
+Suggested animation style: Ranged water effect (wave, beam, bubbles, or pulse) based on move case
+Implementation notes: Implemented: WaterEffects.createImpactEffect -> addWaveEffect. Keep this route; tune wave height and foam count by movePower.
+
+Move: sparkling-aria
+Description: Power: 90
+Accuracy: 100
+PP: 10
+
+The user bursts into song, emitting many bubbles. Any Pokémon suffering from a burn will be healed by the touch of these bubbles.
+Suggested animation style: Ranged water effect (wave, beam, bubbles, or pulse) based on move case
+Implementation notes: Implemented: WaterEffects.createImpactEffect -> addSparklingAria. Add helper-level moveName sub-branch only if you want a unique signature look.
+
+Move: surf
+Description: Power: 90
+Accuracy: 100
+PP: 15
+
+A strong water- type attack.
+Suggested animation style: Ranged water effect (wave, beam, bubbles, or pulse) based on move case
+Implementation notes: Implemented: WaterEffects.createImpactEffect -> addWaveEffect. Keep this route; tune wave height and foam count by movePower.
+
+Move: waterfall
+Description: Power: 80
+Accuracy: 100
+PP: 15
+
+An aquatic charge attack.
+Suggested animation style: Ranged water effect (wave, beam, bubbles, or pulse) based on move case
+Implementation notes: Implemented: WaterEffects.createImpactEffect -> addWaveEffect. Keep this route; tune wave height and foam count by movePower.
+
+Move: water-gun
+Description: Power: 40
+Accuracy: 100
+PP: 25
+
+Squirts water to attack.
+Suggested animation style: Ranged water effect (wave, beam, bubbles, or pulse) based on move case
+Implementation notes: Implemented: WaterEffects.createImpactEffect -> addWaterBeam. Keep as ranged beam; adjust width and speed per movePower.
+
+Move: water-pledge
+Description: Power: 80
+Accuracy: 100
+PP: 10
+
+A column of water strikes the target. When combined with its fire equivalent, the damage increases and a rainbow appears.
+Suggested animation style: Ranged water effect (wave, beam, bubbles, or pulse) based on move case
+Implementation notes: Implemented: WaterEffects.createImpactEffect -> addWaveEffect. Keep this route; tune wave height and foam count by movePower.
+
+Move: water-pulse
+Description: Power: 60
+Accuracy: 100
+PP: 20
+
+Attacks with ultrasonic waves. May confuse the foe
+Suggested animation style: Ranged water effect (wave, beam, bubbles, or pulse) based on move case
+Implementation notes: Implemented: WaterEffects.createImpactEffect -> addWaterPulse. Add helper-level moveName sub-branch only if you want a unique signature look.
+
+Move: water-spout
+Description: Power: 150
+Accuracy: 100
+PP: 5
+
+Inflicts more damage if the user’s HP is high.
+Suggested animation style: Ranged water effect (wave, beam, bubbles, or pulse) based on move case
+Implementation notes: Currently falls back to addFallbackBeam in WaterEffects. To implement a unique animation: add a moveName case in WaterEffects.createImpactEffect and create a dedicated helper Timeline method.
+
+Move: wave-crash
+Description: Power: 120
+Accuracy: 100
+PP: 10
+
+The user shrouds itself in water and slams into the target with its whole body to inflict damage. This also damages the user and raises the user’s action speed.
+Suggested animation style: Ranged water effect (wave, beam, bubbles, or pulse) based on move case
+Implementation notes: Implemented: WaterEffects.createImpactEffect -> addWaveEffect. Keep this route; tune wave height and foam count by movePower.
+
+Move: whirlpool
+Description: Power: 35
+Accuracy: 85
+PP: 15
+
+Traps the foe for 2-5 turns.
+Suggested animation style: Ranged water effect (wave, beam, bubbles, or pulse) based on move case
+Implementation notes: Implemented: WaterEffects.createImpactEffect -> addWhirlpool. Add helper-level moveName sub-branch only if you want a unique signature look.
+

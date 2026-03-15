@@ -107,6 +107,22 @@ public class WaterEffects {
             case "crabhammer" ->
                     addFallbackBeam(startX, startY, endX, endY, movePower, timeline);
 
+            // ── Clamp ─────────────────────────────────────────────────────────
+            case "clamp" ->
+                    addClampEffect(startX, startY, endX, endY, movePower, timeline);
+
+            // ── Flip Turn ─────────────────────────────────────────────────────
+            case "flip-turn" ->
+                    addFlipTurn(startX, startY, endX, endY, movePower, timeline);
+
+            // ── Octazooka ─────────────────────────────────────────────────────
+            case "octazooka" ->
+                    addOctazooka(startX, startY, endX, endY, movePower, timeline);
+
+            // ── Water Spout ───────────────────────────────────────────────────
+            case "water-spout" ->
+                    addWaterSpout(startX, startY, endX, endY, movePower, timeline);
+
             // ── Fallback ──────────────────────────────────────────────────────
             default ->
                     addFallbackBeam(startX, startY, endX, endY, movePower, timeline);
@@ -865,6 +881,367 @@ public class WaterEffects {
                     new KeyValue(wave.opacityProperty(), 0));
             timeline.getKeyFrames().addAll(appear, expand);
             registerCleanup(timeline, wave);
+        }
+    }
+
+    // =========================================================================
+    // CLAMP — two shell-like ellipses close around the defender
+    // =========================================================================
+
+    private void addClampEffect(double startX, double startY, double endX, double endY,
+            int movePower, Timeline timeline) {
+
+        double shellW = 70 + movePower / 4.0;
+        double shellH = 45 + movePower / 6.0;
+
+        // ── Top shell (starts above defender, closes downward) ───────────────
+        Ellipse topShell = new Ellipse(shellW / 2, shellH / 2);
+        topShell.setCenterX(endX);
+        topShell.setCenterY(endY - 80);
+        topShell.setFill(WATER_DEEP.deriveColor(0, 1, 1, 0.75));
+        topShell.setStroke(WATER_MID);
+        topShell.setStrokeWidth(3);
+        topShell.setEffect(new DropShadow(10, WATER_LIGHT));
+        topShell.setOpacity(0);
+        prepareTransientNode(topShell);
+        battleField.getChildren().add(topShell);
+
+        // ── Bottom shell (starts below defender, closes upward) ──────────────
+        Ellipse bottomShell = new Ellipse(shellW / 2, shellH / 2);
+        bottomShell.setCenterX(endX);
+        bottomShell.setCenterY(endY + 80);
+        bottomShell.setFill(WATER_DEEP.deriveColor(0, 1, 1, 0.75));
+        bottomShell.setStroke(WATER_MID);
+        bottomShell.setStrokeWidth(3);
+        bottomShell.setEffect(new DropShadow(10, WATER_LIGHT));
+        bottomShell.setOpacity(0);
+        prepareTransientNode(bottomShell);
+        battleField.getChildren().add(bottomShell);
+
+        // Shells appear and slam shut
+        KeyFrame shellsAppear = new KeyFrame(Duration.millis(40),
+                new KeyValue(topShell.opacityProperty(), 0.9),
+                new KeyValue(bottomShell.opacityProperty(), 0.9));
+        KeyFrame shellsClose = new KeyFrame(Duration.millis(220),
+                new KeyValue(topShell.centerYProperty(), endY - 8),
+                new KeyValue(bottomShell.centerYProperty(), endY + 8));
+        KeyFrame shellsHold = new KeyFrame(Duration.millis(380),
+                new KeyValue(topShell.opacityProperty(), 0.85),
+                new KeyValue(bottomShell.opacityProperty(), 0.85));
+        KeyFrame shellsFade = new KeyFrame(Duration.millis(500),
+                new KeyValue(topShell.opacityProperty(), 0),
+                new KeyValue(bottomShell.opacityProperty(), 0));
+        timeline.getKeyFrames().addAll(shellsAppear, shellsClose, shellsHold, shellsFade);
+        registerCleanup(timeline, topShell);
+        registerCleanup(timeline, bottomShell);
+
+        // ── Water droplets spraying out on impact ────────────────────────────
+        int dropCount = 12 + movePower / 8;
+        for (int i = 0; i < dropCount; i++) {
+            Circle drop = new Circle(2.5 + random.nextDouble() * 3, WATER_FOAM);
+            drop.setCenterX(endX + (random.nextDouble() - 0.5) * 30);
+            drop.setCenterY(endY + (random.nextDouble() - 0.5) * 10);
+            drop.setEffect(new DropShadow(4, WATER_LIGHT));
+            drop.setOpacity(0);
+            prepareTransientNode(drop);
+            battleField.getChildren().add(drop);
+
+            double driftAngle = Math.PI * 2 * i / dropCount + (random.nextDouble() - 0.5) * 0.5;
+            double driftDist = 25 + random.nextDouble() * 35;
+
+            KeyFrame appear  = new KeyFrame(Duration.millis(220),
+                    new KeyValue(drop.opacityProperty(), 0.9));
+            KeyFrame scatter = new KeyFrame(Duration.millis(420),
+                    new KeyValue(drop.centerXProperty(), endX + Math.cos(driftAngle) * driftDist),
+                    new KeyValue(drop.centerYProperty(), endY + Math.sin(driftAngle) * driftDist),
+                    new KeyValue(drop.opacityProperty(), 0));
+            timeline.getKeyFrames().addAll(appear, scatter);
+            registerCleanup(timeline, drop);
+        }
+    }
+
+    // =========================================================================
+    // FLIP TURN — quick arcing water trail, then retreat
+    // =========================================================================
+
+    private void addFlipTurn(double startX, double startY, double endX, double endY,
+            int movePower, Timeline timeline) {
+
+        // Arc peak: tight curve for a quick hit-and-retreat
+        double midX = (startX + endX) / 2.0;
+        double midY = Math.min(startY, endY) - 40;
+
+        // ── Arcing water trail ───────────────────────────────────────────────
+        int arcPoints = 14;
+        for (int i = 0; i < arcPoints - 1; i++) {
+            double t0 = i / (double)(arcPoints - 1);
+            double t1 = (i + 1) / (double)(arcPoints - 1);
+
+            double ax0 = lerp(lerp(startX, midX, t0), lerp(midX, endX, t0), t0);
+            double ay0 = lerp(lerp(startY, midY, t0), lerp(midY, endY, t0), t0);
+            double ax1 = lerp(lerp(startX, midX, t1), lerp(midX, endX, t1), t1);
+            double ay1 = lerp(lerp(startY, midY, t1), lerp(midY, endY, t1), t1);
+
+            Line seg = new Line(ax0, ay0, ax1, ay1);
+            seg.setStroke(WATER_LIGHT.deriveColor(0, 1, 1, 0.9 - i * 0.03));
+            seg.setStrokeWidth(4 + (Math.sin(t0 * Math.PI) * 5));
+            seg.setEffect(new DropShadow(6, WATER_CYAN));
+            seg.setOpacity(0);
+            prepareTransientNode(seg);
+            battleField.getChildren().add(seg);
+
+            int delay = i * 12;
+            KeyFrame appear = new KeyFrame(Duration.millis(delay),
+                    new KeyValue(seg.opacityProperty(), 0.95));
+            KeyFrame fade   = new KeyFrame(Duration.millis(delay + 200),
+                    new KeyValue(seg.opacityProperty(), 0));
+            timeline.getKeyFrames().addAll(appear, fade);
+            registerCleanup(timeline, seg);
+        }
+
+        // ── Small wave crest at impact ───────────────────────────────────────
+        for (int i = 0; i < 2; i++) {
+            double w = 40 + i * 14 + movePower / 10.0;
+            Rectangle waveCrest = new Rectangle(w, 0);
+            waveCrest.setFill(WATER_MID.deriveColor(0, 1, 1, 0.8 - i * 0.15));
+            waveCrest.setArcWidth(w * 0.5);
+            waveCrest.setArcHeight(w * 0.4);
+            waveCrest.setX(endX - w / 2.0);
+            waveCrest.setY(endY);
+            waveCrest.setOpacity(0);
+            prepareTransientNode(waveCrest);
+            battleField.getChildren().add(waveCrest);
+
+            int delay = 120 + i * 20;
+            double peakH = 50 + i * 12 + movePower / 10.0;
+            KeyFrame rise  = new KeyFrame(Duration.millis(delay),
+                    new KeyValue(waveCrest.opacityProperty(), 0.85 - i * 0.1));
+            KeyFrame peak  = new KeyFrame(Duration.millis(delay + 100),
+                    new KeyValue(waveCrest.heightProperty(), peakH),
+                    new KeyValue(waveCrest.yProperty(), endY - peakH));
+            KeyFrame crash = new KeyFrame(Duration.millis(delay + 200),
+                    new KeyValue(waveCrest.heightProperty(), 0),
+                    new KeyValue(waveCrest.opacityProperty(), 0));
+            timeline.getKeyFrames().addAll(rise, peak, crash);
+            registerCleanup(timeline, waveCrest);
+        }
+
+        // ── Splash droplets ──────────────────────────────────────────────────
+        addImpactSplash(endX, endY, movePower / 2, 140, timeline);
+    }
+
+    // =========================================================================
+    // OCTAZOOKA — dark ink blob projectile that splatters on impact
+    // =========================================================================
+
+    private void addOctazooka(double startX, double startY, double endX, double endY,
+            int movePower, Timeline timeline) {
+
+        Color inkDark   = Color.web("#1A237E");
+        Color inkMid    = Color.web("#283593");
+
+        // ── Main ink blob projectile ─────────────────────────────────────────
+        double blobR = 16 + movePower / 10.0;
+        Circle inkBlob = new Circle(blobR);
+        inkBlob.setFill(new LinearGradient(0, 0, 1, 1, true, CycleMethod.NO_CYCLE,
+                new Stop(0, inkDark),
+                new Stop(0.5, inkMid),
+                new Stop(1, WATER_DEEP)));
+        inkBlob.setEffect(new DropShadow(blobR * 0.8, inkDark));
+        inkBlob.setCenterX(startX);
+        inkBlob.setCenterY(startY);
+        inkBlob.setOpacity(0);
+        prepareTransientNode(inkBlob);
+        battleField.getChildren().add(inkBlob);
+
+        KeyFrame blobAppear = new KeyFrame(Duration.millis(30),
+                new KeyValue(inkBlob.opacityProperty(), 0.95));
+        KeyFrame blobTravel = new KeyFrame(Duration.millis(220),
+                new KeyValue(inkBlob.centerXProperty(), endX),
+                new KeyValue(inkBlob.centerYProperty(), endY));
+        KeyFrame blobHit    = new KeyFrame(Duration.millis(260),
+                new KeyValue(inkBlob.radiusProperty(), blobR * 1.4),
+                new KeyValue(inkBlob.opacityProperty(), 0));
+        timeline.getKeyFrames().addAll(blobAppear, blobTravel, blobHit);
+        registerCleanup(timeline, inkBlob);
+
+        // ── Smaller trailing ink drops along the path ────────────────────────
+        int trailCount = 8 + movePower / 12;
+        double dx = endX - startX;
+        double dy = endY - startY;
+        for (int i = 0; i < trailCount; i++) {
+            double t = (i + random.nextDouble() * 0.5) / trailCount;
+            double px = startX + dx * t;
+            double py = startY + dy * t;
+            Circle trail = new Circle(3 + random.nextDouble() * 4,
+                    (i % 2 == 0) ? inkDark : inkMid);
+            trail.setCenterX(px + (random.nextDouble() - 0.5) * 14);
+            trail.setCenterY(py + (random.nextDouble() - 0.5) * 14);
+            trail.setEffect(new GaussianBlur(3));
+            trail.setOpacity(0);
+            prepareTransientNode(trail);
+            battleField.getChildren().add(trail);
+
+            int delay = (int)(t * 200);
+            KeyFrame appear = new KeyFrame(Duration.millis(delay + 40),
+                    new KeyValue(trail.opacityProperty(), 0.8));
+            KeyFrame fade   = new KeyFrame(Duration.millis(delay + 280),
+                    new KeyValue(trail.opacityProperty(), 0));
+            timeline.getKeyFrames().addAll(appear, fade);
+            registerCleanup(timeline, trail);
+        }
+
+        // ── Ink splatter at impact ───────────────────────────────────────────
+        int splatCount = 10 + movePower / 8;
+        for (int i = 0; i < splatCount; i++) {
+            double splatR = 4 + random.nextDouble() * 8;
+            Color splatCol = (i % 3 == 0) ? inkDark
+                           : (i % 3 == 1) ? inkMid
+                           : WATER_DEEP;
+            Circle splat = new Circle(splatR, splatCol);
+            splat.setCenterX(endX);
+            splat.setCenterY(endY);
+            splat.setEffect(new GaussianBlur(3));
+            splat.setOpacity(0);
+            prepareTransientNode(splat);
+            battleField.getChildren().add(splat);
+
+            double driftAngle = Math.PI * 2 * i / splatCount + (random.nextDouble() - 0.5) * 0.6;
+            double driftDist = 20 + random.nextDouble() * 45;
+
+            KeyFrame appear  = new KeyFrame(Duration.millis(220),
+                    new KeyValue(splat.opacityProperty(), 0.9));
+            KeyFrame scatter = new KeyFrame(Duration.millis(420),
+                    new KeyValue(splat.centerXProperty(), endX + Math.cos(driftAngle) * driftDist),
+                    new KeyValue(splat.centerYProperty(), endY + Math.sin(driftAngle) * driftDist),
+                    new KeyValue(splat.radiusProperty(), splatR * 1.3),
+                    new KeyValue(splat.opacityProperty(), 0));
+            timeline.getKeyFrames().addAll(appear, scatter);
+            registerCleanup(timeline, splat);
+        }
+    }
+
+    // =========================================================================
+    // WATER SPOUT — massive geyser erupting from below the defender
+    // =========================================================================
+
+    private void addWaterSpout(double startX, double startY, double endX, double endY,
+            int movePower, Timeline timeline) {
+
+        double geyserBaseY = endY + 80;
+        double geyserPeakY = endY - 180 - movePower / 3.0;
+
+        // ── Geyser column: layered rectangles erupting upward ────────────────
+        int columnLayers = 7;
+        for (int i = 0; i < columnLayers; i++) {
+            double w = 50 + i * 12 + movePower / 6.0;
+            Rectangle column = new Rectangle(w, 0);
+            column.setFill(new LinearGradient(0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
+                    new Stop(0, WATER_FOAM.deriveColor(0, 1, 1, 0.85 - i * 0.05)),
+                    new Stop(0.3, WATER_LIGHT.deriveColor(0, 1, 1, 0.8)),
+                    new Stop(0.7, WATER_MID.deriveColor(0, 1, 1, 0.75)),
+                    new Stop(1, WATER_DEEP.deriveColor(0, 1, 1, 0.7))));
+            column.setArcWidth(w * 0.5);
+            column.setArcHeight(20);
+            column.setEffect(new DropShadow(12 + i * 2, WATER_LIGHT));
+            column.setX(endX - w / 2.0);
+            column.setY(geyserBaseY);
+            column.setOpacity(0);
+            prepareTransientNode(column);
+            battleField.getChildren().add(column);
+
+            int delay = i * 25;
+            double columnH = geyserBaseY - geyserPeakY + i * 10;
+
+            KeyFrame erupt = new KeyFrame(Duration.millis(delay + 40),
+                    new KeyValue(column.opacityProperty(), 0.9 - i * 0.05));
+            KeyFrame peak  = new KeyFrame(Duration.millis(delay + 200),
+                    new KeyValue(column.heightProperty(), columnH),
+                    new KeyValue(column.yProperty(), geyserBaseY - columnH));
+            KeyFrame hold  = new KeyFrame(Duration.millis(delay + 360),
+                    new KeyValue(column.opacityProperty(), 0.8 - i * 0.05));
+            KeyFrame cascade = new KeyFrame(Duration.millis(delay + 520),
+                    new KeyValue(column.heightProperty(), columnH * 0.15),
+                    new KeyValue(column.yProperty(), geyserBaseY - columnH * 0.15),
+                    new KeyValue(column.opacityProperty(), 0));
+            timeline.getKeyFrames().addAll(erupt, peak, hold, cascade);
+            registerCleanup(timeline, column);
+        }
+
+        // ── Spray droplets erupting from the top ─────────────────────────────
+        int sprayCount = 24 + movePower / 6;
+        for (int i = 0; i < sprayCount; i++) {
+            Circle drop = new Circle(3 + random.nextDouble() * 5,
+                    (i % 3 == 0) ? WATER_FOAM
+                  : (i % 3 == 1) ? WATER_LIGHT
+                  : WATER_CYAN);
+            drop.setCenterX(endX + (random.nextDouble() - 0.5) * 50);
+            drop.setCenterY(geyserPeakY + random.nextDouble() * 30);
+            drop.setEffect(new DropShadow(5, WATER_LIGHT));
+            drop.setOpacity(0);
+            prepareTransientNode(drop);
+            battleField.getChildren().add(drop);
+
+            int delay = 140 + random.nextInt(120);
+            double driftX = (random.nextDouble() - 0.5) * 100;
+            double driftY = -40 - random.nextDouble() * 60;
+
+            KeyFrame appear  = new KeyFrame(Duration.millis(delay),
+                    new KeyValue(drop.opacityProperty(), 0.9));
+            KeyFrame scatter = new KeyFrame(Duration.millis(delay + 300),
+                    new KeyValue(drop.centerXProperty(), drop.getCenterX() + driftX),
+                    new KeyValue(drop.centerYProperty(), drop.getCenterY() + driftY),
+                    new KeyValue(drop.opacityProperty(), 0));
+            timeline.getKeyFrames().addAll(appear, scatter);
+            registerCleanup(timeline, drop);
+        }
+
+        // ── Cascading water falling back down ────────────────────────────────
+        int cascadeCount = 18 + movePower / 8;
+        for (int i = 0; i < cascadeCount; i++) {
+            Circle drop = new Circle(3.5 + random.nextDouble() * 4, WATER_MID);
+            double ox = (random.nextDouble() - 0.5) * 70;
+            drop.setCenterX(endX + ox);
+            drop.setCenterY(geyserPeakY + random.nextDouble() * 40);
+            drop.setEffect(new GaussianBlur(3));
+            drop.setOpacity(0);
+            prepareTransientNode(drop);
+            battleField.getChildren().add(drop);
+
+            int delay = 320 + random.nextInt(160);
+            double fallDist = 120 + random.nextDouble() * 100;
+
+            KeyFrame appear = new KeyFrame(Duration.millis(delay),
+                    new KeyValue(drop.opacityProperty(), 0.8));
+            KeyFrame fall   = new KeyFrame(Duration.millis(delay + 300),
+                    new KeyValue(drop.centerYProperty(), drop.getCenterY() + fallDist),
+                    new KeyValue(drop.opacityProperty(), 0));
+            timeline.getKeyFrames().addAll(appear, fall);
+            registerCleanup(timeline, drop);
+        }
+
+        // ── Expanding ripple rings at the base ───────────────────────────────
+        for (int r = 0; r < 4; r++) {
+            Ellipse ripple = new Ellipse(15 + r * 8, 6 + r * 3);
+            ripple.setCenterX(endX);
+            ripple.setCenterY(geyserBaseY);
+            ripple.setFill(Color.TRANSPARENT);
+            ripple.setStroke(WATER_FOAM);
+            ripple.setStrokeWidth(2.5 - r * 0.4);
+            ripple.setEffect(new DropShadow(6, WATER_LIGHT));
+            ripple.setOpacity(0);
+            prepareTransientNode(ripple);
+            battleField.getChildren().add(ripple);
+
+            int delay = 60 + r * 70;
+            KeyFrame appear = new KeyFrame(Duration.millis(delay),
+                    new KeyValue(ripple.opacityProperty(), 0.9));
+            KeyFrame expand = new KeyFrame(Duration.millis(delay + 320),
+                    new KeyValue(ripple.radiusXProperty(), ripple.getRadiusX() * 3),
+                    new KeyValue(ripple.radiusYProperty(), ripple.getRadiusY() * 2.5),
+                    new KeyValue(ripple.opacityProperty(), 0));
+            timeline.getKeyFrames().addAll(appear, expand);
+            registerCleanup(timeline, ripple);
         }
     }
 

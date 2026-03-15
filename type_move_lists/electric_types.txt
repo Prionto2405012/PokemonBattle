@@ -1,21 +1,163 @@
-Electric-type moves
+﻿Electric-type moves
 Source: src/main/resources/com/example/pokemonbattle/database/moves_gen4.json
 Count: 17
 
-charge-beam
-discharge
-electroweb
-nuzzle
-rising-voltage
-shock-wave
-spark
-supercell-slam
-thunder
-thunderbolt
-thunder-fang
-thunder-punch
-thunder-shock
-volt-switch
-volt-tackle
-wild-charge
-zap-cannon
+Format:
+- Move: move-id
+  Description: from moves_gen4.json description
+  Suggested animation style: visual direction for this move
+  Implementation notes: where and how to implement in this codebase
+
+Move: charge-beam
+Description: Power: 50
+Accuracy: 90
+PP: 10
+
+The user fires a concentrated bundle of electricity. It may also raise the user’s Sp. Atk stat.
+Suggested animation style: Ranged lightning bolt path from attacker to defender
+Implementation notes: Route: ranged path in BattleAnimationManager.playRangedAnimation -> ElectricEffects.createRangedEffect. Impact: ElectricEffects.createImpactEffect already handles generic electric zaps. If you want unique visuals, add a dedicated moveName case in ElectricEffects.createRangedEffect or ElectricEffects.createImpactEffect.
+
+Move: discharge
+Description: Power: 80
+Accuracy: 100
+PP: 15
+
+A flare of electricity is loosed to strike all Pokémon in battle. It may also cause paralysis.
+Suggested animation style: Ranged lightning bolt path from attacker to defender
+Implementation notes: Route: ranged path in BattleAnimationManager.playRangedAnimation -> ElectricEffects.createRangedEffect. Impact: ElectricEffects.createImpactEffect already handles generic electric zaps. If you want unique visuals, add a dedicated moveName case in ElectricEffects.createRangedEffect or ElectricEffects.createImpactEffect.
+
+Move: electroweb
+Description: Power: 55
+Accuracy: 95
+PP: 15
+
+The user captures and attacks opposing Pokémon by using an electric net. It reduces the targets’ Speed stat.
+Suggested animation style: Ranged lightning bolt path from attacker to defender
+Implementation notes: Route: ranged path in BattleAnimationManager.playRangedAnimation -> ElectricEffects.createRangedEffect. Impact: ElectricEffects.createImpactEffect already handles generic electric zaps. If you want unique visuals, add a dedicated moveName case in ElectricEffects.createRangedEffect or ElectricEffects.createImpactEffect.
+
+Move: nuzzle
+Description: Power: 20
+Accuracy: 100
+PP: 20
+
+The user attacks by nuzzling its electrified cheeks against the target. This also leaves the target with paralysis.
+Suggested animation style: Melee rush with movement sparks and electric hit burst
+Implementation notes: Route: melee path in BattleAnimationManager.playAttackAnimation with ElectricEffects.addMovementSparks. Impact: ElectricEffects.createImpactEffect already handles generic electric zaps. If you want unique visuals, add a dedicated moveName case in ElectricEffects.createRangedEffect or ElectricEffects.createImpactEffect.
+
+Move: rising-voltage
+Description: Power: 70
+Accuracy: 100
+PP: 20
+
+The user attacks with electric voltage rising from the ground. This move’s power doubles when the target is on Electric Terrain.
+Suggested animation style: Ranged lightning bolt path from attacker to defender
+Implementation notes: Route: ranged path in BattleAnimationManager.playRangedAnimation -> ElectricEffects.createRangedEffect. Impact: ElectricEffects.createImpactEffect already handles generic electric zaps. If you want unique visuals, add a dedicated moveName case in ElectricEffects.createRangedEffect or ElectricEffects.createImpactEffect.
+
+Move: shock-wave
+Description: Power: 60
+Accuracy: -
+PP: 20
+
+A fast and unavoidable electric attack.
+Suggested animation style: Ranged lightning bolt path from attacker to defender
+Implementation notes: Route: ranged path in BattleAnimationManager.playRangedAnimation -> ElectricEffects.createRangedEffect. Impact: ElectricEffects.createImpactEffect already handles generic electric zaps. If you want unique visuals, add a dedicated moveName case in ElectricEffects.createRangedEffect or ElectricEffects.createImpactEffect.
+
+Move: spark
+Description: Power: 65
+Accuracy: 100
+PP: 20
+
+An attack that may cause paralysis.
+Suggested animation style: Melee rush with movement sparks and electric hit burst
+Implementation notes: Route: melee path in BattleAnimationManager.playAttackAnimation with ElectricEffects.addMovementSparks. Impact: ElectricEffects.createImpactEffect already handles generic electric zaps. If you want unique visuals, add a dedicated moveName case in ElectricEffects.createRangedEffect or ElectricEffects.createImpactEffect.
+
+Move: supercell-slam
+Description: Power: 100
+Accuracy: 95
+PP: 15
+
+The user electrifies its body and drops onto the target to inflict damage. If this move misses, the user takes damage instead.
+Suggested animation style: Melee rush with movement sparks and electric hit burst
+Implementation notes: Route: melee path in BattleAnimationManager.playAttackAnimation with ElectricEffects.addMovementSparks. Impact: ElectricEffects.createImpactEffect already handles generic electric zaps. If you want unique visuals, add a dedicated moveName case in ElectricEffects.createRangedEffect or ElectricEffects.createImpactEffect.
+
+Move: thunder
+Description: Power: 110
+Accuracy: 70
+PP: 10
+
+An attack that may cause paralysis.
+Suggested animation style: Ranged lightning bolt path from attacker to defender
+Implementation notes: Route: ranged path in BattleAnimationManager.playRangedAnimation -> ElectricEffects.createRangedEffect. Impact: ElectricEffects.createImpactEffect already handles generic electric zaps. If you want unique visuals, add a dedicated moveName case in ElectricEffects.createRangedEffect or ElectricEffects.createImpactEffect.
+
+Move: thunderbolt
+Description: Power: 90
+Accuracy: 100
+PP: 15
+
+An attack that may cause paralysis.
+Suggested animation style: Ranged lightning bolt path from attacker to defender
+Implementation notes: Route: ranged path in BattleAnimationManager.playRangedAnimation -> ElectricEffects.createRangedEffect. Impact: ElectricEffects.createImpactEffect already handles generic electric zaps. If you want unique visuals, add a dedicated moveName case in ElectricEffects.createRangedEffect or ElectricEffects.createImpactEffect.
+
+Move: thunder-fang
+Description: Power: 65
+Accuracy: 95
+PP: 15
+
+The user bites with electrified fangs. It may also make the foe flinch or become paralyzed.
+Suggested animation style: Melee rush with movement sparks and electric hit burst
+Implementation notes: Route: melee path in BattleAnimationManager.playAttackAnimation with ElectricEffects.addMovementSparks. Impact: ElectricEffects.createImpactEffect already handles generic electric zaps. Move-specific: fang visual already triggered (isFangMove branch). If you want unique visuals, add a dedicated moveName case in ElectricEffects.createRangedEffect or ElectricEffects.createImpactEffect.
+
+Move: thunder-punch
+Description: Power: 75
+Accuracy: 100
+PP: 15
+
+An electric punch. It may paralyze.
+Suggested animation style: Melee rush with movement sparks and electric hit burst
+Implementation notes: Route: melee path in BattleAnimationManager.playAttackAnimation with ElectricEffects.addMovementSparks. Impact: ElectricEffects.createImpactEffect already handles generic electric zaps. Overlay: punch sprite and element overlay already added via FightingEffects.addPunchImageAndOverlay. If you want unique visuals, add a dedicated moveName case in ElectricEffects.createRangedEffect or ElectricEffects.createImpactEffect.
+
+Move: thunder-shock
+Description: Power: 40
+Accuracy: 100
+PP: 30
+
+An electrical attack that may paralyze the foe.
+Suggested animation style: Ranged lightning bolt path from attacker to defender
+Implementation notes: Route: ranged path in BattleAnimationManager.playRangedAnimation -> ElectricEffects.createRangedEffect. Impact: ElectricEffects.createImpactEffect already handles generic electric zaps. If you want unique visuals, add a dedicated moveName case in ElectricEffects.createRangedEffect or ElectricEffects.createImpactEffect.
+
+Move: volt-switch
+Description: Power: 70
+Accuracy: 100
+PP: 20
+
+After making its attack, the user rushes back to switch places with a party Pokémon in waiting.
+Suggested animation style: Ranged lightning bolt path from attacker to defender
+Implementation notes: Route: ranged path in BattleAnimationManager.playRangedAnimation -> ElectricEffects.createRangedEffect. Impact: ElectricEffects.createImpactEffect already handles generic electric zaps. If you want unique visuals, add a dedicated moveName case in ElectricEffects.createRangedEffect or ElectricEffects.createImpactEffect.
+
+Move: volt-tackle
+Description: Power: 120
+Accuracy: 100
+PP: 15
+
+A life-risking tackle that slightly hurts the user.
+Suggested animation style: Melee rush with movement sparks and electric hit burst
+Implementation notes: Route: melee path in BattleAnimationManager.playAttackAnimation with ElectricEffects.addMovementSparks. Impact: ElectricEffects.createImpactEffect already handles generic electric zaps. If you want unique visuals, add a dedicated moveName case in ElectricEffects.createRangedEffect or ElectricEffects.createImpactEffect.
+
+Move: wild-charge
+Description: Power: 90
+Accuracy: 100
+PP: 15
+
+The user shrouds itself in electricity and smashes into its target. It also damages the user a little.
+Suggested animation style: Melee rush with movement sparks and electric hit burst
+Implementation notes: Route: melee path in BattleAnimationManager.playAttackAnimation with ElectricEffects.addMovementSparks. Impact: ElectricEffects.createImpactEffect already handles generic electric zaps. If you want unique visuals, add a dedicated moveName case in ElectricEffects.createRangedEffect or ElectricEffects.createImpactEffect.
+
+Move: zap-cannon
+Description: Power: 120
+Accuracy: 50
+PP: 5
+
+An attack that always paralyzes.
+Suggested animation style: Ranged lightning bolt path from attacker to defender
+Implementation notes: Route: ranged path in BattleAnimationManager.playRangedAnimation -> ElectricEffects.createRangedEffect. Impact: ElectricEffects.createImpactEffect already handles generic electric zaps. If you want unique visuals, add a dedicated moveName case in ElectricEffects.createRangedEffect or ElectricEffects.createImpactEffect.
+
