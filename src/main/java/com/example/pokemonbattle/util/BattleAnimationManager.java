@@ -13,6 +13,7 @@ import com.example.pokemonbattle.util.effects.PsychicEffects;
 import com.example.pokemonbattle.util.effects.RockEffects;
 import com.example.pokemonbattle.util.effects.WaterEffects;
 
+import javafx.animation.Animation;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -212,6 +213,14 @@ public class BattleAnimationManager {
             };
         }
 
+        // Rock: rock-tomb uses a slight advance (rocks fall from above, not from attacker)
+        if (moveType.equals("rock")) {
+            return switch (moveName) {
+                case "rock-tomb" -> ATTACK_DISTANCE_SLIGHT;
+                default -> ATTACK_DISTANCE_FULL;
+            };
+        }
+
         // Ranged moves don't move the attacker at all (handled via playRangedAnimation)
         if (isRangedMove(moveName, moveType, damageClass)) return 0;
 
@@ -239,7 +248,7 @@ public class BattleAnimationManager {
             case "water" -> !moveName.equals("crabhammer");
             case "electric" -> damageClass.equals("special");
             case "rock" -> switch (moveName) {
-                case "rock-blast", "rock-slide", "rock-throw", "rock-tomb",
+                case "rock-blast", "rock-slide", "rock-throw",
                      "rock-wrecker", "power-gem", "meteor-beam",
                      "ancient-power", "smack-down" -> true;
                 default -> false;
@@ -294,7 +303,7 @@ public class BattleAnimationManager {
         double defenderX = defender.getLayoutX() + defender.getFitWidth()  / 2;
         double defenderY = defender.getLayoutY() + defender.getFitHeight() / 2;
 
-        Timeline leadEffect = null;
+        Animation leadEffect = null;
 
         switch (moveType) {
             case "ice" -> leadEffect = iceEffects.createBeamEffect(
@@ -305,7 +314,51 @@ public class BattleAnimationManager {
             Timeline wt = new Timeline();
             waterEffects.createImpactEffect(
                 attackerX, attackerY, defenderX, defenderY, moveName, movePower, wt);
-            leadEffect = wt;
+            if (moveName.equals("dive")) {
+                // ── Dive: attacker sinks underground then re-emerges near defender ──
+                double origOpacity = attacker.getOpacity();
+                double origTransX  = attacker.getTranslateX();
+                double origTransY  = attacker.getTranslateY();
+
+                // Phase 1: attacker gradually sinks (fades out + slides down a bit)
+                Timeline sinkAnim = new Timeline(
+                    new KeyFrame(Duration.ZERO,
+                        new KeyValue(attacker.opacityProperty(), origOpacity)),
+                    new KeyFrame(Duration.millis(280),
+                        new KeyValue(attacker.opacityProperty(), 0.0),
+                        new KeyValue(attacker.translateYProperty(), origTransY + 25))
+                );
+
+                // Phase 2: teleport attacker near defender (still invisible)
+                //          then fade back in
+                boolean isPlayer = (attacker == playerSprite);
+                double emergeOffsetX = isPlayer ? -50 : 50;
+                Timeline emergeAnim = new Timeline(
+                    new KeyFrame(Duration.ZERO,
+                        new KeyValue(attacker.translateXProperty(),
+                            defenderX - attackerX + emergeOffsetX),
+                        new KeyValue(attacker.translateYProperty(),
+                            defenderY - attackerY),
+                        new KeyValue(attacker.opacityProperty(), 0.0)),
+                    new KeyFrame(Duration.millis(220),
+                        new KeyValue(attacker.opacityProperty(), origOpacity))
+                );
+
+                // Phase 3: return attacker to original position (after impact)
+                Timeline returnAnim = new Timeline(
+                    new KeyFrame(Duration.millis(120),
+                        new KeyValue(attacker.translateXProperty(), origTransX),
+                        new KeyValue(attacker.translateYProperty(), origTransY))
+                );
+
+                // Combine: [water fx + sink] → emerge → (impact handled by caller) → return
+                ParallelTransition sinkPhase = new ParallelTransition(wt, sinkAnim);
+                SequentialTransition diveSeq = new SequentialTransition(
+                    sinkPhase, emergeAnim, returnAnim);
+                leadEffect = diveSeq;
+            } else {
+                leadEffect = wt;
+            }
             }
             case "fire" -> {
             Timeline ft = new Timeline();
