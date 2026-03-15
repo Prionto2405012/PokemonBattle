@@ -1,0 +1,90 @@
+TYPE: FLYING
+TARGET EFFECT CLASS: FlyingEffects
+SOURCE DATA: src/main/resources/com/example/pokemonbattle/database/moves_gen4.json
+
+MOVE LIST WITH DESCRIPTION
+Format: [id] move-name | class | power | acc | pp
+[152] acrobatics | physical | power=55 | acc=100 | pp=15
+  Description: Power: 55 Accuracy: 100 PP: 15 The user nimbly strikes the target. If the user is not holding an item, this attack inflicts massive damage.
+[138] aerial-ace | physical | power=60 | acc=null | pp=20
+  Description: Power: 60 Accuracy: - PP: 20 An extremely speedy and unavoidable attack.
+[614] aeroblast | special | power=100 | acc=95 | pp=5
+  Description: Power: 100 Accuracy: 95 PP: 5 Has a high criti cal hit ratio.
+[135] air-cutter | special | power=60 | acc=95 | pp=25
+  Description: Power: 60 Accuracy: 95 PP: 25 Hacks with razorlike wind. High critical-hit ratio.
+[168] air-slash | special | power=75 | acc=95 | pp=15
+  Description: Power: 75 Accuracy: 95 PP: 15 The user attacks with a blade of air that slices even the sky. It may also make the target flinch.
+[413] bounce | physical | power=85 | acc=85 | pp=5
+  Description: Power: 85 Accuracy: 85 PP: 5 Bounces up, then down the next turn. May paralyze.
+[290] brave-bird | physical | power=120 | acc=100 | pp=15
+  Description: Power: 120 Accuracy: 100 PP: 15 The user tucks in its wings and charges from a low altitude. The user also takes serious damage.
+[639] chatter | special | power=65 | acc=100 | pp=20
+  Description: Power: 65 Accuracy: 100 PP: 20 The user attacks using a sound wave based on words it has learned. It may also confuse the foe.
+[632] dragon-ascent | physical | power=120 | acc=100 | pp=5
+  Description: Power: 120 Accuracy: 100 PP: 5 After soaring upward, the user attacks its target by dropping out of the sky at high speeds, although it lowers its own Defense and Sp. Def in the process.
+[310] drill-peck | physical | power=80 | acc=100 | pp=20
+  Description: Power: 80 Accuracy: 100 PP: 20 A strong, spin ning-peck attack.
+[177] dual-wingbeat | physical | power=40 | acc=90 | pp=10
+  Description: Power: 40 Accuracy: 90 PP: 10 The user slams the target with its wings. The target is hit twice in a row.
+[159] fly | physical | power=90 | acc=95 | pp=15
+  Description: Power: 90 Accuracy: 95 PP: 15 1st turn: Fly 2nd turn: Attack
+[240] gust | special | power=40 | acc=100 | pp=35
+  Description: Power: 40 Accuracy: 100 PP: 35 Whips up a strong gust of wind.
+[173] hurricane | special | power=110 | acc=70 | pp=10
+  Description: Power: 110 Accuracy: 70 PP: 10 The user attacks by wrapping its opponent in a fierce wind that flies up into the sky. It may also confuse the target.
+[268] peck | physical | power=35 | acc=100 | pp=35
+  Description: Power: 35 Accuracy: 100 PP: 35 Jabs the foe with a beak, etc.
+[289] pluck | physical | power=60 | acc=100 | pp=20
+  Description: Power: 60 Accuracy: 100 PP: 20 The user pecks the foe. If the foe is holding a Berry, the user plucks it and gains its effect.
+[284] sky-attack | physical | power=140 | acc=90 | pp=5
+  Description: Power: 140 Accuracy: 90 PP: 5 1st turn: Prepare 2nd turn: Attack
+[171] sky-drop | physical | power=60 | acc=100 | pp=10
+  Description: Power: 60 Accuracy: 100 PP: 10 The user takes the target into the sky, then drops it during the next turn. The target cannot attack while in the sky.
+[105] wing-attack | physical | power=60 | acc=100 | pp=35
+  Description: Power: 60 Accuracy: 100 PP: 35 Strikes the target with wings.
+
+PROFESSIONAL ANIMATION IMPLEMENTATION PLAN
+1) Build a dedicated effect class in src/main/java/com/example/pokemonbattle/util/effects/.
+   File: FlyingEffects.java
+   Required public APIs (match existing Rock/Ghost/Psychic pattern):
+   - createImpactEffect(double x, double y, String moveName, int movePower, Timeline timeline)
+   - createImpactEffect(double startX, double startY, double endX, double endY, String moveName, int movePower, Timeline timeline)
+   - createRangedEffect(double startX, double startY, double endX, double endY, String moveName, int movePower, Timeline timeline)
+   Add helpers: prepareTransientNode, registerCleanup, clamp, random jitter helpers, flash helpers.
+
+2) Art direction for this type (keep consistent across all moves):
+   Palette: Sky cyan #81D4FA, wind white #E3F2FD, storm slate #546E7A
+   Motifs: Feathers, wind crescents, pressure rings, vortex trails
+   Rule: intensity = clamp(movePower/100.0, 0.8, 2.4) and drive particle count, radius, speed from intensity.
+
+3) Implement move families first, then map all moves to a family animation.
+   Contact family: wing-attack, peck, drill-peck, brave-bird, acrobatics
+   Projectile/beam family: air-slash, gust, aeroblast, hurricane, air-cutter, twister
+   Charge/delayed family: sky-attack, fly
+   Area burst family: hurricane, ominous-wind-style vortex variant
+   In createImpactEffect/createRangedEffect use switch(moveName) and route each move to a family helper; never leave critical moves on default effect.
+
+4) Wire into BattleAnimationManager (mandatory touchpoints):
+   - Add import for the new type effect class.
+   - Add private final field and instantiate it in constructor.
+   - Update isRangedMove(...) for projectile/beam moves of this type.
+   - Update getAttackDistance(...) for heavy contact moves vs slight lunge moves.
+   - Update createTypeSpecificImpact(...) switch with this type.
+   - Update playRangedAnimation(...) switch to call createRangedEffect for this type.
+   - Optional: add movement aura in createMovementEffect(...) for signature rush moves.
+
+5) Production quality rules (commercial polish):
+   - Readability first: attacker intent in first 80ms, impact beat at 180-320ms, cleanup by <=700ms for normal moves.
+   - Use layered timing: source flare -> travel trail -> target burst -> residual particles.
+   - Add hit-stop illusion: 30-60ms brightness spike + shake + tiny knockback sync on impact frame.
+   - Keep node lifecycle clean: every transient node must be removed via registerCleanup to prevent memory leaks.
+   - Avoid frame spikes: cap particles on weak moves and stagger spawn with small delays.
+
+6) Verification checklist before merge:
+   - Every move in this file has an explicit switch case or documented family fallback.
+   - No orphan nodes remain in battleField after animation ends.
+   - Animations look correct from both player->opponent and opponent->player directions.
+   - Ranged moves do not force full melee rush.
+   - Contact moves still feel impactful with shake/flash/knockback.
+   - Run mvnw -q -DskipTests compile successfully after integration.
+

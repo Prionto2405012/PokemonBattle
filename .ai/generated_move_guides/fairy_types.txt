@@ -1,0 +1,44 @@
+TYPE: FAIRY
+TARGET EFFECT CLASS: FairyEffects
+SOURCE DATA: src/main/resources/com/example/pokemonbattle/database/moves_gen4.json
+
+MOVE LIST WITH DESCRIPTION AND IMPLEMENTATION GUIDE
+Format: [id] move-name | class | power | acc | pp
+[365] alluring-voice | special | power=80 | acc=100 | pp=10
+  Description: Power: 80 Accuracy: 100 PP: 10 The user attacks the target using its angelic voice. This also confuses the target if its stats have been boosted during the turn.
+  Implementation guide: Add case in FairyEffects.createRangedEffect -> addAlluringVoice. Ranged route. Send layered ribbon-like sound waves with glitter motes toward the target, ending in a soft but clear charm burst. This should read as musical, not explosive.
+
+[431] dazzling-gleam | special | power=80 | acc=100 | pp=10
+  Description: Power: 80 Accuracy: 100 PP: 10 The user damages opposing Pokmon by emitting a powerful flash.
+  Implementation guide: Add case -> addDazzlingGleam. Ranged/area route. Expand a radial prism flash from the attacker or target zone with star flecks and a brief bloom. Prioritize readability of the bright cone or circle over dense particle spam.
+
+[358] disarming-voice | special | power=40 | acc=null | pp=15
+  Description: Power: 40 Accuracy: - PP: 15 Letting out a charming cry, the user does emotional damage to opposing Pokmon. This attack never misses.
+  Implementation guide: Add case -> addDisarmingVoice. Ranged route. Similar to Alluring Voice but lighter and more guaranteed-hit in feel: clean wave rings, pink-lilac shimmer, and a restrained impact sparkle.
+
+[261] draining-kiss | special | power=50 | acc=100 | pp=10
+  Description: Power: 50 Accuracy: 100 PP: 10 The user steals the targets energy with a kiss. The users HP is restored by over half of the damage taken by the target.
+  Implementation guide: Add case -> addDrainingKiss. Ranged route. Launch a soft heart or ribbon projectile to the target, then pull luminous motes back toward the attacker to imply life drain. The return path is critical for readability.
+
+[429] fairy-wind | special | power=40 | acc=100 | pp=30
+  Description: Power: 40 Accuracy: 100 PP: 30 The user stirs up a fairy wind and strikes the target with it.
+  Implementation guide: Add case -> addFairyWind. Ranged route. Create a small pastel wind swirl with glitter motes and tiny crescent particles. Keep this as the baseline low-power fairy projectile helper.
+
+[435] misty-explosion | special | power=100 | acc=100 | pp=5
+  Description: Power: 100 Accuracy: 100 PP: 5 The user attacks everything around it and faints upon using this move. This moves power is increased on Misty Terrain.
+  Implementation guide: Add case -> addMistyExplosion. Area burst route. Build a large expanding mist ring with dense glitter and pastel shockwave edges. This should be the biggest fairy burst effect, with a soft-edged but high-radius finish.
+
+[430] moonblast | special | power=95 | acc=100 | pp=15
+  Description: Power: 95 Accuracy: 100 PP: 15 Borrowing the power of the moon, the user attacks the target. This may also lower the targets Sp. Atk stat.
+  Implementation guide: Add case -> addMoonblast. Ranged route. Charge a moonlit orb at source, travel it with silver-pink glow, then bloom it into a crescent-backed flash at the target. Stronger and cleaner than Fairy Wind.
+
+[359] play-rough | physical | power=90 | acc=90 | pp=10
+  Description: Power: 90 Accuracy: 90 PP: 10 The user plays rough with the target and attacks it. This may also lower the targets Attack stat.
+  Implementation guide: Add case -> addPlayRough. Contact route. Use playful but forceful impact language: crossing ribbon arcs, heart-spark fragments, and a compact hit flash. It must still feel like a damaging physical strike, not just a cute sparkle.
+
+TYPE-LEVEL INTEGRATION CHECKLIST
+1) Add the new effect class import, field, and constructor initialization in BattleAnimationManager.
+2) Update getAttackDistance(...) and isRangedMove(...) for the moves of this type so contact and projectile routing are correct.
+3) Update playRangedAnimation(...) and createTypeSpecificImpact(...) to dispatch this type explicitly.
+4) Keep all transient JavaFX nodes unmanaged, mouse transparent, and removed through registerCleanup.
+5) Validate both player-to-opponent and opponent-to-player directions and confirm no lingering nodes remain in battleField.

@@ -38,25 +38,20 @@ public class RockEffects {
         this.battleField = battleField;
     }
 
-    // -----------------------------------------------------------------
     // Public API – single-point overload (melee / contact moves)
-    // -----------------------------------------------------------------
 
-    public void createImpactEffect(double x, double y, String moveName,
-                                   int movePower, Timeline timeline) {
+    public void createImpactEffect(double x, double y, String moveName, int movePower, Timeline timeline) {
         createImpactEffect(x, y, x, y, moveName, movePower, timeline);
     }
 
-    // -----------------------------------------------------------------
     // Public API – full signature (ranged / projectile moves)
-    // -----------------------------------------------------------------
 
     public void createImpactEffect(double startX, double startY,
                                    double endX, double endY,
                                    String moveName, int movePower,
                                    Timeline timeline) {
 
-        double intensity = clamp(movePower / 100.0, 0.4, 1.8);
+        double intensity = clamp(movePower / 100.0, 0.8, 2.4);
 
         switch (moveName) {
             // Crystal / meteor / shard moves
@@ -81,19 +76,17 @@ public class RockEffects {
         }
     }
 
-    // -----------------------------------------------------------------
     // Public API – ranged lead effect (projectile from attacker to target)
-    // -----------------------------------------------------------------
 
     public void createRangedEffect(double startX, double startY,
                                    double endX, double endY,
                                    String moveName, int movePower,
                                    Timeline timeline) {
-        double intensity = clamp(movePower / 100.0, 0.4, 1.8);
-        int count = (int) (3 + 4 * intensity);
+        double intensity = clamp(movePower / 100.0, 0.8, 2.4);
+        int count = (int) (13 + 4 * intensity);
 
         for (int i = 0; i < count; i++) {
-            Polygon rock = buildRockPolygon(8 + random.nextDouble() * 8 * intensity,
+            Polygon rock = buildRockPolygon(15 + random.nextDouble() * 8 * intensity,
                     i % 3 == 0 ? ROCK_BROWN : i % 3 == 1 ? ROCK_GREY : ROCK_DARK);
             rock.setLayoutX(startX + (random.nextDouble() - 0.5) * 20);
             rock.setLayoutY(startY + (random.nextDouble() - 0.5) * 20);
@@ -121,19 +114,16 @@ public class RockEffects {
         }
     }
 
-    // =================================================================
     // Crystal / shard animations
-    // =================================================================
 
     /** ancient-power – crystalline shards burst outward from impact. */
-    private void addShardBurst(double x, double y, double intensity,
-                               Timeline timeline) {
-        int count = (int) (8 + 6 * intensity);
+    private void addShardBurst(double x, double y, double intensity, Timeline timeline) {
+        int count = (int) (18 + 6 * intensity);
         for (int i = 0; i < count; i++) {
-            Polygon shard = buildShardPolygon(10 + random.nextDouble() * 8 * intensity,
+            Polygon shard = buildShardPolygon(20 + random.nextDouble() * 8 * intensity,
                     i % 3 == 0 ? ROCK_CRYSTAL : i % 3 == 1 ? ROCK_AMBER : ROCK_LIGHT);
             double angle = (i / (double) count) * 2 * Math.PI;
-            double radius = 12 + random.nextDouble() * 8;
+            double radius = 20 + random.nextDouble() * 8;
             shard.setLayoutX(x + Math.cos(angle) * radius);
             shard.setLayoutY(y + Math.sin(angle) * radius);
             shard.setRotate(Math.toDegrees(angle));
@@ -142,7 +132,7 @@ public class RockEffects {
             prepareTransientNode(shard);
             battleField.getChildren().add(shard);
 
-            double burstR = 35 + 20 * intensity;
+            double burstR = 40 + 20 * intensity;
             int delay = i * 22;
             KeyFrame appear = new KeyFrame(Duration.millis(delay),
                     new KeyValue(shard.opacityProperty(), 1.0));
@@ -158,14 +148,13 @@ public class RockEffects {
             registerCleanup(timeline, shard);
         }
 
-        addFlashCircle(x, y, 22 * intensity, ROCK_AMBER, 0, 180, timeline);
+        addFlashCircle(x, y, 30 * intensity, ROCK_AMBER, 0, 180, timeline);
     }
 
     /** meteor-beam – large meteor streaks from origin to target with trailing dust. */
-    private void addMeteorBeam(double sx, double sy, double ex, double ey,
-                               double intensity, Timeline timeline) {
+    private void addMeteorBeam(double sx, double sy, double ex, double ey, double intensity, Timeline timeline) {
         // Core meteor
-        Circle meteor = new Circle(12 * intensity, ROCK_AMBER);
+        Circle meteor = new Circle(18 * intensity, ROCK_AMBER);
         meteor.setCenterX(sx);
         meteor.setCenterY(sy);
         meteor.setOpacity(0);
@@ -184,9 +173,9 @@ public class RockEffects {
         registerCleanup(timeline, meteor);
 
         // Trailing dust particles
-        int trails = (int) (6 * intensity);
+        int trails = (int) (16 * intensity);
         for (int i = 0; i < trails; i++) {
-            Circle dust = new Circle(3 + random.nextDouble() * 3, ROCK_DUST);
+            Circle dust = new Circle(10 + random.nextDouble() * 3, ROCK_DUST);
             dust.setCenterX(sx);
             dust.setCenterY(sy);
             dust.setOpacity(0);
@@ -214,11 +203,10 @@ public class RockEffects {
     }
 
     /** power-gem – sparkling gem rays travel from attacker to target. */
-    private void addGemSparkle(double sx, double sy, double ex, double ey,
-                               double intensity, Timeline timeline) {
-        int count = (int) (8 + 5 * intensity);
+    private void addGemSparkle(double sx, double sy, double ex, double ey, double intensity, Timeline timeline) {
+        int count = (int) (18 + 5 * intensity);
         for (int i = 0; i < count; i++) {
-            Polygon gem = buildShardPolygon(6 + random.nextDouble() * 6,
+            Polygon gem = buildShardPolygon(12 + random.nextDouble() * 6,
                     i % 4 == 0 ? ROCK_CRYSTAL : i % 4 == 1 ? ROCK_AMBER
                     : i % 4 == 2 ? Color.web("#E1BEE7") : ROCK_LIGHT);
             gem.setLayoutX(sx + (random.nextDouble() - 0.5) * 16);
@@ -250,11 +238,10 @@ public class RockEffects {
     }
 
     /** stone-edge – jagged stone pillars shoot upward from below the target. */
-    private void addStoneEdge(double x, double y, double intensity,
-                              Timeline timeline) {
-        int count = (int) (5 + 3 * intensity);
+    private void addStoneEdge(double x, double y, double intensity, Timeline timeline) {
+        int count = (int) (15 + 3 * intensity);
         for (int i = 0; i < count; i++) {
-            double size = 18 + random.nextDouble() * 14 * intensity;
+            double size = 25 + random.nextDouble() * 14 * intensity;
             Polygon spike = buildSpikePolygon(size,
                     i % 2 == 0 ? ROCK_DARK : ROCK_GREY);
             double offset = (i - count / 2.0) * 14;
@@ -281,19 +268,16 @@ public class RockEffects {
             registerCleanup(timeline, spike);
         }
 
-        addFlashCircle(x, y, 18 * intensity, ROCK_BROWN, 0, 160, timeline);
+        addFlashCircle(x, y, 25 * intensity, ROCK_BROWN, 0, 160, timeline);
     }
 
-    // =================================================================
     // Rock projectile animations
-    // =================================================================
 
     /** rock-blast – multiple boulders hurled in rapid succession. */
-    private void addRockBurst(double sx, double sy, double ex, double ey,
-                              double intensity, Timeline timeline) {
-        int count = (int) (4 + 3 * intensity);
+    private void addRockBurst(double sx, double sy, double ex, double ey, double intensity, Timeline timeline) {
+        int count = (int) (14 + 3 * intensity);
         for (int i = 0; i < count; i++) {
-            Polygon rock = buildRockPolygon(10 + random.nextDouble() * 6,
+            Polygon rock = buildRockPolygon(18 + random.nextDouble() * 6,
                     i % 2 == 0 ? ROCK_BROWN : ROCK_GREY);
             rock.setLayoutX(sx + (random.nextDouble() - 0.5) * 18);
             rock.setLayoutY(sy + (random.nextDouble() - 0.5) * 18);
@@ -324,11 +308,10 @@ public class RockEffects {
     }
 
     /** rock-slide – rocks cascade downward onto target. */
-    private void addRockSlide(double x, double y, double intensity,
-                              Timeline timeline) {
-        int count = (int) (6 + 4 * intensity);
+    private void addRockSlide(double x, double y, double intensity, Timeline timeline) {
+        int count = (int) (16 + 4 * intensity);
         for (int i = 0; i < count; i++) {
-            double size = 8 + random.nextDouble() * 10 * intensity;
+            double size = 18 + random.nextDouble() * 10 * intensity;
             Polygon rock = buildRockPolygon(size,
                     i % 3 == 0 ? ROCK_BROWN : i % 3 == 1 ? ROCK_GREY : ROCK_TAN);
             double offsetX = (random.nextDouble() - 0.5) * 50;
@@ -357,9 +340,8 @@ public class RockEffects {
     }
 
     /** rock-throw – single rock projectile from attacker to target. */
-    private void addRockThrow(double sx, double sy, double ex, double ey,
-                              double intensity, Timeline timeline) {
-        Polygon rock = buildRockPolygon(14 * intensity, ROCK_BROWN);
+    private void addRockThrow(double sx, double sy, double ex, double ey, double intensity, Timeline timeline) {
+        Polygon rock = buildRockPolygon(20 * intensity, ROCK_BROWN);
         rock.setLayoutX(sx);
         rock.setLayoutY(sy);
         rock.setOpacity(0);
@@ -380,15 +362,14 @@ public class RockEffects {
         registerCleanup(timeline, rock);
 
         addDustCloud(ex, ey, intensity, 220, timeline);
-        addFlashCircle(ex, ey, 14 * intensity, ROCK_SAND, 230, 100, timeline);
+        addFlashCircle(ex, ey, 20 * intensity, ROCK_SAND, 230, 100, timeline);
     }
 
-    /** rock-tomb – rocks fall from above and pile around the target. */
-    private void addRockTomb(double x, double y, double intensity,
-                             Timeline timeline) {
-        int count = (int) (5 + 3 * intensity);
+    /** rock-tomb – rocks fall and pile around the target. */
+    private void addRockTomb(double x, double y, double intensity, Timeline timeline) {
+        int count = (int) (15 + 3 * intensity);
         for (int i = 0; i < count; i++) {
-            double size = 10 + random.nextDouble() * 8 * intensity;
+            double size = 17 + random.nextDouble() * 8 * intensity;
             Polygon rock = buildRockPolygon(size,
                     i % 2 == 0 ? ROCK_DARK : ROCK_BROWN);
             double angle = (i / (double) count) * 2 * Math.PI;
@@ -416,14 +397,13 @@ public class RockEffects {
             registerCleanup(timeline, rock);
         }
 
-        addDustCloud(x, y, intensity * 0.8, 100, timeline);
+        addDustCloud(x, y, intensity, 100, timeline);
     }
 
     /** rock-wrecker – massive boulder hurled at target with explosive debris. */
-    private void addRockWrecker(double sx, double sy, double ex, double ey,
-                                double intensity, Timeline timeline) {
+    private void addRockWrecker(double sx, double sy, double ex, double ey, double intensity, Timeline timeline) {
         // Massive boulder
-        Polygon boulder = buildRockPolygon(22 * intensity, ROCK_DARK);
+        Polygon boulder = buildRockPolygon(28 * intensity, ROCK_DARK);
         boulder.setLayoutX(sx);
         boulder.setLayoutY(sy);
         boulder.setOpacity(0);
@@ -443,9 +423,9 @@ public class RockEffects {
         registerCleanup(timeline, boulder);
 
         // Debris burst on impact
-        int debris = (int) (8 + 5 * intensity);
+        int debris = (int) (18 + 5 * intensity);
         for (int i = 0; i < debris; i++) {
-            Polygon frag = buildRockPolygon(4 + random.nextDouble() * 5,
+            Polygon frag = buildRockPolygon(10 + random.nextDouble() * 5,
                     i % 2 == 0 ? ROCK_BROWN : ROCK_GREY);
             frag.setLayoutX(ex);
             frag.setLayoutY(ey);
@@ -470,23 +450,20 @@ public class RockEffects {
             registerCleanup(timeline, frag);
         }
 
-        addFlashCircle(ex, ey, 30 * intensity, ROCK_SAND, 270, 160, timeline);
+        addFlashCircle(ex, ey, 35 * intensity, ROCK_SAND, 270, 160, timeline);
     }
 
-    // =================================================================
     // Heavy body-slam / debris animations
-    // =================================================================
 
     /** head-smash – violent impact with debris and dust cloud. */
-    private void addHeadSmash(double x, double y, double intensity,
-                              Timeline timeline) {
+    private void addHeadSmash(double x, double y, double intensity, Timeline timeline) {
         // Central impact flash
         addFlashCircle(x, y, 26 * intensity, ROCK_SAND, 0, 200, timeline);
 
         // Debris fragments
-        int count = (int) (10 + 6 * intensity);
+        int count = (int) (20 + 6 * intensity);
         for (int i = 0; i < count; i++) {
-            Polygon frag = buildRockPolygon(5 + random.nextDouble() * 7,
+            Polygon frag = buildRockPolygon(11 + random.nextDouble() * 7,
                     i % 3 == 0 ? ROCK_BROWN : i % 3 == 1 ? ROCK_GREY : ROCK_TAN);
             frag.setLayoutX(x);
             frag.setLayoutY(y);
@@ -511,15 +488,14 @@ public class RockEffects {
             registerCleanup(timeline, frag);
         }
 
-        addDustCloud(x, y, intensity * 1.2, 60, timeline);
+        addDustCloud(x, y, intensity * 1.4, 60, timeline);
     }
 
     /** rollout – rolling boulder from attacker to target with dust trail. */
-    private void addRollout(double sx, double sy, double ex, double ey,
-                            double intensity, Timeline timeline) {
-        Circle boulder = new Circle(14 * intensity, ROCK_BROWN);
+    private void addRollout(double sx, double sy, double ex, double ey, double intensity, Timeline timeline) {
+        Circle boulder = new Circle(20 * intensity, ROCK_BROWN);
         boulder.setStroke(ROCK_DARK);
-        boulder.setStrokeWidth(2);
+        boulder.setStrokeWidth(5);
         boulder.setCenterX(sx);
         boulder.setCenterY(sy);
         boulder.setOpacity(0);
@@ -538,9 +514,9 @@ public class RockEffects {
         registerCleanup(timeline, boulder);
 
         // Dust trail along path
-        int trails = (int) (5 * intensity);
+        int trails = (int) (15 * intensity);
         for (int i = 0; i < trails; i++) {
-            Circle dust = new Circle(4 + random.nextDouble() * 3, ROCK_DUST);
+            Circle dust = new Circle(10 + random.nextDouble() * 3, ROCK_DUST);
             double frac = (i + 1.0) / (trails + 1);
             double mx = sx + (ex - sx) * frac + (random.nextDouble() - 0.5) * 12;
             double my = sy + (ey - sy) * frac + (random.nextDouble() - 0.5) * 12;
@@ -561,13 +537,12 @@ public class RockEffects {
             registerCleanup(timeline, dust);
         }
 
-        addFlashCircle(ex, ey, 16 * intensity, ROCK_SAND, 280, 120, timeline);
+        addFlashCircle(ex, ey, 22 * intensity, ROCK_SAND, 280, 120, timeline);
     }
 
     /** smack-down – stone projectile slams target downward with debris. */
-    private void addSmackDown(double sx, double sy, double ex, double ey,
-                              double intensity, Timeline timeline) {
-        Polygon rock = buildRockPolygon(12 * intensity, ROCK_DARK);
+    private void addSmackDown(double sx, double sy, double ex, double ey, double intensity, Timeline timeline) {
+        Polygon rock = buildRockPolygon(20 * intensity, ROCK_DARK);
         rock.setLayoutX(sx);
         rock.setLayoutY(sy);
         rock.setOpacity(0);
@@ -587,9 +562,9 @@ public class RockEffects {
         registerCleanup(timeline, rock);
 
         // Small fragments on impact
-        int frags = (int) (5 + 3 * intensity);
+        int frags = (int) (15 + 3 * intensity);
         for (int i = 0; i < frags; i++) {
-            Polygon frag = buildRockPolygon(3 + random.nextDouble() * 4,
+            Polygon frag = buildRockPolygon(10 + random.nextDouble() * 4,
                     i % 2 == 0 ? ROCK_GREY : ROCK_TAN);
             frag.setLayoutX(ex);
             frag.setLayoutY(ey);
@@ -616,18 +591,15 @@ public class RockEffects {
         addDustCloud(ex, ey, intensity, 170, timeline);
     }
 
-    // =================================================================
     // Default rock animation (fallback)
-    // =================================================================
 
-    private void addDefaultRocks(double x, double y, double intensity,
-                                 Timeline timeline) {
-        int count = (int) (6 + 4 * intensity);
+    private void addDefaultRocks(double x, double y, double intensity, Timeline timeline) {
+        int count = (int) (16 + 4 * intensity);
         for (int i = 0; i < count; i++) {
-            Polygon rock = buildRockPolygon(6 + random.nextDouble() * 8,
+            Polygon rock = buildRockPolygon(12 + random.nextDouble() * 8,
                     i % 2 == 0 ? ROCK_BROWN : ROCK_GREY);
             double angle = (i / (double) count) * 2 * Math.PI;
-            double radius = 10;
+            double radius = 14;
             rock.setLayoutX(x + Math.cos(angle) * radius);
             rock.setLayoutY(y + Math.sin(angle) * radius);
             rock.setRotate(random.nextDouble() * 360);
@@ -636,7 +608,7 @@ public class RockEffects {
             prepareTransientNode(rock);
             battleField.getChildren().add(rock);
 
-            double burstR = 30 + 15 * intensity;
+            double burstR = 37 + 15 * intensity;
             int delay = i * 25;
             KeyFrame appear = new KeyFrame(Duration.millis(delay),
                     new KeyValue(rock.opacityProperty(), 0.9));
@@ -651,58 +623,54 @@ public class RockEffects {
             registerCleanup(timeline, rock);
         }
 
-        addFlashCircle(x, y, 16 * intensity, ROCK_SAND, 0, 150, timeline);
+        addFlashCircle(x, y, 24 * intensity, ROCK_SAND, 0, 150, timeline);
     }
 
-    // =================================================================
     // Shared helpers
-    // =================================================================
 
     /** Irregular polygon resembling a rough rock/boulder. */
     private Polygon buildRockPolygon(double size, Color fill) {
         Polygon p = new Polygon(
-                -size * 0.5, -size * 0.2,
-                -size * 0.3, -size * 0.55,
-                 size * 0.15, -size * 0.5,
-                 size * 0.5,  -size * 0.15,
-                 size * 0.35,  size * 0.4,
-                -size * 0.1,   size * 0.5,
-                -size * 0.45,  size * 0.2);
+                -size * 0.75, -size * 0.4,
+                -size * 0.45, -size * 0.75,
+                 size * 0.25, -size * 0.7,
+                 size * 0.7,  -size * 0.25,
+                 size * 0.45,  size * 0.55,
+                -size * 0.25,   size * 0.7,
+                -size * 0.55,  size * 0.35);
         p.setFill(fill);
         p.setStroke(ROCK_DARK);
-        p.setStrokeWidth(1);
+        p.setStrokeWidth(4);
         return p;
     }
 
     /** Diamond-shaped crystal shard. */
     private Polygon buildShardPolygon(double size, Color fill) {
         Polygon p = new Polygon(
-                0.0,          -size * 0.7,
-                size * 0.3,    0.0,
-                0.0,           size * 0.7,
-                -size * 0.3,   0.0);
+                0.0, -size * 0.8,
+                size * 0.5, 0.0,
+                0.0, size * 0.8,
+                -size * 0.5, 0.0);
         p.setFill(fill);
         p.setStroke(fill.darker());
-        p.setStrokeWidth(1);
+        p.setStrokeWidth(4);
         return p;
     }
 
     /** Triangular spike pointing upward (for stone-edge pillars). */
     private Polygon buildSpikePolygon(double size, Color fill) {
         Polygon p = new Polygon(
-                0.0,           -size,
-                size * 0.35,    0.0,
-                -size * 0.35,   0.0);
+                0.0, -size,
+                size * 0.5, 0.0,
+                -size * 0.5, 0.0);
         p.setFill(fill);
         p.setStroke(ROCK_DARK);
-        p.setStrokeWidth(1);
+        p.setStrokeWidth(4);
         return p;
     }
 
     /** Expanding flash circle at a point, fading out. */
-    private void addFlashCircle(double x, double y, double radius, Color color,
-                                int startDelay, int fadeDuration,
-                                Timeline timeline) {
+    private void addFlashCircle(double x, double y, double radius, Color color, int startDelay, int fadeDuration, Timeline timeline) {
         Circle flash = new Circle(0, color.deriveColor(0, 1, 1, 0.85));
         flash.setCenterX(x);
         flash.setCenterY(y);
@@ -721,11 +689,10 @@ public class RockEffects {
     }
 
     /** Dust cloud — several soft circles expanding and fading. */
-    private void addDustCloud(double x, double y, double intensity,
-                              int startDelay, Timeline timeline) {
-        int count = (int) (4 + 3 * intensity);
+    private void addDustCloud(double x, double y, double intensity, int startDelay, Timeline timeline) {
+        int count = (int) (14 + 3 * intensity);
         for (int i = 0; i < count; i++) {
-            double r = 6 + random.nextDouble() * 6;
+            double r = 12 + random.nextDouble() * 6;
             Circle dust = new Circle(r, ROCK_DUST);
             dust.setCenterX(x + (random.nextDouble() - 0.5) * 20);
             dust.setCenterY(y + (random.nextDouble() - 0.5) * 14);

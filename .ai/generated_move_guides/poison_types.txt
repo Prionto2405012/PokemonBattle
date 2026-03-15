@@ -1,0 +1,76 @@
+TYPE: POISON
+TARGET EFFECT CLASS: PoisonEffects
+SOURCE DATA: src/main/resources/com/example/pokemonbattle/database/moves_gen4.json
+
+MOVE LIST WITH DESCRIPTION AND IMPLEMENTATION GUIDE
+Format: [id] move-name | class | power | acc | pp
+[316] acid | special | power=40 | acc=100 | pp=30
+  Description: Power: 40 Accuracy: 100 PP: 30 An attack that may lower DEFENSE.
+  Implementation guide: Add case in PoisonEffects.createRangedEffect -> addAcid. Ranged route. Fire a thin corrosive spray with green-violet droplets and a sizzling splash on impact. Use a few downward-dripping residual particles after the hit.
+
+[77] acid-spray | special | power=40 | acc=100 | pp=20
+  Description: Power: 40 Accuracy: 100 PP: 20 The user spits fluid that works to melt the target. This harshly reduces the targets Sp. Def stat.
+  Implementation guide: Add case -> addAcidSpray. Ranged route. Similar to Acid but wider and more forceful, with several droplet clusters and a larger corrosive burst. This should read like armor-melting pressure spray.
+
+[606] barb-barrage | physical | power=60 | acc=100 | pp=10
+  Description: Power: 60 Accuracy: 100 PP: 10 The user launches countless toxic barbs to inflict damage. This may also poison the target. This moves power is doubled if the target has a status condition.
+  Implementation guide: Add case -> addBarbBarrage. Ranged route. Launch multiple toxic spikes with staggered timings and small venom puffs on impact. Use a projectile family rather than a sludge blob family.
+
+[334] belch | special | power=120 | acc=90 | pp=10
+  Description: Power: 120 Accuracy: 90 PP: 10 The user lets out a damaging belch at the target. The user must eat a held Berry to use this move.
+  Implementation guide: Add case -> addBelch. Ranged route. Emit a thick poison gas burst from the source with forward-moving smog and a foul impact puff at the target. The travel should be cloud-like, not beam-like.
+
+[477] clear-smog | special | power=50 | acc=null | pp=15
+  Description: Power: 50 Accuracy: - PP: 15 The user attacks by throwing a clump of special mud. All status changes are returned to normal.
+  Implementation guide: Add case -> addClearSmog. Ranged route. Throw a muted smog clump that dissipates enemy aura on contact. Use gray-purple particles and a cleanup-focused fade rather than a violent burst.
+
+[453] cross-poison | physical | power=70 | acc=100 | pp=20
+  Description: Power: 70 Accuracy: 100 PP: 20 A slashing attack that may also leave the target poisoned. It has a high critical-hit ratio.
+  Implementation guide: Add case -> addCrossPoison. Contact route. Use crossing venom slashes with a purple-green flash at their intersection. This should be the poison slash premium helper.
+
+[330] gunk-shot | physical | power=120 | acc=80 | pp=5
+  Description: Power: 120 Accuracy: 80 PP: 5 The user shoots filthy garbage at the foe to attack. It may also poison the target.
+  Implementation guide: Add case -> addGunkShot. Ranged route. Launch one heavy sludge mass with a lumpy silhouette and a messy splatter burst on impact. Larger droplets should spray outward and fall slightly before cleanup.
+
+[325] poison-fang | physical | power=50 | acc=100 | pp=15
+  Description: Power: 50 Accuracy: 100 PP: 15 A sharp-fanged attack. May badly poison the foe.
+  Implementation guide: Add case -> addPoisonFang. Contact route. Combine fang silhouette cues with venom drip particles and a small toxic burst at bite contact. Reuse the existing fang pattern from electric/dark-style bite logic if later generalized.
+
+[93] poison-jab | physical | power=80 | acc=100 | pp=20
+  Description: Power: 80 Accuracy: 100 PP: 20 The foe is stabbed with a tentacle or arm steeped in poison. It may also poison the foe.
+  Implementation guide: Add case -> addPoisonJab. Contact route. Use a quick stab burst with purple droplets and a brief venom flare at endX/endY. It should be sharper and cleaner than Gunk Shot.
+
+[264] poison-sting | physical | power=15 | acc=100 | pp=35
+  Description: Power: 15 Accuracy: 100 PP: 35 An attack that may poison the target.
+  Implementation guide: Add case -> addPoisonSting. Contact or short projectile hybrid. Very small needle line with a tiny toxic sparkle. This is a lightweight baseline poison puncture helper.
+
+[326] poison-tail | physical | power=50 | acc=100 | pp=25
+  Description: Power: 50 Accuracy: 100 PP: 25 Has a high critical-hit ratio. May also poison.
+  Implementation guide: Add case -> addPoisonTail. Contact route. Use a tail-arc slash with a venom smear trail and one concentrated toxic spark at the end of the swing. Stronger arc than Poison Sting.
+
+[30] sludge | special | power=65 | acc=100 | pp=20
+  Description: Power: 65 Accuracy: 100 PP: 20 An attack that may poison the foe.
+  Implementation guide: Add case -> addSludge. Ranged route. Throw a medium sludge glob that bursts into a few viscous droplets and smog wisps at impact. This should become the core poison projectile helper.
+
+[39] sludge-bomb | special | power=90 | acc=100 | pp=10
+  Description: Power: 90 Accuracy: 100 PP: 10 An attack that may poison the foe.
+  Implementation guide: Add case -> addSludgeBomb. Ranged route. Upgrade Sludge into a denser, rounder projectile with a larger explosive splat and wider droplet field. More impact flash, less gas than Sludge Wave.
+
+[331] sludge-wave | special | power=95 | acc=100 | pp=10
+  Description: Power: 95 Accuracy: 100 PP: 10 It swamps the area around the user with a giant sludge wave. It may also poison those hit.
+  Implementation guide: Add case -> addSludgeWave. Ranged/area route. Sweep a wide toxic wave across the target area with layered sludge ridges and poison mist. This should be broader and more area-focused than Sludge Bomb.
+
+[548] smog | special | power=30 | acc=70 | pp=20
+  Description: Power: 30 Accuracy: 70 PP: 20 An attack that may poison the foe.
+  Implementation guide: Add case -> addSmog. Ranged route. Build a loose drifting cloud with weak forward motion and a lingering poison puff at the target. Keep it visually lighter and less precise than Belch.
+
+[76] venoshock | special | power=65 | acc=100 | pp=10
+  Description: Power: 65 Accuracy: 100 PP: 10 The user drenches the target in a special poisonous liquid. Its power is doubled if the target is poisoned.
+  Implementation guide: Add case -> addVenoshock. Ranged route. Fire a high-energy toxic projectile with brighter electric-like venom crackle around the core, then detonate into sharp poison sparks. It should feel more energized than ordinary sludge attacks.
+
+TYPE-LEVEL INTEGRATION CHECKLIST
+1) Add the new effect class import, field, and constructor initialization in BattleAnimationManager.
+2) Update getAttackDistance(...) and isRangedMove(...) for the moves of this type so contact and projectile routing are correct.
+3) Update playRangedAnimation(...) and createTypeSpecificImpact(...) to dispatch this type explicitly.
+4) Keep all transient JavaFX nodes unmanaged, mouse transparent, and removed through registerCleanup.
+5) Validate both player-to-opponent and opponent-to-player directions and confirm no lingering nodes remain in battleField.

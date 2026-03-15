@@ -39,25 +39,20 @@ public class GroundEffects {
         this.battleField = battleField;
     }
 
-    // -----------------------------------------------------------------
     // Public API – single-point overload (melee / contact moves)
-    // -----------------------------------------------------------------
 
-    public void createImpactEffect(double x, double y, String moveName,
-                                   int movePower, Timeline timeline) {
+    public void createImpactEffect(double x, double y, String moveName, int movePower, Timeline timeline) {
         createImpactEffect(x, y, x, y, moveName, movePower, timeline);
     }
 
-    // -----------------------------------------------------------------
     // Public API – full signature (ranged / projectile moves)
-    // -----------------------------------------------------------------
 
     public void createImpactEffect(double startX, double startY,
                                    double endX, double endY,
                                    String moveName, int movePower,
                                    Timeline timeline) {
 
-        double intensity = clamp(movePower / 100.0, 0.4, 1.8);
+        double intensity = clamp(movePower / 100.0, 0.8, 2.4);
 
         switch (moveName) {
             // Screen shake + ground cracks
@@ -105,19 +100,17 @@ public class GroundEffects {
         }
     }
 
-    // -----------------------------------------------------------------
     // Public API – ranged lead effect (mud / sand projectile to target)
-    // -----------------------------------------------------------------
 
     public void createRangedEffect(double startX, double startY,
                                    double endX, double endY,
                                    String moveName, int movePower,
                                    Timeline timeline) {
-        double intensity = clamp(movePower / 100.0, 0.4, 1.8);
-        int count = (int) (3 + 4 * intensity);
+        double intensity = clamp(movePower / 100.0, 0.8, 2.4);
+        int count = (int) (13 + 4 * intensity);
 
         for (int i = 0; i < count; i++) {
-            Circle blob = buildMudBlob(6 + random.nextDouble() * 6 * intensity,
+            Circle blob = buildMudBlob(12 + random.nextDouble() * 6 * intensity,
                     i % 3 == 0 ? GROUND_MUD : i % 3 == 1 ? GROUND_BROWN : GROUND_CLAY);
             blob.setCenterX(startX + (random.nextDouble() - 0.5) * 20);
             blob.setCenterY(startY + (random.nextDouble() - 0.5) * 20);
@@ -144,10 +137,10 @@ public class GroundEffects {
         }
 
         // Splatter circles on impact
-        int splatters = (int) (3 + 2 * intensity);
+        int splatters = (int) (13 + 2 * intensity);
         int baseDelay = count * 40;
         for (int i = 0; i < splatters; i++) {
-            Circle splat = new Circle(3 + random.nextDouble() * 4,
+            Circle splat = new Circle(8 + random.nextDouble() * 4,
                     GROUND_MUD.deriveColor(0, 1, 1, 0.7));
             splat.setCenterX(endX);
             splat.setCenterY(endY);
@@ -174,21 +167,19 @@ public class GroundEffects {
         }
     }
 
-    // =================================================================
     // Screen shake + ground crack animations
-    // =================================================================
 
     /** bone-rush / bonemerang – bone projectiles hurled with rapid rotation. */
     private void addBoneStrike(double sx, double sy, double ex, double ey,
                                double intensity, Timeline timeline) {
-        int count = (int) (2 + 2 * intensity);
+        int count = (int) (10 + 2 * intensity);
         for (int i = 0; i < count; i++) {
             Rectangle bone = new Rectangle(22 * intensity, 5 * intensity);
             bone.setFill(GROUND_SAND);
             bone.setStroke(GROUND_TAN);
-            bone.setStrokeWidth(1);
-            bone.setArcWidth(3);
-            bone.setArcHeight(3);
+            bone.setStrokeWidth(4);
+            bone.setArcWidth(6);
+            bone.setArcHeight(6);
             bone.setLayoutX(sx + (random.nextDouble() - 0.5) * 14);
             bone.setLayoutY(sy + (random.nextDouble() - 0.5) * 14);
             bone.setOpacity(0);
@@ -238,7 +229,7 @@ public class GroundEffects {
         prepareTransientNode(wave);
         battleField.getChildren().add(wave);
 
-        double waveR = 40 + 25 * intensity;
+        double waveR = 50 + 35 * intensity;
         KeyFrame wAppear = new KeyFrame(Duration.millis(0),
                 new KeyValue(wave.opacityProperty(), 0.8));
         KeyFrame wExpand = new KeyFrame(Duration.millis(250),
@@ -249,14 +240,13 @@ public class GroundEffects {
         registerCleanup(timeline, wave);
 
         addCrackLines(x, y, intensity, 0, timeline);
-        addDustCloud(x, y, intensity * 1.2, 80, timeline);
-        addFlashCircle(x, y, 20 * intensity, GROUND_TAN, 0, 180, timeline);
+        addDustCloud(x, y, intensity * 1.8, 80, timeline);
+        addFlashCircle(x, y, 28 * intensity, GROUND_TAN, 0, 180, timeline);
     }
 
     /** drill-run – spinning drill projectile charges from attacker to target. */
-    private void addDrillRun(double sx, double sy, double ex, double ey,
-                             double intensity, Timeline timeline) {
-        Polygon drill = buildDrillPolygon(16 * intensity, GROUND_BROWN);
+    private void addDrillRun(double sx, double sy, double ex, double ey, double intensity, Timeline timeline) {
+        Polygon drill = buildDrillPolygon(22 * intensity, GROUND_BROWN);
         drill.setLayoutX(sx);
         drill.setLayoutY(sy);
         drill.setOpacity(0);
@@ -276,9 +266,9 @@ public class GroundEffects {
         registerCleanup(timeline, drill);
 
         // Dust trail along path
-        int trails = (int) (5 * intensity);
+        int trails = (int) (15 * intensity);
         for (int i = 0; i < trails; i++) {
-            Circle dust = new Circle(3 + random.nextDouble() * 3, GROUND_DUST);
+            Circle dust = new Circle(10 + random.nextDouble() * 3, GROUND_DUST);
             double frac = (i + 1.0) / (trails + 1);
             double mx = sx + (ex - sx) * frac + (random.nextDouble() - 0.5) * 14;
             double my = sy + (ey - sy) * frac + (random.nextDouble() - 0.5) * 14;
@@ -304,28 +294,21 @@ public class GroundEffects {
     }
 
     /** earthquake – heavy ground vibration with extensive cracks and debris. */
-    private void addEarthquake(double x, double y, double intensity,
-                               Timeline timeline) {
-        // ── Beige/khaki ground overlay (larger for earthquake) ───────────────
-        addGroundOverlay(x, y, 70 + 40 * intensity, intensity * 1.3, 0, timeline);
-
-        // ── Shake the battlefield ────────────────────────────────────────────
-        addBattleFieldShake(intensity, 0, timeline);
-
+    private void addEarthquake(double x, double y, double intensity, Timeline timeline) {
         // Multiple shockwave rings
-        for (int w = 0; w < 3; w++) {
+        for (int w = 0; w < 5; w++) {
             Ellipse wave = new Ellipse(0, 0);
             wave.setCenterX(x);
             wave.setCenterY(y);
             wave.setFill(Color.TRANSPARENT);
             wave.setStroke(w == 0 ? GROUND_BROWN : w == 1 ? GROUND_CLAY : GROUND_TAN);
-            wave.setStrokeWidth(2.5 * intensity);
+            wave.setStrokeWidth(5.5 * intensity);
             wave.setOpacity(0);
             wave.setEffect(new GaussianBlur(2));
             prepareTransientNode(wave);
             battleField.getChildren().add(wave);
 
-            double waveR = 50 + 30 * intensity;
+            double waveR = 60 + 30 * intensity;
             int delay = w * 60;
             KeyFrame wAppear = new KeyFrame(Duration.millis(delay),
                     new KeyValue(wave.opacityProperty(), 0.75));
@@ -338,9 +321,9 @@ public class GroundEffects {
         }
 
         // Ground debris fragments
-        int debris = (int) (8 + 6 * intensity);
+        int debris = (int) (18 + 6 * intensity);
         for (int i = 0; i < debris; i++) {
-            Polygon frag = buildRockChunk(4 + random.nextDouble() * 6,
+            Polygon frag = buildRockChunk(10 + random.nextDouble() * 6,
                     i % 3 == 0 ? GROUND_BROWN : i % 3 == 1 ? GROUND_DARK : GROUND_CLAY);
             frag.setLayoutX(x + (random.nextDouble() - 0.5) * 30);
             frag.setLayoutY(y);
@@ -366,16 +349,15 @@ public class GroundEffects {
             registerCleanup(timeline, frag);
         }
 
-        addCrackLines(x, y, intensity * 1.4, 0, timeline);
-        addDustCloud(x, y, intensity * 1.5, 60, timeline);
-        addFlashCircle(x, y, 30 * intensity, GROUND_TAN, 0, 220, timeline);
+        addCrackLines(x, y, intensity * 1.8, 0, timeline);
+        addDustCloud(x, y, intensity * 1.8, 60, timeline);
+        addFlashCircle(x, y, 38 * intensity, GROUND_TAN, 0, 220, timeline);
     }
 
     /** high-horsepower – massive stomp impact with shockwave and debris. */
-    private void addHighHorsepower(double x, double y, double intensity,
-                                   Timeline timeline) {
+    private void addHighHorsepower(double x, double y, double intensity, Timeline timeline) {
         // Central impact flash
-        addFlashCircle(x, y, 28 * intensity, GROUND_CLAY, 0, 200, timeline);
+        addFlashCircle(x, y, 35 * intensity, GROUND_CLAY, 0, 200, timeline);
 
         // Stomp shockwave
         Ellipse shockwave = new Ellipse(0, 0);
@@ -383,12 +365,12 @@ public class GroundEffects {
         shockwave.setCenterY(y);
         shockwave.setFill(Color.TRANSPARENT);
         shockwave.setStroke(GROUND_BROWN);
-        shockwave.setStrokeWidth(4 * intensity);
+        shockwave.setStrokeWidth(8 * intensity);
         shockwave.setOpacity(0);
         prepareTransientNode(shockwave);
         battleField.getChildren().add(shockwave);
 
-        double waveR = 45 + 20 * intensity;
+        double waveR = 55 + 20 * intensity;
         KeyFrame sAppear = new KeyFrame(Duration.millis(20),
                 new KeyValue(shockwave.opacityProperty(), 0.85));
         KeyFrame sExpand = new KeyFrame(Duration.millis(220),
@@ -399,9 +381,9 @@ public class GroundEffects {
         registerCleanup(timeline, shockwave);
 
         // Flying debris
-        int count = (int) (8 + 5 * intensity);
+        int count = (int) (18 + 5 * intensity);
         for (int i = 0; i < count; i++) {
-            Polygon chunk = buildRockChunk(5 + random.nextDouble() * 6,
+            Polygon chunk = buildRockChunk(10+ random.nextDouble() * 6,
                     i % 2 == 0 ? GROUND_BROWN : GROUND_DARK);
             chunk.setLayoutX(x);
             chunk.setLayoutY(y);
@@ -428,30 +410,27 @@ public class GroundEffects {
         }
 
         addCrackLines(x, y, intensity, 20, timeline);
-        addDustCloud(x, y, intensity * 1.3, 80, timeline);
+        addDustCloud(x, y, intensity * 1.7, 80, timeline);
     }
 
     /** stomping-tantrum – rapid repeated stomps with expanding cracks. */
-    private void addStompingTantrum(double x, double y, double intensity,
-                                   Timeline timeline) {
-        int stomps = (int) (3 + 2 * intensity);
+    private void addStompingTantrum(double x, double y, double intensity, Timeline timeline) {
+        int stomps = (int) (13 + 2 * intensity);
         for (int s = 0; s < stomps; s++) {
             int baseDelay = s * 100;
-
             // Stomp flash for each impact
-            addFlashCircle(x, y, 16 * intensity, GROUND_CLAY, baseDelay, 90, timeline);
+            addFlashCircle(x, y, 23 * intensity, GROUND_CLAY, baseDelay, 90, timeline);
 
             // Small debris per stomp
-            int frags = (int) (3 + 2 * intensity);
+            int frags = (int) (13 + 2 * intensity);
             for (int i = 0; i < frags; i++) {
-                Polygon chunk = buildRockChunk(3 + random.nextDouble() * 5,
+                Polygon chunk = buildRockChunk(10 + random.nextDouble() * 5,
                         i % 2 == 0 ? GROUND_BROWN : GROUND_TAN);
                 chunk.setLayoutX(x + (random.nextDouble() - 0.5) * 16);
                 chunk.setLayoutY(y);
                 chunk.setOpacity(0);
                 prepareTransientNode(chunk);
                 battleField.getChildren().add(chunk);
-
                 double angle = random.nextDouble() * 2 * Math.PI;
                 double dist = 15 + random.nextDouble() * 20 * intensity;
                 int delay = baseDelay + i * 12;
@@ -473,27 +452,24 @@ public class GroundEffects {
             }
         }
 
-        addCrackLines(x, y, intensity * 1.2, 40, timeline);
-        addDustCloud(x, y, intensity, 60, timeline);
+        addCrackLines(x, y, intensity * 1.8, 40, timeline);
+        addDustCloud(x, y, intensity * 1.7, 80, timeline);
     }
 
-    // =================================================================
     // Eruption pillar animations
-    // =================================================================
 
     /** earth-power – brown/tan pillars erupt upward from beneath the defender. */
-    private void addEarthPower(double x, double y, double intensity,
-                               Timeline timeline) {
-        int count = (int) (4 + 3 * intensity);
+    private void addEarthPower(double x, double y, double intensity, Timeline timeline) {
+        int count = (int) (14 + 3 * intensity);
         for (int i = 0; i < count; i++) {
             double w = 10 + random.nextDouble() * 8 * intensity;
             double h = 30 + random.nextDouble() * 25 * intensity;
             Rectangle pillar = new Rectangle(w, h);
             pillar.setFill(i % 2 == 0 ? GROUND_BROWN : GROUND_TAN);
             pillar.setStroke(GROUND_DARK);
-            pillar.setStrokeWidth(1);
-            pillar.setArcWidth(4);
-            pillar.setArcHeight(4);
+            pillar.setStrokeWidth(3);
+            pillar.setArcWidth(8);
+            pillar.setArcHeight(8);
             double offsetX = (i - count / 2.0) * 16;
             pillar.setLayoutX(x + offsetX - w / 2);
             pillar.setLayoutY(y + 10);
@@ -519,16 +495,16 @@ public class GroundEffects {
         }
 
         addDustCloud(x, y, intensity, 60, timeline);
-        addFlashCircle(x, y, 22 * intensity, GROUND_CLAY, 0, 180, timeline);
+        addFlashCircle(x, y, 30 * intensity, GROUND_CLAY, 0, 180, timeline);
     }
 
     /** land's-wrath – wide line of earth pillars erupting across the target zone. */
     private void addLandsWrath(double x, double y, double intensity,
                                Timeline timeline) {
-        int count = (int) (6 + 4 * intensity);
+        int count = (int) (16 + 4 * intensity);
         for (int i = 0; i < count; i++) {
-            double w = 8 + random.nextDouble() * 7;
-            double h = 25 + random.nextDouble() * 30 * intensity;
+            double w = 10 + random.nextDouble() * 7;
+            double h = 30 + random.nextDouble() * 30 * intensity;
             Polygon pillar = buildPillarPolygon(w, h,
                     i % 3 == 0 ? GROUND_BROWN : i % 3 == 1 ? GROUND_CLAY : GROUND_TAN);
             double spread = (i - count / 2.0) * 14;
@@ -555,18 +531,16 @@ public class GroundEffects {
             registerCleanup(timeline, pillar);
         }
 
-        addDustCloud(x, y, intensity * 1.3, 40, timeline);
-        addFlashCircle(x, y, 26 * intensity, GROUND_TAN, 0, 200, timeline);
+        addDustCloud(x, y, intensity * 1.8, 40, timeline);
+        addFlashCircle(x, y, 30 * intensity, GROUND_TAN, 0, 200, timeline);
     }
 
     /** precipice-blades – tall sharp blades of earth erupt violently. */
-    private void addPrecipiceBlades(double x, double y, double intensity,
-                                    Timeline timeline) {
-        int count = (int) (5 + 3 * intensity);
+    private void addPrecipiceBlades(double x, double y, double intensity, Timeline timeline) {
+        int count = (int) (15 + 3 * intensity);
         for (int i = 0; i < count; i++) {
-            double size = 35 + random.nextDouble() * 25 * intensity;
-            Polygon blade = buildBladePolygon(size,
-                    i % 2 == 0 ? GROUND_DARK : GROUND_BROWN);
+            double size = 45 + random.nextDouble() * 25 * intensity;
+            Polygon blade = buildBladePolygon(size, i % 2 == 0 ? GROUND_DARK : GROUND_BROWN);
             double offset = (i - count / 2.0) * 18;
             blade.setLayoutX(x + offset);
             blade.setLayoutY(y + 20);
@@ -592,20 +566,18 @@ public class GroundEffects {
             registerCleanup(timeline, blade);
         }
 
-        addDustCloud(x, y, intensity * 1.5, 40, timeline);
-        addFlashCircle(x, y, 28 * intensity, GROUND_CLAY, 0, 200, timeline);
+        addDustCloud(x, y, intensity * 1.9, 40, timeline);
+        addFlashCircle(x, y, 35 * intensity, GROUND_CLAY, 0, 200, timeline);
     }
 
-    // =================================================================
     // Sand swirl animations
-    // =================================================================
 
     /** sand-tomb – spinning vortex of sand trapping the target. */
     private void addSandTomb(double x, double y, double intensity,
                              Timeline timeline) {
-        int count = (int) (12 + 8 * intensity);
+        int count = (int) (20 + 8 * intensity);
         for (int i = 0; i < count; i++) {
-            Circle grain = new Circle(2 + random.nextDouble() * 3,
+            Circle grain = new Circle(8 + random.nextDouble() * 3,
                     i % 3 == 0 ? GROUND_SAND : i % 3 == 1 ? GROUND_TAN : GROUND_CLAY);
             double angle = (i / (double) count) * 2 * Math.PI;
             double radius = 10 + random.nextDouble() * 8;
@@ -616,7 +588,7 @@ public class GroundEffects {
             prepareTransientNode(grain);
             battleField.getChildren().add(grain);
 
-            double spiralR = 30 + 20 * intensity;
+            double spiralR = 38 + 20 * intensity;
             double endAngle = angle + Math.PI * 3;
             int delay = i * 20;
 
@@ -635,7 +607,7 @@ public class GroundEffects {
         }
 
         // Central swirl haze
-        Ellipse haze = new Ellipse(10, 6);
+        Ellipse haze = new Ellipse(18, 12);
         haze.setCenterX(x);
         haze.setCenterY(y);
         haze.setFill(GROUND_SAND.deriveColor(0, 1, 1, 0.4));
@@ -656,23 +628,21 @@ public class GroundEffects {
     }
 
     /** sandstorm – swirling sand particles engulfing the target area. */
-    private void addSandstorm(double x, double y, double intensity,
-                              Timeline timeline) {
-        int count = (int) (16 + 10 * intensity);
+    private void addSandstorm(double x, double y, double intensity, Timeline timeline) {
+        int count = (int) (26 + 10 * intensity);
         for (int i = 0; i < count; i++) {
-            Circle sand = new Circle(1.5 + random.nextDouble() * 2.5,
+            Circle sand = new Circle(4.5 + random.nextDouble() * 2.5,
                     i % 4 == 0 ? GROUND_SAND : i % 4 == 1 ? GROUND_TAN
                     : i % 4 == 2 ? GROUND_DUST : GROUND_CLAY);
             double startAngle = random.nextDouble() * 2 * Math.PI;
-            double startR = 5 + random.nextDouble() * 15;
+            double startR = 4 + random.nextDouble() * 15;
             sand.setCenterX(x + Math.cos(startAngle) * startR);
             sand.setCenterY(y + Math.sin(startAngle) * startR * 0.5);
             sand.setOpacity(0);
             prepareTransientNode(sand);
             battleField.getChildren().add(sand);
 
-            double endAngle = startAngle + Math.PI * 2.5
-                    + random.nextDouble() * Math.PI;
+            double endAngle = startAngle + Math.PI * 2.5 + random.nextDouble() * Math.PI;
             double endR = 25 + random.nextDouble() * 30 * intensity;
             int delay = i * 18;
 
@@ -694,19 +664,18 @@ public class GroundEffects {
             registerCleanup(timeline, sand);
         }
 
-        addFlashCircle(x, y, 20 * intensity, GROUND_SAND, 0, 300, timeline);
+        addFlashCircle(x, y, 28 * intensity, GROUND_SAND, 0, 300, timeline);
     }
 
     /** scorching-sands – hot sand swirl with reddish glow. */
-    private void addScorchingSands(double x, double y, double intensity,
-                                   Timeline timeline) {
+    private void addScorchingSands(double x, double y, double intensity, Timeline timeline) {
         Color scorchGlow = Color.web("#FF8A65");
-        int count = (int) (14 + 8 * intensity);
+        int count = (int) (24 + 8 * intensity);
         for (int i = 0; i < count; i++) {
-            Circle grain = new Circle(2 + random.nextDouble() * 3,
+            Circle grain = new Circle(8 + random.nextDouble() * 3,
                     i % 3 == 0 ? GROUND_SAND : i % 3 == 1 ? scorchGlow : GROUND_TAN);
             double angle = (i / (double) count) * 2 * Math.PI;
-            double radius = 8 + random.nextDouble() * 10;
+            double radius = 14 + random.nextDouble() * 10;
             grain.setCenterX(x + Math.cos(angle) * radius);
             grain.setCenterY(y + Math.sin(angle) * radius * 0.5);
             grain.setOpacity(0);
@@ -715,7 +684,7 @@ public class GroundEffects {
             prepareTransientNode(grain);
             battleField.getChildren().add(grain);
 
-            double spiralR = 28 + 18 * intensity;
+            double spiralR = 32 + 18 * intensity;
             double endAngle = angle + Math.PI * 2.8;
             int delay = i * 20;
 
@@ -733,19 +702,16 @@ public class GroundEffects {
             registerCleanup(timeline, grain);
         }
 
-        addFlashCircle(x, y, 22 * intensity, scorchGlow, 0, 250, timeline);
+        addFlashCircle(x, y, 28 * intensity, scorchGlow, 0, 250, timeline);
     }
 
-    // =================================================================
     // Mud / sand impact animations
-    // =================================================================
 
     /** mud-bomb / mud-shot – mud splatters outward on impact. */
-    private void addMudSplatter(double x, double y, double intensity,
-                                Timeline timeline) {
-        int count = (int) (6 + 5 * intensity);
+    private void addMudSplatter(double x, double y, double intensity, Timeline timeline) {
+        int count = (int) (16 + 5 * intensity);
         for (int i = 0; i < count; i++) {
-            Circle blob = new Circle(4 + random.nextDouble() * 5 * intensity,
+            Circle blob = new Circle(10 + random.nextDouble() * 5 * intensity,
                     i % 3 == 0 ? GROUND_MUD : i % 3 == 1 ? GROUND_BROWN : GROUND_CLAY);
             blob.setCenterX(x);
             blob.setCenterY(y);
@@ -754,8 +720,7 @@ public class GroundEffects {
             prepareTransientNode(blob);
             battleField.getChildren().add(blob);
 
-            double angle = (i / (double) count) * 2 * Math.PI
-                    + (random.nextDouble() - 0.5) * 0.5;
+            double angle = (i / (double) count) * 2 * Math.PI + (random.nextDouble() - 0.5) * 0.5;
             double dist = 15 + random.nextDouble() * 25 * intensity;
             int delay = i * 15;
 
@@ -775,16 +740,16 @@ public class GroundEffects {
             registerCleanup(timeline, blob);
         }
 
-        addFlashCircle(x, y, 18 * intensity, GROUND_MUD, 0, 160, timeline);
-        addDustCloud(x, y, intensity * 0.7, 100, timeline);
+        addFlashCircle(x, y, 24 * intensity, GROUND_MUD, 0, 160, timeline);
+        addDustCloud(x, y, intensity * 1, 100, timeline);
     }
 
     /** sand-attack – sand burst at target with lingering haze. */
     private void addSandSplatter(double x, double y, double intensity,
                                  Timeline timeline) {
-        int count = (int) (10 + 6 * intensity);
+        int count = (int) (20 + 6 * intensity);
         for (int i = 0; i < count; i++) {
-            Circle grain = new Circle(1.5 + random.nextDouble() * 2,
+            Circle grain = new Circle(4.5 + random.nextDouble() * 2,
                     i % 3 == 0 ? GROUND_SAND : i % 3 == 1 ? GROUND_TAN : GROUND_DUST);
             grain.setCenterX(x + (random.nextDouble() - 0.5) * 10);
             grain.setCenterY(y + (random.nextDouble() - 0.5) * 10);
@@ -810,20 +775,18 @@ public class GroundEffects {
             registerCleanup(timeline, grain);
         }
 
-        addFlashCircle(x, y, 14 * intensity, GROUND_SAND, 0, 180, timeline);
+        addFlashCircle(x, y, 24 * intensity, GROUND_SAND, 0, 180, timeline);
     }
 
-    // =================================================================
     // Dust cloud animation
-    // =================================================================
 
     /** dig – underground approach followed by erupting dust cloud at target. */
     private void addDig(double x, double y, double intensity,
                         Timeline timeline) {
         // Dust burst upward
-        int count = (int) (8 + 6 * intensity);
+        int count = (int) (18 + 6 * intensity);
         for (int i = 0; i < count; i++) {
-            Circle dust = new Circle(4 + random.nextDouble() * 5,
+            Circle dust = new Circle(10 + random.nextDouble() * 5,
                     i % 3 == 0 ? GROUND_DUST : i % 3 == 1 ? GROUND_SAND : GROUND_TAN);
             dust.setCenterX(x + (random.nextDouble() - 0.5) * 24);
             dust.setCenterY(y);
@@ -852,9 +815,9 @@ public class GroundEffects {
         }
 
         // Ground debris tossed upward
-        int debris = (int) (4 + 3 * intensity);
+        int debris = (int) (14 + 3 * intensity);
         for (int i = 0; i < debris; i++) {
-            Polygon chunk = buildRockChunk(4 + random.nextDouble() * 5,
+            Polygon chunk = buildRockChunk(10 + random.nextDouble() * 5,
                     i % 2 == 0 ? GROUND_BROWN : GROUND_DARK);
             chunk.setLayoutX(x + (random.nextDouble() - 0.5) * 20);
             chunk.setLayoutY(y);
@@ -862,8 +825,7 @@ public class GroundEffects {
             prepareTransientNode(chunk);
             battleField.getChildren().add(chunk);
 
-            double angle = -Math.PI / 2
-                    + (random.nextDouble() - 0.5) * Math.PI * 0.6;
+            double angle = -Math.PI / 2 + (random.nextDouble() - 0.5) * Math.PI * 0.6;
             double dist = 20 + random.nextDouble() * 25 * intensity;
             int delay = 30 + i * 25;
 
@@ -883,21 +845,18 @@ public class GroundEffects {
             registerCleanup(timeline, chunk);
         }
 
-        addFlashCircle(x, y, 24 * intensity, GROUND_TAN, 0, 200, timeline);
+        addFlashCircle(x, y, 30 * intensity, GROUND_TAN, 0, 200, timeline);
     }
 
-    // =================================================================
     // Default ground animation (fallback)
-    // =================================================================
 
-    private void addDefaultGround(double x, double y, double intensity,
-                                  Timeline timeline) {
-        int count = (int) (6 + 4 * intensity);
+    private void addDefaultGround(double x, double y, double intensity, Timeline timeline) {
+        int count = (int) (16 + 4 * intensity);
         for (int i = 0; i < count; i++) {
-            Polygon chunk = buildRockChunk(5 + random.nextDouble() * 7,
+            Polygon chunk = buildRockChunk(10 + random.nextDouble() * 7,
                     i % 2 == 0 ? GROUND_BROWN : GROUND_CLAY);
             double angle = (i / (double) count) * 2 * Math.PI;
-            double radius = 10;
+            double radius = 18;
             chunk.setLayoutX(x + Math.cos(angle) * radius);
             chunk.setLayoutY(y + Math.sin(angle) * radius);
             chunk.setRotate(random.nextDouble() * 360);
@@ -906,7 +865,7 @@ public class GroundEffects {
             prepareTransientNode(chunk);
             battleField.getChildren().add(chunk);
 
-            double burstR = 28 + 15 * intensity;
+            double burstR = 35 + 15 * intensity;
             int delay = i * 25;
             KeyFrame appear = new KeyFrame(Duration.millis(delay),
                     new KeyValue(chunk.opacityProperty(), 0.9));
@@ -925,12 +884,10 @@ public class GroundEffects {
         }
 
         addDustCloud(x, y, intensity, 60, timeline);
-        addFlashCircle(x, y, 16 * intensity, GROUND_TAN, 0, 150, timeline);
+        addFlashCircle(x, y, 30 * intensity, GROUND_TAN, 0, 150, timeline);
     }
 
-    // =================================================================
     // Shared helpers
-    // =================================================================
 
     /** Irregular polygon resembling a rough earth chunk. */
     private Polygon buildRockChunk(double size, Color fill) {
@@ -944,49 +901,49 @@ public class GroundEffects {
                 -size * 0.45,  size * 0.2);
         p.setFill(fill);
         p.setStroke(GROUND_DARK);
-        p.setStrokeWidth(1);
+        p.setStrokeWidth(4);
         return p;
     }
 
     /** Tall tapered polygon used for earth pillars. */
     private Polygon buildPillarPolygon(double w, double h, Color fill) {
         Polygon p = new Polygon(
-                -w * 0.35,  0.0,
+                -w * 0.35, 0.0,
                 -w * 0.25, -h * 0.8,
-                 0.0,       -h,
-                 w * 0.25,  -h * 0.8,
-                 w * 0.35,   0.0);
+                 0.0, -h,
+                 w * 0.25, -h * 0.8,
+                 w * 0.35, 0.0);
         p.setFill(fill);
         p.setStroke(GROUND_DARK);
-        p.setStrokeWidth(1);
+        p.setStrokeWidth(4);
         return p;
     }
 
     /** Sharp upward blade polygon for precipice-blades. */
     private Polygon buildBladePolygon(double size, Color fill) {
         Polygon p = new Polygon(
-                 0.0,          -size,
-                 size * 0.2,   -size * 0.3,
-                 size * 0.3,    0.0,
-                -size * 0.3,    0.0,
-                -size * 0.2,   -size * 0.3);
+                 0.0, -size,
+                 size * 0.2, -size * 0.3,
+                 size * 0.3, 0.0,
+                -size * 0.3, 0.0,
+                -size * 0.2, -size * 0.3);
         p.setFill(fill);
         p.setStroke(GROUND_DARK);
-        p.setStrokeWidth(1.2);
+        p.setStrokeWidth(4);
         return p;
     }
 
     /** Pointed polygon for drill-run spinning projectile. */
     private Polygon buildDrillPolygon(double size, Color fill) {
         Polygon p = new Polygon(
-                 size * 0.7,    0.0,
-                 size * 0.15,  -size * 0.3,
-                -size * 0.5,   -size * 0.2,
-                -size * 0.5,    size * 0.2,
-                 size * 0.15,   size * 0.3);
+                 size * 0.7, 0.0,
+                 size * 0.15, -size * 0.3,
+                -size * 0.5, -size * 0.2,
+                -size * 0.5, size * 0.2,
+                 size * 0.15, size * 0.3);
         p.setFill(fill);
         p.setStroke(GROUND_DARK);
-        p.setStrokeWidth(1);
+        p.setStrokeWidth(4);
         return p;
     }
 
@@ -994,24 +951,24 @@ public class GroundEffects {
     private Circle buildMudBlob(double radius, Color fill) {
         Circle c = new Circle(radius, fill);
         c.setStroke(GROUND_DARK);
-        c.setStrokeWidth(1);
+        c.setStrokeWidth(4);
         return c;
     }
 
     /** Crack lines radiating from an impact point. */
     private void addCrackLines(double x, double y, double intensity,
                                int startDelay, Timeline timeline) {
-        int count = (int) (5 + 4 * intensity);
+        int count = (int) (15 + 4 * intensity);
         for (int i = 0; i < count; i++) {
             double angle = (i / (double) count) * 2 * Math.PI
                     + (random.nextDouble() - 0.5) * 0.4;
-            double length = 18 + random.nextDouble() * 25 * intensity;
+            double length = 24 + random.nextDouble() * 25 * intensity;
 
             Line crack = new Line(x, y,
                     x + Math.cos(angle) * 3,
                     y + Math.sin(angle) * 3);
             crack.setStroke(GROUND_DARK);
-            crack.setStrokeWidth(1.5 + random.nextDouble() * 1.5);
+            crack.setStrokeWidth(3.5 + random.nextDouble() * 1.5);
             crack.setOpacity(0);
             prepareTransientNode(crack);
             battleField.getChildren().add(crack);
@@ -1054,11 +1011,10 @@ public class GroundEffects {
     }
 
     /** Dust cloud — several soft circles expanding and fading. */
-    private void addDustCloud(double x, double y, double intensity,
-                              int startDelay, Timeline timeline) {
-        int count = (int) (4 + 3 * intensity);
+    private void addDustCloud(double x, double y, double intensity, int startDelay, Timeline timeline) {
+        int count = (int) (14 + 3 * intensity);
         for (int i = 0; i < count; i++) {
-            double r = 6 + random.nextDouble() * 6;
+            double r = 10 + random.nextDouble() * 6;
             Circle dust = new Circle(r, GROUND_DUST);
             dust.setCenterX(x + (random.nextDouble() - 0.5) * 22);
             dust.setCenterY(y + (random.nextDouble() - 0.5) * 14);
