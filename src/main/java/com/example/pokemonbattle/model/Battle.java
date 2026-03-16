@@ -121,12 +121,44 @@ public class Battle {
 
     private void executeMove(PokemonInstance attacker, Move move, PokemonInstance defender) {
         if (move == null || attacker.isFainted()) return;
+
+        // Handle lunar-blessing as a self-heal status move
+        if ("lunar-blessing".equals(move.getName())) {
+            int healAmount = Math.max(1, attacker.getMaxHp() / 2);
+            int actualHeal = Math.min(healAmount, attacker.getMaxHp() - attacker.getCurrentHp());
+            if (actualHeal > 0) {
+                attacker.heal(actualHeal);
+            }
+            notifyHealApplied(attacker.getName(), move.getName(), actualHeal);
+            return;
+        }
+
         int damage = calculateDamage(move, attacker, defender);
         defender.takeDamage(damage);
         notifyDamageDealt(attacker.getName(), move.getName(), defender.getName(), damage);
+
+        // Drain moves restore HP to the attacker
+        if (isDrainMove(move.getName())) {
+            int healAmount = Math.max(1, damage / 2);
+            int actualHeal = Math.min(healAmount, attacker.getMaxHp() - attacker.getCurrentHp());
+            if (actualHeal > 0) {
+                attacker.heal(actualHeal);
+            }
+            notifyHealApplied(attacker.getName(), move.getName(), actualHeal);
+        }
+
         if (defender.isFainted()) {
             notifyPokemonFainted(defender.getName());
         }
+    }
+
+    private boolean isDrainMove(String moveName) {
+        return switch (moveName) {
+            case "drain-punch", "giga-drain", "mega-drain", "absorb",
+                 "leech-life", "draining-kiss", "dream-eater",
+                 "horn-leech", "oblivion-wing", "parabolic-charge" -> true;
+            default -> false;
+        };
     }
 
     private int calculateDamage(Move move, PokemonInstance attacker, PokemonInstance defender) {
@@ -265,6 +297,10 @@ public class Battle {
         for (BattleListener l : listeners) l.onBattleEnd(winnerName);
     }
 
+    private void notifyHealApplied(String pokemonName, String moveName, int healAmount) {
+        for (BattleListener l : listeners) l.onHealApplied(pokemonName, moveName, healAmount);
+    }
+
     private void notifyPlayerPokemonFaintedNeedsSwitch(String playerName) {
         for (BattleListener l : listeners) l.onPlayerPokemonFaintedNeedsSwitch(playerName);
     }
@@ -276,6 +312,7 @@ public class Battle {
         void onPokemonFainted(String pokemonName);
         void onPokemonSwitched(String playerName, String pokemonName);
         void onBattleEnd(String winnerName);
+        void onHealApplied(String pokemonName, String moveName, int healAmount);
         /** Called when player1's active pokemon faints — controller must show switch overlay. */
         void onPlayerPokemonFaintedNeedsSwitch(String playerName);
     }

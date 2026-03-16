@@ -32,9 +32,14 @@ import javafx.animation.TranslateTransition;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.effect.ColorAdjust;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 import javafx.util.Duration;
 
 public class BattleAnimationManager {
@@ -42,12 +47,13 @@ public class BattleAnimationManager {
     private final ImageView playerSprite;
     private final ImageView opponentSprite;
     private final Pane battleField;
+    private boolean animationEnabled = true;
 
     // Animation constants
     private static final double ATTACK_DISTANCE_FULL   = 120.0;
     private static final double ATTACK_DISTANCE_SLIGHT = 30.0;
-    private static final double ATTACK_DURATION_MS     = 200.0;
-    private static final double RETURN_DURATION_MS     = 250.0;
+    private static final double ATTACK_DURATION_MS     = 350.0;
+    private static final double RETURN_DURATION_MS     = 400.0;
     private static final double IMPACT_SHAKE_DISTANCE  = 8.0;
     private static final double IMPACT_SCALE_REDUCTION = 0.88;
 
@@ -99,6 +105,12 @@ public class BattleAnimationManager {
     // =
 
     public void playAttackAnimation(ImageView attacker, ImageView defender, Move move, Runnable onComplete) {
+        // If animation is disabled, skip all movement/effects and just call onComplete
+        if (!animationEnabled) {
+            if (onComplete != null) onComplete.run();
+            return;
+        }
+
         double attackerOriginalX      = attacker.getTranslateX();
         double attackerOriginalY      = attacker.getTranslateY();
         double attackerOriginalScaleX = attacker.getScaleX();
@@ -801,5 +813,101 @@ public class BattleAnimationManager {
             battleField.getChildren().remove(node);
             if (previous != null) previous.handle(e);
         });
+    }
+
+    // =
+    // ANIMATION TOGGLE
+    // =
+
+    public void setAnimationEnabled(boolean enabled) {
+        this.animationEnabled = enabled;
+    }
+
+    public boolean isAnimationEnabled() {
+        return animationEnabled;
+    }
+
+    // =
+    // FLOATING DAMAGE / HEAL NUMBERS
+    // =
+
+    /**
+     * Shows a floating damage number (red) beside the defender sprite.
+     * Fades in, holds briefly, then fades out over ~1.8s total.
+     */
+    public void showDamageNumber(ImageView defender, int damage) {
+        if (damage <= 0) return;
+
+        Text damageText = new Text("-" + damage);
+        damageText.setFont(Font.font("System", FontWeight.BOLD, 22));
+        damageText.setFill(Color.RED);
+        damageText.setStroke(Color.DARKRED);
+        damageText.setStrokeWidth(0.8);
+        damageText.setEffect(new DropShadow(4, Color.BLACK));
+        prepareTransientNode(damageText);
+        damageText.setOpacity(0);
+
+        double x = defender.getLayoutX() + defender.getFitWidth() + 5;
+        double y = defender.getLayoutY() + defender.getFitHeight() * 0.3;
+        damageText.setX(x);
+        damageText.setY(y);
+
+        battleField.getChildren().add(damageText);
+
+        Timeline anim = new Timeline(
+            new KeyFrame(Duration.ZERO,
+                new KeyValue(damageText.opacityProperty(), 0),
+                new KeyValue(damageText.yProperty(), y)),
+            new KeyFrame(Duration.millis(200),
+                new KeyValue(damageText.opacityProperty(), 1.0)),
+            new KeyFrame(Duration.millis(1200),
+                new KeyValue(damageText.opacityProperty(), 1.0),
+                new KeyValue(damageText.yProperty(), y - 15)),
+            new KeyFrame(Duration.millis(1800),
+                new KeyValue(damageText.opacityProperty(), 0),
+                new KeyValue(damageText.yProperty(), y - 25))
+        );
+        anim.setOnFinished(e -> battleField.getChildren().remove(damageText));
+        anim.play();
+    }
+
+    /**
+     * Shows a floating heal number (green) beside the attacker sprite.
+     * Fades in, holds briefly, then fades out over ~1.8s total.
+     */
+    public void showHealNumber(ImageView target, int healAmount) {
+        if (healAmount <= 0) return;
+
+        Text healText = new Text("+" + healAmount);
+        healText.setFont(Font.font("System", FontWeight.BOLD, 22));
+        healText.setFill(Color.LIMEGREEN);
+        healText.setStroke(Color.DARKGREEN);
+        healText.setStrokeWidth(0.8);
+        healText.setEffect(new DropShadow(4, Color.BLACK));
+        prepareTransientNode(healText);
+        healText.setOpacity(0);
+
+        double x = target.getLayoutX() + target.getFitWidth() + 5;
+        double y = target.getLayoutY() + target.getFitHeight() * 0.3;
+        healText.setX(x);
+        healText.setY(y);
+
+        battleField.getChildren().add(healText);
+
+        Timeline anim = new Timeline(
+            new KeyFrame(Duration.ZERO,
+                new KeyValue(healText.opacityProperty(), 0),
+                new KeyValue(healText.yProperty(), y)),
+            new KeyFrame(Duration.millis(200),
+                new KeyValue(healText.opacityProperty(), 1.0)),
+            new KeyFrame(Duration.millis(1200),
+                new KeyValue(healText.opacityProperty(), 1.0),
+                new KeyValue(healText.yProperty(), y - 15)),
+            new KeyFrame(Duration.millis(1800),
+                new KeyValue(healText.opacityProperty(), 0),
+                new KeyValue(healText.yProperty(), y - 25))
+        );
+        anim.setOnFinished(e -> battleField.getChildren().remove(healText));
+        anim.play();
     }
 }
