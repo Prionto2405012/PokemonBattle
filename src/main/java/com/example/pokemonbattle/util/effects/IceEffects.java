@@ -73,29 +73,33 @@ public class IceEffects {
     }
     
     private void addBeamParticles(double startX, double startY, double endX, double endY, Timeline timeline) {
-        int particleCount = 30;
+        int particleCount = 35;
         
         for (int i = 0; i < particleCount; i++) {
             double t = i / (double)particleCount;
             double px = startX + (endX - startX) * t;
             double py = startY + (endY - startY) * t;
             
-            Circle particle = new Circle(12 + random.nextDouble() * 4, Color.WHITE);
-            particle.setCenterX(px);
-            particle.setCenterY(py);
+            Circle particle = new Circle(10 + random.nextDouble() * 5, Color.WHITE);
+            particle.setCenterX(px + (random.nextDouble() - 0.5) * 10);
+            particle.setCenterY(py + (random.nextDouble() - 0.5) * 10);
             particle.setOpacity(0);
-            particle.setEffect(new DropShadow(8, Color.CYAN));
+            particle.setEffect(new DropShadow(12, Color.CYAN));
             prepareTransientNode(particle);
             
             battleField.getChildren().add(particle);
             
-            int delay = i * 15;
+            int delay = i * 18;
             KeyFrame appear = new KeyFrame(Duration.millis(delay),
-                new KeyValue(particle.opacityProperty(), 1.0));
-            KeyFrame fade = new KeyFrame(Duration.millis(delay + 300),
-                new KeyValue(particle.opacityProperty(), 0));
+                new KeyValue(particle.opacityProperty(), 0.95));
+            KeyFrame shimmer = new KeyFrame(Duration.millis(delay + 180),
+                new KeyValue(particle.opacityProperty(), 0.7),
+                new KeyValue(particle.radiusProperty(), particle.getRadius() * 1.3));
+            KeyFrame fade = new KeyFrame(Duration.millis(delay + 400),
+                new KeyValue(particle.opacityProperty(), 0),
+                new KeyValue(particle.radiusProperty(), particle.getRadius() * 0.5));
             
-            timeline.getKeyFrames().addAll(appear, fade);
+            timeline.getKeyFrames().addAll(appear, shimmer, fade);
             
             registerCleanup(timeline, particle);
         }
@@ -131,20 +135,24 @@ public class IceEffects {
     
     private void addFangVisual(double x, double y, Timeline timeline) {
         for (int i = 0; i < 2; i++) {
+            // Create a multi-faceted ice fang with >15 polygon sides
             Polygon fang = new Polygon();
-            fang.getPoints().addAll(
-                0.0, 0.0,
-                -18.0, -25.0,
-                0.0, -55.0,
-                18.0, -25.0
-            );
+            int sides = 16;
+            double outerR = 28.0;
+            double innerR = 14.0;
+            for (int s = 0; s < sides; s++) {
+                double angle = (s / (double) sides) * 2 * Math.PI - Math.PI / 2;
+                double r = (s % 2 == 0) ? outerR : innerR;
+                // Elongate vertically for fang shape
+                fang.getPoints().addAll(Math.cos(angle) * r * 0.7, Math.sin(angle) * r * 1.4);
+            }
             
             fang.setFill(Color.CYAN);
             fang.setStroke(Color.LIGHTBLUE);
-            fang.setStrokeWidth(12);
+            fang.setStrokeWidth(2.5);
             fang.setEffect(new DropShadow(25, Color.DEEPSKYBLUE));
             
-            double xOffset = i == 0 ? -15 : 15;
+            double xOffset = i == 0 ? -18 : 18;
             fang.setLayoutX(x + xOffset);
             fang.setLayoutY(y);
             fang.setOpacity(0);
@@ -153,15 +161,18 @@ public class IceEffects {
             
             battleField.getChildren().add(fang);
             
-            KeyFrame appear = new KeyFrame(Duration.millis(50),
+            KeyFrame appear = new KeyFrame(Duration.millis(60),
                 new KeyValue(fang.opacityProperty(), 1.0));
-            KeyFrame bite = new KeyFrame(Duration.millis(100),
-                new KeyValue(fang.scaleXProperty(), 1.4),
-                new KeyValue(fang.scaleYProperty(), 1.4));
-            KeyFrame disappear = new KeyFrame(Duration.millis(200),
+            KeyFrame bite = new KeyFrame(Duration.millis(140),
+                new KeyValue(fang.scaleXProperty(), 1.5),
+                new KeyValue(fang.scaleYProperty(), 1.5));
+            KeyFrame crunch = new KeyFrame(Duration.millis(220),
+                new KeyValue(fang.scaleXProperty(), 1.2),
+                new KeyValue(fang.scaleYProperty(), 1.2));
+            KeyFrame disappear = new KeyFrame(Duration.millis(350),
                 new KeyValue(fang.opacityProperty(), 0));
             
-            timeline.getKeyFrames().addAll(appear, bite, disappear);
+            timeline.getKeyFrames().addAll(appear, bite, crunch, disappear);
             
             registerCleanup(timeline, fang);
         }
@@ -239,12 +250,12 @@ public class IceEffects {
         double segmentLength = Math.min(Math.max(160.0, distance * 0.5), distance + 120.0);
 
         // Wind lines
-        int windLineCount = Math.min(18 + movePower / 12, 26);
+        int windLineCount = Math.min(20 + movePower / 10, 30);
         
         for (int i = 0; i < windLineCount; i++) {
             Line windLine = new Line();
             windLine.setStroke(Color.LIGHTBLUE);
-            windLine.setStrokeWidth(12);
+            windLine.setStrokeWidth(3 + random.nextDouble() * 3);
             windLine.setOpacity(0);
             windLine.setEffect(new GaussianBlur(2));
 
@@ -289,7 +300,7 @@ public class IceEffects {
         }
         
         // Snowflakes in wind
-        int snowCount = Math.min(20 + movePower / 10, 32);
+        int snowCount = Math.min(24 + movePower / 8, 36);
         addSnowflakes(startX, startY, endX, endY, snowCount, true, timeline);
     }
     
@@ -306,10 +317,10 @@ public class IceEffects {
         double cloudSpan = Math.max(120.0, safeBattleHeight() * 0.55);
 
         // Mist clouds
-        int mistCount = Math.min(15 + movePower / 25, 20);
+        int mistCount = Math.min(18 + movePower / 20, 25);
         
         for (int i = 0; i < mistCount; i++) {
-            Circle mist = new Circle(20 + random.nextDouble() * 20, Color.LIGHTCYAN);
+            Circle mist = new Circle(22 + random.nextDouble() * 22, Color.LIGHTCYAN);
             mist.setOpacity(0);
             mist.setEffect(new GaussianBlur(15));
 
@@ -338,7 +349,7 @@ public class IceEffects {
         }
         
         // Light snowflakes
-        addSnowflakes(startX, startY, endX, endY, 30, false, timeline);
+        addSnowflakes(startX, startY, endX, endY, 32, false, timeline);
     }
     
     private void addCrushEffect(double startX, double startY, double endX, double endY, int movePower,
@@ -351,10 +362,10 @@ public class IceEffects {
         double px = -uy;
         double py = ux;
 
-        int cubeCount = Math.min(15 + movePower / 20, 20);
+        int cubeCount = Math.min(18 + movePower / 18, 24);
         
         for (int i = 0; i < cubeCount; i++) {
-            Rectangle cube = new Rectangle(15 + random.nextDouble() * 10, 12 + random.nextDouble() * 10);
+            Rectangle cube = new Rectangle(16 + random.nextDouble() * 12, 16 + random.nextDouble() * 12);
             cube.setFill(Color.CYAN);
             cube.setStroke(Color.LIGHTBLUE);
             cube.setStrokeWidth(3);
@@ -399,20 +410,23 @@ public class IceEffects {
         double py = ux;
 
         // Ice shards
-        int shardCount = Math.min(10 + movePower / 20, 15);
+        int shardCount = Math.min(16 + movePower / 15, 22);
         
         for (int i = 0; i < shardCount; i++) {
+            // Multi-faceted ice shard with >15 polygon sides
             Polygon shard = new Polygon();
-            shard.getPoints().addAll(
-                0.0, 0.0,
-                -10.0, -20.0,
-                5.0, -40.0,
-                10.0, -20.0
-            );
+            int sides = 16;
+            double shardLen = 18 + random.nextDouble() * 10;
+            for (int s = 0; s < sides; s++) {
+                double angle = (s / (double) sides) * 2 * Math.PI - Math.PI / 2;
+                double rx = shardLen * 0.3 * (0.7 + 0.3 * Math.abs(Math.cos(angle * 2)));
+                double ry = shardLen * (0.6 + 0.4 * Math.abs(Math.cos(angle)));
+                shard.getPoints().addAll(Math.cos(angle) * rx, Math.sin(angle) * ry);
+            }
             shard.setFill(Color.CYAN);
             shard.setStroke(Color.LIGHTBLUE);
             shard.setStrokeWidth(1.5);
-            shard.setEffect(new DropShadow(10, Color.DEEPSKYBLUE));
+            shard.setEffect(new DropShadow(12, Color.DEEPSKYBLUE));
 
             double progress = (i + random.nextDouble()) / shardCount;
             double lateral = (random.nextDouble() - 0.5) * Math.max(120.0, safeBattleHeight() * 0.5);
@@ -439,7 +453,7 @@ public class IceEffects {
         }
         
         // Snowflakes
-        int snowCount = Math.min(15 + movePower / 20, 20);
+        int snowCount = Math.min(18 + movePower / 15, 28);
         addSnowflakes(startX, startY, endX, endY, snowCount, false, timeline);
     }
     
@@ -453,11 +467,12 @@ public class IceEffects {
         double px = -uy;
         double py = ux;
 
-        for (int i = 0; i < count; i++) {
-            Circle snowflake = new Circle(5 + random.nextDouble() * 4, Color.WHITE);
-            snowflake.setEffect(new DropShadow(6, Color.LIGHTBLUE));
+        int actualCount = Math.max(count, 16);
+        for (int i = 0; i < actualCount; i++) {
+            Circle snowflake = new Circle(9 + random.nextDouble() * 5, Color.WHITE);
+            snowflake.setEffect(new DropShadow(8, Color.LIGHTBLUE));
 
-            double progress = (i + random.nextDouble()) / count;
+            double progress = (i + random.nextDouble()) / actualCount;
             double lateral = (random.nextDouble() - 0.5) * Math.max(120.0, safeBattleHeight() * 0.7);
 
             snowflake.setCenterX(startX + (ux * distance * progress) + (px * lateral));
