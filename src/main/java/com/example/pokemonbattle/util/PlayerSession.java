@@ -16,9 +16,11 @@ public class PlayerSession {
     private User currentUser;
     private String avatarPath;
     private String avatarGender;
+    private boolean moveAnimationEnabled = true;
 
     private static final String PREF_AVATAR_PATH   = "avatar_path";
     private static final String PREF_AVATAR_GENDER  = "avatar_gender";
+    private static final String PREF_MOVE_ANIMATION = "move_animation";
 
     private PlayerSession() {}
 
@@ -42,6 +44,7 @@ public class PlayerSession {
         } else {
             avatarPath = null;
             avatarGender = null;
+            moveAnimationEnabled = true;
         }
     }
 
@@ -80,6 +83,17 @@ public class PlayerSession {
         return avatarGender;
     }
 
+    // Move animation toggle
+
+    public boolean isMoveAnimationEnabled() {
+        return moveAnimationEnabled;
+    }
+
+    public void setMoveAnimationEnabled(boolean enabled) {
+        this.moveAnimationEnabled = enabled;
+        savePreferences();
+    }
+
     // Persistence (Preferences API)
 
     private void loadPreferences() {
@@ -87,8 +101,10 @@ public class PlayerSession {
         Preferences prefs = getUserPreferences();
         avatarPath  = prefs.get(PREF_AVATAR_PATH, null);
         avatarGender = prefs.get(PREF_AVATAR_GENDER, null);
+        moveAnimationEnabled = prefs.getBoolean(PREF_MOVE_ANIMATION, true);
         System.out.println("[PlayerSession] Loaded prefs for user " + currentUser.getId()
-                + " → avatar=" + avatarPath + ", gender=" + avatarGender);
+                + " → avatar=" + avatarPath + ", gender=" + avatarGender
+                + ", moveAnimation=" + moveAnimationEnabled);
     }
 
     private void savePreferences() {
@@ -96,6 +112,7 @@ public class PlayerSession {
         Preferences prefs = getUserPreferences();
         if (avatarPath != null)   prefs.put(PREF_AVATAR_PATH, avatarPath);
         if (avatarGender != null) prefs.put(PREF_AVATAR_GENDER, avatarGender);
+        prefs.putBoolean(PREF_MOVE_ANIMATION, moveAnimationEnabled);
         try {
             prefs.flush();
             System.out.println("[PlayerSession] Saved prefs for user " + currentUser.getId());
@@ -117,5 +134,6 @@ public class PlayerSession {
         currentUser = null;
         avatarPath = null;
         avatarGender = null;
+        moveAnimationEnabled = true;
     }
 }
