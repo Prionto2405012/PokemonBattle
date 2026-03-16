@@ -1,6 +1,7 @@
 // BugEffects.java
 package com.example.pokemonbattle.util.effects;
 
+import com.example.pokemonbattle.util.MediaCache;
 import java.util.Random;
 
 import javafx.animation.KeyFrame;
@@ -11,6 +12,8 @@ import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.GaussianBlur;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -31,6 +34,7 @@ public class BugEffects {
     private static final Color BUG_BROWN     = Color.web("#5D4037");
     private static final Color BUG_LIGHT     = Color.web("#DCEDC8");
     private static final Color BUG_TEAL      = Color.web("#00838F");
+        private static final String FANG_ASSET   = "fang.gif";
 
     public BugEffects(Pane battleField) {
         this.battleField = battleField;
@@ -57,10 +61,16 @@ public class BugEffects {
             case "fury-cutter"  -> addScissorCut(startX, startY, endX, endY, intensity * 0.85, timeline);
             case "twineedle"    -> addTwinNeedle(startX, startY, endX, endY, intensity, timeline);
             case "lunge"        -> addScissorCut(startX, startY, endX, endY, intensity, timeline);
-            case "bug-bite"     -> addBugBite(startX, startY, endX, endY, intensity, timeline);
+                        case "bug-bite"     -> {
+                                addFangImage(endX, endY, timeline);
+                                addBugBite(startX, startY, endX, endY, intensity, timeline);
+                        }
 
             // Leech / drain
-            case "leech-life"   -> addLeechLife(startX, startY, endX, endY, intensity, timeline);
+                        case "leech-life"   -> {
+                                addFangImage(endX, endY, timeline);
+                                addLeechLife(startX, startY, endX, endY, intensity, timeline);
+                        }
 
             // Swarm strike
             case "attack-order" -> addSwarmStrike(endX, endY, intensity, timeline);
@@ -494,6 +504,42 @@ public class BugEffects {
         node.setManaged(false);
         node.setMouseTransparent(true);
     }
+
+        private void addFangImage(double x, double y, Timeline timeline) {
+                try {
+                        Image image = MediaCache.getImage(FANG_ASSET);
+                        if (image == null) {
+                                return;
+                        }
+
+                        ImageView imageView = new ImageView(image);
+                        imageView.setFitWidth(190);
+                        imageView.setFitHeight(190);
+                        imageView.setPreserveRatio(true);
+                        imageView.setLayoutX(x - 95);
+                        imageView.setLayoutY(y - 108);
+                        imageView.setOpacity(0);
+                        imageView.setScaleX(0.55);
+                        imageView.setScaleY(0.55);
+                        prepareTransientNode(imageView);
+                        battleField.getChildren().add(imageView);
+
+                        KeyFrame appear = new KeyFrame(Duration.millis(35),
+                                new KeyValue(imageView.opacityProperty(), 1.0),
+                                new KeyValue(imageView.scaleXProperty(), 1.25),
+                                new KeyValue(imageView.scaleYProperty(), 1.25));
+                        KeyFrame settle = new KeyFrame(Duration.millis(115),
+                                new KeyValue(imageView.scaleXProperty(), 1.0),
+                                new KeyValue(imageView.scaleYProperty(), 1.0));
+                        KeyFrame fade = new KeyFrame(Duration.millis(330),
+                                new KeyValue(imageView.opacityProperty(), 0.0));
+
+                        timeline.getKeyFrames().addAll(appear, settle, fade);
+                        registerCleanup(timeline, imageView);
+                } catch (Exception ignored) {
+                        // Overlay is optional; the core move effect should still play.
+                }
+        }
 
     private void registerCleanup(Timeline timeline, Node node) {
         EventHandler<ActionEvent> prev = timeline.getOnFinished();

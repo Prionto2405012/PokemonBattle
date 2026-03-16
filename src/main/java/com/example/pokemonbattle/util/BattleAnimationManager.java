@@ -8,7 +8,6 @@ import com.example.pokemonbattle.util.effects.DragonEffects;
 import com.example.pokemonbattle.util.effects.ElectricEffects;
 import com.example.pokemonbattle.util.effects.FairyEffects;
 import com.example.pokemonbattle.util.effects.FightingEffects;
-import com.example.pokemonbattle.util.effects.ContactOverlayEffects;
 import com.example.pokemonbattle.util.effects.FireEffects;
 import com.example.pokemonbattle.util.effects.FlyingEffects;
 import com.example.pokemonbattle.util.effects.GhostEffects;
@@ -64,7 +63,6 @@ public class BattleAnimationManager {
     private final IceEffects      iceEffects;
     private final FireEffects     fireEffects;
     private final FightingEffects fightingEffects;
-    private final ContactOverlayEffects contactOverlayEffects;
     private final RockEffects     rockEffects;
     private final WaterEffects    waterEffects;
     private final GhostEffects    ghostEffects;
@@ -87,7 +85,6 @@ public class BattleAnimationManager {
         this.iceEffects      = new IceEffects(battleField);
         this.fireEffects     = new FireEffects(battleField);
         this.fightingEffects = new FightingEffects(battleField);
-        this.contactOverlayEffects = new ContactOverlayEffects(battleField);
         this.rockEffects     = new RockEffects(battleField);
         this.waterEffects    = new WaterEffects(battleField);
         this.ghostEffects    = new GhostEffects(battleField);
@@ -743,20 +740,6 @@ public class BattleAnimationManager {
             default         -> createDefaultImpact(endX, endY, movePower, effect);
         }
 
-        if (isFangMove(moveName)) {
-            contactOverlayEffects.addFangAnimation(endX, endY, effect);
-        }
-
-        if (!moveType.equals("fighting") && isKickOrFeetMove(moveName)) {
-            contactOverlayEffects.addFeetImage(endX, endY, effect);
-        }
-
-        // For non-fighting punch moves (fire-punch, ice-punch, thunder-punch),
-        // overlay the punch image + elemental particles on top of the type effect
-        if (!moveType.equals("fighting") && moveName.contains("punch")) {
-            fightingEffects.addPunchImageAndOverlay(endX, endY, moveName, moveType, effect);
-        }
-
         return effect;
     }
 
@@ -818,18 +801,6 @@ public class BattleAnimationManager {
     private void prepareTransientNode(javafx.scene.Node node) {
         node.setManaged(false);
         node.setMouseTransparent(true);
-    }
-
-    private boolean isKickOrFeetMove(String moveName) {
-        return moveName.contains("-kick") || moveName.contains("-feet");
-    }
-
-    private boolean isFangMove(String moveName) {
-        return moveName.contains("fang")
-                || moveName.equals("bite")
-                || moveName.endsWith("-bite")
-                || moveName.equals("crunch")
-                || moveName.equals("leech-life");
     }
 
     private void registerCleanup(Timeline timeline, javafx.scene.Node node) {

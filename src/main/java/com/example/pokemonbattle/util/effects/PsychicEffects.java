@@ -1,6 +1,7 @@
 // PsychicEffects.java
 package com.example.pokemonbattle.util.effects;
 
+import com.example.pokemonbattle.util.MediaCache;
 import java.util.Random;
 
 import javafx.animation.KeyFrame;
@@ -11,6 +12,8 @@ import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.GaussianBlur;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -33,6 +36,7 @@ public class PsychicEffects {
     private static final Color PSY_CYAN   = Color.web("#80CBC4");
     private static final Color PSY_WHITE  = Color.WHITE;
     private static final Color PSY_INDIGO = Color.web("#5C6BC0");
+        private static final String FANG_ASSET = "fang.gif";
 
     public PsychicEffects(Pane battleField) {
         this.battleField = battleField;
@@ -73,7 +77,10 @@ public class PsychicEffects {
 
             // Melee telekinetic overlay
             case "heart-stamp"      -> addTelekineticSlash(endX, endY, intensity, timeline);
-            case "psychic-fangs"    -> addTelekineticSlash(endX, endY, intensity, timeline);
+                        case "psychic-fangs"    -> {
+                                addFangImage(endX, endY, timeline);
+                                addTelekineticSlash(endX, endY, intensity, timeline);
+                        }
             case "psycho-cut"       -> addTelekineticSlash(endX, endY, intensity, timeline);
             case "psyshield-bash"   -> addTelekineticSlash(endX, endY, intensity, timeline);
             case "psystrike"        -> addTelekineticSlash(endX, endY, intensity, timeline);
@@ -531,6 +538,42 @@ public class PsychicEffects {
         node.setManaged(false);
         node.setMouseTransparent(true);
     }
+
+        private void addFangImage(double x, double y, Timeline timeline) {
+                try {
+                        Image image = MediaCache.getImage(FANG_ASSET);
+                        if (image == null) {
+                                return;
+                        }
+
+                        ImageView imageView = new ImageView(image);
+                        imageView.setFitWidth(190);
+                        imageView.setFitHeight(190);
+                        imageView.setPreserveRatio(true);
+                        imageView.setLayoutX(x - 95);
+                        imageView.setLayoutY(y - 108);
+                        imageView.setOpacity(0);
+                        imageView.setScaleX(0.55);
+                        imageView.setScaleY(0.55);
+                        prepareTransientNode(imageView);
+                        battleField.getChildren().add(imageView);
+
+                        KeyFrame appear = new KeyFrame(Duration.millis(35),
+                                new KeyValue(imageView.opacityProperty(), 1.0),
+                                new KeyValue(imageView.scaleXProperty(), 1.25),
+                                new KeyValue(imageView.scaleYProperty(), 1.25));
+                        KeyFrame settle = new KeyFrame(Duration.millis(115),
+                                new KeyValue(imageView.scaleXProperty(), 1.0),
+                                new KeyValue(imageView.scaleYProperty(), 1.0));
+                        KeyFrame fade = new KeyFrame(Duration.millis(330),
+                                new KeyValue(imageView.opacityProperty(), 0.0));
+
+                        timeline.getKeyFrames().addAll(appear, settle, fade);
+                        registerCleanup(timeline, imageView);
+                } catch (Exception ignored) {
+                        // Overlay is optional; the core move effect should still play.
+                }
+        }
 
     private void registerCleanup(Timeline timeline, Node node) {
         EventHandler<ActionEvent> prev = timeline.getOnFinished();

@@ -1,6 +1,7 @@
 // DarkEffects.java
 package com.example.pokemonbattle.util.effects;
 
+import com.example.pokemonbattle.util.MediaCache;
 import java.util.Random;
 
 import javafx.animation.KeyFrame;
@@ -11,6 +12,8 @@ import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.GaussianBlur;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -33,6 +36,7 @@ public class DarkEffects {
     private static final Color DARK_SHADOW  = Color.web("#0D0D0D");
     private static final Color DARK_SMOKE   = Color.web("#616161");
     private static final Color DARK_RED     = Color.web("#D32F2F");
+        private static final String FANG_ASSET  = "fang.gif";
 
     public DarkEffects(Pane battleField) {
         this.battleField = battleField;
@@ -56,7 +60,10 @@ public class DarkEffects {
 
         switch (moveName) {
             // Fast melee lunge with black-purple slash trails
-            case "bite"         -> addDarkSlashLunge(startX, startY, endX, endY, intensity, timeline);
+                        case "bite"         -> {
+                                addFangImage(endX, endY, timeline);
+                                addDarkSlashLunge(startX, startY, endX, endY, intensity, timeline);
+                        }
             case "foul-play"    -> addDarkSlashLunge(startX, startY, endX, endY, intensity, timeline);
             case "knock-off"    -> addDarkSlashLunge(startX, startY, endX, endY, intensity, timeline);
             case "lash-out"     -> addDarkSlashLunge(startX, startY, endX, endY, intensity, timeline);
@@ -68,7 +75,10 @@ public class DarkEffects {
 
             // Dark aura burst with drifting smoke particles
             case "brutal-swing"   -> addDarkAuraBurst(endX, endY, intensity, timeline);
-            case "crunch"         -> addDarkAuraBurst(endX, endY, intensity, timeline);
+                        case "crunch"         -> {
+                                addFangImage(endX, endY, timeline);
+                                addDarkAuraBurst(endX, endY, intensity, timeline);
+                        }
             case "darkest-lariat" -> addDarkAuraBurst(endX, endY, intensity, timeline);
             case "feint-attack"   -> addDarkAuraBurst(endX, endY, intensity, timeline);
 
@@ -571,6 +581,42 @@ public class DarkEffects {
         node.setManaged(false);
         node.setMouseTransparent(true);
     }
+
+        private void addFangImage(double x, double y, Timeline timeline) {
+                try {
+                        Image image = MediaCache.getImage(FANG_ASSET);
+                        if (image == null) {
+                                return;
+                        }
+
+                        ImageView imageView = new ImageView(image);
+                        imageView.setFitWidth(190);
+                        imageView.setFitHeight(190);
+                        imageView.setPreserveRatio(true);
+                        imageView.setLayoutX(x - 95);
+                        imageView.setLayoutY(y - 108);
+                        imageView.setOpacity(0);
+                        imageView.setScaleX(0.55);
+                        imageView.setScaleY(0.55);
+                        prepareTransientNode(imageView);
+                        battleField.getChildren().add(imageView);
+
+                        KeyFrame appear = new KeyFrame(Duration.millis(35),
+                                new KeyValue(imageView.opacityProperty(), 1.0),
+                                new KeyValue(imageView.scaleXProperty(), 1.25),
+                                new KeyValue(imageView.scaleYProperty(), 1.25));
+                        KeyFrame settle = new KeyFrame(Duration.millis(115),
+                                new KeyValue(imageView.scaleXProperty(), 1.0),
+                                new KeyValue(imageView.scaleYProperty(), 1.0));
+                        KeyFrame fade = new KeyFrame(Duration.millis(330),
+                                new KeyValue(imageView.opacityProperty(), 0.0));
+
+                        timeline.getKeyFrames().addAll(appear, settle, fade);
+                        registerCleanup(timeline, imageView);
+                } catch (Exception ignored) {
+                        // Overlay is optional; the core move effect should still play.
+                }
+        }
 
     private void registerCleanup(Timeline timeline, Node node) {
         EventHandler<ActionEvent> prev = timeline.getOnFinished();

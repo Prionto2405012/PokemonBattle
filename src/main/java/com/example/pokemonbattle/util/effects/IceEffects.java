@@ -1,6 +1,7 @@
 // IceEffects.java
 package com.example.pokemonbattle.util.effects;
 
+import com.example.pokemonbattle.util.MediaCache;
 import java.util.Random;
 
 import javafx.animation.KeyFrame;
@@ -11,6 +12,8 @@ import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.GaussianBlur;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -22,6 +25,8 @@ import javafx.util.Duration;
 public class IceEffects {
     private final Pane battleField;
     private final Random random = new Random();
+    private static final String PUNCH_ASSET = "punch.png";
+    private static final String FANG_ASSET = "fang.gif";
     
     public IceEffects(Pane battleField) {
         this.battleField = battleField;
@@ -112,6 +117,7 @@ public class IceEffects {
     public void createImpactEffect(double startX, double startY, double endX, double endY,
             String moveName, int movePower, Timeline timeline) {
         boolean isFangMove = moveName.contains("fang");
+        boolean isPunchMove = moveName.contains("punch");
         boolean isBallMove = moveName.contains("ball");
         boolean isWindMove = moveName.contains("wind") || moveName.contains("blizzard") || moveName.contains("avalanche");
         boolean isBreathMove = moveName.contains("breath") || moveName.contains("reception") || 
@@ -119,6 +125,10 @@ public class IceEffects {
         boolean isCrushMove = moveName.contains("crush");
         
         if (isFangMove) {
+            addFangImage(endX, endY, timeline);
+            addIceShardsAndSnowflakes(startX, startY, endX, endY, movePower, timeline);
+        } else if (isPunchMove) {
+            addPunchImage(endX, endY, timeline);
             addIceShardsAndSnowflakes(startX, startY, endX, endY, movePower, timeline);
         } else if (isBallMove) {
             addIceBallEffect(startX, startY, endX, endY, movePower, timeline);
@@ -463,6 +473,52 @@ public class IceEffects {
     private void prepareTransientNode(Node node) {
         node.setManaged(false);
         node.setMouseTransparent(true);
+    }
+
+    private void addPunchImage(double x, double y, Timeline timeline) {
+        addStaticImpactImage(PUNCH_ASSET, x, y, 160, 160, timeline);
+    }
+
+    private void addFangImage(double x, double y, Timeline timeline) {
+        addStaticImpactImage(FANG_ASSET, x, y, 190, 190, timeline);
+    }
+
+    private void addStaticImpactImage(String assetName, double x, double y,
+                                      double width, double height,
+                                      Timeline timeline) {
+        try {
+            Image image = MediaCache.getImage(assetName);
+            if (image == null) {
+                return;
+            }
+
+            ImageView imageView = new ImageView(image);
+            imageView.setFitWidth(width);
+            imageView.setFitHeight(height);
+            imageView.setPreserveRatio(true);
+            imageView.setLayoutX(x - width / 2.0);
+            imageView.setLayoutY(y - height / 2.0);
+            imageView.setOpacity(0);
+            imageView.setScaleX(0.55);
+            imageView.setScaleY(0.55);
+            prepareTransientNode(imageView);
+            battleField.getChildren().add(imageView);
+
+            KeyFrame appear = new KeyFrame(Duration.millis(35),
+                new KeyValue(imageView.opacityProperty(), 1.0),
+                new KeyValue(imageView.scaleXProperty(), 1.25),
+                new KeyValue(imageView.scaleYProperty(), 1.25));
+            KeyFrame settle = new KeyFrame(Duration.millis(115),
+                new KeyValue(imageView.scaleXProperty(), 1.0),
+                new KeyValue(imageView.scaleYProperty(), 1.0));
+            KeyFrame fade = new KeyFrame(Duration.millis(330),
+                new KeyValue(imageView.opacityProperty(), 0.0));
+
+            timeline.getKeyFrames().addAll(appear, settle, fade);
+            registerCleanup(timeline, imageView);
+        } catch (Exception ignored) {
+            // Overlay is optional; the core move effect should still play.
+        }
     }
 
     private void registerCleanup(Timeline timeline, Node node) {
