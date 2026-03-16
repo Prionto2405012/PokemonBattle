@@ -52,10 +52,11 @@ public class BattleAnimationManager {
     // Animation constants
     private static final double ATTACK_DISTANCE_FULL   = 120.0;
     private static final double ATTACK_DISTANCE_SLIGHT = 30.0;
-    private static final double ATTACK_DURATION_MS     = 350.0;
-    private static final double RETURN_DURATION_MS     = 400.0;
+    private static final double ATTACK_DURATION_MS     = 480.0;
+    private static final double RETURN_DURATION_MS     = 550.0;
     private static final double IMPACT_SHAKE_DISTANCE  = 8.0;
     private static final double IMPACT_SCALE_REDUCTION = 0.88;
+    private static final double ANIMATION_SPEED_MULTIPLIER = 1.2;
 
     // Type effect handlers
     private final ElectricEffects electricEffects;
@@ -179,7 +180,7 @@ public class BattleAnimationManager {
             if (onComplete != null) onComplete.run();
         });
 
-        sequence.play();
+        playAtCurrentSpeed(sequence);
     }
 
     // =
@@ -464,7 +465,7 @@ public class BattleAnimationManager {
                 Timeline sinkAnim = new Timeline(
                     new KeyFrame(Duration.ZERO,
                         new KeyValue(attacker.opacityProperty(), origOpacity)),
-                    new KeyFrame(Duration.millis(280),
+                    new KeyFrame(Duration.millis(380),
                         new KeyValue(attacker.opacityProperty(), 0.0),
                         new KeyValue(attacker.translateYProperty(), origTransY + 25))
                 );
@@ -480,13 +481,13 @@ public class BattleAnimationManager {
                         new KeyValue(attacker.translateYProperty(),
                             defenderY - attackerY),
                         new KeyValue(attacker.opacityProperty(), 0.0)),
-                    new KeyFrame(Duration.millis(220),
+                    new KeyFrame(Duration.millis(300),
                         new KeyValue(attacker.opacityProperty(), origOpacity))
                 );
 
                 // Phase 3: return attacker to original position (after impact)
                 Timeline returnAnim = new Timeline(
-                    new KeyFrame(Duration.millis(120),
+                    new KeyFrame(Duration.millis(160),
                         new KeyValue(attacker.translateXProperty(), origTransX),
                         new KeyValue(attacker.translateYProperty(), origTransY))
                 );
@@ -602,9 +603,9 @@ public class BattleAnimationManager {
                     defender.setTranslateY(defenderOriginalY);
                     if (onComplete != null) onComplete.run();
                 });
-                seq.play();
+                playAtCurrentSpeed(seq);
             });
-            leadEffect.play();
+            playAtCurrentSpeed(leadEffect);
         } else {
             if (onComplete != null) onComplete.run();
         }
@@ -642,7 +643,7 @@ public class BattleAnimationManager {
 
         Timeline shake = createShakeEffect(defender, movePower, defenderBaseTranslateX);
 
-        ScaleTransition shrink = new ScaleTransition(Duration.millis(80), defender);
+        ScaleTransition shrink = new ScaleTransition(Duration.millis(110), defender);
         shrink.setToX(IMPACT_SCALE_REDUCTION);
         shrink.setToY(IMPACT_SCALE_REDUCTION);
         shrink.setAutoReverse(true);
@@ -655,7 +656,7 @@ public class BattleAnimationManager {
         double pushDirection = (defender == playerSprite) ? -1.0
                 : (defender == opponentSprite ? 1.0 : 0.0);
         double pushDistance = Math.min(10 + movePower / 18.0, 22.0);
-        TranslateTransition knockback = new TranslateTransition(Duration.millis(120), defender);
+        TranslateTransition knockback = new TranslateTransition(Duration.millis(160), defender);
         knockback.setToX(defenderBaseTranslateX + pushDirection * pushDistance);
         knockback.setInterpolator(Interpolator.EASE_OUT);
 
@@ -682,13 +683,13 @@ public class BattleAnimationManager {
         return new Timeline(
                 new KeyFrame(Duration.ZERO,
                         new KeyValue(defender.translateXProperty(), defenderBaseTranslateX)),
-                new KeyFrame(Duration.millis(40),
+                new KeyFrame(Duration.millis(55),
                         new KeyValue(defender.translateXProperty(), defenderBaseTranslateX + shakeIntensity)),
-                new KeyFrame(Duration.millis(80),
+                new KeyFrame(Duration.millis(110),
                         new KeyValue(defender.translateXProperty(), defenderBaseTranslateX - shakeIntensity)),
-                new KeyFrame(Duration.millis(120),
+                new KeyFrame(Duration.millis(165),
                         new KeyValue(defender.translateXProperty(), defenderBaseTranslateX + shakeIntensity)),
-                new KeyFrame(Duration.millis(160),
+                new KeyFrame(Duration.millis(220),
                         new KeyValue(defender.translateXProperty(), defenderBaseTranslateX)));
     }
 
@@ -697,13 +698,13 @@ public class BattleAnimationManager {
         return new Timeline(
                 new KeyFrame(Duration.ZERO,
                         new KeyValue(flash.brightnessProperty(), 0)),
-                new KeyFrame(Duration.millis(50),
+                new KeyFrame(Duration.millis(70),
                         new KeyValue(flash.brightnessProperty(), flashIntensity)),
-                new KeyFrame(Duration.millis(100),
+                new KeyFrame(Duration.millis(140),
                         new KeyValue(flash.brightnessProperty(), 0)),
-                new KeyFrame(Duration.millis(150),
+                new KeyFrame(Duration.millis(210),
                         new KeyValue(flash.brightnessProperty(), flashIntensity * 0.7)),
-                new KeyFrame(Duration.millis(200),
+                new KeyFrame(Duration.millis(280),
                         new KeyValue(flash.brightnessProperty(), 0)));
     }
 
@@ -766,14 +767,14 @@ public class BattleAnimationManager {
             particle.setCenterY(y);
             battleField.getChildren().add(particle);
 
-            KeyFrame appear = new KeyFrame(Duration.millis(50),
+            KeyFrame appear = new KeyFrame(Duration.millis(70),
                     new KeyValue(particle.opacityProperty(), 1.0),
                     new KeyValue(particle.radiusProperty(), 8));
-            KeyFrame expand = new KeyFrame(Duration.millis(150),
+            KeyFrame expand = new KeyFrame(Duration.millis(200),
                     new KeyValue(particle.centerXProperty(), x + Math.cos(angle) * radius),
                     new KeyValue(particle.centerYProperty(), y + Math.sin(angle) * radius),
                     new KeyValue(particle.radiusProperty(), 3));
-            KeyFrame fade = new KeyFrame(Duration.millis(200),
+            KeyFrame fade = new KeyFrame(Duration.millis(280),
                     new KeyValue(particle.opacityProperty(), 0));
 
             timeline.getKeyFrames().addAll(appear, expand, fade);
@@ -787,11 +788,11 @@ public class BattleAnimationManager {
             double baseTranslateX, double baseTranslateY,
             double baseScaleX, double baseScaleY) {
 
-        ScaleTransition scaleBack = new ScaleTransition(Duration.millis(150), defender);
+        ScaleTransition scaleBack = new ScaleTransition(Duration.millis(200), defender);
         scaleBack.setToX(baseScaleX);
         scaleBack.setToY(baseScaleY);
 
-        TranslateTransition slideBack = new TranslateTransition(Duration.millis(150), defender);
+        TranslateTransition slideBack = new TranslateTransition(Duration.millis(200), defender);
         slideBack.setToX(baseTranslateX);
         slideBack.setToY(baseTranslateY);
 
@@ -825,6 +826,11 @@ public class BattleAnimationManager {
 
     public boolean isAnimationEnabled() {
         return animationEnabled;
+    }
+
+    private void playAtCurrentSpeed(Animation animation) {
+        animation.setRate(ANIMATION_SPEED_MULTIPLIER);
+        animation.play();
     }
 
     // =
@@ -868,7 +874,7 @@ public class BattleAnimationManager {
                 new KeyValue(damageText.yProperty(), y - 25))
         );
         anim.setOnFinished(e -> battleField.getChildren().remove(damageText));
-        anim.play();
+        playAtCurrentSpeed(anim);
     }
 
     /**
@@ -908,6 +914,6 @@ public class BattleAnimationManager {
                 new KeyValue(healText.yProperty(), y - 25))
         );
         anim.setOnFinished(e -> battleField.getChildren().remove(healText));
-        anim.play();
+        playAtCurrentSpeed(anim);
     }
 }

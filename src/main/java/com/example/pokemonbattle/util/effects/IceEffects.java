@@ -55,12 +55,12 @@ public class IceEffects {
         battleField.getChildren().add(beam);
         
         // Beam grows
-        KeyFrame grow = new KeyFrame(Duration.millis(150),
+        KeyFrame grow = new KeyFrame(Duration.millis(200),
             new KeyValue(beam.widthProperty(), distance),
             new KeyValue(beam.opacityProperty(), 0.9));
-        KeyFrame hold = new KeyFrame(Duration.millis(300),
+        KeyFrame hold = new KeyFrame(Duration.millis(400),
             new KeyValue(beam.opacityProperty(), 0.9));
-        KeyFrame fade = new KeyFrame(Duration.millis(400),
+        KeyFrame fade = new KeyFrame(Duration.millis(540),
             new KeyValue(beam.opacityProperty(), 0));
         
         beamTimeline.getKeyFrames().addAll(grow, hold, fade);
@@ -89,14 +89,14 @@ public class IceEffects {
             
             battleField.getChildren().add(particle);
             
-            int delay = i * 18;
+            int delay = i * 24;
             double baseRadius = particle.getRadius();
             KeyFrame appear = new KeyFrame(Duration.millis(delay),
                 new KeyValue(particle.opacityProperty(), 0.95));
-            KeyFrame shimmer = new KeyFrame(Duration.millis(delay + 180),
+            KeyFrame shimmer = new KeyFrame(Duration.millis(delay + 240),
                 new KeyValue(particle.opacityProperty(), 0.7),
                 new KeyValue(particle.radiusProperty(), baseRadius * 1.3));
-            KeyFrame fade = new KeyFrame(Duration.millis(delay + 400),
+            KeyFrame fade = new KeyFrame(Duration.millis(delay + 540),
                 new KeyValue(particle.opacityProperty(), 0),
                 new KeyValue(particle.radiusProperty(), baseRadius * 0.65));
             
@@ -162,15 +162,15 @@ public class IceEffects {
             
             battleField.getChildren().add(fang);
             
-            KeyFrame appear = new KeyFrame(Duration.millis(60),
+            KeyFrame appear = new KeyFrame(Duration.millis(80),
                 new KeyValue(fang.opacityProperty(), 1.0));
-            KeyFrame bite = new KeyFrame(Duration.millis(140),
+            KeyFrame bite = new KeyFrame(Duration.millis(190),
                 new KeyValue(fang.scaleXProperty(), 1.5),
                 new KeyValue(fang.scaleYProperty(), 1.5));
-            KeyFrame crunch = new KeyFrame(Duration.millis(220),
+            KeyFrame crunch = new KeyFrame(Duration.millis(300),
                 new KeyValue(fang.scaleXProperty(), 1.2),
                 new KeyValue(fang.scaleYProperty(), 1.2));
-            KeyFrame disappear = new KeyFrame(Duration.millis(350),
+            KeyFrame disappear = new KeyFrame(Duration.millis(470),
                 new KeyValue(fang.opacityProperty(), 0));
             
             timeline.getKeyFrames().addAll(appear, bite, crunch, disappear);
@@ -208,21 +208,21 @@ public class IceEffects {
         double midX = (startX + endX) / 2.0;
         double midY = Math.min(startY, endY) - 70;
 
-        KeyFrame appear = new KeyFrame(Duration.millis(40),
+        KeyFrame appear = new KeyFrame(Duration.millis(55),
             new KeyValue(orb.opacityProperty(), 1.0),
             new KeyValue(halo.opacityProperty(), 0.95));
-        KeyFrame arcMid = new KeyFrame(Duration.millis(150),
+        KeyFrame arcMid = new KeyFrame(Duration.millis(200),
             new KeyValue(orb.centerXProperty(), midX),
             new KeyValue(orb.centerYProperty(), midY),
             new KeyValue(halo.centerXProperty(), midX),
             new KeyValue(halo.centerYProperty(), midY));
-        KeyFrame impact = new KeyFrame(Duration.millis(280),
+        KeyFrame impact = new KeyFrame(Duration.millis(380),
             new KeyValue(orb.centerXProperty(), endX),
             new KeyValue(orb.centerYProperty(), endY),
             new KeyValue(halo.centerXProperty(), endX),
             new KeyValue(halo.centerYProperty(), endY),
             new KeyValue(halo.radiusProperty(), halo.getRadius() * 1.7));
-        KeyFrame fade = new KeyFrame(Duration.millis(360),
+        KeyFrame fade = new KeyFrame(Duration.millis(480),
             new KeyValue(orb.opacityProperty(), 0),
             new KeyValue(halo.opacityProperty(), 0),
             new KeyValue(orb.radiusProperty(), orb.getRadius() * 0.7));
@@ -284,11 +284,11 @@ public class IceEffects {
             
             battleField.getChildren().add(windLine);
             
-            int delay = i * 20;
+            int delay = i * 27;
             KeyFrame start = new KeyFrame(Duration.millis(delay));
-            KeyFrame appear = new KeyFrame(Duration.millis(delay + 50),
+            KeyFrame appear = new KeyFrame(Duration.millis(delay + 70),
                 new KeyValue(windLine.opacityProperty(), 0.7));
-            KeyFrame move = new KeyFrame(Duration.millis(delay + 280),
+            KeyFrame move = new KeyFrame(Duration.millis(delay + 380),
                 new KeyValue(windLine.startXProperty(), tx),
                 new KeyValue(windLine.startYProperty(), ty),
                 new KeyValue(windLine.endXProperty(), tx + (ux * segmentLength) + (px * jitter)),
@@ -335,10 +335,10 @@ public class IceEffects {
             
             battleField.getChildren().add(mist);
             
-            int delay = i * 30;
+            int delay = i * 40;
             KeyFrame appear = new KeyFrame(Duration.millis(delay),
                 new KeyValue(mist.opacityProperty(), 0.6));
-            KeyFrame expand = new KeyFrame(Duration.millis(delay + 200),
+            KeyFrame expand = new KeyFrame(Duration.millis(delay + 270),
                 new KeyValue(mist.radiusProperty(), mist.getRadius() * 2),
                 new KeyValue(mist.centerXProperty(), mist.getCenterX() + (ux * travel)),
                 new KeyValue(mist.centerYProperty(), mist.getCenterY() + (uy * travel)),
@@ -383,13 +383,13 @@ public class IceEffects {
             
             battleField.getChildren().add(cube);
             
-            int delay = i * 40;
+            int delay = i * 55;
             KeyFrame appear = new KeyFrame(Duration.millis(delay),
                 new KeyValue(cube.opacityProperty(), 1.0));
-            KeyFrame fall = new KeyFrame(Duration.millis(delay + 300),
+            KeyFrame fall = new KeyFrame(Duration.millis(delay + 400),
                 new KeyValue(cube.yProperty(), cube.getY() + 140),
                 new KeyValue(cube.rotateProperty(), cube.getRotate() + 180));
-            KeyFrame shatter = new KeyFrame(Duration.millis(delay + 350),
+            KeyFrame shatter = new KeyFrame(Duration.millis(delay + 470),
                 new KeyValue(cube.opacityProperty(), 0),
                 new KeyValue(cube.scaleXProperty(), 0.3),
                 new KeyValue(cube.scaleYProperty(), 0.3));
@@ -440,10 +440,10 @@ public class IceEffects {
             
             battleField.getChildren().add(shard);
             
-            int delay = i * 35;
+            int delay = i * 47;
             KeyFrame appear = new KeyFrame(Duration.millis(delay),
                 new KeyValue(shard.opacityProperty(), 1.0));
-            KeyFrame fly = new KeyFrame(Duration.millis(delay + 250),
+            KeyFrame fly = new KeyFrame(Duration.millis(delay + 340),
                 new KeyValue(shard.translateXProperty(), (ux * 90) + (px * (random.nextDouble() - 0.5) * 28)),
                 new KeyValue(shard.translateYProperty(), (uy * 90) + (py * (random.nextDouble() - 0.5) * 28)),
                 new KeyValue(shard.opacityProperty(), 0));
@@ -483,7 +483,7 @@ public class IceEffects {
             
             battleField.getChildren().add(snowflake);
             
-            int delay = i * 25;
+            int delay = i * 34;
             double travel = windBlown ? Math.min(distance * 0.55, 240.0) : Math.min(distance * 0.35, 140.0);
             double lateralDrift = windBlown ? (random.nextDouble() - 0.5) * 60.0 : (random.nextDouble() - 0.5) * 34.0;
             double snowEndX = snowflake.getCenterX() + (ux * travel) + (px * lateralDrift);
@@ -491,7 +491,7 @@ public class IceEffects {
             
             KeyFrame appear = new KeyFrame(Duration.millis(delay),
                 new KeyValue(snowflake.opacityProperty(), 1.0));
-            KeyFrame driftFrame = new KeyFrame(Duration.millis(delay + 350),
+            KeyFrame driftFrame = new KeyFrame(Duration.millis(delay + 470),
                 new KeyValue(snowflake.centerXProperty(), snowEndX),
                 new KeyValue(snowflake.centerYProperty(), snowEndY),
                 new KeyValue(snowflake.opacityProperty(), 0));

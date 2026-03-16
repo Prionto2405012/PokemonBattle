@@ -135,7 +135,7 @@ public class GhostEffects {
     // Spectral orb projectile – dark purple orb arcing with wispy trails
 
     private void addSpectralOrb(double startX, double startY, double endX, double endY, double intensity, Timeline timeline) {
-        double orbRadius = 22 + 8 * intensity;
+        double orbRadius = 15 + 8 * intensity;
 
         // Main orb
         Circle orb = new Circle(orbRadius, GHOST_DARK);
@@ -158,7 +158,7 @@ public class GhostEffects {
         battleField.getChildren().add(glow);
 
         // Halo ring
-        Circle halo = new Circle(orbRadius * 4.5, Color.color(0.48, 0.12, 0.64, 0.18));
+        Circle halo = new Circle(orbRadius * 3.5, Color.color(0.48, 0.12, 0.64, 0.18));
         halo.setStroke(GHOST_WISP.deriveColor(0, 1, 1, 0.25));
         halo.setStrokeWidth(8);
         halo.setEffect(new GaussianBlur(10));
