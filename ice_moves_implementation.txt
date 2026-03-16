@@ -1,0 +1,900 @@
+================================================================================
+            ICE TYPE MOVES — FULL IMPLEMENTATION GUIDE
+            PokemonBattle Project (JavaFX / Gen 4 Dataset)
+================================================================================
+
+OVERVIEW
+--------
+This document covers every Ice-type move in moves_gen4.json, what they do,
+what is already implemented, and exactly what code/functions/workflow needs to
+be added or changed to fully implement each move's special mechanics.
+
+There are 18 Ice-type moves in the dataset. The current engine
+(Battle.java → calculateDamage) handles basic damage correctly for all of them
+via type-effectiveness lookup (ICE = index 5 in the TYPE_EFFECTIVENESS chart).
+What is missing are the secondary/special effects specific to each move.
+
+================================================================================
+ARCHITECTURE QUICK REFERENCE
+================================================================================
+
+FILE                               ROLE
+----                               ----
+src/main/java/.../model/
+  Battle.java                      Core battle logic: executeRound(),
+                                   executeMove(), calculateDamage(),
+                                   getAIMove(). THIS is where all move
+                                   special effects must be coded.
+  Move.java                        Data-only POJO: id, name, power,
+                                   accuracy, pp, type, damage_class,
+                                   description. No logic. Read-only.
+  PokemonInstance.java             Per-pokemon state: currentHp, maxHp,
+                                   attack, defense, spAttack, spDefense,
+                                   speed, fainted, MoveSlot PP tracking.
+                                   Add stat stages and status fields here.
+  Player.java                      Holds a team, current pokemon pointer.
+
+src/main/java/.../controller/
+  BattleController.java            JavaFX UI controller. Drives animation,
+                                   displays battle log via battleStatusLabel,
+                                   calls battle.executeRound(). Add UI
+                                   feedback for status effects here.
+
+src/main/java/.../util/
+  BattleAnimationManager.java      Routes move type to the right effects
+                                   handler. Ice is routed to IceEffects.
+                                   Also decides physical (rush) vs ranged
+                                   (beam) in getAttackDistance() and
+                                   isRangedMove().
+
+src/main/java/.../util/effects/
+  IceEffects.java                  All visual particle/animation code for
+                                   Ice moves. createBeamEffect(), 
+                                   createImpactEffect() and sub-methods
+                                   for each visual category.
+
+src/main/resources/.../database/
+  moves_gen4.json                  Move data source. All 18 ice moves live
+                                   here with id, name, power, accuracy, pp,
+                                   type, damage_class, description.
+
+================================================================================
+COMPLETE ICE MOVE TABLE
+================================================================================
+
+ #  | ID  | Name              | Pwr | Acc | PP | Class    | Special Effect
+----|-----|-------------------|-----|-----|----|----------|--------------------------------
+ 1  | 579 | powder-snow       |  40 | 100 | 25 | special  | 10% chance to FREEZE target
+ 2  | 180 | ice-punch         |  75 | 100 | 15 | physical | 10% chance to FREEZE target
+ 3  | 186 | ice-beam          |  90 | 100 | 10 | special  | 10% chance to FREEZE target
+ 4  | 187 | blizzard          | 110 |  70 |  5 | special  | 10% chance to FREEZE target
+ 5  | 196 | icy-wind          |  55 |  95 | 15 | special  | LOWERS target Speed by 1 stage
+ 6  | 228 | ice-spinner       |  80 | 100 | 15 | physical | Destroys active terrain
+ 7  | 233 | avalanche         |  60 | 100 | 10 | physical | DOUBLES power if user took damage this turn
+ 8  | 340 | ice-fang          |  65 |  95 | 15 | physical | 10% flinch OR 10% FREEZE target
+ 9  | 491 | ice-ball          |  30 |  90 | 20 | physical | 5-turn move: power doubles each hit (×2,×4,×8,×16 + Defense-Curl bonus)
+10  | 515 | aurora-beam       |  65 | 100 | 20 | special  | 10% chance to LOWER target Attack by 1 stage
+11  | 529 | snowscape         |   — |   — | 10 | status   | Sets SNOW weather for 5 turns (boosts Ice Defense ×1.5)
+12  | 542 | icicle-spear      |  25 | 100 | 30 | physical | Hits 2–5 times; each hit calculated separately
+13  | 543 | ice-shard         |  40 | 100 | 30 | physical | Priority +1 (always strikes before normal moves)
+14  | 545 | triple-axel       |  20 |  90 | 10 | physical | 3 hits; power = 20, 40, 60 per kick (each accuracy-checked)
+15  | 547 | frost-breath      |  60 |  90 | 10 | special  | ALWAYS lands a critical hit (ignores crit-stage modifiers)
+16  | 554 | icicle-crash      |  85 |  90 | 10 | physical | 30% chance to FLINCH target
+17  | 585 | freeze-dry        |  70 | 100 | 20 | special  | 10% FREEZE chance; SUPER EFFECTIVE on Water (overrides normal chart)
+18  | 603 | chilly-reception  |   — |   — | 10 | status   | Sets SNOW for 5 turns, then user SWITCHES OUT
+
+================================================================================
+WHAT IS ALREADY IMPLEMENTED
+================================================================================
+
+1. TYPE EFFECTIVENESS
+   - Battle.java: TYPE_EFFECTIVENESS[ICE=5][defendingType] is fully populated.
+   - ICE is super effective against: Grass(4)×2, Flying(9)×2, Ground(8)×2,
+     Dragon(14)×2
+   - ICE is not very effective against: Fire(1)×0.5, Water(2)×0.5,
+     Ice(5)×0.5, Steel(16)×0.5
+   - getTypeEffectivenessMultiplier() handles multi-type defenders correctly.
+
+2. PHYSICAL vs SPECIAL DAMAGE
+   - calculateDamage() already branches on move.getDamage_class():
+     "special" → spAttack / spDefense
+     "physical" → attack / defense
+   - All 18 ice moves will use correct stats automatically.
+
+3. STATUS MOVES (NO DAMAGE)
+   - calculateDamage() returns 0 when power == null || power == 0
+     OR damage_class == "status".
+   - snowscape (id 529) and chilly-reception (id 603) return 0 damage.
+   - WARNING: their actual effect (setting weather/switching) is NOT coded yet.
+
+4. VISUAL ANIMATIONS — IceEffects.java
+   The following visual categories are already implemented and are automatically
+   selected inside IceEffects.createImpactEffect() by move-name keyword matching:
+
+   BEAM (createBeamEffect via BattleAnimationManager.playRangedAnimation):
+     → Triggered for all moves whose name contains "beam" OR "spear"
+        (ice-beam, icicle-spear)
+     → Cyan rectangle grows from attacker to defender; particles along path.
+
+   FANG (addFangVisual):
+     → moveName.contains("fang") → ice-fang
+     → Two crystalline icicle fangs appear at defender, then shatter.
+
+   BALL (addIceBallEffect):
+     → moveName.contains("ball") → ice-ball
+     → Glowing orb arcs from attacker to defender with ice shard explosion.
+
+   WIND (addWindEffect):
+     → moveName.contains("wind") OR "blizzard" OR "avalanche"
+        → icy-wind, blizzard, avalanche
+     → Multiple wind lines sweep across field with snowflakes.
+
+   BREATH (addBreathEffect):
+     → moveName.contains("breath") OR "reception" OR "freeze" OR "powder"
+        → frost-breath, chilly-reception, freeze-dry, powder-snow
+     → Mist clouds expand from attacker with light snowflakes.
+
+   CRUSH (addCrushEffect):
+     → moveName.contains("crush") → icicle-crash
+     → Ice cubes fall from above and shatter on target.
+
+   DEFAULT (addIceShardsAndSnowflakes):
+     → All other ice moves: ice-punch, ice-spinner, aurora-beam, snowscape,
+        ice-shard, triple-axel
+     → Ice shards fly out + snowflake particles scatter.
+
+5. MELEE vs RANGED ROUTING (BattleAnimationManager.java)
+   - ice-punch → ATTACK_DISTANCE_FULL (punches close the gap)
+   - Everything else ice → ATTACK_DISTANCE_SLIGHT
+   - isRangedMove() → For ice, any move with "beam" or "spear" in the name
+     is ranged (fires a projectile timeline, no attacker lunge).
+
+6. AI MOVE SELECTION
+   - getAIMove() in Battle.java already does type-effectiveness scoring for
+     all moves, so AI will prefer ice moves against Flying/Dragon/Grass/Ground
+     targets automatically.
+
+================================================================================
+WHAT IS NOT IMPLEMENTED AND HOW TO ADD IT
+================================================================================
+
+The following sections describe EVERY special mechanic that needs to be coded,
+where exactly the code goes, what data structures are needed, and the full
+workflow for each.
+
+------------------------------------------------------------------------
+PREREQUISITE: ADD STAT STAGES AND STATUS FIELDS TO PokemonInstance.java
+------------------------------------------------------------------------
+
+Before implementing any secondary effects, PokemonInstance needs:
+
+  // --- In PokemonInstance.java ---
+
+  // Stat stage modifiers (-6 to +6)
+  private int attackStage = 0;
+  private int defenseStage = 0;
+  private int spAttackStage = 0;
+  private int spDefenseStage = 0;
+  private int speedStage = 0;
+  private int accuracyStage = 0;
+  private int evasionStage = 0;
+
+  // Status conditions (one primary status at a time)
+  public enum StatusCondition { NONE, FROZEN, BURNED, PARALYZED, POISONED, BADLY_POISONED, ASLEEP }
+  private StatusCondition statusCondition = StatusCondition.NONE;
+
+  // Flinch flag (set per-turn, cleared at start of each turn)
+  private boolean flinching = false;
+
+  // Stat stage helper: returns the multiplier for a given stage (-6 to +6)
+  public static double getStageMultiplier(int stage) {
+      // Numerator/denominator from the official formula
+      int[] num = {2,2,2,2,2,2,2,3,4,5,6,7,8};
+      int[] den = {8,7,6,5,4,3,2,2,2,2,2,2,2};
+      int idx = stage + 6; // shift so stage -6 = index 0
+      return (double) num[idx] / den[idx];
+  }
+
+  // Apply this in calculateDamage (Battle.java) when reading attack/defense:
+  //   int atkStat = (int)(attacker.getAttack() * getStageMultiplier(attacker.getAttackStage()));
+
+  // Getters/setters: getAttackStage(), setAttackStage(),
+  //                  getSpeedStage(), setSpeedStage(), etc.
+  // Clamp stages to [-6, +6] in the setter.
+
+  // Status getters/setters: getStatus(), setStatus(StatusCondition)
+  // isFlinching(): return flinching; setFlinching(boolean)
+
+WORKFLOW:
+  1. Add fields above to PokemonInstance.java
+  2. Add getStageMultiplier() as a public static method
+  3. Update Battle.calculateDamage() to multiply attack/defense by stage multiplier
+  4. Add clearFlinch() call at the start of executeRound() for both pokemon
+  5. Add frozen-check at the top of executeMove() — skip the move if frozen
+  6. Add flinch-check in executeMove() — skip the move if faster pokemon already flinched it
+
+--------------------------------------------------------------------------------
+MOVE 1: powder-snow (id 579) — 10% FREEZE chance
+MOVE 2: ice-punch (id 180)   — 10% FREEZE chance
+MOVE 3: ice-beam (id 186)    — 10% FREEZE chance
+MOVE 4: blizzard (id 187)    — 10% FREEZE chance
+MOVE 5: ice-fang (id 340)    — 10% FREEZE chance (OR 10% flinch)
+--------------------------------------------------------------------------------
+
+WHAT IT DOES:
+  After dealing damage, there is a 10% chance to inflict the FROZEN status on
+  the target. A frozen Pokemon cannot move until it thaws (randomly each turn,
+  or after being hit by a Fire move). Ice-fang also has a separate 10% flinch
+  chance on top of the freeze chance.
+
+WHERE TO ADD THE CODE — Battle.java: executeMove()
+
+  private void executeMove(PokemonInstance attacker, Move move, PokemonInstance defender) {
+      if (move == null || attacker.isFainted()) return;
+
+      // --- NEW: skip if frozen ---
+      if (attacker.getStatus() == StatusCondition.FROZEN) {
+          if (random.nextDouble() < 0.20) {            // 20% thaw chance per turn
+              attacker.setStatus(StatusCondition.NONE);
+              notifyStatusChanged(attacker.getName(), "thawed out");
+          } else {
+              notifyStatusChanged(attacker.getName(), "is frozen solid and can't move");
+              return; // skip the move
+          }
+      }
+
+      // --- NEW: skip if flinching ---
+      if (attacker.isFlinching()) {
+          notifyStatusChanged(attacker.getName(), "flinched and couldn't move");
+          // flinching is cleared at start of next executeRound()
+          return;
+      }
+
+      int damage = calculateDamage(move, attacker, defender);
+      defender.takeDamage(damage);
+      notifyDamageDealt(attacker.getName(), move.getName(), defender.getName(), damage);
+      if (defender.isFainted()) {
+          notifyPokemonFainted(defender.getName());
+      }
+
+      // --- NEW: secondary effects after damage ---
+      applySecondaryEffect(move, attacker, defender);
+  }
+
+  // NEW METHOD to add:
+  private void applySecondaryEffect(Move move, PokemonInstance attacker, PokemonInstance defender) {
+      if (move == null || defender.isFainted()) return;
+      String name = move.getName();
+
+      switch (name) {
+          // --- 10% Freeze chance ---
+          case "powder-snow", "ice-punch", "ice-beam", "blizzard" -> {
+              if (defender.getStatus() == StatusCondition.NONE && random.nextDouble() < 0.10) {
+                  defender.setStatus(StatusCondition.FROZEN);
+                  notifyStatusChanged(defender.getName(), "was frozen solid");
+              }
+          }
+          // --- ice-fang: 10% freeze OR 10% flinch (handled separately) ---
+          case "ice-fang" -> {
+              double roll = random.nextDouble();
+              if (defender.getStatus() == StatusCondition.NONE && roll < 0.10) {
+                  defender.setStatus(StatusCondition.FROZEN);
+                  notifyStatusChanged(defender.getName(), "was frozen solid");
+              } else if (roll < 0.20) { // next 10% is flinch
+                  defender.setFlinching(true);
+                  notifyStatusChanged(defender.getName(), "flinched");
+              }
+          }
+          // ... other cases below ...
+      }
+  }
+
+  // NEW LISTENER NOTIFICATION METHOD:
+  private void notifyStatusChanged(String pokemonName, String message) {
+      for (BattleListener l : listeners) l.onStatusChanged(pokemonName, message);
+  }
+
+  // ADD TO BattleListener interface:
+  void onStatusChanged(String pokemonName, String message);
+
+UI FEEDBACK — BattleController.java:
+  @Override
+  public void onStatusChanged(String pokemonName, String message) {
+      Platform.runLater(() ->
+          battleStatusLabel.setText(capitalize(pokemonName) + " " + message + "!"));
+  }
+
+  // Also apply a blue tint overlay to the frozen pokemon sprite:
+  // Use a ColorAdjust effect with hue=-0.5, saturation=0.5 on playerSpriteImage
+  // or opponentSpriteImage when frozen status is set.
+
+ANIMATION ENHANCEMENT — IceEffects.java:
+  When a freeze is applied, add a brief "encasing in ice" effect:
+  - A semi-transparent cyan Rectangle the size of the defender sprite
+    fades in (opacity 0 → 0.5) and then fades out partially (stays at 0.2
+    to indicate frozen state).
+  This is purely cosmetic — the freeze is tracked in PokemonInstance.
+
+--------------------------------------------------------------------------------
+MOVE 5: icy-wind (id 196) — Lowers target SPEED by 1 stage
+MOVE 10: aurora-beam (id 515) — 10% chance to lower target ATTACK by 1 stage
+--------------------------------------------------------------------------------
+
+WHAT IT DOES:
+  icy-wind always lowers the target's Speed by 1 stage after dealing damage.
+  aurora-beam has a 10% chance to lower the target's Attack by 1 stage.
+  Stat stages cap at -6 and +6.
+
+WHERE TO ADD IN Battle.java: applySecondaryEffect() (same method as above)
+
+          // --- icy-wind: always lower speed 1 stage ---
+          case "icy-wind" -> {
+              int newStage = Math.max(-6, defender.getSpeedStage() - 1);
+              defender.setSpeedStage(newStage);
+              notifyStatChanged(defender.getName(), "speed", -1);
+          }
+          // --- aurora-beam: 10% lower attack 1 stage ---
+          case "aurora-beam" -> {
+              if (random.nextDouble() < 0.10) {
+                  int newStage = Math.max(-6, defender.getAttackStage() - 1);
+                  defender.setAttackStage(newStage);
+                  notifyStatChanged(defender.getName(), "attack", -1);
+              }
+          }
+
+  // NEW NOTIFICATION:
+  private void notifyStatChanged(String pokemonName, String stat, int stages) {
+      String direction = stages < 0 ? "fell" : "rose";
+      String magnitude = Math.abs(stages) == 2 ? " sharply" : Math.abs(stages) >= 3 ? " drastically" : "";
+      for (BattleListener l : listeners)
+          l.onStatusChanged(pokemonName, "'s " + stat + magnitude + " " + direction);
+  }
+
+IN calculateDamage() — apply speed stage to determine turn order in executeRound():
+  The speed stage is already not affecting damage (speed isn't used there),
+  but executeRound() compares getSpeed() to decide who goes first.
+  Change that comparison to use effective speed:
+
+  // In Battle.executeRound():
+  double p1EffSpeed = p1Pokemon.getSpeed() * PokemonInstance.getStageMultiplier(p1Pokemon.getSpeedStage());
+  double p2EffSpeed = p2Pokemon.getSpeed() * PokemonInstance.getStageMultiplier(p2Pokemon.getSpeedStage());
+  boolean player1First = p1EffSpeed >= p2EffSpeed;
+
+  // In BattleController.onMoveSelected():
+  double playerEffSpeed = playerPokemon.getSpeed() * PokemonInstance.getStageMultiplier(playerPokemon.getSpeedStage());
+  double oppEffSpeed = opponentPokemon.getSpeed() * PokemonInstance.getStageMultiplier(opponentPokemon.getSpeedStage());
+  boolean playerMovesFirst = playerEffSpeed >= oppEffSpeed;
+
+--------------------------------------------------------------------------------
+MOVE 6: ice-spinner (id 228) — Destroys active terrain
+--------------------------------------------------------------------------------
+
+WHAT IT DOES:
+  After dealing damage, ice-spinner removes the active terrain (Grassy Terrain,
+  Electric Terrain, Psychic Terrain, Misty Terrain). In the current build, no
+  terrain system exists, so this is a STUB for future implementation.
+
+WHERE TO ADD — Battle.java:
+  1. Add a terrain field:
+       private String activeTerrain = null; // "grassy", "electric", "psychic", "misty"
+  2. In applySecondaryEffect():
+       case "ice-spinner" -> {
+           if (activeTerrain != null) {
+               activeTerrain = null;
+               notifyStatusChanged(attacker.getName(), "destroyed the terrain");
+           }
+       }
+
+NOTE: Until you add terrain-setting moves, this will never trigger. The code
+stub is harmless — add it now so ice-spinner is connected when terrain is added.
+
+--------------------------------------------------------------------------------
+MOVE 7: avalanche (id 233) — DOUBLES power if user took damage this turn
+--------------------------------------------------------------------------------
+
+WHAT IT DOES:
+  avalanche's base power is 60, but if the user was hit by the opponent in the
+  same turn before avalanche is executed, the power becomes 120.
+
+DATA NEEDED — Battle.java:
+  Track whether a pokemon has been damaged this turn:
+    private boolean player1DamagedThisTurn = false;
+    private boolean player2DamagedThisTurn = false;
+
+  In executeMove(), after takeDamage():
+    if (defender == player1.getCurrentPokemon()) player1DamagedThisTurn = true;
+    else player2DamagedThisTurn = true;
+
+  At start of executeRound():
+    player1DamagedThisTurn = false;
+    player2DamagedThisTurn = false;
+
+IN calculateDamage():
+  // Before computing damage:
+  int effectivePower = move.getPower();
+  if ("avalanche".equals(move.getName())) {
+      boolean attackerIsP1 = (attacker == player1.getCurrentPokemon());
+      boolean tookDamage = attackerIsP1 ? player1DamagedThisTurn : player2DamagedThisTurn;
+      if (tookDamage) effectivePower *= 2;
+  }
+  // Then use effectivePower instead of move.getPower() in the formula.
+
+IMPORTANT: avalanche has –4 priority in the official games (it always moves
+last). You can skip priority implementation for now, but note that for full
+authenticity the user must be hit BEFORE avalanche fires, which usually means
+the opponent goes first. The "damagedThisTurn" flag captures this correctly
+since executeRound executes the faster pokemon first.
+
+--------------------------------------------------------------------------------
+MOVE 9: ice-ball (id 491) — 5-turn escalating power
+--------------------------------------------------------------------------------
+
+WHAT IT DOES:
+  ice-ball locks the user into attacking for 5 consecutive turns.
+  Turn 1: 30 power, Turn 2: 60, Turn 3: 120, Turn 4: 240, Turn 5: 480.
+  If a turn misses, the sequence resets.
+  (Defense Curl in the prior turn doubles all values — optional.)
+
+DATA NEEDED — PokemonInstance.java or Battle.java:
+  // Track locked moves per pokemon:
+  private Map<String, Integer> lockedMoveTurns = new HashMap<>();
+  // Key = move name, Value = current turn count (1..5)
+
+  // OR store in Battle.java per-player:
+  private int player1IceBallTurn = 0; // 0 = not active
+  private int player2IceBallTurn = 0;
+
+IN calculateDamage():
+  if ("ice-ball".equals(move.getName())) {
+      boolean isP1 = (attacker == player1.getCurrentPokemon());
+      int turnNum = isP1 ? player1IceBallTurn : player2IceBallTurn;
+      if (turnNum == 0) turnNum = 1; // first use
+      int effectivePower = 30 * (1 << (turnNum - 1)); // 30, 60, 120, 240, 480
+      // use effectivePower in the formula
+  }
+
+IN executeRound() (after executing the move):
+  if player uses ice-ball:
+    if hit: player1IceBallTurn = (player1IceBallTurn % 5) + 1;
+            if (player1IceBallTurn == 5) player1IceBallTurn = 0; // reset after 5
+    if miss: player1IceBallTurn = 0;
+
+  For the AI side correspondingly with player2IceBallTurn.
+
+ACCURACY CHECK: Currently calculateDamage() doesn't handle accuracy. For
+ice-ball consecutive turns after the first auto-hit (in the original games,
+turns 2-5 cannot miss). For simplicity you can just let the standard accuracy
+roll apply every turn unless you want to match official behaviour.
+
+--------------------------------------------------------------------------------
+MOVE 12: icicle-spear (id 542) — Hits 2–5 times
+--------------------------------------------------------------------------------
+
+WHAT IT DOES:
+  icicle-spear hits a random 2, 3, 4, or 5 times. Each hit is calculated
+  independently (same power per hit: 25). Total damage = sum of all hits.
+  PP is consumed once regardless of how many hits occur.
+
+WHERE TO ADD — Battle.java: executeMove()
+
+  if ("icicle-spear".equals(move.getName())) {
+      int hitCount = getMultiHitCount(); // 2,2,3,3,4,5 weighted distribution
+      int totalDamage = 0;
+      for (int i = 0; i < hitCount; i++) {
+          if (defender.isFainted()) break;
+          int dmg = calculateDamage(move, attacker, defender);
+          defender.takeDamage(dmg);
+          totalDamage += dmg;
+      }
+      notifyDamageDealt(attacker.getName(), move.getName(), defender.getName(), totalDamage);
+      notifyStatusChanged(attacker.getName(), "hit " + hitCount + " times");
+      if (defender.isFainted()) notifyPokemonFainted(defender.getName());
+      return; // skip the normal damage path
+  }
+
+  // Helper:
+  private int getMultiHitCount() {
+      // 2 hits: 37.5%, 3 hits: 37.5%, 4 hits: 12.5%, 5 hits: 12.5%
+      double r = random.nextDouble();
+      if (r < 0.375) return 2;
+      if (r < 0.75)  return 3;
+      if (r < 0.875) return 4;
+      return 5;
+  }
+
+ANIMATION: BattleAnimationManager currently plays the beam animation once.
+To show multiple hits, you could call the impact effect N times sequentially.
+Alternatively, leave the animation as-is (single beam) and note in the log
+how many hits landed. Full multi-hit animation would require chaining
+N sequential playRangedAnimation calls.
+
+--------------------------------------------------------------------------------
+MOVE 13: ice-shard (id 543) — Priority +1
+--------------------------------------------------------------------------------
+
+WHAT IT DOES:
+  ice-shard always moves before normal-priority moves (Quick Attack,
+  ExtremeSpeed etc. also use priority; ice-shard is +1).
+  Against another +1 priority move, speed breaks the tie as normal.
+
+WHERE TO ADD — Battle.java: executeRound()
+
+  1. Add a helper:
+       private int getMovePriority(Move move) {
+           if (move == null) return 0;
+           return switch (move.getName()) {
+               case "ice-shard", "quick-attack", "shadow-sneak",
+                    "mach-punch", "bullet-punch", "aqua-jet",
+                    "sucker-punch", "fake-out" -> 1;
+               case "protect", "detect" -> 3;
+               default -> 0;
+           };
+       }
+
+  2. In executeRound(), change the turn-order check:
+       int p1Priority = getMovePriority(player1Move);
+       int p2Priority = getMovePriority(player2Move);
+       boolean player1First;
+       if (p1Priority != p2Priority) {
+           player1First = p1Priority > p2Priority;
+       } else {
+           double p1EffSpeed = p1Pokemon.getSpeed() * PokemonInstance.getStageMultiplier(p1Pokemon.getSpeedStage());
+           double p2EffSpeed = p2Pokemon.getSpeed() * PokemonInstance.getStageMultiplier(p2Pokemon.getSpeedStage());
+           player1First = p1EffSpeed >= p2EffSpeed;
+       }
+
+  3. BattleController.onMoveSelected() must mirror this logic for its own
+     playerMovesFirst variable (used to decide animation order):
+       int playerPriority = getMovePriority(move);
+       int aiPriority = getMovePriority(aiMove);
+       boolean playerMovesFirst;
+       if (playerPriority != aiPriority) {
+           playerMovesFirst = playerPriority > aiPriority;
+       } else {
+           playerMovesFirst = (playerEffSpeed >= oppEffSpeed);
+       }
+  NOTE: getMovePriority is needed in both Battle.java AND BattleController.java.
+  Best practice: make it a public static method on Move or a utility class so
+  it isn't duplicated.
+
+--------------------------------------------------------------------------------
+MOVE 14: triple-axel (id 545) — 3 hits, power 20 / 40 / 60
+--------------------------------------------------------------------------------
+
+WHAT IT DOES:
+  triple-axel hits exactly 3 times. Power of each hit increases:
+  First hit: 20, second hit: 40, third hit: 60.
+  Each hit has its own accuracy check (90%). If any hit misses, subsequent
+  hits are cancelled.
+
+WHERE TO ADD — Battle.java: executeMove() (special-case block)
+
+  if ("triple-axel".equals(move.getName())) {
+      int[] powers = {20, 40, 60};
+      int totalDamage = 0;
+      int hitsLanded = 0;
+      for (int i = 0; i < 3; i++) {
+          if (defender.isFainted()) break;
+          // accuracy check per hit
+          if (move.getAccuracy() != null && random.nextInt(100) >= move.getAccuracy()) {
+              break; // missed, cancel remaining hits
+          }
+          // create a temporary Move with the right power for damage formula
+          int dmg = calculateDamageWithPower(powers[i], move, attacker, defender);
+          defender.takeDamage(dmg);
+          totalDamage += dmg;
+          hitsLanded++;
+      }
+      notifyDamageDealt(attacker.getName(), move.getName(), defender.getName(), totalDamage);
+      if (hitsLanded > 0)
+          notifyStatusChanged(attacker.getName(), "hit " + hitsLanded + " time(s) with triple-axel");
+      if (defender.isFainted()) notifyPokemonFainted(defender.getName());
+      return; // skip normal damage
+  }
+
+  // Helper that accepts an explicit power value:
+  private int calculateDamageWithPower(int power, Move move, PokemonInstance attacker, PokemonInstance defender) {
+      // Same as calculateDamage but power is passed in, not from move.getPower()
+      int atkStat = "special".equals(move.getDamage_class()) ? attacker.getSpAttack() : attacker.getAttack();
+      int defStat = "special".equals(move.getDamage_class()) ? defender.getSpDefense() : defender.getDefense();
+      double damage = ((2.0 * attacker.getLevel() / 5.0 + 2.0) * power * atkStat / (double) defStat) / 50.0 + 2.0;
+      float effectiveness = getTypeEffectivenessMultiplier(move.getType(), defender.getTypes());
+      damage *= effectiveness;
+      damage *= (0.85 + random.nextDouble() * 0.15);
+      return Math.max(1, (int) damage);
+  }
+
+--------------------------------------------------------------------------------
+MOVE 15: frost-breath (id 547) — ALWAYS critical hit
+--------------------------------------------------------------------------------
+
+WHAT IT DOES:
+  frost-breath (and storm-throw for Fighting) always lands a critical hit.
+  Critical hit in Pokemon = 1.5× damage multiplier (Gen VI+) or 2× (older).
+
+WHERE TO ADD — Battle.java: calculateDamage()
+
+  // Add at the top of calculateDamage():
+  boolean isCritical = isCriticalHitMove(move);
+  // ... (existing formula) ...
+  if (isCritical) damage *= 1.5;
+
+  private boolean isCriticalHitMove(Move move) {
+      if (move == null) return false;
+      return switch (move.getName()) {
+          case "frost-breath", "storm-throw" -> true;
+          default -> false;
+      };
+  }
+
+UI FEEDBACK:
+  In notifyDamageDealt() (or a new notifyCriticalHit()), display
+  "A critical hit!" in the battleStatusLabel before the damage number.
+  Add a flag:
+    notifyDamageDealt(attacker.getName(), move.getName(), defender.getName(), damage, isCritical);
+  Update BattleListener.onDamageDealt() signature accordingly.
+
+--------------------------------------------------------------------------------
+MOVE 16: icicle-crash (id 554) — 30% FLINCH chance
+--------------------------------------------------------------------------------
+
+WHAT IT DOES:
+  After dealing damage there is a 30% chance the target flinches
+  (cannot move during that same turn IF the flinching pokemon moves second).
+  A flinch only matters if the icicle-crash user moves BEFORE the target.
+
+WHERE TO ADD — Battle.java: applySecondaryEffect()
+
+          case "icicle-crash" -> {
+              if (random.nextDouble() < 0.30) {
+                  defender.setFlinching(true);
+                  notifyStatusChanged(defender.getName(), "flinched");
+              }
+          }
+
+HOW FLINCH INTERACTS WITH TURN ORDER:
+  Flinch only prevents the move if the defender hasn't attacked yet this round.
+  In executeRound(), moves execute in sequence. If ice-crash fires first and
+  sets flinching=true, and then the flinched pokemon's turn comes in executeMove(),
+  it checks isFlinching() and skips its move. This works naturally with the
+  sequential structure already in executeRound(). Clear flinching at the top
+  of the NEXT executeRound() call.
+
+--------------------------------------------------------------------------------
+MOVE 17: freeze-dry (id 585) — Super effective on WATER, 10% FREEZE
+--------------------------------------------------------------------------------
+
+WHAT IT DOES:
+  freeze-dry has a unique type-effectiveness override: it treats Water-type
+  defenders as if Water were weak to Ice, even though Water normally resists Ice.
+  Additionally there is a 10% chance to freeze the target.
+
+WHERE TO ADD — Battle.java: calculateDamage() after effectiveness calculation
+
+  // Override freeze-dry effectiveness against Water
+  if ("freeze-dry".equals(move.getName())) {
+      // Re-compute effectiveness with Water treated as ×2 for Ice
+      float freezeDryEff = 1.0f;
+      for (String defType : defender.getTypes()) {
+          if ("water".equalsIgnoreCase(defType)) {
+              freezeDryEff *= 2.0f; // Water is super-effective for this move
+          } else {
+              PokemonType defTypeEnum = PokemonType.fromString(defType);
+              freezeDryEff *= TYPE_EFFECTIVENESS[PokemonType.ICE.index][defTypeEnum.index];
+          }
+      }
+      effectiveness = freezeDryEff;
+  }
+  // (effectiveness is already declared above this point in the method)
+
+FOR FREEZE CHANCE — same as ice-beam, in applySecondaryEffect():
+          case "freeze-dry" -> {
+              if (defender.getStatus() == StatusCondition.NONE && random.nextDouble() < 0.10) {
+                  defender.setStatus(StatusCondition.FROZEN);
+                  notifyStatusChanged(defender.getName(), "was frozen solid");
+              }
+          }
+
+NOTE: The TYPE_EFFECTIVENESS chart at ICE(5) vs WATER(2) is currently set to
+0.5f (ice resists water → ice is 0.5× against water). freeze-dry bypasses this.
+Make sure the override happens after the chart lookup, not before.
+
+--------------------------------------------------------------------------------
+MOVE 11: snowscape (id 529) — Sets SNOW weather for 5 turns
+MOVE 18: chilly-reception (id 603) — Sets SNOW + user switches out
+--------------------------------------------------------------------------------
+
+WHAT THEY DO:
+  snowscape and chilly-reception both set the SNOW weather condition for 5 turns.
+  While SNOW is active:
+    - Ice-type Pokemon receive a ×1.5 Defense bonus (introduced with Snowscape
+      replacing Hail in Gen IX). Blizzard hits without accuracy check.
+    - Non-Ice types take no chip damage (unlike old Hail).
+  chilly-reception additionally forces the user to switch to another party member.
+
+DATA NEEDED — Battle.java:
+  private String activeWeather = null; // "rain", "sun", "sandstorm", "snow"
+  private int weatherTurnsRemaining = 0;
+
+  // At the start of executeRound(), decrement weather:
+  if (weatherTurnsRemaining > 0) {
+      weatherTurnsRemaining--;
+      if (weatherTurnsRemaining == 0) {
+          activeWeather = null;
+          notifyStatusChanged("Field", "the weather cleared up");
+      }
+  }
+
+  // In applySecondaryEffect():
+  case "snowscape", "chilly-reception" -> {
+      activeWeather = "snow";
+      weatherTurnsRemaining = 5;
+      notifyStatusChanged("Field", "it started to snow");
+
+      if ("chilly-reception".equals(move.getName())) {
+          // Force the user to switch — call the same mechanism as voluntary switch
+          notifyPlayerPokemonSwitchRequired(attacker);
+          // For AI: auto-pick next available pokemon
+      }
+  }
+
+IN calculateDamage() — apply snow Defense boost:
+  // After computing atkStat/defStat, before the formula:
+  if ("snow".equals(activeWeather)) {
+      List<String> defTypes = defender.getTypes();
+      if (defTypes != null && defTypes.stream().anyMatch(t -> "ice".equalsIgnoreCase(t))) {
+          if ("physical".equals(move.getDamage_class())) {
+              defStat = (int)(defStat * 1.5);
+          }
+      }
+  }
+
+IN calculateDamage() — Blizzard never misses in snow:
+  // Already passes accuracy as null in some cases; add an explicit check:
+  // (Accuracy check logic would need to be added separately if you implement
+  //  miss/accuracy rolls in executeMove())
+  if ("blizzard".equals(move.getName()) && "snow".equals(activeWeather)) {
+      // guaranteed hit — skip accuracy roll
+  }
+
+UI FEEDBACK:
+  - Show a snow overlay on the battle background while weather is active.
+  - This can be done in BattleController by adding a semi-transparent CSS
+    class or a snowflake particle loop (using IceEffects.addSnowflakes() on
+    a repeating loop) when weather changes to "snow".
+  - BattleListener interface needs: void onWeatherChanged(String weatherType, int turns);
+
+CHILLY-RECEPTION SWITCH:
+  The switch-out after chilly-reception requires:
+  - A new BattleListener callback: onMoveUserMustSwitch(String playerName)
+  - In BattleController, show the same pokemon selection overlay used for
+    forced-faint switches (showForcedSwitchOverlay()), but triggered mid-turn.
+  - For the AI, just call handleFaintedAI() adapter or a new handleVoluntaryAI()
+    that picks the best remaining pokemon.
+
+================================================================================
+SUMMARY: ALL CHANGES BY FILE
+================================================================================
+
+PokemonInstance.java
+  - Add: attackStage, defenseStage, spAttackStage, spDefenseStage, speedStage
+  - Add: StatusCondition enum (NONE, FROZEN, BURNED, PARALYZED, etc.)
+  - Add: statusCondition field and getter/setter
+  - Add: flinching boolean and isFlinching() / setFlinching()
+  - Add: getStageMultiplier(int stage) static helper
+  - Ensure all stage setters clamp to [-6, +6]
+
+Battle.java
+  - Add: player1DamagedThisTurn, player2DamagedThisTurn booleans (for avalanche)
+  - Add: player1IceBallTurn, player2IceBallTurn counters (for ice-ball)
+  - Add: activeWeather String, weatherTurnsRemaining int (for snowscape)
+  - Add: activeTerrain String (for ice-spinner)
+  - Modify: executeMove() — add frozen-skip, flinch-skip at top
+  - Modify: executeMove() — add applySecondaryEffect() call after damage
+  - New method: applySecondaryEffect(Move, PokemonInstance attacker, PokemonInstance defender)
+    Cases: powder-snow, ice-punch, ice-beam, blizzard, ice-fang,
+           icy-wind, aurora-beam, ice-spinner, avalanche, icicle-spear,
+           ice-shard (handled via priority), triple-axel, frost-breath,
+           icicle-crash, freeze-dry, snowscape, chilly-reception
+  - Modify: calculateDamage() — use stat stage multipliers for attack/defense
+  - Modify: calculateDamage() — critical hit multiplier for frost-breath
+  - Modify: calculateDamage() — freeze-dry Water override
+  - Modify: calculateDamage() — snow weather Defense boost
+  - Modify: executeRound() — priority check via getMovePriority()
+  - Modify: executeRound() — clear flinch flags at start
+  - Modify: executeRound() — decrement weather turns
+  - New method: getMovePriority(Move) — ice-shard returns 1
+  - New method: getMultiHitCount() — weighted 2-5 distribution
+  - New method: calculateDamageWithPower(int power, Move, attacker, defender)
+  - New method: isCriticalHitMove(Move)
+  - Modify: notifyDamageDealt() — add critical hit flag (optional)
+  - New method: notifyStatusChanged(pokemonName, message)
+  - New method: notifyStatChanged(pokemonName, stat, stages)
+  - Modify: BattleListener interface — add onStatusChanged(), onStatChanged(),
+            onWeatherChanged()
+
+BattleController.java
+  - Implement: onStatusChanged() — display message in battleStatusLabel
+  - Implement: onStatChanged() — display stat drop/rise message
+  - Implement: onWeatherChanged() — start/stop snow overlay animation
+  - Modify: onMoveSelected() — mirror getMovePriority() for animation order
+  - Modify: onMoveSelected() — use effective speed (with stage multiplier)
+    for playerMovesFirst determination
+  - Optional: show frozen status as blue tint on affected sprite
+
+BattleAnimationManager.java
+  No changes strictly required. Current ice routing works for all 18 moves.
+  Optional improvements:
+  - triple-axel: repeat impact effect 3 times with increasing panning positions
+  - icicle-spear: repeat beam effect N times for hit count
+  - snowscape/chilly-reception: play a field-wide snow burst animation
+    (chain multiple IceEffects.addWindEffect() calls)
+  - Add "chilly-reception" to the BREATH category in IceEffects
+    (currently detected by moveName.contains("reception") — already handled)
+
+IceEffects.java
+  No required changes. All 18 ice moves are already routed to an appropriate
+  visual effect by the existing keyword matching in createImpactEffect().
+  Optional: add an explicit "aurora-beam" case with a rainbow-aurora visual
+  distinct from the generic shard effect.
+
+moves_gen4.json
+  No changes needed. All 18 ice moves are present and correctly structured.
+
+================================================================================
+IMPLEMENTATION ORDER (RECOMMENDED)
+================================================================================
+
+Step 1: PokemonInstance — add stat stages, status, flinch (foundation)
+Step 2: Battle.java — wire stat stage multipliers into calculateDamage()
+        and speed comparison in executeRound()
+Step 3: Battle.java — add applySecondaryEffect() with FREEZE cases first
+        (powder-snow, ice-punch, ice-beam, blizzard, ice-fang, freeze-dry)
+Step 4: Battle.java — add icy-wind and aurora-beam STAT DROP cases
+Step 5: Battle.java — add priority system + ice-shard
+Step 6: Battle.java — add flinch system + icicle-crash, ice-fang flinch
+Step 7: Battle.java — add multi-hit for icicle-spear
+Step 8: Battle.java — add triple-axel (3-hit increasing power)
+Step 9: Battle.java — add frost-breath critical hit
+Step 10: Battle.java — add avalanche damage doubling
+Step 11: Battle.java — add snowscape / chilly-reception weather system
+Step 12: Battle.java — add ice-ball 5-turn lock (most complex)
+Step 13: Battle.java — add ice-spinner terrain destruction (stub)
+Step 14: BattleController — wire in all new listener callbacks for UI feedback
+Step 15: BattleAnimationManager (optional) — enhance multi-hit animations
+
+================================================================================
+ICE TYPE EFFECTIVENESS REFERENCE
+================================================================================
+
+Ice moves are SUPER EFFECTIVE (×2) against:
+  - Grass         (Bulbasaur, Chikorita, Turtwig, etc.)
+  - Flying        (Pidgeot, Gyarados, Dragonite, etc.)
+  - Ground        (Sandslash, Rhydon, etc.)
+  - Dragon        (Dragonair, Garchomp, etc.)
+
+Ice moves are NOT VERY EFFECTIVE (×0.5) against:
+  - Fire          (Charizard, etc.)
+  - Water         (Blastoise, etc.) — NOTE: freeze-dry OVERRIDES this to ×2
+  - Ice           (Jynx, Lapras, etc.)
+  - Steel         (Skarmory, Magnezone, etc.)
+
+Ice moves deal NORMAL DAMAGE (×1) against all other types.
+
+In Battle.java the ICE row of the TYPE_EFFECTIVENESS chart is:
+  chart[5][8]  = 2.0f;  // ICE vs GROUND
+  chart[5][9]  = 2.0f;  // ICE vs FLYING
+  chart[5][4]  = 2.0f;  // ICE vs GRASS
+  chart[5][14] = 2.0f;  // ICE vs DRAGON
+  chart[5][1]  = 0.5f;  // ICE vs FIRE
+  chart[5][3]  = 0.5f;  // ICE vs ELECTRIC (wrong — should be ×1)
+  chart[5][5]  = 0.5f;  // ICE vs ICE
+  // MISSING from chart[5]: chart[5][2] = 0.5f (ICE vs WATER)
+  //                        chart[5][16] = 0.5f (ICE vs STEEL)
+  // BUG NOTE: chart[5][3] = 0.5f appears to be an error in the existing code
+  //   (Ice is NOT not-very-effective against Electric in official games).
+  //   This should be removed (left at default 1.0f).
+
+================================================================================
+END OF ICE MOVES IMPLEMENTATION GUIDE
+================================================================================

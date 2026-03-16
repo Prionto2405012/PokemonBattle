@@ -3910,6 +3910,16 @@
     "description": "Power: 100\nAccuracy: 75\nPP: 5\n\nThe foe becomes trapped within a maelstrom of fire that rages for two to five turns."
   },
   {
+    "id": 648,
+    "name": "dark-hole",
+    "power": 0,
+    "accuracy": null,
+    "pp": 10,
+    "type": "dark",
+    "damage_class": "status",
+    "description": "Power: -\nAccuracy: -\nPP: 10\n\nThe user opens a dark hole that traps the target. The target is unable to escape until the user leaves the battlefield."
+  },
+  {
     "id": 649,
     "name": "shadow-force",
     "power": 120,
@@ -3920,6 +3930,16 @@
     "description": "Power: 120\nAccuracy: 100\nPP: 5\n\nThe user disappears, then strikes the foe on the second turn. It hits even if the foe used Protect."
   },
   {
+    "id": 650,
+    "name": "roost",
+    "power": 0,
+    "accuracy": null,
+    "pp": 15,
+    "type": "flying",
+    "damage_class": "status",
+    "description": "Power: -\nAccuracy: -\nPP: 15\n\nThe user restores half of it's max HP"
+  },
+  {
     "id": 651,
     "name": "lunar-blessing",
     "power": 0,
@@ -3928,16 +3948,6 @@
     "type": "psychic",
     "damage_class": "status",
     "description": "Power: -\nAccuracy: -\nPP: 5\n\nThe user heals its own status conditions and restores its HP. Incoming moves also become more likely to miss."
-  },
-  {
-    "id": 652,
-    "name": "take-heart",
-    "power": 0,
-    "accuracy": null,
-    "pp": 10,
-    "type": "psychic",
-    "damage_class": "status",
-    "description": "Power: -\nAccuracy: -\nPP: 10\n\nThe user lifts its spirits, healing its own status conditions and raising its offensive and defensive stats."
   },
   {
     "id": 655,

@@ -1,0 +1,429 @@
+================================================================================
+DRAINING AND HP-RESTORING MOVES (FROM moves_gen4.json)
+Source: src/main/resources/com/example/pokemonbattle/database/moves_gen4.json
+================================================================================
+
+This file lists every move in the current dataset that either:
+1) Drains HP from the defender and restores HP to the user, or
+2) Directly restores HP (self or ally).
+
+Total qualifying moves: 10
+
+--------------------------------------------------------------------------------
+A) HP DRAIN FROM DEFENDER -> USER HEALS
+--------------------------------------------------------------------------------
+
+1) absorb
+   - ID: 451
+   - Type: grass
+   - Class: special
+   - Power: 20 | Accuracy: 100 | PP: 25
+   - Effect: Steals 1/2 of the damage inflicted.
+
+2) mega-drain
+   - ID: 13
+   - Type: grass
+   - Class: special
+   - Power: 40 | Accuracy: 100 | PP: 15
+   - Effect: Steals 1/2 of the damage inflicted.
+
+3) giga-drain
+   - ID: 42
+   - Type: grass
+   - Class: special
+   - Power: 75 | Accuracy: 100 | PP: 10
+   - Effect: Steals 1/2 of the damage inflicted.
+
+4) leech-life
+   - ID: 318
+   - Type: bug
+   - Class: physical
+   - Power: 80 | Accuracy: 100 | PP: 10
+   - Effect: Steals 1/2 of the damage inflicted.
+
+5) drain-punch
+   - ID: 419
+   - Type: fighting
+   - Class: physical
+   - Power: 75 | Accuracy: 100 | PP: 10
+   - Effect: User HP is restored by half the damage dealt.
+
+6) draining-kiss
+   - ID: 261
+   - Type: fairy
+   - Class: special
+   - Power: 50 | Accuracy: 100 | PP: 10
+   - Effect: User HP is restored by over half the damage dealt.
+
+7) dream-eater
+   - ID: 247
+   - Type: psychic
+   - Class: special
+   - Power: 100 | Accuracy: 100 | PP: 15
+   - Effect: Steals HP from a sleeping target.
+
+--------------------------------------------------------------------------------
+B) DIRECT HP RESTORE (NO HP DRAIN FROM DEFENDER)
+--------------------------------------------------------------------------------
+
+8) roost
+   - ID: 650
+   - Type: flying
+   - Class: status
+   - Power: - | Accuracy: - | PP: 15
+   - Effect: Restores half of the user's max HP.
+
+9) lunar-blessing
+   - ID: 651
+   - Type: psychic
+   - Class: status
+   - Power: - | Accuracy: - | PP: 5
+   - Effect: Restores the user's HP and heals status conditions.
+
+10) pollen-puff
+    - ID: 263
+    - Type: bug
+    - Class: special
+    - Power: 90 | Accuracy: 100 | PP: 15
+    - Effect: If used on an ally, restores that ally's HP.
+
+--------------------------------------------------------------------------------
+NOTES
+--------------------------------------------------------------------------------
+- This list is strictly based on move entries present in the current
+  moves_gen4.json in this repository.
+- Moves like hyper-beam and giga-impact were excluded because they involve
+  recharge/rest turns, not HP healing.
+- Moves that only prevent recovery (for example psychic-noise) were excluded
+  because they do not restore HP.
+
+================================================================================
+RIGOROUS IMPLEMENTATION DETAILS (HOW TO ADD TO THIS CODEBASE)
+================================================================================
+
+GOAL
+----
+Implement full battle mechanics for all 10 drain/heal moves listed above,
+using the current architecture:
+- Core logic in model/Battle.java
+- State and HP utilities in model/PokemonInstance.java
+- UI messaging in controller/BattleController.java
+
+CURRENT BASELINE (IMPORTANT)
+----------------------------
+Battle.java currently does only generic damage:
+1) executeMove() -> calculateDamage() -> defender.takeDamage(damage)
+2) No move-specific secondary effects are applied.
+3) Status moves (power null/0 or class status) currently do 0 damage and do
+   nothing else.
+
+Because of that, all drain/heal behavior must be explicitly added.
+
+--------------------------------------------------------------------------------
+1) FILE-BY-FILE CHANGES
+--------------------------------------------------------------------------------
+
+A) src/main/java/com/example/pokemonbattle/model/PokemonInstance.java
+
+Add missing status support (required for dream-eater and lunar-blessing):
+
+1. Add enum:
+   public enum StatusCondition {
+       NONE,
+       SLEEP,
+       FROZEN,
+       BURN,
+       PARALYSIS,
+       POISON,
+       BADLY_POISONED
+   }
+
+2. Add field:
+   private StatusCondition statusCondition = StatusCondition.NONE;
+
+3. Add methods:
+   public StatusCondition getStatusCondition()
+   public void setStatusCondition(StatusCondition statusCondition)
+   public boolean hasStatusCondition()  // true when != NONE
+
+4. HP helpers (if not already present):
+   public void healToFull()
+   public int getMissingHp()
+
+Notes:
+- heal(int amt) already exists and clamps to max HP. Reuse it for all restore.
+- Keep status field in this class only; Battle should read/write it.
+
+
+B) src/main/java/com/example/pokemonbattle/model/Battle.java
+
+This is the main implementation point. Add a move-effects pipeline.
+
+1. Add constants near top of class:
+   private static final double DRAIN_HALF = 0.50;
+   private static final double DRAIN_THREE_QUARTER = 0.75;
+   private static final double HEAL_HALF_MAX = 0.50;
+
+2. Modify executeMove(attacker, move, defender):
+
+   Existing flow:
+   - calculate damage
+   - apply damage
+   - notify damage
+   - faint check
+
+   New flow:
+   - handle status-only restorative moves first (roost, lunar-blessing)
+   - otherwise calculate/apply damage
+   - apply post-damage effects (drain, pollen ally heal, dream-eater gating)
+
+3. Add method:
+   private boolean handleStatusMove(PokemonInstance attacker, Move move)
+
+   Behavior:
+   - roost: heal attacker for 50% max HP
+   - lunar-blessing: clear attacker's status + heal attacker (use full heal or
+     50% heal depending your intended balance; dataset text says restores HP,
+     not necessarily full)
+   - return true when move fully handled and no damage should occur.
+
+4. Add method:
+   private void applyPostDamageEffects(Move move, PokemonInstance attacker,
+                                       PokemonInstance defender, int damageDealt)
+
+   Route by move name:
+   - absorb/mega-drain/giga-drain/leech-life/drain-punch: heal attacker by
+     floor(damageDealt * 0.5), min 1 if damageDealt > 0
+   - draining-kiss: heal attacker by floor(damageDealt * 0.75)
+   - dream-eater: only valid if defender is asleep; otherwise move fails
+   - pollen-puff: see targeting logic section below
+
+5. Add helper methods:
+   private int healByFractionOfDamage(PokemonInstance user, int damage,
+                                      double fraction)
+   private int healByFractionOfMaxHp(PokemonInstance user, double fraction)
+   private boolean isDrainMove(String moveName)
+   private boolean isHealingStatusMove(String moveName)
+
+6. Add battle notifications for healing:
+   private void notifyHpRestored(String pokemonName, int healed)
+   private void notifyMoveFailed(String pokemonName, String moveName, String reason)
+
+7. Extend BattleListener interface:
+   void onHpRestored(String pokemonName, int healedAmount);
+   void onMoveFailed(String pokemonName, String moveName, String reason);
+
+8. Accuracy/miss handling (recommended for correctness):
+   Add hit check before damage for moves with accuracy != null.
+   If missed, no drain/heal from damage should trigger.
+
+
+C) src/main/java/com/example/pokemonbattle/controller/BattleController.java
+
+Implement the new listener callbacks:
+
+1. onHpRestored(...):
+   - update battleStatusLabel with "<name> restored <N> HP!"
+   - call updateBattleDisplay() to refresh HP bars immediately.
+
+2. onMoveFailed(...):
+   - show clear reason text such as
+     "Dream Eater failed: target is not asleep."
+
+3. No animation manager changes are strictly required, but optional polish:
+   - Add green pulse around attacker on successful healing.
+
+--------------------------------------------------------------------------------
+2) PER-MOVE IMPLEMENTATION SPEC
+--------------------------------------------------------------------------------
+
+DRain-from-damage group
+-----------------------
+
+1) absorb (id 451)
+2) mega-drain (id 13)
+3) giga-drain (id 42)
+4) leech-life (id 318)
+5) drain-punch (id 419)
+
+Implementation:
+- After damage is actually dealt to defender, heal attacker by 50% of
+  damageDealt.
+- Formula: heal = max(1, floor(damageDealt * 0.5)) when damageDealt > 0.
+- If damageDealt == 0, heal = 0.
+- Use attacker.heal(heal) and notifyHpRestored.
+
+
+6) draining-kiss (id 261)
+
+Implementation:
+- Same trigger point as drain moves (post-hit).
+- Heal fraction is 0.75.
+- Formula: heal = max(1, floor(damageDealt * 0.75)) when damageDealt > 0.
+
+
+7) dream-eater (id 247)
+
+Implementation requirements:
+- Move should fail if defender status is not SLEEP.
+- On fail: damage 0, no healing, notifyMoveFailed.
+- On success: deal normal damage and heal user by 50% of damage dealt.
+
+Where to enforce:
+- In executeMove(), before calculateDamage(), add special precondition check:
+  if moveName == "dream-eater" and defender.getStatusCondition() != SLEEP
+  then fail early and return.
+
+
+Direct restorative group
+------------------------
+
+8) roost (id 650)
+
+Implementation:
+- Status move; no damage.
+- Heal user by 50% of max HP.
+- Formula: heal = floor(maxHp * 0.5), minimum 1.
+- Cap at max HP via PokemonInstance.heal().
+
+Optional advanced behavior (canon):
+- Temporarily lose Flying type for the turn.
+- Can be skipped now since current engine has no turn-phase type overrides.
+
+
+9) lunar-blessing (id 651)
+
+Implementation:
+- Status move; no damage.
+- Clear user's status condition.
+- Restore HP (choose one policy and keep consistent):
+  a) full heal (simple and strong), or
+  b) 50% max HP (balanced for your current battle pace).
+
+Recommended for this codebase:
+- Use 50% max HP to avoid overpowering single-turn sustain.
+
+Notes:
+- Dataset description mentions "Incoming moves also become more likely to miss."
+- Current battle model has no volatile evasion buff system.
+- Add TODO in Battle.java for future volatile state support.
+
+
+10) pollen-puff (id 263)
+
+Implementation in this project (single-target 1v1):
+- In 1v1 enemy targeting, keep current behavior as damaging attack.
+- Add ally-heal path only for future double-battle/team-targeting modes.
+
+How to structure now:
+- Add method signature ready for expansion:
+  private boolean isAllyTarget(PokemonInstance attacker, PokemonInstance target)
+- For now, return false always in standard Battle mode.
+- In applyPostDamageEffects, if move == pollen-puff and isAllyTarget(...) true,
+  skip damage and heal ally by a fixed amount or fraction of max HP.
+
+This keeps the code future-proof without breaking current 1v1 flow.
+
+--------------------------------------------------------------------------------
+3) EXACT EXECUTION WORKFLOW TO IMPLEMENT
+--------------------------------------------------------------------------------
+
+Turn workflow in Battle.executeRound():
+1. Determine order by speed (current logic already exists).
+2. First actor calls executeMove().
+3. In executeMove():
+   a) Precondition checks (null/fainted, dream-eater sleep gate)
+   b) Status-heal move handling (roost/lunar-blessing)
+   c) Accuracy check (if you add it)
+   d) Damage calculation and defender.takeDamage(damage)
+   e) applyPostDamageEffects(move, attacker, defender, damage)
+   f) faint checks and notifications
+4. Second actor executes if not fainted.
+5. Existing faint-switch and battle end checks proceed unchanged.
+
+--------------------------------------------------------------------------------
+4) SUGGESTED CODE SKELETON (Battle.java)
+--------------------------------------------------------------------------------
+
+Use this structure to avoid scattered if/else blocks:
+
+private void executeMove(PokemonInstance attacker, Move move, PokemonInstance defender) {
+    if (move == null || attacker.isFainted()) return;
+
+    String moveName = move.getName() == null ? "" : move.getName().toLowerCase();
+
+    if ("dream-eater".equals(moveName)
+            && defender.getStatusCondition() != PokemonInstance.StatusCondition.SLEEP) {
+        notifyMoveFailed(attacker.getName(), move.getName(), "target is not asleep");
+        return;
+    }
+
+    if (handleStatusMove(attacker, move)) {
+        return;
+    }
+
+    int damage = calculateDamage(move, attacker, defender);
+    defender.takeDamage(damage);
+    notifyDamageDealt(attacker.getName(), move.getName(), defender.getName(), damage);
+
+    applyPostDamageEffects(move, attacker, defender, damage);
+
+    if (defender.isFainted()) {
+        notifyPokemonFainted(defender.getName());
+    }
+}
+
+--------------------------------------------------------------------------------
+5) EDGE CASES YOU MUST HANDLE
+--------------------------------------------------------------------------------
+
+1. No overheal:
+   - PokemonInstance.heal already clamps to max HP, rely on it.
+
+2. Healing from 0 damage:
+   - Drain effects should not heal when damageDealt == 0.
+
+3. Dream Eater fail path:
+   - Must fail before damage if target is not asleep.
+
+4. Fainted defender:
+   - Drain still heals based on damage dealt this hit (standard behavior).
+
+5. Status-only moves when user already full HP:
+   - Move still executes; healed amount may be 0.
+   - Notify clearly: "restored 0 HP" or "HP is already full".
+
+6. PP handling:
+   - Ensure move PP decrements once when used (this likely occurs in higher-level
+     selection/action handling; if not implemented, add it in executeRound path).
+
+--------------------------------------------------------------------------------
+6) VALIDATION CHECKLIST
+--------------------------------------------------------------------------------
+
+Run these manual test cases after implementation:
+
+1. absorb deals 20 damage -> user heals 10.
+2. draining-kiss deals 41 damage -> user heals floor(30.75)=30.
+3. dream-eater on awake target -> fails, no damage, no heal.
+4. dream-eater on sleeping target -> deals damage and heals 50%.
+5. roost at 30/100 HP -> becomes 80/100.
+6. lunar-blessing while burned and 20/100 HP -> burn cleared and HP restored.
+7. drain move at near-full HP -> HP caps at max, no overflow.
+8. pollen-puff in current 1v1 still behaves as damage move.
+
+--------------------------------------------------------------------------------
+7) OPTIONAL REFACTOR (CLEANER LONG-TERM DESIGN)
+--------------------------------------------------------------------------------
+
+If you want this scalable for many move effects:
+- Create a MoveEffectEngine class in model/ or service/.
+- Battle.executeMove delegates to MoveEffectEngine.apply(move, context).
+- Context carries attacker, defender, random, and callback hooks.
+
+That prevents Battle.java from becoming a giant switch statement as you add
+more mechanics.
+
+================================================================================
+END OF IMPLEMENTATION DETAILS
+================================================================================
