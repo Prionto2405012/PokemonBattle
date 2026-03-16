@@ -1,5 +1,9 @@
 package com.example.pokemonbattle.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import com.example.pokemonbattle.util.MusicManager;
 import com.example.pokemonbattle.util.PokeballOverlay;
 import com.example.pokemonbattle.util.SceneManager;
@@ -15,8 +19,6 @@ import javafx.scene.media.MediaView;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
-
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class IntroController {
     @FXML private StackPane rootPane;
@@ -145,9 +147,10 @@ public class IntroController {
         fadeBg.setOnFinished(e -> {
             disposeMediaPlayer();
             // Keep pokeball spinning while start scene loads and reveals
-            // Pass pokeball reference to StartController via SceneManager data
-            SceneManager.setData("pokeballOverlay", pokeball);
-            goToStartScreen();
+            // Pass pokeball reference in switch payload so it survives sceneData.clear().
+            Map<String, Object> transitionData = new HashMap<>();
+            transitionData.put("pokeballOverlay", pokeball);
+            SceneManager.switchSceneWithData("start.fxml", "Pokemon Battle", 1200, 700, transitionData);
         });
 
         fadeBg.play();

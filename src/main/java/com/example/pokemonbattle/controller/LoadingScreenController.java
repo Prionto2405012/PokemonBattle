@@ -25,6 +25,8 @@ public class LoadingScreenController {
 
     private MediaPlayer mediaPlayer;
     private Timeline progressTimeline;
+    private static final String PRIMARY_LOADING_VIDEO = "Pikachu.mp4";
+    private static final String FALLBACK_LOADING_VIDEO = "Pokeball loading animation.mp4";
 
     // Total loading duration in milliseconds
     private static final double LOAD_DURATION_MS = 3000.0;
@@ -41,10 +43,9 @@ public class LoadingScreenController {
     }
 
     private void setupVideo() {
-        mediaPlayer = com.example.pokemonbattle.util.MediaCache.claimMediaPlayer("Pikachu.mp4");
-
+        mediaPlayer = claimLoadingVideoPlayer();
         if (mediaPlayer == null) {
-            System.err.println("LoadingScreenController: Pikachu.mp4 player unavailable.");
+            System.err.println("LoadingScreenController: No usable loading video player available.");
             return;
         }
         mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
@@ -61,6 +62,31 @@ public class LoadingScreenController {
                 && mediaPlayer.getStatus() != MediaPlayer.Status.PLAYING) {
             mediaPlayer.play();
         }
+    }
+
+    private MediaPlayer claimLoadingVideoPlayer() {
+        MediaPlayer primary = com.example.pokemonbattle.util.MediaCache.claimMediaPlayer(PRIMARY_LOADING_VIDEO);
+        if (primary != null) {
+            primary.setOnError(() -> {
+                Throwable error = primary.getError();
+                System.err.println("LoadingScreenController: " + PRIMARY_LOADING_VIDEO + " failed: "
+                        + (error != null ? error.getMessage() : "unknown"));
+                MediaPlayer fallback = com.example.pokemonbattle.util.MediaCache.claimMediaPlayer(FALLBACK_LOADING_VIDEO);
+                if (fallback != null && fallback.getError() == null) {
+                    fallback.setCycleCount(MediaPlayer.INDEFINITE);
+                    bgVideo.setMediaPlayer(fallback);
+                    fallback.play();
+                    mediaPlayer = fallback;
+                }
+            });
+            return primary;
+        }
+
+        MediaPlayer fallback = com.example.pokemonbattle.util.MediaCache.claimMediaPlayer(FALLBACK_LOADING_VIDEO);
+        if (fallback == null) {
+            System.err.println("LoadingScreenController: fallback video unavailable: " + FALLBACK_LOADING_VIDEO);
+        }
+        return fallback;
     }
 
     private void setupProgressBar() {

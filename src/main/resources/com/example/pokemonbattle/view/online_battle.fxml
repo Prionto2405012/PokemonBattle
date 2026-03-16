@@ -276,6 +276,9 @@
                 <Button fx:id="goBackResultButton" text="Go Back"
                     prefWidth="220" prefHeight="50" onAction="#onGoBackClicked"
                     styleClass="result-btn, result-btn-back" />
+                <Button fx:id="battleAgainResultButton" text="Battle Again"
+                    prefWidth="220" prefHeight="50" onAction="#onBattleAgainClicked"
+                    styleClass="result-btn, result-btn-again-victory" />
             </HBox>
         </VBox>
     </StackPane>

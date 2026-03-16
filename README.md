@@ -3,6 +3,7 @@
 PokemonBattle is a JavaFX desktop game project with:
 - Local battles (player vs AI)
 - Online battles through a TCP server (server-authoritative battle state)
+- "Local Player" battles implemented via localhost TCP matchmaking (not offline hot-seat)
 - SQLite-backed authentication and player history
 - Scene-based UI flow with animated transitions and overlays
 
@@ -89,6 +90,12 @@ Run server (custom port):
 mvn exec:java -Dexec.mainClass="com.example.pokemonbattle.server.BattleServer" -Dexec.args="7777"
 ```
 
+Important runtime note:
+
+- `New Game -> Local Player` currently uses the same online pipeline over `localhost:5555`.
+- If the battle server is not running, `waiting_online.fxml` will show a connection failure.
+- For now, start `BattleServer` before trying both `Online` and `Local Player` multiplayer paths.
+
 ## 5) What Is Done Where
 
 ### Controllers (`src/main/java/com/example/pokemonbattle/controller`)
@@ -154,7 +161,8 @@ Core domain types such as:
 1. `Launcher` starts `HelloApplication`.
 2. `HelloApplication` initializes `SceneManager`, fonts, media cache.
 3. First scene is switched to `intro.fxml`.
-4. Navigation between screens is centralized through `SceneManager`.
+4. Intro-to-start transition passes temporary overlay state through scene-switch payload data.
+5. Navigation between screens is centralized through `SceneManager`.
 
 ### B) Authentication Flow
 
@@ -178,6 +186,13 @@ Core domain types such as:
 4. During turns, clients submit actions/moves and receive authoritative updates (`DamageMessage`, `TurnReadyMessage`, `BattleEndMessage`, etc.).
 5. `OnlineBattleController` updates UI state based only on server messages.
 
+### E) Local Player (Same-Machine Multiplayer) Flow
+
+1. `NewGameController` stores `connectionMode=LOCAL` and routes to `waiting_online.fxml`.
+2. `WaitingController` connects to `localhost:5555` using `ServerConnection`.
+3. Matchmaking and battle progression then use the same server-authoritative message flow as online mode.
+4. If no server is listening on port `5555`, the connection attempt fails and the waiting screen reports it.
+
 ## 7) Data and State Ownership
 
 - UI transient state: screen controllers
@@ -185,6 +200,7 @@ Core domain types such as:
 - Session identity/preferences: `PlayerSession`
 - Authoritative online battle state: server (`OnlineBattle`)
 - Persistent user/game history: SQLite database
+- Local-player multiplayer authority: same TCP server stack (`localhost`), not offline in-process battle authority
 
 Rule of thumb:
 - If the change affects battle fairness/validation in online mode, implement it on server side first.

@@ -157,6 +157,8 @@ public class OnlineBattleController {
     private Label resultMessageLabel;
     @FXML
     private Button goBackResultButton;
+    @FXML
+    private Button battleAgainResultButton;
 
     @FXML
     private StackPane forfeitOverlay;
@@ -291,6 +293,7 @@ public class OnlineBattleController {
         MusicManager.getInstance().attachClickSounds(rootPane);
         Platform.runLater(this::playVSIntro);
         animationManager = new BattleAnimationManager(playerSpriteImage, opponentSpriteImage, battleField);
+        animationManager.setAnimationEnabled(PlayerSession.getInstance().isMoveAnimationEnabled());
     }
 
     // Info overlay
@@ -786,11 +789,17 @@ public class OnlineBattleController {
         battleResultCard.getStyleClass().removeAll("result-card-victory", "result-card-defeat");
         resultTitleLabel.getStyleClass().removeAll("result-title-victory", "result-title-defeat");
         resultMessageLabel.getStyleClass().removeAll("result-message-victory", "result-message-defeat");
+        if (battleAgainResultButton != null) {
+            battleAgainResultButton.getStyleClass().removeAll("result-btn-again-victory", "result-btn-again-defeat");
+        }
 
         String v = playerWon ? "victory" : "defeat";
         battleResultCard.getStyleClass().add("result-card-" + v);
         resultTitleLabel.getStyleClass().add("result-title-" + v);
         resultMessageLabel.getStyleClass().add("result-message-" + v);
+        if (battleAgainResultButton != null) {
+            battleAgainResultButton.getStyleClass().add("result-btn-again-" + v);
+        }
 
         battleResultOverlay.setOpacity(0);
         battleResultOverlay.setVisible(true);
@@ -803,6 +812,15 @@ public class OnlineBattleController {
 
     @FXML
     private void onGoBackClicked() {
+        if (confettiTimer != null) {
+            confettiTimer.stop();
+            confettiTimer = null;
+        }
+        doDisconnectAndLeave();
+    }
+
+    @FXML
+    private void onBattleAgainClicked() {
         if (confettiTimer != null) {
             confettiTimer.stop();
             confettiTimer = null;

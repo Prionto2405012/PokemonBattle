@@ -1,8 +1,9 @@
 // PoisonEffects.java
 package com.example.pokemonbattle.util.effects;
 
-import com.example.pokemonbattle.util.MediaCache;
 import java.util.Random;
+
+import com.example.pokemonbattle.util.MediaCache;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -20,7 +21,6 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Ellipse;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Polygon;
-import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
 public class PoisonEffects {
@@ -43,25 +43,21 @@ public class PoisonEffects {
         this.battleField = battleField;
     }
 
-    // -----------------------------------------------------------------
     // Public API – single-point overload (melee / contact moves)
-    // -----------------------------------------------------------------
 
     public void createImpactEffect(double x, double y, String moveName,
                                    int movePower, Timeline timeline) {
         createImpactEffect(x, y, x, y, moveName, movePower, timeline);
     }
 
-    // -----------------------------------------------------------------
     // Public API – full signature (all poison moves)
-    // -----------------------------------------------------------------
 
     public void createImpactEffect(double startX, double startY,
                                    double endX, double endY,
                                    String moveName, int movePower,
                                    Timeline timeline) {
 
-        double intensity = clamp(movePower / 100.0, 0.4, 1.8);
+        double intensity = clamp(movePower / 100.0, 0.8,2.4);
 
         switch (moveName) {
             // Venom-sting melee jabs
@@ -92,15 +88,13 @@ public class PoisonEffects {
         }
     }
 
-    // -----------------------------------------------------------------
     // Public API – ranged lead effect (projectile from attacker to target)
-    // -----------------------------------------------------------------
 
     public void createRangedEffect(double startX, double startY,
                                    double endX, double endY,
                                    String moveName, int movePower,
                                    Timeline timeline) {
-        double intensity = clamp(movePower / 100.0, 0.4, 1.8);
+        double intensity = clamp(movePower / 100.0, 0.8,2.4);
         switch (moveName) {
             case "sludge-bomb", "gunk-shot" ->
                     addSludgeBomb(startX, startY, endX, endY, intensity, timeline);
@@ -111,9 +105,7 @@ public class PoisonEffects {
         }
     }
 
-    // =================================================================
     // Venom strike – fang/stinger jab with dripping poison droplets
-    // =================================================================
 
     private void addVenomStrike(double sx, double sy, double ex, double ey,
                                 double intensity, Timeline timeline) {
@@ -121,7 +113,7 @@ public class PoisonEffects {
         double dy = ey - sy;
 
         // Purple trail drops along approach
-        int trailCount = (int) (5 + 4 * intensity);
+        int trailCount = (int) (15 + 4 * intensity);
         for (int i = 0; i < trailCount; i++) {
             double t = (i + 0.5) / trailCount;
             double tx = sx + dx * t + (random.nextDouble() - 0.5) * 14;
@@ -149,19 +141,19 @@ public class PoisonEffects {
         }
 
         // Stinger impact lines at target
-        int stingCount = (int) (2 + 2 * intensity);
+        int stingCount = (int) (12 + 2 * intensity);
         for (int i = 0; i < stingCount; i++) {
             double angle = -35 + i * (70.0 / Math.max(stingCount - 1, 1));
             double rad = Math.toRadians(angle);
             double len = 20 + 12 * intensity;
 
             Line sting = new Line(
-                    ex - Math.cos(rad) * len * 0.5,
-                    ey - Math.sin(rad) * len * 0.5,
-                    ex + Math.cos(rad) * len * 0.5,
-                    ey + Math.sin(rad) * len * 0.5);
+                    ex - Math.cos(rad) * len * 0.65,
+                    ey - Math.sin(rad) * len * 0.65,
+                    ex + Math.cos(rad) * len * 0.65,
+                    ey + Math.sin(rad) * len * 0.65);
             sting.setStroke(i % 2 == 0 ? POISON_VIOLET : POISON_GREEN);
-            sting.setStrokeWidth(2.5 + intensity);
+            sting.setStrokeWidth(3.5 + intensity);
             sting.setOpacity(0);
             sting.setEffect(new DropShadow(8 + 3 * intensity, POISON_PURPLE));
             prepareTransientNode(sting);
@@ -180,19 +172,17 @@ public class PoisonEffects {
             registerCleanup(timeline, sting);
         }
 
-        addPoisonFlash(ex, ey, 15 + 10 * intensity, POISON_VIOLET, 90, 200, timeline);
+        addPoisonFlash(ex, ey, 20 + 10 * intensity, POISON_VIOLET, 90, 200, timeline);
     }
 
-    // =================================================================
     // Barb barrage – thorn projectiles flying at target
-    // =================================================================
 
     private void addBarbBarrage(double sx, double sy, double ex, double ey,
                                 double intensity, Timeline timeline) {
-        int count = (int) (4 + 4 * intensity);
+        int count = (int) (14 + 4 * intensity);
         for (int i = 0; i < count; i++) {
             // Needle-like polygon for each barb
-            Polygon barb = buildBarbPolygon(6 + random.nextDouble() * 5 * intensity);
+            Polygon barb = buildBarbPolygon(10 + random.nextDouble() * 5 * intensity);
             barb.setFill(i % 2 == 0 ? POISON_VIOLET : POISON_PURPLE);
             barb.setEffect(new DropShadow(5, POISON_DARK));
             barb.setLayoutX(sx + (random.nextDouble() - 0.5) * 20);
@@ -220,23 +210,21 @@ public class PoisonEffects {
             registerCleanup(timeline, barb);
         }
 
-        addPoisonFlash(ex, ey, 14 + 8 * intensity, POISON_GREEN, 140, 180, timeline);
+        addPoisonFlash(ex, ey, 20 + 8 * intensity, POISON_GREEN, 140, 180, timeline);
     }
 
     /** Build a narrow diamond/spike polygon for a barb. */
     private Polygon buildBarbPolygon(double size) {
-        return new Polygon(0, -size, size * 0.3, 0, 0, size * 0.4, -size * 0.3, 0);
+        return new Polygon(0, -size, size * 0.5, 0, 0, size * 0.6, -size * 0.5, 0);
     }
 
-    // =================================================================
     // Toxic jab – purple aura burst on contact
-    // =================================================================
 
     private void addToxicJab(double x, double y, double intensity, Timeline timeline) {
         // Expanding toxic aura
         Circle aura = new Circle(0, POISON_DARK.deriveColor(0, 1, 1, 0.55));
         aura.setStroke(POISON_VIOLET.deriveColor(0, 1, 1, 0.7));
-        aura.setStrokeWidth(3 + 1.5 * intensity);
+        aura.setStrokeWidth(5 + 1.5 * intensity);
         aura.setCenterX(x);
         aura.setCenterY(y);
         aura.setEffect(new GaussianBlur(8 + 4 * intensity));
@@ -259,17 +247,15 @@ public class PoisonEffects {
 
         // Poison droplets scattering outward
         addPoisonDroplets(x, y, intensity, 0, timeline);
-        addPoisonFlash(x, y, 18 + 10 * intensity, POISON_GREEN, 0, 160, timeline);
+        addPoisonFlash(x, y, 22 + 10 * intensity, POISON_GREEN, 0, 160, timeline);
     }
 
-    // =================================================================
     // Sludge splatter – blob that arcs and splatters
-    // =================================================================
 
     private void addSludgeSplatter(double sx, double sy, double ex, double ey,
                                    double intensity, Timeline timeline) {
         // Main sludge blob
-        Circle blob = new Circle(10 + 5 * intensity, POISON_SLUDGE);
+        Circle blob = new Circle(15 + 5 * intensity, POISON_SLUDGE);
         blob.setEffect(new DropShadow(10, POISON_DARK));
         blob.setCenterX(sx);
         blob.setCenterY(sy);
@@ -298,16 +284,14 @@ public class PoisonEffects {
         addSplatDroplets(ex, ey, intensity, 280, timeline);
     }
 
-    // =================================================================
     // Sludge bomb – large toxic explosion on impact
-    // =================================================================
 
     private void addSludgeBomb(double sx, double sy, double ex, double ey,
                                double intensity, Timeline timeline) {
         // Core sludge projectile
-        Circle bomb = new Circle(8 + 4 * intensity, POISON_SLUDGE);
+        Circle bomb = new Circle(12 + 4 * intensity, POISON_SLUDGE);
         bomb.setStroke(POISON_VIOLET.deriveColor(0, 1, 1, 0.6));
-        bomb.setStrokeWidth(2);
+        bomb.setStrokeWidth(4);
         bomb.setEffect(new DropShadow(12, POISON_DARK));
         bomb.setCenterX(sx);
         bomb.setCenterY(sy);
@@ -352,17 +336,15 @@ public class PoisonEffects {
         addSplatDroplets(ex, ey, intensity, 260, timeline);
     }
 
-    // =================================================================
     // Sludge wave – wide toxic wave spreading at target
-    // =================================================================
 
     private void addSludgeWave(double x, double y, double intensity, Timeline timeline) {
-        int waveCount = (int) (3 + 2 * intensity);
+        int waveCount = (int) (13 + 2 * intensity);
         for (int i = 0; i < waveCount; i++) {
             Ellipse wave = new Ellipse(0, 0);
             wave.setFill(Color.TRANSPARENT);
             wave.setStroke((i % 2 == 0 ? POISON_SLUDGE : POISON_VIOLET).deriveColor(0, 1, 1, 0.65));
-            wave.setStrokeWidth(4 - i * 0.5);
+            wave.setStrokeWidth(6 - i * 0.5);
             wave.setEffect(new GaussianBlur(4 + i));
             wave.setCenterX(x);
             wave.setCenterY(y);
@@ -392,15 +374,13 @@ public class PoisonEffects {
         addSplatDroplets(x, y, intensity * 0.85, 0, timeline);
     }
 
-    // =================================================================
     // Acid spray – streaks of corrosive liquid
-    // =================================================================
 
     private void addAcidSpray(double sx, double sy, double ex, double ey,
                               double intensity, Timeline timeline) {
-        int streamCount = (int) (4 + 4 * intensity);
+        int streamCount = (int) (14 + 4 * intensity);
         for (int i = 0; i < streamCount; i++) {
-            Circle drop = new Circle(3 + random.nextDouble() * 3.5,
+            Circle drop = new Circle(8 + random.nextDouble() * 3.5,
                     i % 3 == 0 ? POISON_ACID : i % 3 == 1 ? POISON_TOXIC : POISON_GREEN);
             drop.setEffect(new GaussianBlur(2));
             drop.setCenterX(sx + (random.nextDouble() - 0.5) * 16);
@@ -427,26 +407,22 @@ public class PoisonEffects {
         }
 
         // Corrosive splash on impact
-        addPoisonFlash(ex, ey, 18 + 10 * intensity, POISON_ACID, streamCount * 35, 200, timeline);
+        addPoisonFlash(ex, ey, 22 + 10 * intensity, POISON_ACID, streamCount * 35, 200, timeline);
     }
 
-    // =================================================================
     // Default poison burst – aura + droplets
-    // =================================================================
 
     private void addDefaultPoisonBurst(double x, double y, double intensity, Timeline timeline) {
         addToxicJab(x, y, intensity, timeline);
     }
 
-    // =================================================================
     // Shared helpers – droplet scatter, splat
-    // =================================================================
 
     private void addPoisonDroplets(double x, double y, double intensity,
                                    int startDelay, Timeline timeline) {
-        int count = (int) (7 + 5 * intensity);
+        int count = (int) (17 + 5 * intensity);
         for (int i = 0; i < count; i++) {
-            Circle drop = new Circle(3 + random.nextDouble() * 3,
+            Circle drop = new Circle(8 + random.nextDouble() * 3,
                     i % 3 == 0 ? POISON_VIOLET : i % 3 == 1 ? POISON_GREEN : POISON_PURPLE);
             drop.setEffect(new GaussianBlur(3));
             double angle = (i / (double) count) * 2 * Math.PI;
@@ -472,9 +448,9 @@ public class PoisonEffects {
 
     private void addSplatDroplets(double x, double y, double intensity,
                                   int startDelay, Timeline timeline) {
-        int count = (int) (5 + 4 * intensity);
+        int count = (int) (15 + 4 * intensity);
         for (int i = 0; i < count; i++) {
-            Circle splat = new Circle(3 + random.nextDouble() * 4,
+            Circle splat = new Circle(8 + random.nextDouble() * 4,
                     i % 2 == 0 ? POISON_SLUDGE : POISON_VIOLET);
             splat.setEffect(new GaussianBlur(3));
             double angle = random.nextDouble() * 2 * Math.PI;
@@ -500,9 +476,7 @@ public class PoisonEffects {
         }
     }
 
-    // =================================================================
     // Flash circle helper
-    // =================================================================
 
     private void addPoisonFlash(double x, double y, double radius, Color color,
                                 int startDelay, int fadeDuration, Timeline timeline) {
@@ -523,9 +497,7 @@ public class PoisonEffects {
         registerCleanup(timeline, flash);
     }
 
-    // =================================================================
     // Utilities
-    // =================================================================
 
     private double clamp(double v, double min, double max) {
         return Math.max(min, Math.min(max, v));
@@ -544,14 +516,14 @@ public class PoisonEffects {
                         }
 
                         ImageView imageView = new ImageView(image);
-                        imageView.setFitWidth(190);
-                        imageView.setFitHeight(190);
+                        imageView.setFitWidth(200);
+                        imageView.setFitHeight(200);
                         imageView.setPreserveRatio(true);
-                        imageView.setLayoutX(x - 95);
-                        imageView.setLayoutY(y - 108);
+                        imageView.setLayoutX(x - 100);
+                        imageView.setLayoutY(y - 100);
                         imageView.setOpacity(0);
-                        imageView.setScaleX(0.55);
-                        imageView.setScaleY(0.55);
+                        imageView.setScaleX(0.65);
+                        imageView.setScaleY(0.65);
                         prepareTransientNode(imageView);
                         battleField.getChildren().add(imageView);
 

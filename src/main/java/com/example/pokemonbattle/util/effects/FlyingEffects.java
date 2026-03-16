@@ -16,8 +16,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Ellipse;
 import javafx.scene.shape.Line;
-import javafx.scene.shape.Polygon;
-import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
 public class FlyingEffects {
@@ -39,25 +37,20 @@ public class FlyingEffects {
         this.battleField = battleField;
     }
 
-    // -----------------------------------------------------------------
     // Public API – single-point overload (melee / contact moves)
-    // -----------------------------------------------------------------
 
-    public void createImpactEffect(double x, double y, String moveName,
-                                   int movePower, Timeline timeline) {
+    public void createImpactEffect(double x, double y, String moveName, int movePower, Timeline timeline) {
         createImpactEffect(x, y, x, y, moveName, movePower, timeline);
     }
 
-    // -----------------------------------------------------------------
     // Public API – full signature (all flying moves)
-    // -----------------------------------------------------------------
 
     public void createImpactEffect(double startX, double startY,
                                    double endX, double endY,
                                    String moveName, int movePower,
                                    Timeline timeline) {
 
-        double intensity = clamp(movePower / 100.0, 0.4, 1.8);
+        double intensity = clamp(movePower / 100.0, 0.8, 2.4);
 
         switch (moveName) {
             // Wing strikes – sweeping feather burst on contact
@@ -89,24 +82,20 @@ public class FlyingEffects {
         }
     }
 
-    // -----------------------------------------------------------------
     // Public API – ranged lead effect (beam / wind to target)
-    // -----------------------------------------------------------------
 
     public void createRangedEffect(double startX, double startY,
                                    double endX, double endY,
                                    String moveName, int movePower,
                                    Timeline timeline) {
-        double intensity = clamp(movePower / 100.0, 0.4, 1.8);
+        double intensity = clamp(movePower / 100.0, 0.8, 2.4);
         switch (moveName) {
             case "oblivion-wing" -> addOblivionWing(startX, startY, endX, endY, intensity, timeline);
             default              -> addHurricane(startX, startY, endX, endY, intensity, timeline);
         }
     }
 
-    // =================================================================
     // Wing strike – sweeping feathers burst on contact
-    // =================================================================
 
     private void addWingStrike(double sx, double sy, double ex, double ey,
                                double intensity, Timeline timeline) {
@@ -114,13 +103,13 @@ public class FlyingEffects {
         double dy = ey - sy;
 
         // Feather trail along approach path
-        int trailCount = (int) (5 + 4 * intensity);
+        int trailCount = (int) (15 + 4 * intensity);
         for (int i = 0; i < trailCount; i++) {
             double t = (i + 0.5) / trailCount;
             double tx = sx + dx * t + (random.nextDouble() - 0.5) * 16;
             double ty = sy + dy * t + (random.nextDouble() - 0.5) * 16;
 
-            Ellipse feather = new Ellipse(3 + random.nextDouble() * 3, 7 + random.nextDouble() * 5);
+            Ellipse feather = new Ellipse(6 + random.nextDouble() * 3, 10 + random.nextDouble() * 5);
             feather.setFill((i % 2 == 0 ? FLY_FEATHER : FLY_LIGHT).deriveColor(0, 1, 1, 0.7));
             feather.setEffect(new GaussianBlur(3));
             feather.setCenterX(tx);
@@ -143,7 +132,7 @@ public class FlyingEffects {
         }
 
         // Sweeping arc slashes at impact
-        int slashCount = (int) (2 + 2 * intensity);
+        int slashCount = (int) (6 + 2 * intensity);
         for (int i = 0; i < slashCount; i++) {
             double angle = -40 + i * (80.0 / Math.max(slashCount - 1, 1));
             double rad = Math.toRadians(angle);
@@ -173,20 +162,18 @@ public class FlyingEffects {
             registerCleanup(timeline, slash);
         }
 
-        addFlashCircle(ex, ey, 18 + 12 * intensity, FLY_CYAN, 80, 200, timeline);
+        addFlashCircle(ex, ey, 22 + 12 * intensity, FLY_CYAN, 80, 200, timeline);
     }
 
-    // =================================================================
     // Drill peck – spiralling narrow cone of wind at impact
-    // =================================================================
 
     private void addDrillPeck(double sx, double sy, double ex, double ey,
                               double intensity, Timeline timeline) {
         // Spiralling wind lines converging to impact
-        int lineCount = (int) (6 + 4 * intensity);
+        int lineCount = (int) (16 + 4 * intensity);
         for (int i = 0; i < lineCount; i++) {
             double angle = (i / (double) lineCount) * 2 * Math.PI;
-            double startRadius = 20 + 10 * intensity;
+            double startRadius = 25 + 10 * intensity;
             double lx = ex + Math.cos(angle) * startRadius;
             double ly = ey + Math.sin(angle) * startRadius;
 
@@ -212,16 +199,14 @@ public class FlyingEffects {
         }
 
         // Central impact circle
-        addFlashCircle(ex, ey, 12 + 8 * intensity, FLY_WHITE, 100, 160, timeline);
+        addFlashCircle(ex, ey, 18 + 8 * intensity, FLY_WHITE, 100, 160, timeline);
     }
 
-    // =================================================================
     // Aerial slash – sharp air-blade marks
-    // =================================================================
 
     private void addAerialSlash(double x, double y, double intensity, Timeline timeline) {
         // Cross-slash pattern
-        int slashCount = (int) (3 + 2 * intensity);
+        int slashCount = (int) (10 + 2 * intensity);
         for (int i = 0; i < slashCount; i++) {
             double angle = -60 + i * (120.0 / Math.max(slashCount - 1, 1));
             double rad = Math.toRadians(angle);
@@ -233,7 +218,7 @@ public class FlyingEffects {
                     x + Math.cos(rad) * slashLen * 0.6,
                     y + Math.sin(rad) * slashLen * 0.6);
             slash.setStroke(FLY_SLASH);
-            slash.setStrokeWidth(3 + 1.5 * intensity);
+            slash.setStrokeWidth(6 + 1.5 * intensity);
             slash.setOpacity(0);
             slash.setEffect(new DropShadow(10 + 4 * intensity, FLY_CYAN));
             prepareTransientNode(slash);
@@ -253,9 +238,9 @@ public class FlyingEffects {
         }
 
         // Air pressure ring expanding outward
-        Circle ring = new Circle(10, Color.TRANSPARENT);
+        Circle ring = new Circle(10 + 5 * intensity, Color.TRANSPARENT);
         ring.setStroke(FLY_SKY.deriveColor(0, 1, 1, 0.6));
-        ring.setStrokeWidth(3);
+        ring.setStrokeWidth(6);
         ring.setCenterX(x);
         ring.setCenterY(y);
         ring.setEffect(new GaussianBlur(4));
@@ -263,7 +248,7 @@ public class FlyingEffects {
         prepareTransientNode(ring);
         battleField.getChildren().add(ring);
 
-        double ringRadius = 38 + 22 * intensity;
+        double ringRadius = 43 + 22 * intensity;
         KeyFrame rAppear = new KeyFrame(Duration.millis(50),
                 new KeyValue(ring.opacityProperty(), 0.75));
         KeyFrame rExpand = new KeyFrame(Duration.millis(220),
@@ -276,17 +261,15 @@ public class FlyingEffects {
         timeline.getKeyFrames().addAll(rAppear, rExpand, rFade);
         registerCleanup(timeline, ring);
 
-        addFlashCircle(x, y, 14 + 10 * intensity, FLY_WHITE, 60, 180, timeline);
+        addFlashCircle(x, y, 20 + 10 * intensity, FLY_WHITE, 60, 180, timeline);
     }
 
-    // =================================================================
     // Diving strike – swooping entry with impact shockwave
-    // =================================================================
 
     private void addDivingStrike(double sx, double sy, double ex, double ey,
                                  double intensity, Timeline timeline) {
         // Speed-streak lines showing the swooping arc
-        int streakCount = (int) (6 + 4 * intensity);
+        int streakCount = (int) (16 + 4 * intensity);
         for (int i = 0; i < streakCount; i++) {
             double t = (i + 0.5) / streakCount;
             double mx = sx + (ex - sx) * t;
@@ -294,7 +277,7 @@ public class FlyingEffects {
 
             Line streak = new Line(mx - 8, my - 6, mx + 8, my + 6);
             streak.setStroke(FLY_LIGHT.deriveColor(0, 1, 1, 0.7));
-            streak.setStrokeWidth(2.5);
+            streak.setStrokeWidth(4.5);
             streak.setEffect(new GaussianBlur(3));
             streak.setOpacity(0);
             prepareTransientNode(streak);
@@ -313,7 +296,7 @@ public class FlyingEffects {
         // Impact shockwave ring at landing
         Circle shock = new Circle(0, Color.TRANSPARENT);
         shock.setStroke(FLY_SKY.deriveColor(0, 1, 1, 0.8));
-        shock.setStrokeWidth(4 + intensity);
+        shock.setStrokeWidth(8 + intensity);
         shock.setCenterX(ex);
         shock.setCenterY(ey);
         shock.setEffect(new DropShadow(10, FLY_CYAN));
@@ -321,7 +304,7 @@ public class FlyingEffects {
         prepareTransientNode(shock);
         battleField.getChildren().add(shock);
 
-        double shockRadius = 40 + 24 * intensity;
+        double shockRadius = 45 + 24 * intensity;
         KeyFrame sAppear = new KeyFrame(Duration.millis(130),
                 new KeyValue(shock.opacityProperty(), 0.9),
                 new KeyValue(shock.radiusProperty(), 8.0));
@@ -337,25 +320,22 @@ public class FlyingEffects {
 
         // Wind particles scattering on impact
         addWindParticles(ex, ey, intensity, 120, timeline);
-        addFlashCircle(ex, ey, 20 + 12 * intensity, FLY_WHITE, 130, 200, timeline);
+        addFlashCircle(ex, ey, 25 + 12 * intensity, FLY_WHITE, 130, 200, timeline);
     }
 
-    // =================================================================
     // Sky Attack – charged glowing strike
-    // =================================================================
 
-    private void addSkyAttack(double sx, double sy, double ex, double ey,
-                              double intensity, Timeline timeline) {
+    private void addSkyAttack(double sx, double sy, double ex, double ey, double intensity, Timeline timeline) {
         // Charging glow around attacker
         Circle charge = new Circle(0, FLY_CYAN.deriveColor(0, 1, 1, 0.5));
-        charge.setEffect(new GaussianBlur(10 + 4 * intensity));
+        charge.setEffect(new GaussianBlur(15 + 4 * intensity));
         charge.setCenterX(sx);
         charge.setCenterY(sy);
         charge.setOpacity(0);
         prepareTransientNode(charge);
         battleField.getChildren().add(charge);
 
-        double chargeR = 28 + 16 * intensity;
+        double chargeR = 32 + 16 * intensity;
         KeyFrame cAppear = new KeyFrame(Duration.millis(0),
                 new KeyValue(charge.opacityProperty(), 0.8),
                 new KeyValue(charge.radiusProperty(), chargeR));
@@ -376,7 +356,7 @@ public class FlyingEffects {
         prepareTransientNode(explosion);
         battleField.getChildren().add(explosion);
 
-        double exR = 32 + 20 * intensity;
+        double exR = 35 + 20 * intensity;
         KeyFrame eAppear = new KeyFrame(Duration.millis(150),
                 new KeyValue(explosion.opacityProperty(), 1.0),
                 new KeyValue(explosion.radiusProperty(), exR * 0.3));
@@ -393,16 +373,14 @@ public class FlyingEffects {
         addWingStrike(sx, sy, ex, ey, intensity, timeline);
     }
 
-    // =================================================================
     // Wind gust – concentric air pressure rings
-    // =================================================================
 
     private void addWindGust(double x, double y, double intensity, Timeline timeline) {
-        int ringCount = (int) (3 + 2 * intensity);
+        int ringCount = (int) (13 + 2 * intensity);
         for (int i = 0; i < ringCount; i++) {
-            Circle ring = new Circle(8 + i * 4, Color.TRANSPARENT);
+            Circle ring = new Circle(12 + i * 4, Color.TRANSPARENT);
             ring.setStroke(FLY_WIND.deriveColor(0, 1, 1, 0.55 - i * 0.08));
-            ring.setStrokeWidth(3 - i * 0.4);
+            ring.setStrokeWidth(7 - i * 0.4);
             ring.setCenterX(x + (random.nextDouble() - 0.5) * 10);
             ring.setCenterY(y + (random.nextDouble() - 0.5) * 10);
             ring.setEffect(new GaussianBlur(4 + i));
@@ -428,19 +406,17 @@ public class FlyingEffects {
         addWindParticles(x, y, intensity, 0, timeline);
     }
 
-    // =================================================================
     // Feather dance – fluttering feathers swirling at target
-    // =================================================================
 
     private void addFeatherDance(double x, double y, double intensity, Timeline timeline) {
-        int count = (int) (10 + 6 * intensity);
+        int count = (int) (20 + 6 * intensity);
         for (int i = 0; i < count; i++) {
             double angle = (i / (double) count) * 2 * Math.PI;
-            double radius = 14 + random.nextDouble() * 18;
+            double radius = 20 + random.nextDouble() * 18;
             double px = x + Math.cos(angle) * radius;
             double py = y + Math.sin(angle) * radius;
 
-            Ellipse feather = new Ellipse(3 + random.nextDouble() * 2.5, 8 + random.nextDouble() * 5);
+            Ellipse feather = new Ellipse(8 + random.nextDouble() * 2.5, 13 + random.nextDouble() * 5);
             feather.setFill((i % 3 == 0 ? FLY_FEATHER : i % 3 == 1 ? FLY_LIGHT : FLY_WHITE)
                     .deriveColor(0, 1, 1, 0.75));
             feather.setEffect(new GaussianBlur(2));
@@ -469,18 +445,15 @@ public class FlyingEffects {
         }
     }
 
-    // =================================================================
     // Hurricane – spiralling wind beam travelling to target
-    // =================================================================
 
-    private void addHurricane(double sx, double sy, double ex, double ey,
-                              double intensity, Timeline timeline) {
+    private void addHurricane(double sx, double sy, double ex, double ey, double intensity, Timeline timeline) {
         double dx = ex - sx;
         double dy = ey - sy;
         double dist = Math.sqrt(dx * dx + dy * dy);
 
         // Spiralling wind-column particles along path
-        int count = (int) (10 + 8 * intensity);
+        int count = (int) (20 + 8 * intensity);
         for (int i = 0; i < count; i++) {
             double t = (i + random.nextDouble()) / count;
             double angle = t * 4 * Math.PI;
@@ -489,7 +462,7 @@ public class FlyingEffects {
             double px = sx + dx * t + Math.cos(angle) * spiralR;
             double py = sy + dy * t + Math.sin(angle) * spiralR;
 
-            Circle particle = new Circle(3 + random.nextDouble() * 3,
+            Circle particle = new Circle(10 + random.nextDouble() * 3,
                     i % 3 == 0 ? FLY_SKY : i % 3 == 1 ? FLY_WIND : FLY_CYAN);
             particle.setEffect(new GaussianBlur(3));
             particle.setCenterX(px);
@@ -512,16 +485,14 @@ public class FlyingEffects {
         addWindGust(ex, ey, intensity, timeline);
     }
 
-    // =================================================================
     // Oblivion Wing – dark wing-shaped energy beam
-    // =================================================================
 
     private void addOblivionWing(double sx, double sy, double ex, double ey,
                                  double intensity, Timeline timeline) {
         // Core dark-beam line
         Line beam = new Line(sx, sy, sx, sy);
         beam.setStroke(FLY_DARK.deriveColor(0, 1, 1, 0.85));
-        beam.setStrokeWidth(5 + 2.5 * intensity);
+        beam.setStrokeWidth(8 + 2.5 * intensity);
         beam.setEffect(new DropShadow(14 + 6 * intensity, FLY_SKY));
         beam.setOpacity(0);
         prepareTransientNode(beam);
@@ -541,13 +512,13 @@ public class FlyingEffects {
         // Wing-shaped side flanges (ellipses rotated perpendicular to beam)
         double angle = Math.atan2(ey - sy, ex - sx);
         double perpAngle = angle + Math.PI / 2;
-        int wingCount = (int) (4 + 3 * intensity);
+        int wingCount = (int) (14 + 3 * intensity);
         for (int i = 0; i < wingCount; i++) {
             double t = (i + 0.5) / wingCount;
             double wx = sx + (ex - sx) * t;
             double wy = sy + (ey - sy) * t;
 
-            Ellipse wing = new Ellipse(4 + 2 * intensity, 10 + 6 * intensity);
+            Ellipse wing = new Ellipse(8 + 2 * intensity, 13 + 6 * intensity);
             wing.setFill(FLY_DARK.deriveColor(0, 1, 1, 0.45));
             wing.setEffect(new GaussianBlur(4));
             wing.setCenterX(wx + Math.cos(perpAngle) * (8 + random.nextDouble() * 8));
@@ -567,26 +538,21 @@ public class FlyingEffects {
             registerCleanup(timeline, wing);
         }
 
-        addFlashCircle(ex, ey, 20 + 12 * intensity, FLY_SKY, 200, 200, timeline);
+        addFlashCircle(ex, ey, 25 + 12 * intensity, FLY_SKY, 200, 200, timeline);
     }
 
-    // =================================================================
     // Default wind burst – simple expanding wind rings
-    // =================================================================
 
     private void addDefaultWindBurst(double x, double y, double intensity, Timeline timeline) {
         addWindGust(x, y, intensity, timeline);
     }
 
-    // =================================================================
     // Shared wind particle scatter
-    // =================================================================
 
-    private void addWindParticles(double x, double y, double intensity,
-                                  int startDelay, Timeline timeline) {
-        int count = (int) (6 + 5 * intensity);
+    private void addWindParticles(double x, double y, double intensity, int startDelay, Timeline timeline) {
+        int count = (int) (16 + 5 * intensity);
         for (int i = 0; i < count; i++) {
-            Circle p = new Circle(3 + random.nextDouble() * 3,
+            Circle p = new Circle(8 + random.nextDouble() * 3,
                     i % 2 == 0 ? FLY_LIGHT : FLY_CYAN);
             p.setEffect(new GaussianBlur(3));
             double angle = random.nextDouble() * 2 * Math.PI;
@@ -610,12 +576,9 @@ public class FlyingEffects {
         }
     }
 
-    // =================================================================
     // Flash circle helper
-    // =================================================================
 
-    private void addFlashCircle(double x, double y, double radius, Color color,
-                                int startDelay, int fadeDuration, Timeline timeline) {
+    private void addFlashCircle(double x, double y, double radius, Color color, int startDelay, int fadeDuration, Timeline timeline) {
         Circle flash = new Circle(0, color.deriveColor(0, 1, 1, 0.7));
         flash.setCenterX(x);
         flash.setCenterY(y);
@@ -633,9 +596,7 @@ public class FlyingEffects {
         registerCleanup(timeline, flash);
     }
 
-    // =================================================================
     // Utilities
-    // =================================================================
 
     private double clamp(double v, double min, double max) {
         return Math.max(min, Math.min(max, v));
