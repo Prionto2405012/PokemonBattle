@@ -90,14 +90,15 @@ public class IceEffects {
             battleField.getChildren().add(particle);
             
             int delay = i * 18;
+            double baseRadius = particle.getRadius();
             KeyFrame appear = new KeyFrame(Duration.millis(delay),
                 new KeyValue(particle.opacityProperty(), 0.95));
             KeyFrame shimmer = new KeyFrame(Duration.millis(delay + 180),
                 new KeyValue(particle.opacityProperty(), 0.7),
-                new KeyValue(particle.radiusProperty(), particle.getRadius() * 1.3));
+                new KeyValue(particle.radiusProperty(), baseRadius * 1.3));
             KeyFrame fade = new KeyFrame(Duration.millis(delay + 400),
                 new KeyValue(particle.opacityProperty(), 0),
-                new KeyValue(particle.radiusProperty(), particle.getRadius() * 0.5));
+                new KeyValue(particle.radiusProperty(), baseRadius * 0.65));
             
             timeline.getKeyFrames().addAll(appear, shimmer, fade);
             

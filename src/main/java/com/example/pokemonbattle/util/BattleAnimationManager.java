@@ -833,7 +833,7 @@ public class BattleAnimationManager {
 
     /**
      * Shows a floating damage number (red) beside the defender sprite.
-     * Fades in, holds briefly, then fades out over ~1.5s total.
+     * Fades in, holds briefly, then fades out over ~1.8s total.
      */
     public void showDamageNumber(ImageView defender, int damage) {
         if (damage <= 0) return;
@@ -873,7 +873,7 @@ public class BattleAnimationManager {
 
     /**
      * Shows a floating heal number (green) beside the attacker sprite.
-     * Fades in, holds briefly, then fades out over ~1.5s total.
+     * Fades in, holds briefly, then fades out over ~1.8s total.
      */
     public void showHealNumber(ImageView target, int healAmount) {
         if (healAmount <= 0) return;
