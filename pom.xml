@@ -147,7 +147,7 @@
         <configuration>
           <mainClass>com.example.pokemonbattle/com.example.pokemonbattle.Launcher</mainClass>
           <options>
-            <option>--enable-native-access=javafx.graphics</option>
+            <option>--enable-native-access=javafx.graphics,javafx.media,ALL-UNNAMED</option>
           </options>
         </configuration>
       </plugin>

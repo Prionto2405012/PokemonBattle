@@ -15,7 +15,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
-import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Polyline;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.util.Duration;
@@ -106,8 +105,7 @@ public class ElectricEffects {
      */
     public void createImpactEffect(double x, double y, String moveName, int movePower, Timeline timeline) {
         switch (moveName) {
-            case "thunder-fang"    -> { addFangVisual(x, y, timeline);
-                                        addDefaultZaps(x, y, movePower, timeline); }
+            case "thunder-fang"    -> addDefaultZaps(x, y, movePower, timeline);
             case "thunder-punch"   -> addPunchZaps(x, y, movePower, timeline);
             case "supercell-slam"  -> addGroundSlamBurst(x, y, movePower, timeline);
             case "volt-tackle",
@@ -433,9 +431,11 @@ public class ElectricEffects {
     // RANGED – volt-switch: quick bolt then flash
 
     private void addVoltSwitch(double sx, double sy, double ex, double ey, int power, Timeline tl) {
+        double intensity = Math.max(0.8, power / 100.0);
+
         // Fast single bolt
         Polyline bolt = createBolt(sx, sy, ex, ey, 15, 16);
-        bolt.setStrokeWidth(10);
+        bolt.setStrokeWidth(8 + 2 * intensity);
         battleField.getChildren().add(bolt);
 
         tl.getKeyFrames().addAll(
@@ -445,7 +445,7 @@ public class ElectricEffects {
         registerCleanup(tl, bolt);
 
         // Quick flash at defender
-        Circle flash = new Circle(35, ELECTRIC_YELLOW);
+        Circle flash = new Circle(30 + 5 * intensity, ELECTRIC_YELLOW);
         flash.setCenterX(ex);
         flash.setCenterY(ey);
         flash.setOpacity(0);
@@ -456,7 +456,7 @@ public class ElectricEffects {
         tl.getKeyFrames().addAll(
             new KeyFrame(Duration.millis(30),  new KeyValue(flash.opacityProperty(), 0.95)),
             new KeyFrame(Duration.millis(120), new KeyValue(flash.opacityProperty(), 0),
-                new KeyValue(flash.radiusProperty(), 55.0)));
+                new KeyValue(flash.radiusProperty(), 48 + 7 * intensity)));
         registerCleanup(tl, flash);
     }
 
@@ -724,46 +724,6 @@ public class ElectricEffects {
 
         timeline.getKeyFrames().addAll(appear, fade);
         registerCleanup(timeline, flare);
-    }
-
-    private void addFangVisual(double x, double y, Timeline timeline) {
-        for (int i = 0; i < 2; i++) {
-            Polygon fang = new Polygon();
-            fang.getPoints().addAll(
-                0.0, 0.0,
-                -25.0, -30.0,
-                0.0, -65.0,
-                25.0, -30.0
-            );
-
-            fang.setFill(ELECTRIC_YELLOW);
-            fang.setStroke(ELECTRIC_GOLD);
-            fang.setStrokeWidth(10);
-            fang.setEffect(new DropShadow(20, ELECTRIC_GOLD));
-
-            double xOffset = i == 0 ? -20 : 20;
-            fang.setLayoutX(x + xOffset);
-            fang.setLayoutY(y);
-            fang.setOpacity(0);
-            fang.setRotate(i == 0 ? -20 : 20);
-            prepareTransientNode(fang);
-
-            battleField.getChildren().add(fang);
-
-            KeyFrame appear = new KeyFrame(Duration.millis(50),
-                new KeyValue(fang.opacityProperty(), 1.0),
-                new KeyValue(fang.scaleXProperty(), 1.0),
-                new KeyValue(fang.scaleYProperty(), 1.0));
-            KeyFrame bite = new KeyFrame(Duration.millis(100),
-                new KeyValue(fang.scaleXProperty(), 1.4),
-                new KeyValue(fang.scaleYProperty(), 1.4));
-            KeyFrame disappear = new KeyFrame(Duration.millis(200),
-                new KeyValue(fang.opacityProperty(), 0));
-
-            timeline.getKeyFrames().addAll(appear, bite, disappear);
-
-            registerCleanup(timeline, fang);
-        }
     }
 
     private Polyline createBolt(double startX, double startY, double endX, double endY,

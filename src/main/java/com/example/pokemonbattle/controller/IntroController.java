@@ -16,12 +16,16 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 public class IntroController {
     @FXML private StackPane rootPane;
     @FXML private MediaView mediaView;
     private MediaPlayer mediaPlayer;
+    private Rectangle startupMask;
     private static final double TRIGGER_BEFORE_END_MS = 1000.0;
     private volatile boolean transitionTriggered = false;
+    private final AtomicBoolean startupRevealTriggered = new AtomicBoolean(false);
 
     @FXML
     public void initialize() {
@@ -31,6 +35,14 @@ public class IntroController {
             goToStartScreen();
             return;
         }
+
+        startupMask = new Rectangle();
+        startupMask.setFill(Color.BLACK);
+        startupMask.widthProperty().bind(rootPane.widthProperty());
+        startupMask.heightProperty().bind(rootPane.heightProperty());
+        startupMask.setManaged(false);
+        startupMask.setOpacity(1.0);
+        rootPane.getChildren().add(startupMask);
 
         mediaView.setMediaPlayer(mediaPlayer);
         mediaView.fitWidthProperty().bind(rootPane.widthProperty());
@@ -52,7 +64,41 @@ public class IntroController {
             System.err.println("IntroController: MediaPlayer error — " + (error != null ? error.getMessage() : "Unknown error"));
             goToStartScreen();
         });
-        mediaPlayer.setOnReady(mediaPlayer::play);
+
+        mediaPlayer.currentTimeProperty().addListener((obs, oldTime, newTime) -> {
+            if (newTime == null || !newTime.greaterThan(Duration.ZERO)) {
+                return;
+            }
+            if (!startupRevealTriggered.compareAndSet(false, true)) {
+                return;
+            }
+            Rectangle mask = startupMask;
+            if (mask == null) {
+                return;
+            }
+
+            FadeTransition reveal = new FadeTransition(Duration.millis(250), mask);
+            reveal.setFromValue(mask.getOpacity());
+            reveal.setToValue(0.0);
+            reveal.setOnFinished(e -> {
+                mask.widthProperty().unbind();
+                mask.heightProperty().unbind();
+                rootPane.getChildren().remove(mask);
+                if (startupMask == mask) {
+                    startupMask = null;
+                }
+            });
+            reveal.play();
+        });
+
+        mediaPlayer.setOnReady(() -> {
+            mediaPlayer.seek(Duration.ZERO);
+            mediaPlayer.play();
+        });
+        if (mediaPlayer.getStatus() == MediaPlayer.Status.READY) {
+            mediaPlayer.seek(Duration.ZERO);
+            mediaPlayer.play();
+        }
     }
 
     private void handleEndOfMedia() {

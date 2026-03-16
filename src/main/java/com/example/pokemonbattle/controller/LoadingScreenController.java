@@ -57,6 +57,10 @@ public class LoadingScreenController {
                 mediaPlayer.play();
             }
         });
+        if (mediaPlayer.getStatus() == MediaPlayer.Status.READY
+                && mediaPlayer.getStatus() != MediaPlayer.Status.PLAYING) {
+            mediaPlayer.play();
+        }
     }
 
     private void setupProgressBar() {

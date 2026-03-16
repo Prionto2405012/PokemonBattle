@@ -11,8 +11,6 @@ import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.GaussianBlur;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
@@ -23,12 +21,11 @@ public class FightingEffects {
 
     private final Pane battleField;
     private final Random random = new Random();
-
-    // Cached so the PNG is only decoded once per JVM run
-    private static Image punchImageCache = null;
+    private final ContactOverlayEffects contactOverlayEffects;
 
     public FightingEffects(Pane battleField) {
         this.battleField = battleField;
+        this.contactOverlayEffects = new ContactOverlayEffects(battleField);
     }
 
     // -
@@ -41,7 +38,11 @@ public class FightingEffects {
      */
     public void createImpactEffect(double x, double y, String moveName,
                                    int movePower, Timeline timeline) {
-        addPunchImage(x, y, timeline);
+        if (moveName.contains("-kick") || moveName.contains("-feet")) {
+            contactOverlayEffects.addFeetImage(x, y, timeline);
+        } else {
+            contactOverlayEffects.addPunchImage(x, y, timeline);
+        }
         addImpactStarburst(x, y, movePower, timeline);
     }
 
@@ -52,7 +53,7 @@ public class FightingEffects {
      */
     public void addPunchImageAndOverlay(double x, double y, String moveName,
                                         String moveType, Timeline timeline) {
-        addPunchImage(x, y, timeline);
+        contactOverlayEffects.addPunchImage(x, y, timeline);
 
         if (moveType.equals("fire") && moveName.contains("punch")) {
             addFirePunchEmbers(x, y, timeline);
@@ -69,55 +70,6 @@ public class FightingEffects {
      * Loads punch.png once (cached), places it centred on (x, y), pops in fast
      * then fades out — the visual "landing" moment of the punch.
      */
-    private void addPunchImage(double x, double y, Timeline timeline) {
-        try {
-            Image img = loadPunchImage();
-            if (img == null) return;
-
-            ImageView iv = new ImageView(img);
-            iv.setFitWidth(160);
-            iv.setFitHeight(160);
-            iv.setPreserveRatio(true);
-            // Centre the image on the impact coordinate; offset slightly upward
-            iv.setLayoutX(x - 80);
-            iv.setLayoutY(y - 80);
-            iv.setOpacity(0);
-            iv.setScaleX(0.55);
-            iv.setScaleY(0.55);
-            prepareTransientNode(iv);
-            battleField.getChildren().add(iv);
-
-            // 0 ms  → invisible, tiny
-            // 35 ms → fully visible, slight over-scale (pop)
-            // 115 ms → settled at 1×
-            // 330 ms → faded to 0
-            KeyFrame appear = new KeyFrame(Duration.millis(35),
-                new KeyValue(iv.opacityProperty(), 1.0),
-                new KeyValue(iv.scaleXProperty(), 1.25),
-                new KeyValue(iv.scaleYProperty(), 1.25));
-            KeyFrame settle = new KeyFrame(Duration.millis(115),
-                new KeyValue(iv.scaleXProperty(), 1.0),
-                new KeyValue(iv.scaleYProperty(), 1.0));
-            KeyFrame fade = new KeyFrame(Duration.millis(330),
-                new KeyValue(iv.opacityProperty(), 0.0));
-
-            timeline.getKeyFrames().addAll(appear, settle, fade);
-            registerCleanup(timeline, iv);
-        } catch (Exception ignored) {
-            // Animation is non-critical; silently skip if asset is missing
-        }
-    }
-
-    private static Image loadPunchImage() {
-        if (punchImageCache == null) {
-            var url = FightingEffects.class.getResource(
-                    "/com/example/pokemonbattle/assets/punch.png");
-            if (url != null) {
-                punchImageCache = new Image(url.toExternalForm());
-            }
-        }
-        return punchImageCache;
-    }
     // Fighting-type: impact starburst
     /** White starburst that pops at the impact location — comic-book "POW". */
     private void addImpactStarburst(double x, double y, int movePower,

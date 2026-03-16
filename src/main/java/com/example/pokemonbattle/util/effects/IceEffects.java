@@ -119,7 +119,7 @@ public class IceEffects {
         boolean isCrushMove = moveName.contains("crush");
         
         if (isFangMove) {
-            addFangVisual(endX, endY, timeline);
+            addIceShardsAndSnowflakes(startX, startY, endX, endY, movePower, timeline);
         } else if (isBallMove) {
             addIceBallEffect(startX, startY, endX, endY, movePower, timeline);
         } else if (isWindMove) {
@@ -134,53 +134,6 @@ public class IceEffects {
         }
     }
     
-    private void addFangVisual(double x, double y, Timeline timeline) {
-        for (int i = 0; i < 2; i++) {
-            // Create a multi-faceted ice fang with >15 polygon sides
-            Polygon fang = new Polygon();
-            int sides = 16;
-            double outerR = 28.0;
-            double innerR = 14.0;
-            for (int s = 0; s < sides; s++) {
-                double angle = (s / (double) sides) * 2 * Math.PI - Math.PI / 2;
-                double r = (s % 2 == 0) ? outerR : innerR;
-                // Elongate vertically for fang shape
-                fang.getPoints().addAll(Math.cos(angle) * r * 0.7, Math.sin(angle) * r * 1.4);
-            }
-            
-            fang.setFill(Color.CYAN);
-            fang.setStroke(Color.LIGHTBLUE);
-            fang.setStrokeWidth(2.5);
-            fang.setEffect(new DropShadow(25, Color.DEEPSKYBLUE));
-            
-            double xOffset = i == 0 ? -18 : 18;
-            fang.setLayoutX(x + xOffset);
-            fang.setLayoutY(y);
-            fang.setOpacity(0);
-            fang.setRotate(i == 0 ? -20 : 20);
-            prepareTransientNode(fang);
-            
-            battleField.getChildren().add(fang);
-            
-            KeyFrame appear = new KeyFrame(Duration.millis(80),
-                new KeyValue(fang.opacityProperty(), 1.0));
-            KeyFrame bite = new KeyFrame(Duration.millis(190),
-                new KeyValue(fang.scaleXProperty(), 1.5),
-                new KeyValue(fang.scaleYProperty(), 1.5));
-            KeyFrame crunch = new KeyFrame(Duration.millis(300),
-                new KeyValue(fang.scaleXProperty(), 1.2),
-                new KeyValue(fang.scaleYProperty(), 1.2));
-            KeyFrame disappear = new KeyFrame(Duration.millis(470),
-                new KeyValue(fang.opacityProperty(), 0));
-            
-            timeline.getKeyFrames().addAll(appear, bite, crunch, disappear);
-            
-            registerCleanup(timeline, fang);
-        }
-        
-        addIceShardsAndSnowflakes(x - 90, y, x, y, 65, timeline);
-    }
-
     private void addIceBallEffect(double startX, double startY, double endX, double endY, int movePower,
             Timeline timeline) {
         double orbRadius = 20 + Math.min(movePower / 10.0, 10);

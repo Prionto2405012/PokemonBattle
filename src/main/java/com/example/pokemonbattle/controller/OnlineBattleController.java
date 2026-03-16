@@ -421,10 +421,10 @@ public class OnlineBattleController {
         infoName.setText(cap(move.getName()));
         String type = (move.getType() != null) ? move.getType() : "normal";
         infoType.setText("Type: " + cap(type));
-        int pow = move.getPower();
-        infoPower.setText("Power: " + (pow > 0 ? String.valueOf(pow) : "—"));
-        int acc = move.getAccuracy();
-        infoAccuracy.setText("Accuracy: " + (acc > 0 ? acc + "%" : "—"));
+        Integer pow = move.getPower();
+        infoPower.setText("Power: " + (pow != null && pow > 0 ? String.valueOf(pow) : "—"));
+        Integer acc = move.getAccuracy();
+        infoAccuracy.setText("Accuracy: " + (acc != null && acc > 0 ? acc + "%" : "—"));
         int maxPp = move.getPp() > 0 ? move.getPp() : currentPp;
         infoPp.setText("PP: " + currentPp + " / " + maxPp);
         String desc = move.getDescription();
@@ -661,10 +661,44 @@ public class OnlineBattleController {
         };
 
         if (animationManager != null) {
-            animationManager.playAttackAnimation(attackerSprite, defenderSprite, null, afterAnimation);
+            Move moveForAnimation = resolveMoveForAnimation(msg.getMoveUsed());
+            animationManager.playAttackAnimation(attackerSprite, defenderSprite, moveForAnimation, afterAnimation);
         } else {
             afterAnimation.run();
         }
+    }
+
+    private Move resolveMoveForAnimation(String moveName) {
+        if (moveName == null || moveName.isBlank()) {
+            return null;
+        }
+
+        String needle = moveName.trim().toLowerCase();
+
+        if (player != null) {
+            Move found = findMoveInTeam(player, needle);
+            if (found != null) return found;
+        }
+
+        if (opponent != null) {
+            Move found = findMoveInTeam(opponent, needle);
+            if (found != null) return found;
+        }
+
+        return null;
+    }
+
+    private Move findMoveInTeam(Player side, String moveNameLower) {
+        for (PokemonInstance p : side.getTeam()) {
+            for (PokemonInstance.MoveSlot slot : p.getBattleMoves()) {
+                Move move = slot.getMove();
+                if (move != null && move.getName() != null
+                        && move.getName().equalsIgnoreCase(moveNameLower)) {
+                    return move;
+                }
+            }
+        }
+        return null;
     }
 
     private void applyBattleUpdate(BattleUpdateMessage msg) {

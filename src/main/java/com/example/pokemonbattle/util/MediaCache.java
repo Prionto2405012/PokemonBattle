@@ -173,7 +173,7 @@ public final class MediaCache {
                         long raw = Long.parseLong(dt) * 10L; // centiseconds → ms
                         delayMs = raw > 0 ? raw : 100;
                     }
-                } catch (Exception ignored) {
+                } catch (IllegalArgumentException ignored) {
                 }
                 delays[i] = delayMs;
             }
@@ -189,12 +189,33 @@ public final class MediaCache {
     }
     public static MediaPlayer claimMediaPlayer(String assetName) {
         MediaPlayer player = PLAYER_CACHE.remove(assetName);
-        if (player != null)
-            return player;
+        if (player != null) {
+            if (player.getError() == null) {
+                return player;
+            }
+            System.err.println("[MediaCache] Discarding errored cached player for " + assetName + ", rebuilding.");
+            try {
+                player.dispose();
+            } catch (Exception ignored) {
+            }
+            return buildMediaPlayer(assetName);
+        }
         CompletableFuture<MediaPlayer> future = PLAYER_IN_FLIGHT.remove(assetName);
         if (future != null) {
             System.out.println("[MediaCache] Waiting for in-flight MediaPlayer: " + assetName);
-            return future.join();
+            MediaPlayer inFlightPlayer = future.join();
+            if (inFlightPlayer == null) {
+                return null;
+            }
+            if (inFlightPlayer.getError() == null) {
+                return inFlightPlayer;
+            }
+            System.err.println("[MediaCache] In-flight player errored for " + assetName + ", rebuilding.");
+            try {
+                inFlightPlayer.dispose();
+            } catch (Exception ignored) {
+            }
+            return buildMediaPlayer(assetName);
         }
         System.err.println("[MediaCache] MediaPlayer cache miss — building now: " + assetName);
         return buildMediaPlayer(assetName);
@@ -225,10 +246,11 @@ private static void constructAndWait(String url, Consumer<MediaPlayer> onReady) 
         System.out.println("[MediaCache] Video READY: " + url);
         onReady.accept(player);
     });
-    player.setOnError(() ->
-        System.err.println("[MediaCache] Video error: " +
-            (player.getError() != null ? player.getError().getMessage() : "unknown"))
-    );
+    player.setOnError(() -> {
+        Throwable error = player.getError();
+        System.err.println("[MediaCache] Video error: "
+            + (error != null ? error.getMessage() : "unknown"));
+    });
 }
     private static void scheduleMediaPlayerBuild(String name) {
         CompletableFuture<MediaPlayer> future = CompletableFuture
@@ -254,10 +276,11 @@ private static void constructAndWait(String url, Consumer<MediaPlayer> onReady) 
         }
         MediaPlayer player = new MediaPlayer(new Media(url));
         player.setAutoPlay(false);
-        player.setOnError(() ->
+        player.setOnError(() -> {
+            Throwable error = player.getError();
             System.err.println("[MediaCache] Pre-built player error for " + name + ": "
-                + (player.getError() != null ? player.getError().getMessage() : "unknown"))
-        );
+                + (error != null ? error.getMessage() : "unknown"));
+        });
         System.out.println("[MediaCache] Pre-built MediaPlayer: " + name);
         return player;
     }

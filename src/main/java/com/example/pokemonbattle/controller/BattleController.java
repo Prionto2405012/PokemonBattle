@@ -489,10 +489,10 @@ public class BattleController implements Battle.BattleListener {
         infoName.setText(capitalize(move.getName()));
         String type = (move.getType() != null) ? move.getType() : "normal";
         infoType.setText("Type: " + capitalize(type));
-        int pow = move.getPower();
-        infoPower.setText("Power: " + (pow > 0 ? String.valueOf(pow) : "—"));
-        int acc = move.getAccuracy();
-        infoAccuracy.setText("Accuracy: " + (acc > 0 ? acc + "%" : "—"));
+        Integer pow = move.getPower();
+        infoPower.setText("Power: " + (pow != null && pow > 0 ? String.valueOf(pow) : "—"));
+        Integer acc = move.getAccuracy();
+        infoAccuracy.setText("Accuracy: " + (acc != null && acc > 0 ? acc + "%" : "—"));
         int maxPp = move.getPp() > 0 ? move.getPp() : currentPp;
         infoPp.setText("PP: " + currentPp + " / " + maxPp);
         String desc = move.getDescription();

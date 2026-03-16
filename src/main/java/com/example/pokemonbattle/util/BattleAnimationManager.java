@@ -8,6 +8,7 @@ import com.example.pokemonbattle.util.effects.DragonEffects;
 import com.example.pokemonbattle.util.effects.ElectricEffects;
 import com.example.pokemonbattle.util.effects.FairyEffects;
 import com.example.pokemonbattle.util.effects.FightingEffects;
+import com.example.pokemonbattle.util.effects.ContactOverlayEffects;
 import com.example.pokemonbattle.util.effects.FireEffects;
 import com.example.pokemonbattle.util.effects.FlyingEffects;
 import com.example.pokemonbattle.util.effects.GhostEffects;
@@ -31,6 +32,7 @@ import javafx.animation.Timeline;
 import javafx.animation.TranslateTransition;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Bounds;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.ImageView;
@@ -45,7 +47,6 @@ import javafx.util.Duration;
 public class BattleAnimationManager {
 
     private final ImageView playerSprite;
-    private final ImageView opponentSprite;
     private final Pane battleField;
     private boolean animationEnabled = true;
 
@@ -63,6 +64,7 @@ public class BattleAnimationManager {
     private final IceEffects      iceEffects;
     private final FireEffects     fireEffects;
     private final FightingEffects fightingEffects;
+    private final ContactOverlayEffects contactOverlayEffects;
     private final RockEffects     rockEffects;
     private final WaterEffects    waterEffects;
     private final GhostEffects    ghostEffects;
@@ -79,13 +81,13 @@ public class BattleAnimationManager {
 
     public BattleAnimationManager(ImageView playerSprite, ImageView opponentSprite, Pane battleField) {
         this.playerSprite   = playerSprite;
-        this.opponentSprite = opponentSprite;
         this.battleField    = battleField;
 
         this.electricEffects = new ElectricEffects(battleField);
         this.iceEffects      = new IceEffects(battleField);
         this.fireEffects     = new FireEffects(battleField);
         this.fightingEffects = new FightingEffects(battleField);
+        this.contactOverlayEffects = new ContactOverlayEffects(battleField);
         this.rockEffects     = new RockEffects(battleField);
         this.waterEffects    = new WaterEffects(battleField);
         this.ghostEffects    = new GhostEffects(battleField);
@@ -121,8 +123,6 @@ public class BattleAnimationManager {
         double defenderOriginalScaleX = defender.getScaleX();
         double defenderOriginalScaleY = defender.getScaleY();
 
-        boolean attackingRight = (attacker == playerSprite);
-
         String  moveName    = (move != null && move.getName() != null) ? move.getName().toLowerCase() : "tackle";
         String  moveType    = (move != null && move.getType() != null) ? move.getType().toLowerCase() : "normal";
         String  damageClass = (move != null && move.getDamage_class() != null)
@@ -130,6 +130,11 @@ public class BattleAnimationManager {
             : "physical";
         Integer powerVal    = (move != null) ? move.getPower() : null;
         int     movePower   = (powerVal != null) ? powerVal : 50;
+
+        double attackerX = getCenterX(attacker);
+        double attackerY = getCenterY(attacker);
+        double defenderX = getCenterX(defender);
+        boolean attackingRight = attackerX <= defenderX;
 
         double attackDistance = getAttackDistance(moveType, moveName, damageClass);
         attackDistance = attackingRight ? attackDistance : -attackDistance;
@@ -149,8 +154,6 @@ public class BattleAnimationManager {
 
         Timeline movementEffect = createMovementEffect(attacker, moveType, attackingRight, moveName);
 
-        double attackerX = attacker.getLayoutX() + attacker.getFitWidth()  / 2;
-        double attackerY = attacker.getLayoutY() + attacker.getFitHeight() / 2;
         ParallelTransition impact = createImpactEffect(defender, attackerX, attackerY,
                 moveName, moveType, movePower, defenderOriginalX);
 
@@ -439,10 +442,10 @@ public class BattleAnimationManager {
             double defenderOriginalScaleX, double defenderOriginalScaleY,
             Runnable onComplete) {
 
-        double attackerX = attacker.getLayoutX() + attacker.getFitWidth()  / 2;
-        double attackerY = attacker.getLayoutY() + attacker.getFitHeight() / 2;
-        double defenderX = defender.getLayoutX() + defender.getFitWidth()  / 2;
-        double defenderY = defender.getLayoutY() + defender.getFitHeight() / 2;
+        double attackerX = getCenterX(attacker);
+        double attackerY = getCenterY(attacker);
+        double defenderX = getCenterX(defender);
+        double defenderY = getCenterY(defender);
 
         Animation leadEffect = null;
 
@@ -653,15 +656,16 @@ public class BattleAnimationManager {
         defender.setEffect(flash);
         Timeline flashTimeline = createFlashEffect(flash, movePower);
 
-        double pushDirection = (defender == playerSprite) ? -1.0
-                : (defender == opponentSprite ? 1.0 : 0.0);
+        double fieldMidX = battleField.getWidth() > 0 ? battleField.getWidth() / 2.0 : 0.0;
+        double defenderMidX = getCenterX(defender);
+        double pushDirection = defenderMidX <= fieldMidX ? -1.0 : 1.0;
         double pushDistance = Math.min(10 + movePower / 18.0, 22.0);
         TranslateTransition knockback = new TranslateTransition(Duration.millis(160), defender);
         knockback.setToX(defenderBaseTranslateX + pushDirection * pushDistance);
         knockback.setInterpolator(Interpolator.EASE_OUT);
 
-        double defenderX = defender.getLayoutX() + defender.getFitWidth()  / 2;
-        double defenderY = defender.getLayoutY() + defender.getFitHeight() / 2;
+        double defenderX = getCenterX(defender);
+        double defenderY = getCenterY(defender);
 
         Timeline typeEffect = createTypeSpecificImpact(
                 attackerX, attackerY, defenderX, defenderY,
@@ -739,6 +743,14 @@ public class BattleAnimationManager {
             default         -> createDefaultImpact(endX, endY, movePower, effect);
         }
 
+        if (isFangMove(moveName)) {
+            contactOverlayEffects.addFangAnimation(endX, endY, effect);
+        }
+
+        if (!moveType.equals("fighting") && isKickOrFeetMove(moveName)) {
+            contactOverlayEffects.addFeetImage(endX, endY, effect);
+        }
+
         // For non-fighting punch moves (fire-punch, ice-punch, thunder-punch),
         // overlay the punch image + elemental particles on top of the type effect
         if (!moveType.equals("fighting") && moveName.contains("punch")) {
@@ -808,12 +820,34 @@ public class BattleAnimationManager {
         node.setMouseTransparent(true);
     }
 
+    private boolean isKickOrFeetMove(String moveName) {
+        return moveName.contains("-kick") || moveName.contains("-feet");
+    }
+
+    private boolean isFangMove(String moveName) {
+        return moveName.contains("fang")
+                || moveName.equals("bite")
+                || moveName.endsWith("-bite")
+                || moveName.equals("crunch")
+                || moveName.equals("leech-life");
+    }
+
     private void registerCleanup(Timeline timeline, javafx.scene.Node node) {
         EventHandler<ActionEvent> previous = timeline.getOnFinished();
         timeline.setOnFinished(e -> {
             battleField.getChildren().remove(node);
             if (previous != null) previous.handle(e);
         });
+    }
+
+    private double getCenterX(ImageView sprite) {
+        Bounds b = sprite.getBoundsInParent();
+        return b.getMinX() + b.getWidth() / 2.0;
+    }
+
+    private double getCenterY(ImageView sprite) {
+        Bounds b = sprite.getBoundsInParent();
+        return b.getMinY() + b.getHeight() / 2.0;
     }
 
     // =

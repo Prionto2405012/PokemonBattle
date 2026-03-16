@@ -69,8 +69,7 @@ public class FireEffects {
             case "overheat"          -> addOverheatOverdrive(startX, startY, endX, endY, intensity, timeline);
             case "flare-blitz"       -> { addExplosionCore(endX, endY, intensity, false, timeline);
                                           addReboundSpark(startX, startY, timeline); }
-            case "fire-fang"         -> { addFangVisual(endX, endY, timeline);
-                                          addEmberBurst(endX, endY, endX, endY, 0.6, timeline); }
+            case "fire-fang"         -> addEmberBurst(endX, endY, endX, endY, 0.6, timeline);
             case "flame-burst"       -> addBurstSplash(endX, endY, intensity, timeline);
             case "flame-charge"      -> addChargeFlareTrail(startX, startY, endX, endY, intensity, false, timeline);
             case "incinerate"        -> addBerryIncinerateAsh(endX, endY, intensity, timeline);
