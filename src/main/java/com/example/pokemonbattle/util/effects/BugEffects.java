@@ -14,10 +14,7 @@ import javafx.scene.effect.GaussianBlur;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.scene.shape.Ellipse;
 import javafx.scene.shape.Line;
-import javafx.scene.shape.Polygon;
-import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
 public class BugEffects {
@@ -39,25 +36,20 @@ public class BugEffects {
         this.battleField = battleField;
     }
 
-    // -----------------------------------------------------------------
     // Public API – single-point overload (melee / contact moves)
-    // -----------------------------------------------------------------
 
-    public void createImpactEffect(double x, double y, String moveName,
-                                   int movePower, Timeline timeline) {
+    public void createImpactEffect(double x, double y, String moveName, int movePower, Timeline timeline) {
         createImpactEffect(x, y, x, y, moveName, movePower, timeline);
     }
 
-    // -----------------------------------------------------------------
     // Public API – full signature (all bug moves)
-    // -----------------------------------------------------------------
 
     public void createImpactEffect(double startX, double startY,
                                    double endX, double endY,
                                    String moveName, int movePower,
                                    Timeline timeline) {
 
-        double intensity = clamp(movePower / 100.0, 0.4, 1.8);
+        double intensity = clamp(movePower / 100.0, 0.8, 2.4);
 
         switch (moveName) {
             // Cutting / slashing melee
@@ -84,15 +76,13 @@ public class BugEffects {
         }
     }
 
-    // -----------------------------------------------------------------
     // Public API – ranged lead effect
-    // -----------------------------------------------------------------
 
     public void createRangedEffect(double startX, double startY,
                                    double endX, double endY,
                                    String moveName, int movePower,
                                    Timeline timeline) {
-        double intensity = clamp(movePower / 100.0, 0.4, 1.8);
+        double intensity = clamp(movePower / 100.0, 0.8, 2.4);
         switch (moveName) {
             case "pollen-puff" -> addPollenPuff(startX, startY, endX, endY, intensity, timeline);
             case "signal-beam" -> addSignalBeam(startX, startY, endX, endY, intensity, timeline);
@@ -101,23 +91,20 @@ public class BugEffects {
         }
     }
 
-    // =================================================================
     // Scissor cut – crossed blades (X pattern)
-    // =================================================================
 
-    private void addScissorCut(double sx, double sy, double ex, double ey,
-                               double intensity, Timeline timeline) {
+    private void addScissorCut(double sx, double sy, double ex, double ey, double intensity, Timeline timeline) {
         double dx = ex - sx;
         double dy = ey - sy;
 
         // Green energy trail along approach
-        int trailCount = (int) (5 + 4 * intensity);
+        int trailCount = (int) (15 + 4 * intensity);
         for (int i = 0; i < trailCount; i++) {
             double t = (i + 0.5) / trailCount;
             double tx = sx + dx * t + (random.nextDouble() - 0.5) * 14;
             double ty = sy + dy * t + (random.nextDouble() - 0.5) * 14;
 
-            Circle trail = new Circle(3 + random.nextDouble() * 3,
+            Circle trail = new Circle(10 + random.nextDouble() * 3,
                     i % 2 == 0 ? BUG_GREEN : BUG_LIME);
             trail.setEffect(new GaussianBlur(3));
             trail.setCenterX(tx);
@@ -137,10 +124,10 @@ public class BugEffects {
         }
 
         // X-shaped crossing cuts at impact
-        double len = 26 + 16 * intensity;
+        double len = 36 + 16 * intensity;
         double[][] slashPairs = {
-            { -45, 135 },
-            { 45, 225 }
+            { -55, 145 },
+            { 55, 235 }
         };
         int lineIdx = 0;
         for (double[] pair : slashPairs) {
@@ -152,7 +139,7 @@ public class BugEffects {
                         ex - Math.cos(rad) * len * 0.5,
                         ey - Math.sin(rad) * len * 0.5);
                 slash.setStroke(lineIdx % 2 == 0 ? BUG_LIME : BUG_AMBER);
-                slash.setStrokeWidth(3 + 1.5 * intensity);
+                slash.setStrokeWidth(6 + 1.5 * intensity);
                 slash.setOpacity(0);
                 slash.setEffect(new DropShadow(8 + 3 * intensity, BUG_GREEN));
                 prepareTransientNode(slash);
@@ -173,15 +160,12 @@ public class BugEffects {
             }
         }
 
-        addBugFlash(ex, ey, 16 + 10 * intensity, BUG_LIME, 90, 200, timeline);
+        addBugFlash(ex, ey, 26 + 10 * intensity, BUG_LIME, 90, 200, timeline);
     }
 
-    // =================================================================
     // Twin needle – two parallel stinger jabs
-    // =================================================================
 
-    private void addTwinNeedle(double sx, double sy, double ex, double ey,
-                               double intensity, Timeline timeline) {
+    private void addTwinNeedle(double sx, double sy, double ex, double ey, double intensity, Timeline timeline) {
         double dx = ex - sx;
         double dy = ey - sy;
         double perpX = -dy / Math.max(Math.sqrt(dx * dx + dy * dy), 1) * 8;
@@ -193,7 +177,7 @@ public class BugEffects {
 
             Line needle = new Line(sx + offX, sy + offY, ex + offX, ey + offY);
             needle.setStroke(n < 0 ? BUG_GREEN : BUG_AMBER);
-            needle.setStrokeWidth(3 + intensity);
+            needle.setStrokeWidth(6 + 1.5 * intensity);
             needle.setOpacity(0);
             needle.setEffect(new DropShadow(6 + 2 * intensity, BUG_DARK));
             prepareTransientNode(needle);
@@ -209,26 +193,23 @@ public class BugEffects {
             registerCleanup(timeline, needle);
         }
 
-        addBugFlash(ex, ey, 12 + 8 * intensity, BUG_YELLOW, 90, 160, timeline);
+        addBugFlash(ex, ey, 20 + 8 * intensity, BUG_YELLOW, 90, 160, timeline);
     }
 
-    // =================================================================
     // Bug bite – quick lunge with mandible snap
-    // =================================================================
 
-    private void addBugBite(double sx, double sy, double ex, double ey,
-                            double intensity, Timeline timeline) {
+    private void addBugBite(double sx, double sy, double ex, double ey, double intensity, Timeline timeline) {
         double dx = ex - sx;
         double dy = ey - sy;
 
         // Short impact streak
-        int streakCount = (int) (4 + 3 * intensity);
+        int streakCount = (int) (14 + 3 * intensity);
         for (int i = 0; i < streakCount; i++) {
             double t = (i + 0.5) / streakCount;
             double tx = sx + dx * t + (random.nextDouble() - 0.5) * 12;
             double ty = sy + dy * t + (random.nextDouble() - 0.5) * 12;
 
-            Circle dot = new Circle(3 + random.nextDouble() * 2.5,
+            Circle dot = new Circle(10 + random.nextDouble() * 2.5,
                     i % 2 == 0 ? BUG_BROWN : BUG_AMBER);
             dot.setEffect(new GaussianBlur(2));
             dot.setCenterX(tx);
@@ -247,18 +228,15 @@ public class BugEffects {
             registerCleanup(timeline, dot);
         }
 
-        addBugFlash(ex, ey, 13 + 8 * intensity, BUG_AMBER, 90, 160, timeline);
+        addBugFlash(ex, ey, 20 + 8 * intensity, BUG_AMBER, 90, 160, timeline);
     }
 
-    // =================================================================
     // Leech life – energy drained from target back to attacker
-    // =================================================================
 
-    private void addLeechLife(double sx, double sy, double ex, double ey,
-                              double intensity, Timeline timeline) {
-        int orbCount = (int) (5 + 4 * intensity);
+    private void addLeechLife(double sx, double sy, double ex, double ey, double intensity, Timeline timeline) {
+        int orbCount = (int) (15 + 4 * intensity);
         for (int i = 0; i < orbCount; i++) {
-            Circle orb = new Circle(4 + random.nextDouble() * 3.5,
+            Circle orb = new Circle(10 + random.nextDouble() * 3.5,
                     i % 2 == 0 ? BUG_GREEN : BUG_LIME);
             orb.setEffect(new DropShadow(5, BUG_DARK));
             orb.setCenterX(ex + (random.nextDouble() - 0.5) * 20);
@@ -281,20 +259,18 @@ public class BugEffects {
             registerCleanup(timeline, orb);
         }
 
-        addBugFlash(ex, ey, 12 + 8 * intensity, BUG_LIME, 0, 180, timeline);
+        addBugFlash(ex, ey, 20 + 8 * intensity, BUG_LIME, 0, 180, timeline);
     }
 
-    // =================================================================
     // Swarm strike / attack order – flying swarm of bug projectiles
-    // =================================================================
 
     private void addSwarmStrike(double x, double y, double intensity, Timeline timeline) {
-        int swarmCount = (int) (8 + 6 * intensity);
+        int swarmCount = (int) (18 + 6 * intensity);
         for (int i = 0; i < swarmCount; i++) {
             double angle = (i / (double) swarmCount) * 2 * Math.PI;
             double startR = 50 + 20 * intensity;
 
-            Circle bug = new Circle(3 + random.nextDouble() * 3,
+            Circle bug = new Circle(10 + random.nextDouble() * 3,
                     i % 3 == 0 ? BUG_GREEN : i % 3 == 1 ? BUG_AMBER : BUG_LIME);
             bug.setCenterX(x + Math.cos(angle) * startR);
             bug.setCenterY(y + Math.sin(angle) * startR);
@@ -315,19 +291,16 @@ public class BugEffects {
             registerCleanup(timeline, bug);
         }
 
-        addBugFlash(x, y, 20 + 12 * intensity, BUG_LIME, swarmCount * 22, 200, timeline);
+        addBugFlash(x, y, 28 + 12 * intensity, BUG_LIME, swarmCount * 22, 200, timeline);
     }
 
-    // =================================================================
     // Bug buzz – vibrating sound-wave rings
-    // =================================================================
 
-    private void addBugBuzz(double sx, double sy, double ex, double ey,
-                            double intensity, Timeline timeline) {
+    private void addBugBuzz(double sx, double sy, double ex, double ey, double intensity, Timeline timeline) {
         // Concentric vibrating rings from attacker to target
-        int ringCount = (int) (3 + 2 * intensity);
+        int ringCount = (int) (13 + 2 * intensity);
         for (int i = 0; i < ringCount; i++) {
-            Circle ring = new Circle(6 + i * 4, Color.TRANSPARENT);
+            Circle ring = new Circle(12 + i * 4, Color.TRANSPARENT);
             ring.setStroke((i % 2 == 0 ? BUG_AMBER : BUG_YELLOW).deriveColor(0, 1, 1, 0.6));
             ring.setStrokeWidth(2.5 - i * 0.3);
             ring.setCenterX(sx);
@@ -355,20 +328,17 @@ public class BugEffects {
             registerCleanup(timeline, ring);
         }
 
-        addBugFlash(ex, ey, 18 + 10 * intensity, BUG_AMBER, ringCount * 55, 200, timeline);
+        addBugFlash(ex, ey, 25 + 10 * intensity, BUG_AMBER, ringCount * 55, 200, timeline);
     }
 
-    // =================================================================
     // Signal beam – multi-colour energy beam
-    // =================================================================
 
-    private void addSignalBeam(double sx, double sy, double ex, double ey,
-                               double intensity, Timeline timeline) {
+    private void addSignalBeam(double sx, double sy, double ex, double ey, double intensity, Timeline timeline) {
         Color[] beamColors = { BUG_GREEN, BUG_AMBER, BUG_TEAL };
         for (int b = 0; b < beamColors.length; b++) {
             Line beam = new Line(sx, sy, sx, sy);
             beam.setStroke(beamColors[b].deriveColor(0, 1, 1, 0.75));
-            beam.setStrokeWidth((4 + 1.5 * intensity) - b);
+            beam.setStrokeWidth((8 + 1.5 * intensity) - b);
             beam.setEffect(new GaussianBlur(3 + b));
             beam.setOpacity(0);
             prepareTransientNode(beam);
@@ -387,16 +357,14 @@ public class BugEffects {
             registerCleanup(timeline, beam);
         }
 
-        addBugFlash(ex, ey, 20 + 12 * intensity, BUG_TEAL, 220, 200, timeline);
+        addBugFlash(ex, ey, 28 + 12 * intensity, BUG_TEAL, 220, 200, timeline);
     }
 
-    // =================================================================
     // Silver wind – sparkling wind burst with silver-green particles
-    // =================================================================
 
     private void addSilverWind(double sx, double sy, double ex, double ey,
                                double intensity, Timeline timeline) {
-        int count = (int) (8 + 6 * intensity);
+        int count = (int) (18 + 6 * intensity);
         double dx = ex - sx;
         double dy = ey - sy;
 
@@ -405,7 +373,7 @@ public class BugEffects {
             double px = sx + dx * t + (random.nextDouble() - 0.5) * 22;
             double py = sy + dy * t + (random.nextDouble() - 0.5) * 22;
 
-            Circle particle = new Circle(3 + random.nextDouble() * 3.5,
+            Circle particle = new Circle(10 + random.nextDouble() * 3.5,
                     i % 3 == 0 ? BUG_LIGHT : i % 3 == 1 ? BUG_LIME : BUG_YELLOW);
             particle.setEffect(new GaussianBlur(3));
             particle.setCenterX(px);
@@ -426,20 +394,18 @@ public class BugEffects {
             registerCleanup(timeline, particle);
         }
 
-        addBugFlash(ex, ey, 18 + 10 * intensity, BUG_LIGHT, count / 2 * 25, 200, timeline);
+        addBugFlash(ex, ey, 28 + 10 * intensity, BUG_LIGHT, count / 2 * 25, 200, timeline);
     }
 
-    // =================================================================
     // Pollen puff – round pollen ball arcing to target
-    // =================================================================
 
     private void addPollenPuff(double sx, double sy, double ex, double ey,
                                double intensity, Timeline timeline) {
-        double orbRadius = 12 + 5 * intensity;
+        double orbRadius = 18 + 5 * intensity;
 
         Circle puff = new Circle(orbRadius, BUG_YELLOW.deriveColor(0, 1, 1, 0.85));
         puff.setStroke(BUG_AMBER);
-        puff.setStrokeWidth(2.5);
+        puff.setStrokeWidth(5.5);
         puff.setEffect(new DropShadow(14 + 5 * intensity, BUG_DARK));
         puff.setCenterX(sx);
         puff.setCenterY(sy);
@@ -466,9 +432,9 @@ public class BugEffects {
         registerCleanup(timeline, puff);
 
         // Pollen scatter on landing
-        int pollenCount = (int) (6 + 4 * intensity);
+        int pollenCount = (int) (16 + 4 * intensity);
         for (int i = 0; i < pollenCount; i++) {
-            Circle pollen = new Circle(2 + random.nextDouble() * 3, BUG_YELLOW);
+            Circle pollen = new Circle(8 + random.nextDouble() * 3, BUG_YELLOW);
             pollen.setEffect(new GaussianBlur(2));
             double angle = random.nextDouble() * 2 * Math.PI;
             double dist = 10 + random.nextDouble() * 16 * intensity;
@@ -492,17 +458,12 @@ public class BugEffects {
         }
     }
 
-    // =================================================================
     // Default bug burst
-    // =================================================================
 
-    private void addDefaultBugBurst(double x, double y, double intensity, Timeline timeline) {
-        addSwarmStrike(x, y, intensity, timeline);
+    private void addDefaultBugBurst(double x, double y, double intensity, Timeline timeline) { addSwarmStrike(x, y, intensity, timeline);
     }
 
-    // =================================================================
     // Flash circle helper
-    // =================================================================
 
     private void addBugFlash(double x, double y, double radius, Color color,
                              int startDelay, int fadeDuration, Timeline timeline) {
@@ -523,9 +484,7 @@ public class BugEffects {
         registerCleanup(timeline, flash);
     }
 
-    // =================================================================
     // Utilities
-    // =================================================================
 
     private double clamp(double v, double min, double max) {
         return Math.max(min, Math.min(max, v));
