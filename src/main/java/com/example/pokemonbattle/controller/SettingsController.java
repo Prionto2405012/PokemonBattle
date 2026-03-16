@@ -1,6 +1,7 @@
 package com.example.pokemonbattle.controller;
 
 import com.example.pokemonbattle.util.MusicManager;
+import com.example.pokemonbattle.util.PlayerSession;
 
 import javafx.animation.FadeTransition;
 import javafx.animation.Interpolator;
@@ -59,7 +60,8 @@ public class SettingsController {
     private Button langEnBtn, langJpBtn;
     private final BooleanProperty gameSoundOn = new SimpleBooleanProperty(true);
     private final BooleanProperty battleSoundOn = new SimpleBooleanProperty(false);
-    private final BooleanProperty animationOn = new SimpleBooleanProperty(false);
+    private final BooleanProperty animationOn = new SimpleBooleanProperty(
+            PlayerSession.getInstance().isMoveAnimationEnabled());
 
     private int selectedGameGen = 1;
     private int selectedBattleGen = 1;
@@ -113,8 +115,10 @@ public class SettingsController {
 
     @FXML
     void onAnimationToggle(MouseEvent e) {
-        animationOn.set(!animationOn.get());
-        animateToggle(animationToggle, animationKnob, animationOn.get());
+        boolean nowOn = !animationOn.get();
+        animationOn.set(nowOn);
+        animateToggle(animationToggle, animationKnob, nowOn);
+        PlayerSession.getInstance().setMoveAnimationEnabled(nowOn);
     }
     @FXML
     void onGameGenSelect(ActionEvent e) {

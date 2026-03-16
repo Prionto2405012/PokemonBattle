@@ -195,6 +195,7 @@ public class BattleController implements Battle.BattleListener {
 
         Platform.runLater(this::playVSIntro);
         animationManager = new BattleAnimationManager(playerSpriteImage, opponentSpriteImage, battleField);
+        animationManager.setAnimationEnabled(PlayerSession.getInstance().isMoveAnimationEnabled());
     }
 
     // ─── Move selection ───────────────────────────────────────────────────────
@@ -1127,6 +1128,13 @@ public class BattleController implements Battle.BattleListener {
         String entry = capitalize(attacker) + " used " + capitalize(move) + "! " + damage + " dmg!";
         battleStatusLabel.setText(entry);
         battleLog.add(entry);
+        // Show floating damage number beside the defender
+        if (damage > 0 && animationManager != null) {
+            ImageView defenderSprite = getDefenderSprite(defender);
+            if (defenderSprite != null) {
+                Platform.runLater(() -> animationManager.showDamageNumber(defenderSprite, damage));
+            }
+        }
     }
 
     @Override
@@ -1148,6 +1156,22 @@ public class BattleController implements Battle.BattleListener {
     }
 
     @Override
+    public void onHealApplied(String pokemonName, String moveName, int healAmount) {
+        if (healAmount > 0) {
+            String entry = capitalize(pokemonName) + " restored " + healAmount + " HP!";
+            battleStatusLabel.setText(entry);
+            battleLog.add(entry);
+            // Show floating heal number beside the healed pokemon
+            if (animationManager != null) {
+                ImageView healedSprite = getDefenderSprite(pokemonName);
+                if (healedSprite != null) {
+                    Platform.runLater(() -> animationManager.showHealNumber(healedSprite, healAmount));
+                }
+            }
+        }
+    }
+
+    @Override
     public void onBattleEnd(String winnerName) {
         boolean playerWon = winnerName.equals(player.getName());
         saveBattleResult(playerWon);
@@ -1156,6 +1180,21 @@ public class BattleController implements Battle.BattleListener {
             MusicManager.getInstance().playVictorySFX();
         }
         Platform.runLater(() -> showResultOverlay(playerWon));
+    }
+
+    /**
+     * Maps a pokemon name to the corresponding ImageView sprite on the battlefield.
+     */
+    private ImageView getDefenderSprite(String pokemonName) {
+        if (player != null && player.getCurrentPokemon() != null
+                && player.getCurrentPokemon().getName().equalsIgnoreCase(pokemonName)) {
+            return playerSpriteImage;
+        }
+        if (opponent != null && opponent.getCurrentPokemon() != null
+                && opponent.getCurrentPokemon().getName().equalsIgnoreCase(pokemonName)) {
+            return opponentSpriteImage;
+        }
+        return null;
     }
 
     // ─── Result overlay ───────────────────────────────────────────────────────
