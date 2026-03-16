@@ -14,10 +14,8 @@ import javafx.scene.effect.GaussianBlur;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.scene.shape.Ellipse;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Polygon;
-import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
 public class DragonEffects {
@@ -39,25 +37,20 @@ public class DragonEffects {
         this.battleField = battleField;
     }
 
-    // -----------------------------------------------------------------
     // Public API – single-point overload (melee / contact moves)
-    // -----------------------------------------------------------------
 
-    public void createImpactEffect(double x, double y, String moveName,
-                                   int movePower, Timeline timeline) {
+    public void createImpactEffect(double x, double y, String moveName, int movePower, Timeline timeline) {
         createImpactEffect(x, y, x, y, moveName, movePower, timeline);
     }
 
-    // -----------------------------------------------------------------
     // Public API – full signature (all dragon moves)
-    // -----------------------------------------------------------------
 
     public void createImpactEffect(double startX, double startY,
                                    double endX, double endY,
                                    String moveName, int movePower,
                                    Timeline timeline) {
 
-        double intensity = clamp(movePower / 100.0, 0.4, 1.8);
+        double intensity = clamp(movePower / 100.0, 0.8, 2.4);
 
         switch (moveName) {
             // Claw slash melee
@@ -85,15 +78,13 @@ public class DragonEffects {
         }
     }
 
-    // -----------------------------------------------------------------
     // Public API – ranged lead effect
-    // -----------------------------------------------------------------
 
     public void createRangedEffect(double startX, double startY,
                                    double endX, double endY,
                                    String moveName, int movePower,
                                    Timeline timeline) {
-        double intensity = clamp(movePower / 100.0, 0.4, 1.8);
+        double intensity = clamp(movePower / 100.0, 0.8, 2.4);
         switch (moveName) {
             case "draco-meteor" -> addDracoMeteor(startX, startY, endX, endY, intensity, timeline);
             case "dragon-breath" -> addDragonBreath(startX, startY, endX, endY, intensity, timeline);
@@ -102,23 +93,20 @@ public class DragonEffects {
         }
     }
 
-    // =================================================================
     // Dragon claw – deep tear marks with draconic energy
-    // =================================================================
 
-    private void addDragonClaw(double sx, double sy, double ex, double ey,
-                               double intensity, Timeline timeline) {
+    private void addDragonClaw(double sx, double sy, double ex, double ey, double intensity, Timeline timeline) {
         double dx = ex - sx;
         double dy = ey - sy;
 
         // Energy trail along approach
-        int trailCount = (int) (5 + 4 * intensity);
+        int trailCount = (int) (15 + 4 * intensity);
         for (int i = 0; i < trailCount; i++) {
             double t = (i + 0.5) / trailCount;
             double tx = sx + dx * t + (random.nextDouble() - 0.5) * 16;
             double ty = sy + dy * t + (random.nextDouble() - 0.5) * 16;
 
-            Circle energy = new Circle(3 + random.nextDouble() * 3,
+            Circle energy = new Circle(10 + random.nextDouble() * 3,
                     i % 3 == 0 ? DRAGON_CYAN : i % 3 == 1 ? DRAGON_TEAL : DRAGON_BLUE);
             energy.setEffect(new GaussianBlur(4));
             energy.setCenterX(tx);
@@ -144,7 +132,7 @@ public class DragonEffects {
             Line claw = new Line(ex + offset - 6, ey - 20 - 8 * intensity,
                                  ex + offset + 4, ey + 14 + 8 * intensity);
             claw.setStroke(i % 2 == 0 ? DRAGON_CYAN : DRAGON_GOLD);
-            claw.setStrokeWidth(3 + 1.5 * intensity);
+            claw.setStrokeWidth(8 + 1.5 * intensity);
             claw.setOpacity(0);
             claw.setEffect(new DropShadow(10 + 4 * intensity, DRAGON_BLUE));
             prepareTransientNode(claw);
@@ -163,17 +151,14 @@ public class DragonEffects {
             registerCleanup(timeline, claw);
         }
 
-        addDragonFlash(ex, ey, 16 + 10 * intensity, DRAGON_CYAN, 90, 200, timeline);
+        addDragonFlash(ex, ey, 22 + 10 * intensity, DRAGON_CYAN, 90, 200, timeline);
     }
 
-    // =================================================================
     // Dragon rush – full-speed charge with fiery draconic aura
-    // =================================================================
 
-    private void addDragonRush(double sx, double sy, double ex, double ey,
-                               double intensity, Timeline timeline) {
+    private void addDragonRush(double sx, double sy, double ex, double ey, double intensity, Timeline timeline) {
         // Aura rings expanding from attacker during charge
-        int auraCount = (int) (3 + 2 * intensity);
+        int auraCount = (int) (13 + 2 * intensity);
         for (int i = 0; i < auraCount; i++) {
             double t = (i + 0.5) / auraCount;
             double ax = sx + (ex - sx) * t;
@@ -181,7 +166,7 @@ public class DragonEffects {
 
             Circle aura = new Circle(0, DRAGON_BLUE.deriveColor(0, 1, 1, 0.5));
             aura.setStroke(DRAGON_GOLD.deriveColor(0, 1, 1, 0.65));
-            aura.setStrokeWidth(3 + intensity);
+            aura.setStrokeWidth(8 + intensity);
             aura.setCenterX(ax);
             aura.setCenterY(ay);
             aura.setEffect(new GaussianBlur(6 + 2 * intensity));
@@ -212,7 +197,7 @@ public class DragonEffects {
         prepareTransientNode(shock);
         battleField.getChildren().add(shock);
 
-        double shockR = 34 + 20 * intensity;
+        double shockR = 40 + 20 * intensity;
         KeyFrame sAppear = new KeyFrame(Duration.millis(110),
                 new KeyValue(shock.opacityProperty(), 0.9),
                 new KeyValue(shock.radiusProperty(), shockR * 0.25));
@@ -226,19 +211,16 @@ public class DragonEffects {
         timeline.getKeyFrames().addAll(sAppear, sPeak, sFade);
         registerCleanup(timeline, shock);
 
-        addDragonFlash(ex, ey, 24 + 14 * intensity, DRAGON_GOLD, 110, 200, timeline);
+        addDragonFlash(ex, ey, 34 + 14 * intensity, DRAGON_GOLD, 110, 200, timeline);
     }
 
-    // =================================================================
     // Dragon pulse / dragon rage – draconic energy beam
-    // =================================================================
 
-    private void addDragonBeam(double sx, double sy, double ex, double ey,
-                               double intensity, Timeline timeline) {
+    private void addDragonBeam(double sx, double sy, double ex, double ey, double intensity, Timeline timeline) {
         // Core beam
         Line beam = new Line(sx, sy, sx, sy);
         beam.setStroke(DRAGON_CYAN.deriveColor(0, 1, 1, 0.88));
-        beam.setStrokeWidth(7 + 3 * intensity);
+        beam.setStrokeWidth(12 + 3 * intensity);
         beam.setEffect(new DropShadow(16 + 6 * intensity, DRAGON_BLUE));
         beam.setOpacity(0);
         prepareTransientNode(beam);
@@ -247,7 +229,7 @@ public class DragonEffects {
         // Inner bright core
         Line core = new Line(sx, sy, sx, sy);
         core.setStroke(DRAGON_LIGHT.deriveColor(0, 1, 1, 0.95));
-        core.setStrokeWidth(3 + intensity);
+        core.setStrokeWidth(8 + intensity);
         core.setEffect(new GaussianBlur(2));
         core.setOpacity(0);
         prepareTransientNode(core);
@@ -270,13 +252,13 @@ public class DragonEffects {
         registerCleanup(timeline, core);
 
         // Energy particles along beam
-        int count = (int) (6 + 5 * intensity);
+        int count = (int) (16 + 5 * intensity);
         for (int i = 0; i < count; i++) {
             double t = (i + 0.5) / count;
             double px = sx + (ex - sx) * t + (random.nextDouble() - 0.5) * 12;
             double py = sy + (ey - sy) * t + (random.nextDouble() - 0.5) * 12;
 
-            Circle particle = new Circle(3 + random.nextDouble() * 3,
+            Circle particle = new Circle(10 + random.nextDouble() * 3,
                     i % 2 == 0 ? DRAGON_TEAL : DRAGON_CYAN);
             particle.setEffect(new GaussianBlur(3));
             particle.setCenterX(px);
@@ -295,15 +277,12 @@ public class DragonEffects {
             registerCleanup(timeline, particle);
         }
 
-        addDragonFlash(ex, ey, 22 + 12 * intensity, DRAGON_CYAN, 190, 200, timeline);
+        addDragonFlash(ex, ey, 26 + 12 * intensity, DRAGON_CYAN, 190, 200, timeline);
     }
 
-    // =================================================================
     // Dragon breath – wide fan of draconic energy
-    // =================================================================
 
-    private void addDragonBreath(double sx, double sy, double ex, double ey,
-                                 double intensity, Timeline timeline) {
+    private void addDragonBreath(double sx, double sy, double ex, double ey, double intensity, Timeline timeline) {
         // Fan of 3 beams spreading from attacker
         double baseAngle = Math.atan2(ey - sy, ex - sx);
         double[] fanAngles = { baseAngle - 0.15, baseAngle, baseAngle + 0.15 };
@@ -311,7 +290,7 @@ public class DragonEffects {
         for (double angle : fanAngles) {
             Line breath = new Line(sx, sy, sx, sy);
             breath.setStroke(DRAGON_TEAL.deriveColor(0, 1, 1, 0.8));
-            breath.setStrokeWidth(4 + 2 * intensity);
+            breath.setStrokeWidth(8 + 2 * intensity);
             breath.setEffect(new GaussianBlur(4 + intensity));
             breath.setOpacity(0);
             prepareTransientNode(breath);
@@ -333,20 +312,17 @@ public class DragonEffects {
             registerCleanup(timeline, breath);
         }
 
-        addDragonFlash(ex, ey, 20 + 10 * intensity, DRAGON_TEAL, 180, 200, timeline);
+        addDragonFlash(ex, ey, 28 + 10 * intensity, DRAGON_TEAL, 180, 200, timeline);
     }
 
-    // =================================================================
     // Draco meteor – meteor plunging from above with explosion
-    // =================================================================
 
-    private void addDracoMeteor(double sx, double sy, double ex, double ey,
-                                double intensity, Timeline timeline) {
+    private void addDracoMeteor(double sx, double sy, double ex, double ey, double intensity, Timeline timeline) {
         // Meteor falling from top
         double meteorStartX = ex + (random.nextDouble() - 0.5) * 30;
         double meteorStartY = ey - 180 - 40 * intensity;
 
-        Circle meteor = new Circle(14 + 6 * intensity, DRAGON_GOLD);
+        Circle meteor = new Circle(18 + 6 * intensity, DRAGON_GOLD);
         meteor.setEffect(new DropShadow(22 + 8 * intensity, DRAGON_RED));
         meteor.setCenterX(meteorStartX);
         meteor.setCenterY(meteorStartY);
@@ -366,13 +342,13 @@ public class DragonEffects {
         registerCleanup(timeline, meteor);
 
         // Meteor trail
-        int trailCount = (int) (6 + 4 * intensity);
+        int trailCount = (int) (16 + 4 * intensity);
         for (int i = 0; i < trailCount; i++) {
             double t = (i + 0.5) / trailCount;
             double tx = meteorStartX + (ex - meteorStartX) * t + (random.nextDouble() - 0.5) * 14;
             double ty = meteorStartY + (ey - meteorStartY) * t;
 
-            Circle trail = new Circle(4 + random.nextDouble() * 4,
+            Circle trail = new Circle(8 + random.nextDouble() * 4,
                     i % 2 == 0 ? DRAGON_RED : DRAGON_GOLD);
             trail.setEffect(new GaussianBlur(4));
             trail.setCenterX(tx);
@@ -414,18 +390,15 @@ public class DragonEffects {
         timeline.getKeyFrames().addAll(eAppear, ePeak, eFade);
         registerCleanup(timeline, explosion);
 
-        addDragonFlash(ex, ey, 28 + 16 * intensity, DRAGON_GOLD, 290, 220, timeline);
+        addDragonFlash(ex, ey, 32 + 16 * intensity, DRAGON_GOLD, 290, 220, timeline);
     }
 
-    // =================================================================
     // Scale shot – rapid scales fired as projectiles
-    // =================================================================
 
-    private void addScaleShot(double sx, double sy, double ex, double ey,
-                              double intensity, Timeline timeline) {
-        int count = (int) (4 + 4 * intensity);
+    private void addScaleShot(double sx, double sy, double ex, double ey, double intensity, Timeline timeline) {
+        int count = (int) (14 + 4 * intensity);
         for (int i = 0; i < count; i++) {
-            Polygon scale = buildScalePolygon(6 + random.nextDouble() * 5 * intensity);
+            Polygon scale = buildScalePolygon(10 + random.nextDouble() * 5 * intensity);
             scale.setFill(i % 3 == 0 ? DRAGON_TEAL : i % 3 == 1 ? DRAGON_BLUE : DRAGON_CYAN);
             scale.setEffect(new DropShadow(5, DRAGON_DARK));
             scale.setLayoutX(sx + (random.nextDouble() - 0.5) * 16);
@@ -454,25 +427,21 @@ public class DragonEffects {
             registerCleanup(timeline, scale);
         }
 
-        addDragonFlash(ex, ey, 14 + 8 * intensity, DRAGON_CYAN, count * 45, 180, timeline);
+        addDragonFlash(ex, ey, 20 + 8 * intensity, DRAGON_CYAN, count * 45, 180, timeline);
     }
 
     /** Diamond-shaped scale polygon. */
     private Polygon buildScalePolygon(double size) {
-        return new Polygon(0, -size, size * 0.55, 0, 0, size * 0.7, -size * 0.55, 0);
+        return new Polygon(0, -size, size * 0.7, 0, 0, size * 0.8, -size * 0.7, 0);
     }
 
-    // =================================================================
     // Default dragon burst
-    // =================================================================
 
     private void addDefaultDragonBurst(double x, double y, double intensity, Timeline timeline) {
         addDragonRush(x, y, x, y, intensity, timeline);
     }
 
-    // =================================================================
     // Flash circle helper
-    // =================================================================
 
     private void addDragonFlash(double x, double y, double radius, Color color,
                                 int startDelay, int fadeDuration, Timeline timeline) {
@@ -493,9 +462,7 @@ public class DragonEffects {
         registerCleanup(timeline, flash);
     }
 
-    // =================================================================
     // Utilities
-    // =================================================================
 
     private double clamp(double v, double min, double max) {
         return Math.max(min, Math.min(max, v));

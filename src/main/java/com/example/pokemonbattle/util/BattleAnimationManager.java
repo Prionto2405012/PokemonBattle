@@ -56,6 +56,7 @@ public class BattleAnimationManager {
     private static final double RETURN_DURATION_MS     = 550.0;
     private static final double IMPACT_SHAKE_DISTANCE  = 8.0;
     private static final double IMPACT_SCALE_REDUCTION = 0.88;
+    private static final double ANIMATION_SPEED_MULTIPLIER = 1.2;
 
     // Type effect handlers
     private final ElectricEffects electricEffects;
@@ -179,7 +180,7 @@ public class BattleAnimationManager {
             if (onComplete != null) onComplete.run();
         });
 
-        sequence.play();
+        playAtCurrentSpeed(sequence);
     }
 
     // =
@@ -602,9 +603,9 @@ public class BattleAnimationManager {
                     defender.setTranslateY(defenderOriginalY);
                     if (onComplete != null) onComplete.run();
                 });
-                seq.play();
+                playAtCurrentSpeed(seq);
             });
-            leadEffect.play();
+            playAtCurrentSpeed(leadEffect);
         } else {
             if (onComplete != null) onComplete.run();
         }
@@ -827,6 +828,11 @@ public class BattleAnimationManager {
         return animationEnabled;
     }
 
+    private void playAtCurrentSpeed(Animation animation) {
+        animation.setRate(ANIMATION_SPEED_MULTIPLIER);
+        animation.play();
+    }
+
     // =
     // FLOATING DAMAGE / HEAL NUMBERS
     // =
@@ -868,7 +874,7 @@ public class BattleAnimationManager {
                 new KeyValue(damageText.yProperty(), y - 25))
         );
         anim.setOnFinished(e -> battleField.getChildren().remove(damageText));
-        anim.play();
+        playAtCurrentSpeed(anim);
     }
 
     /**
@@ -908,6 +914,6 @@ public class BattleAnimationManager {
                 new KeyValue(healText.yProperty(), y - 25))
         );
         anim.setOnFinished(e -> battleField.getChildren().remove(healText));
-        anim.play();
+        playAtCurrentSpeed(anim);
     }
 }

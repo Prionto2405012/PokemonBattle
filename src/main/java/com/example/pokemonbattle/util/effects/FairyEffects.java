@@ -14,10 +14,7 @@ import javafx.scene.effect.GaussianBlur;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.scene.shape.Ellipse;
 import javafx.scene.shape.Line;
-import javafx.scene.shape.Polygon;
-import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
 public class FairyEffects {
@@ -39,25 +36,21 @@ public class FairyEffects {
         this.battleField = battleField;
     }
 
-    // -----------------------------------------------------------------
     // Public API – single-point overload (melee / contact moves)
-    // -----------------------------------------------------------------
 
     public void createImpactEffect(double x, double y, String moveName,
                                    int movePower, Timeline timeline) {
         createImpactEffect(x, y, x, y, moveName, movePower, timeline);
     }
 
-    // -----------------------------------------------------------------
     // Public API – full signature (all fairy moves)
-    // -----------------------------------------------------------------
 
     public void createImpactEffect(double startX, double startY,
                                    double endX, double endY,
                                    String moveName, int movePower,
                                    Timeline timeline) {
 
-        double intensity = clamp(movePower / 100.0, 0.4, 1.8);
+        double intensity = clamp(movePower / 100.0, 0.8,2.4);
 
         switch (moveName) {
             // Physical melee moves
@@ -82,15 +75,13 @@ public class FairyEffects {
         }
     }
 
-    // -----------------------------------------------------------------
     // Public API – ranged lead effect
-    // -----------------------------------------------------------------
 
     public void createRangedEffect(double startX, double startY,
                                    double endX, double endY,
                                    String moveName, int movePower,
                                    Timeline timeline) {
-        double intensity = clamp(movePower / 100.0, 0.4, 1.8);
+        double intensity = clamp(movePower / 100.0, 0.8,2.4);
         switch (moveName) {
             case "moonblast"     -> addMoonblast(startX, startY, endX, endY, intensity, timeline);
             case "moongeist-beam" -> addMoongeistBeam(startX, startY, endX, endY, intensity, timeline);
@@ -98,9 +89,7 @@ public class FairyEffects {
         }
     }
 
-    // =================================================================
     // Play rough – tumbling sparkle-and-paw swipes
-    // =================================================================
 
     private void addPlayRough(double sx, double sy, double ex, double ey,
                               double intensity, Timeline timeline) {
@@ -108,13 +97,13 @@ public class FairyEffects {
         double dy = ey - sy;
 
         // Sparkle trail along approach
-        int trailCount = (int) (6 + 4 * intensity);
+        int trailCount = (int) (16 + 4 * intensity);
         for (int i = 0; i < trailCount; i++) {
             double t = (i + 0.5) / trailCount;
             double tx = sx + dx * t + (random.nextDouble() - 0.5) * 18;
             double ty = sy + dy * t + (random.nextDouble() - 0.5) * 18;
 
-            Circle sparkle = new Circle(3 + random.nextDouble() * 3,
+            Circle sparkle = new Circle(10 + random.nextDouble() * 3,
                     i % 3 == 0 ? FAIRY_PINK : i % 3 == 1 ? FAIRY_GOLD : FAIRY_LIGHT);
             sparkle.setEffect(new GaussianBlur(3));
             sparkle.setCenterX(tx);
@@ -135,7 +124,7 @@ public class FairyEffects {
         }
 
         // Slash marks at impact
-        int slashCount = (int) (2 + 2 * intensity);
+        int slashCount = (int) (10 + 2 * intensity);
         for (int i = 0; i < slashCount; i++) {
             double angle = -45 + i * (90.0 / Math.max(slashCount - 1, 1));
             double rad = Math.toRadians(angle);
@@ -147,7 +136,7 @@ public class FairyEffects {
                     ex + Math.cos(rad) * slashLen * 0.5,
                     ey + Math.sin(rad) * slashLen * 0.5);
             slash.setStroke(i % 2 == 0 ? FAIRY_PINK : FAIRY_ROSE);
-            slash.setStrokeWidth(3 + intensity);
+            slash.setStrokeWidth(6 + intensity);
             slash.setOpacity(0);
             slash.setEffect(new DropShadow(8 + 3 * intensity, FAIRY_PINK));
             prepareTransientNode(slash);
@@ -166,18 +155,16 @@ public class FairyEffects {
             registerCleanup(timeline, slash);
         }
 
-        addFairyFlash(ex, ey, 16 + 10 * intensity, FAIRY_GOLD, 90, 200, timeline);
+        addFairyFlash(ex, ey, 22 + 10 * intensity, FAIRY_GOLD, 90, 200, timeline);
     }
 
-    // =================================================================
     // Spirit break – shattering pink energy burst
-    // =================================================================
 
     private void addSpiritBreak(double x, double y, double intensity, Timeline timeline) {
         // Expanding pink shockwave ring
         Circle ring = new Circle(0, Color.TRANSPARENT);
         ring.setStroke(FAIRY_PINK.deriveColor(0, 1, 1, 0.75));
-        ring.setStrokeWidth(4 + 1.5 * intensity);
+        ring.setStrokeWidth(8 + 1.5 * intensity);
         ring.setCenterX(x);
         ring.setCenterY(y);
         ring.setEffect(new DropShadow(12 + 4 * intensity, FAIRY_ROSE));
@@ -200,18 +187,16 @@ public class FairyEffects {
 
         // Burst shards
         addFairyShards(x, y, intensity, 0, timeline);
-        addFairyFlash(x, y, 22 + 12 * intensity, FAIRY_GOLD, 0, 180, timeline);
+        addFairyFlash(x, y, 28 + 12 * intensity, FAIRY_GOLD, 0, 180, timeline);
     }
 
-    // =================================================================
     // Draining kiss – heart-shaped energy pulled toward attacker
-    // =================================================================
 
     private void addDrainingKiss(double sx, double sy, double ex, double ey,
                                  double intensity, Timeline timeline) {
-        int orbCount = (int) (5 + 4 * intensity);
+        int orbCount = (int) (15 + 4 * intensity);
         for (int i = 0; i < orbCount; i++) {
-            Circle orb = new Circle(4 + random.nextDouble() * 4,
+            Circle orb = new Circle(9 + random.nextDouble() * 4,
                     i % 2 == 0 ? FAIRY_PINK : FAIRY_LAVENDER);
             orb.setEffect(new DropShadow(6, FAIRY_ROSE));
             orb.setCenterX(ex + (random.nextDouble() - 0.5) * 20);
@@ -234,22 +219,20 @@ public class FairyEffects {
             registerCleanup(timeline, orb);
         }
 
-        addFairyFlash(ex, ey, 14 + 8 * intensity, FAIRY_PINK, 0, 180, timeline);
+        addFairyFlash(ex, ey, 20 + 8 * intensity, FAIRY_PINK, 0, 180, timeline);
     }
 
-    // =================================================================
     // Fairy wind – swirling pastel sparkles
-    // =================================================================
 
     private void addFairyWind(double x, double y, double intensity, Timeline timeline) {
-        int count = (int) (8 + 6 * intensity);
+        int count = (int) (18 + 6 * intensity);
         for (int i = 0; i < count; i++) {
             double angle = (i / (double) count) * 2 * Math.PI;
             double startR = 8 + random.nextDouble() * 10;
             double px = x + Math.cos(angle) * startR;
             double py = y + Math.sin(angle) * startR;
 
-            Circle sparkle = new Circle(3 + random.nextDouble() * 3,
+            Circle sparkle = new Circle(8 + random.nextDouble() * 3,
                     i % 3 == 0 ? FAIRY_PINK : i % 3 == 1 ? FAIRY_LIGHT : FAIRY_LAVENDER);
             sparkle.setEffect(new GaussianBlur(3));
             sparkle.setCenterX(px);
@@ -276,13 +259,11 @@ public class FairyEffects {
         }
     }
 
-    // =================================================================
     // Moonblast – pink moon-energy sphere hurled at target
-    // =================================================================
 
     private void addMoonblast(double sx, double sy, double ex, double ey,
                               double intensity, Timeline timeline) {
-        double orbRadius = 14 + 7 * intensity;
+        double orbRadius = 20 + 7 * intensity;
 
         // Main orb
         Circle orb = new Circle(orbRadius, FAIRY_LIGHT.deriveColor(0, 1, 1, 0.9));
@@ -337,7 +318,7 @@ public class FairyEffects {
     /** Sparkle trail behind the moonblast orb. */
     private void addMoonTrail(double sx, double sy, double ex, double ey,
                               double intensity, Timeline timeline) {
-        int count = (int) (8 + 5 * intensity);
+        int count = (int) (18 + 5 * intensity);
         double dx = ex - sx;
         double dy = ey - sy;
 
@@ -346,7 +327,7 @@ public class FairyEffects {
             double wx = sx + dx * t + (random.nextDouble() - 0.5) * 18;
             double wy = sy + dy * t + (random.nextDouble() - 0.5) * 18;
 
-            Circle sparkle = new Circle(3 + random.nextDouble() * 3,
+            Circle sparkle = new Circle(8 + random.nextDouble() * 3,
                     i % 2 == 0 ? FAIRY_LIGHT : FAIRY_PINK);
             sparkle.setEffect(new GaussianBlur(3));
             sparkle.setCenterX(wx);
@@ -368,17 +349,15 @@ public class FairyEffects {
         }
     }
 
-    // =================================================================
     // Dazzling gleam – wide horizontal burst of rainbow sparkles
-    // =================================================================
 
     private void addDazzlingGleam(double sx, double sy, double ex, double ey,
                                   double intensity, Timeline timeline) {
         // Wide horizontal beam
         Line beam = new Line(sx, sy, sx, sy);
         beam.setStroke(FAIRY_WHITE.deriveColor(0, 1, 1, 0.85));
-        beam.setStrokeWidth(6 + 2 * intensity);
-        beam.setEffect(new DropShadow(14 + 5 * intensity, FAIRY_PINK));
+        beam.setStrokeWidth(12 + 2 * intensity);
+        beam.setEffect(new DropShadow(28 + 5 * intensity, FAIRY_PINK));
         beam.setOpacity(0);
         prepareTransientNode(beam);
         battleField.getChildren().add(beam);
@@ -395,14 +374,14 @@ public class FairyEffects {
         registerCleanup(timeline, beam);
 
         // Rainbow sparkles along beam
-        int count = (int) (8 + 6 * intensity);
+        int count = (int) (18 + 6 * intensity);
         Color[] sparkleColors = { FAIRY_PINK, FAIRY_GOLD, FAIRY_LAVENDER, FAIRY_BLUE, FAIRY_WHITE };
         for (int i = 0; i < count; i++) {
             double t = (i + random.nextDouble()) / count;
             double wx = sx + (ex - sx) * t + (random.nextDouble() - 0.5) * 14;
             double wy = sy + (ey - sy) * t + (random.nextDouble() - 0.5) * 14;
 
-            Circle sparkle = new Circle(3 + random.nextDouble() * 3.5,
+            Circle sparkle = new Circle(8 + random.nextDouble() * 3.5,
                     sparkleColors[i % sparkleColors.length]);
             sparkle.setEffect(new GaussianBlur(3));
             sparkle.setCenterX(wx);
@@ -422,20 +401,18 @@ public class FairyEffects {
             registerCleanup(timeline, sparkle);
         }
 
-        addFairyFlash(ex, ey, 22 + 12 * intensity, FAIRY_WHITE, 180, 200, timeline);
+        addFairyFlash(ex, ey, 26 + 12 * intensity, FAIRY_WHITE, 180, 200, timeline);
     }
 
-    // =================================================================
     // Moongeist beam – silver moon-beam lance
-    // =================================================================
 
     private void addMoongeistBeam(double sx, double sy, double ex, double ey,
                                   double intensity, Timeline timeline) {
         // Core silver beam
         Line beam = new Line(sx, sy, sx, sy);
         beam.setStroke(FAIRY_MOON.deriveColor(0, 1, 1, 0.9));
-        beam.setStrokeWidth(7 + 3 * intensity);
-        beam.setEffect(new DropShadow(16 + 6 * intensity, FAIRY_LIGHT));
+        beam.setStrokeWidth(10 + 3 * intensity);
+        beam.setEffect(new DropShadow(22 + 6 * intensity, FAIRY_LIGHT));
         beam.setOpacity(0);
         prepareTransientNode(beam);
         battleField.getChildren().add(beam);
@@ -443,7 +420,7 @@ public class FairyEffects {
         // Inner bright core
         Line core = new Line(sx, sy, sx, sy);
         core.setStroke(FAIRY_WHITE.deriveColor(0, 1, 1, 0.95));
-        core.setStrokeWidth(3 + intensity);
+        core.setStrokeWidth(8 + 2 * intensity);
         core.setEffect(new GaussianBlur(2));
         core.setOpacity(0);
         prepareTransientNode(core);
@@ -466,13 +443,13 @@ public class FairyEffects {
         registerCleanup(timeline, core);
 
         // Moon crescent particles along beam
-        int count = (int) (5 + 4 * intensity);
+        int count = (int) (15 + 4 * intensity);
         for (int i = 0; i < count; i++) {
             double t = (i + 0.5) / count;
             double wx = sx + (ex - sx) * t + (random.nextDouble() - 0.5) * 12;
             double wy = sy + (ey - sy) * t + (random.nextDouble() - 0.5) * 12;
 
-            Circle moonParticle = new Circle(4 + random.nextDouble() * 3, FAIRY_MOON);
+            Circle moonParticle = new Circle(10 + random.nextDouble() * 3, FAIRY_MOON);
             moonParticle.setEffect(new GaussianBlur(3));
             moonParticle.setCenterX(wx);
             moonParticle.setCenterY(wy);
@@ -490,17 +467,15 @@ public class FairyEffects {
             registerCleanup(timeline, moonParticle);
         }
 
-        addFairyFlash(ex, ey, 24 + 14 * intensity, FAIRY_MOON, 200, 220, timeline);
+        addFairyFlash(ex, ey, 30 + 14 * intensity, FAIRY_MOON, 200, 220, timeline);
     }
 
-    // =================================================================
     // Misty explosion – huge pastel burst expanding in all directions
-    // =================================================================
 
     private void addMistyExplosion(double x, double y, double intensity, Timeline timeline) {
         // Large misty expansion circle
         Circle mist = new Circle(0, FAIRY_LIGHT.deriveColor(0, 1, 1, 0.6));
-        mist.setEffect(new GaussianBlur(14 + 6 * intensity));
+        mist.setEffect(new GaussianBlur(20 + 6 * intensity));
         mist.setCenterX(x);
         mist.setCenterY(y);
         mist.setOpacity(0);
@@ -523,7 +498,7 @@ public class FairyEffects {
         // Ring overlay
         Circle ring = new Circle(0, Color.TRANSPARENT);
         ring.setStroke(FAIRY_PINK.deriveColor(0, 1, 1, 0.7));
-        ring.setStrokeWidth(4 + 1.5 * intensity);
+        ring.setStrokeWidth(8 + 1.5 * intensity);
         ring.setCenterX(x);
         ring.setCenterY(y);
         ring.setEffect(new GaussianBlur(5));
@@ -544,28 +519,24 @@ public class FairyEffects {
         registerCleanup(timeline, ring);
 
         // Sparkle burst in all directions
-        addFairyShards(x, y, intensity * 1.3, 0, timeline);
+        addFairyShards(x, y, intensity * 1.8, 0, timeline);
         addFairyFlash(x, y, 26 + 16 * intensity, FAIRY_GOLD, 0, 200, timeline);
     }
 
-    // =================================================================
     // Default fairy burst – basic sparkle circle
-    // =================================================================
 
     private void addDefaultFairyBurst(double x, double y, double intensity, Timeline timeline) {
         addSpiritBreak(x, y, intensity, timeline);
     }
 
-    // =================================================================
     // Shared helpers – fairy shards, flash
-    // =================================================================
 
     private void addFairyShards(double x, double y, double intensity,
                                 int startDelay, Timeline timeline) {
-        int count = (int) (8 + 6 * intensity);
+        int count = (int) (18 + 6 * intensity);
         for (int i = 0; i < count; i++) {
             double angle = (i / (double) count) * 2 * Math.PI;
-            Circle shard = new Circle(3 + random.nextDouble() * 3,
+            Circle shard = new Circle(8 + random.nextDouble() * 3,
                     i % 3 == 0 ? FAIRY_PINK : i % 3 == 1 ? FAIRY_GOLD : FAIRY_LIGHT);
             shard.setEffect(new GaussianBlur(2));
             shard.setCenterX(x);
@@ -609,9 +580,7 @@ public class FairyEffects {
         registerCleanup(timeline, flash);
     }
 
-    // =================================================================
     // Utilities
-    // =================================================================
 
     private double clamp(double v, double min, double max) {
         return Math.max(min, Math.min(max, v));
