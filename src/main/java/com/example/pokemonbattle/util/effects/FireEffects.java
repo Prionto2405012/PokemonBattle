@@ -3,6 +3,8 @@ package com.example.pokemonbattle.util.effects;
 
 import java.util.Random;
 
+import com.example.pokemonbattle.util.MediaCache;
+
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
@@ -11,6 +13,8 @@ import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.GaussianBlur;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
@@ -41,6 +45,9 @@ public class FireEffects {
     private static final Color LAVA_RED     = Color.web("#D32F2F");
     private static final Color LAVA_ORANGE  = Color.web("#FF6F00");
     private static final Color ASH_GRAY     = Color.web("#616161");
+        private static final String PUNCH_ASSET = "punch.png";
+        private static final String FEET_ASSET  = "feet.png";
+        private static final String FANG_ASSET  = "fang.gif";
 
     public FireEffects(Pane battleField) {
         this.battleField = battleField;
@@ -60,7 +67,10 @@ public class FireEffects {
         double intensity = clamp(movePower / 100.0, 0.4, 1.8);
 
         switch (moveName) {
-            case "fire-punch"        -> { addFirePunchEmbers(endX, endY, intensity, timeline); }
+                        case "fire-punch"        -> {
+                                addPunchImage(endX, endY, timeline);
+                                addFirePunchEmbers(endX, endY, intensity, timeline);
+                        }
             case "ember"             -> addEmberBurst(startX, startY, endX, endY, intensity, timeline);
             case "flamethrower"      -> addFlamethrowerStream(startX, startY, endX, endY, intensity, timeline);
             case "fire-spin"         -> addFireVortex(endX, endY, intensity, timeline);
@@ -69,15 +79,20 @@ public class FireEffects {
             case "overheat"          -> addOverheatOverdrive(startX, startY, endX, endY, intensity, timeline);
             case "flare-blitz"       -> { addExplosionCore(endX, endY, intensity, false, timeline);
                                           addReboundSpark(startX, startY, timeline); }
-            case "fire-fang"         -> { addFangVisual(endX, endY, timeline);
-                                          addEmberBurst(endX, endY, endX, endY, 0.6, timeline); }
+                        case "fire-fang"         -> {
+                                addFangImage(endX, endY, timeline);
+                                addEmberBurst(endX, endY, endX, endY, 0.6, timeline);
+                        }
             case "flame-burst"       -> addBurstSplash(endX, endY, intensity, timeline);
             case "flame-charge"      -> addChargeFlareTrail(startX, startY, endX, endY, intensity, false, timeline);
             case "incinerate"        -> addBerryIncinerateAsh(endX, endY, intensity, timeline);
             case "inferno"           -> addInfernoPillar(endX, endY, intensity, timeline);
             case "fire-pledge"       -> addPledgeColumn(endX, endY, intensity, timeline);
             case "temper-flare"      -> addTemperFlareBacklash(endX, endY, intensity, timeline);
-            case "blaze-kick"        -> addKickArcFlame(endX, endY, intensity, timeline);
+                        case "blaze-kick"        -> {
+                                addFeetImage(endX, endY, timeline);
+                                addKickArcFlame(endX, endY, intensity, timeline);
+                        }
             case "blast-burn"        -> addBlastBurnDetonation(startX, startY, endX, endY, intensity, timeline);
             case "mystical-fire"     -> addMysticFlameSpiral(startX, startY, endX, endY, intensity, timeline);
             case "flame-wheel"       -> addWheelSpinRing(startX, startY, endX, endY, intensity, timeline);
@@ -1225,6 +1240,58 @@ public class FireEffects {
         node.setManaged(false);
         node.setMouseTransparent(true);
     }
+
+        private void addPunchImage(double x, double y, Timeline timeline) {
+                addStaticImpactImage(PUNCH_ASSET, x, y, 160, 160, timeline);
+        }
+
+        private void addFeetImage(double x, double y, Timeline timeline) {
+                addStaticImpactImage(FEET_ASSET, x, y, 170, 170, timeline);
+        }
+
+        private void addFangImage(double x, double y, Timeline timeline) {
+                addStaticImpactImage(FANG_ASSET, x, y, 190, 190, timeline);
+        }
+
+        private void addStaticImpactImage(String assetName, double x, double y,
+                                                                          double width, double height,
+                                                                          Timeline timeline) {
+                try {
+                        Image image = MediaCache.getImage(assetName);
+                        if (image == null) {
+                                return;
+                        }
+
+                        ImageView imageView = new ImageView(image);
+                        imageView.setFitWidth(width);
+                        imageView.setFitHeight(height);
+                        imageView.setPreserveRatio(true);
+                        imageView.setSmooth(true);
+                        imageView.setLayoutX(x - width / 2.0);
+                        imageView.setLayoutY(y - height / 2.0);
+                        imageView.setOpacity(0);
+                        imageView.setScaleX(0.55);
+                        imageView.setScaleY(0.55);
+                        prepareTransientNode(imageView);
+                        battleField.getChildren().add(imageView);
+
+                        KeyFrame appear = new KeyFrame(Duration.millis(35),
+                                new KeyValue(imageView.opacityProperty(), 1.0),
+                                new KeyValue(imageView.scaleXProperty(), 1.25),
+                                new KeyValue(imageView.scaleYProperty(), 1.25));
+                        KeyFrame settle = new KeyFrame(Duration.millis(115),
+                                new KeyValue(imageView.scaleXProperty(), 1.0),
+                                new KeyValue(imageView.scaleYProperty(), 1.0));
+                        long fadeMs = (FANG_ASSET.equals(assetName) || FEET_ASSET.equals(assetName)) ? 560L : 330L;
+                        KeyFrame fade = new KeyFrame(Duration.millis(fadeMs),
+                                new KeyValue(imageView.opacityProperty(), 0.0));
+
+                        timeline.getKeyFrames().addAll(appear, settle, fade);
+                        registerCleanup(timeline, imageView);
+                } catch (Exception ignored) {
+                        // Overlay is optional; the core move effect should still play.
+                }
+        }
 
     private void registerCleanup(Timeline timeline, Node node) {
         EventHandler<ActionEvent> previous = timeline.getOnFinished();

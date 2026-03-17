@@ -1,0 +1,182 @@
+/* ============================================
+   BUTTON STYLING REFERENCE GUIDE
+   ============================================
+   
+   All buttons now have the following effects:
+   
+   1. HOVER EFFECT:
+      - Scales up to 105% (1.05x)
+      - Enhanced shadow (from 8px to 12px)
+      - Smooth transition (0.3s ease)
+   
+   2. CLICK/PRESSED EFFECT:
+      - Scales down to 98% (0.98x)
+      - Inner shadow effect (inset)
+      - Translates down 2px for "pressed" feel
+   
+   3. LINEAR GRADIENTS:
+      - Each button has a unique gradient angle
+      - Different angles: 0deg, 45deg, 60deg, 90deg, 120deg, 135deg, 180deg
+      - Hover inverts brightness
+      - Pressed inverts gradient direction
+*/
+
+/* ============================================
+   AVAILABLE BUTTON CLASSES
+   ============================================ */
+
+// RED BUTTON (0-100% diagonal)
+styleClass="button-red"
+// Gradient: #e74c3c → #c0392b
+// Use for: New Game, Primary Actions
+
+// BLUE BUTTON (45deg angle)
+styleClass="button-blue"
+// Gradient: #3498db → #2980b9
+// Use for: Load Game, Information
+
+// PURPLE BUTTON (90deg angle)
+styleClass="button-purple"
+// Gradient: #9b59b6 → #8e44ad
+// Use for: Settings, Special Features
+
+// GRAY BUTTON (135deg angle)
+styleClass="button-gray"
+// Gradient: #95a5a6 → #7f8c8d
+// Use for: Back, Cancel, Secondary Actions
+
+// DARK BUTTON (180deg angle)
+styleClass="button-dark"
+// Gradient: #34495e → #2c3e50
+// Use for: Exit, Danger, Final Actions
+
+// GREEN BUTTON (60deg angle)
+styleClass="button-green"
+// Gradient: #27ae60 → #229954
+// Use for: Continue, Success, Confirm
+
+// ORANGE BUTTON (120deg angle)
+styleClass="button-orange"
+// Gradient: #ff6b6b → #ee5a52
+// Use for: Start, Warning, Attention
+
+/* ============================================
+   HOW TO USE IN FXML
+   ============================================ */
+
+// Single class:
+<Button text="My Button" styleClass="button-red"/>
+
+// Multiple classes:
+<Button text="My Button" styleClass="button-blue my-custom-class"/>
+
+// With other properties:
+<Button text="My Button" 
+        styleClass="button-green" 
+        prefWidth="250"
+        onAction="#onButtonClick"/>
+
+/* ============================================
+   SHADOW EFFECTS BREAKDOWN
+   ============================================ */
+
+// DEFAULT STATE:
+-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 8, 0, 0, 4);
+// ↳ Outer shadow, 8px blur, 4px down
+
+// HOVER STATE:
+-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 12, 0, 0, 6);
+// ↳ Stronger shadow, 12px blur, 6px down
+
+// PRESSED STATE:
+-fx-effect: innershadow(gaussian, rgba(0,0,0,0.6), 8, 0, 0, 2);
+// ↳ Inner shadow (inset), creates depth illusion
+
+/* ============================================
+   GRADIENT ANGLES EXPLAINED
+   ============================================ */
+
+// 0deg = Left to Right (→)
+linear-gradient(from 0% 0% to 100% 100%, color1, color2)
+
+// 45deg = Diagonal Top-Left to Bottom-Right (↘)
+linear-gradient(from 45deg, color1, color2)
+
+// 60deg = Slight diagonal
+linear-gradient(from 60deg, color1, color2)
+
+// 90deg = Top to Bottom (↓)
+linear-gradient(from 90deg, color1, color2)
+
+// 120deg = Diagonal variation
+linear-gradient(from 120deg, color1, color2)
+
+// 135deg = Diagonal Top-Right to Bottom-Left (↙)
+linear-gradient(from 135deg, color1, color2)
+
+// 180deg = Bottom to Top (↑)
+linear-gradient(from 180deg, color1, color2)
+
+/* ============================================
+   CUSTOMIZATION TIPS
+   ============================================ */
+
+// 1. Add your own button color variant:
+.button-custom {
+    -fx-background-color: linear-gradient(from 90deg, #yourColor1, #yourColor2);
+    -fx-border-color: #yourBorderColor;
+    -fx-border-width: 2px;
+}
+
+.button-custom:hover {
+    -fx-background-color: linear-gradient(from 90deg, #lighterColor1, #lighterColor2);
+}
+
+.button-custom:pressed {
+    -fx-background-color: linear-gradient(from 270deg, #yourColor2, #yourColor1);
+}
+
+// 2. Adjust hover scale:
+.button:hover {
+    -fx-scale-x: 1.1;  /* More dramatic scaling */
+    -fx-scale-y: 1.1;
+}
+
+// 3. Change transition speed:
+.button {
+    -fx-transition: all 0.5s ease;  /* Slower transition */
+}
+
+// 4. Modify shadow intensity:
+.button:hover {
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.7), 15, 0, 0, 8);
+    /* Darker, larger shadow */
+}
+
+/* ============================================
+   OTHER STYLES AVAILABLE
+   ============================================ */
+
+// Title labels:
+styleClass="title-label"
+// 48px, bold, white, with drop shadow
+
+// Subtitle labels:
+styleClass="subtitle-label"
+// 18px, light gray (#e0e0e0)
+
+// Text fields (automatically styled):
+// White background, blue border on focus, shadow effects
+
+/* ============================================
+   TESTING CHECKLIST
+   ============================================ */
+
+✓ Hover effect - buttons scale up
+✓ Hover shadow - shadow becomes stronger
+✓ Click effect - buttons shrink and move down
+✓ Click shadow - inner shadow appears
+✓ Gradients - colors smoothly transition
+✓ Smooth animations - no jerky movements
+✓ Border highlights - visible on all buttons
+✓ Color contrast - text readable on all backgrounds

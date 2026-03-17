@@ -16,7 +16,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Ellipse;
 import javafx.scene.shape.Line;
-import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
@@ -39,25 +38,20 @@ public class GrassEffects {
         this.battleField = battleField;
     }
 
-    // -----------------------------------------------------------------
     // Public API – single-point overload (melee / contact moves)
-    // -----------------------------------------------------------------
 
-    public void createImpactEffect(double x, double y, String moveName,
-                                   int movePower, Timeline timeline) {
+    public void createImpactEffect(double x, double y, String moveName, int movePower, Timeline timeline) {
         createImpactEffect(x, y, x, y, moveName, movePower, timeline);
     }
 
-    // -----------------------------------------------------------------
     // Public API – full signature (all grass moves)
-    // -----------------------------------------------------------------
 
     public void createImpactEffect(double startX, double startY,
                                    double endX, double endY,
                                    String moveName, int movePower,
                                    Timeline timeline) {
 
-        double intensity = clamp(movePower / 100.0, 0.4, 1.8);
+        double intensity = clamp(movePower / 100.0, 0.8, 2.4);
 
         switch (moveName) {
             // Whip / vine melee
@@ -87,15 +81,13 @@ public class GrassEffects {
         }
     }
 
-    // -----------------------------------------------------------------
     // Public API – ranged lead effect
-    // -----------------------------------------------------------------
 
     public void createRangedEffect(double startX, double startY,
                                    double endX, double endY,
                                    String moveName, int movePower,
                                    Timeline timeline) {
-        double intensity = clamp(movePower / 100.0, 0.4, 1.8);
+        double intensity = clamp(movePower / 100.0, 0.8, 2.4);
         switch (moveName) {
             case "solar-beam"     -> addSolarBeam(startX, startY, endX, endY, intensity, timeline);
             case "energy-ball", "seed-flare" ->
@@ -106,19 +98,16 @@ public class GrassEffects {
         }
     }
 
-    // =================================================================
     // Vine whip – long lashing vines
-    // =================================================================
 
-    private void addVineWhip(double sx, double sy, double ex, double ey,
-                             double intensity, Timeline timeline) {
-        int vineCount = (int) (2 + intensity);
+    private void addVineWhip(double sx, double sy, double ex, double ey, double intensity, Timeline timeline) {
+        int vineCount = (int) (8 + intensity);
         for (int v = 0; v < vineCount; v++) {
-            double offY = (v - (vineCount - 1) / 2.0) * 8;
+            double offY = (v - (vineCount - 1) / 1.2) * 8;
 
             Line vine = new Line(sx, sy + offY, sx, sy + offY);
             vine.setStroke(v % 2 == 0 ? GRASS_GREEN : GRASS_LIGHT);
-            vine.setStrokeWidth(3 + 1.5 * intensity);
+            vine.setStrokeWidth(6 + 1.5 * intensity);
             vine.setEffect(new DropShadow(6 + 2 * intensity, GRASS_DARK));
             vine.setOpacity(0);
             prepareTransientNode(vine);
@@ -139,18 +128,16 @@ public class GrassEffects {
 
         // Leaf particles at impact
         addLeafParticles(ex, ey, intensity, vineCount * 35 + 120, timeline);
-        addGrassFlash(ex, ey, 14 + 10 * intensity, GRASS_LIGHT, vineCount * 35 + 160, 180, timeline);
+        addGrassFlash(ex, ey, 20 + 10 * intensity, GRASS_LIGHT, vineCount * 35 + 160, 180, timeline);
     }
 
-    // =================================================================
     // Wood hammer – heavy wooden slam with bark debris
-    // =================================================================
 
     private void addWoodHammer(double x, double y, double intensity, Timeline timeline) {
         // Shockwave ring from slam
         Circle ring = new Circle(0, Color.TRANSPARENT);
         ring.setStroke(GRASS_BROWN.deriveColor(0, 1, 1, 0.7));
-        ring.setStrokeWidth(4 + 1.5 * intensity);
+        ring.setStrokeWidth(8 + 1.5 * intensity);
         ring.setCenterX(x);
         ring.setCenterY(y);
         ring.setEffect(new GaussianBlur(5));
@@ -158,7 +145,7 @@ public class GrassEffects {
         prepareTransientNode(ring);
         battleField.getChildren().add(ring);
 
-        double ringR = 32 + 20 * intensity;
+        double ringR = 35 + 20 * intensity;
         KeyFrame rAppear = new KeyFrame(Duration.millis(0),
                 new KeyValue(ring.opacityProperty(), 0.85));
         KeyFrame rExpand = new KeyFrame(Duration.millis(200),
@@ -172,11 +159,11 @@ public class GrassEffects {
         registerCleanup(timeline, ring);
 
         // Bark/wood debris
-        int debrisCount = (int) (6 + 4 * intensity);
+        int debrisCount = (int) (16 + 4 * intensity);
         for (int i = 0; i < debrisCount; i++) {
             Rectangle bark = new Rectangle(
-                    4 + random.nextDouble() * 6 * intensity,
-                    3 + random.nextDouble() * 4 * intensity);
+                    9 + random.nextDouble() * 6 * intensity,
+                    8 + random.nextDouble() * 4 * intensity);
             bark.setFill(i % 2 == 0 ? GRASS_BROWN : GRASS_DARK);
             bark.setX(x - bark.getWidth() / 2);
             bark.setY(y - bark.getHeight() / 2);
@@ -202,12 +189,10 @@ public class GrassEffects {
             registerCleanup(timeline, bark);
         }
 
-        addGrassFlash(x, y, 22 + 12 * intensity, GRASS_LIGHT, 0, 200, timeline);
+        addGrassFlash(x, y, 28 + 12 * intensity, GRASS_LIGHT, 0, 200, timeline);
     }
 
-    // =================================================================
     // Leaf slash / leaf blade – sharp leaf cuts
-    // =================================================================
 
     private void addLeafSlash(double sx, double sy, double ex, double ey,
                               double intensity, Timeline timeline) {
@@ -215,13 +200,13 @@ public class GrassEffects {
         double dy = ey - sy;
 
         // Leaf trail along approach
-        int trailCount = (int) (5 + 4 * intensity);
+        int trailCount = (int) (15 + 4 * intensity);
         for (int i = 0; i < trailCount; i++) {
             double t = (i + 0.5) / trailCount;
             double tx = sx + dx * t + (random.nextDouble() - 0.5) * 14;
             double ty = sy + dy * t + (random.nextDouble() - 0.5) * 14;
 
-            Ellipse leaf = new Ellipse(4 + random.nextDouble() * 3, 8 + random.nextDouble() * 5);
+            Ellipse leaf = new Ellipse(9 + random.nextDouble() * 3, 13 + random.nextDouble() * 5);
             leaf.setFill((i % 2 == 0 ? GRASS_GREEN : GRASS_LIGHT).deriveColor(0, 1, 1, 0.7));
             leaf.setEffect(new GaussianBlur(2));
             leaf.setCenterX(tx);
@@ -244,7 +229,7 @@ public class GrassEffects {
         }
 
         // Slash marks at impact
-        int slashCount = (int) (2 + 2 * intensity);
+        int slashCount = (int) (10 + 2 * intensity);
         for (int i = 0; i < slashCount; i++) {
             double angle = -45 + i * (90.0 / Math.max(slashCount - 1, 1));
             double rad = Math.toRadians(angle);
@@ -256,7 +241,7 @@ public class GrassEffects {
                     ex + Math.cos(rad) * slashLen * 0.5,
                     ey + Math.sin(rad) * slashLen * 0.5);
             slash.setStroke(i % 2 == 0 ? GRASS_LIGHT : GRASS_GREEN);
-            slash.setStrokeWidth(3 + intensity);
+            slash.setStrokeWidth(5 + intensity);
             slash.setOpacity(0);
             slash.setEffect(new DropShadow(8 + 3 * intensity, GRASS_GREEN));
             prepareTransientNode(slash);
@@ -275,21 +260,19 @@ public class GrassEffects {
             registerCleanup(timeline, slash);
         }
 
-        addGrassFlash(ex, ey, 15 + 10 * intensity, GRASS_FRESH, 90, 200, timeline);
+        addGrassFlash(ex, ey, 20 + 10 * intensity, GRASS_FRESH, 90, 200, timeline);
     }
 
-    // =================================================================
     // Razor leaf – spinning sharp leaves flying to target
-    // =================================================================
 
     private void addRazorLeaf(double sx, double sy, double ex, double ey,
                               double intensity, Timeline timeline) {
-        int leafCount = (int) (4 + 4 * intensity);
+        int leafCount = (int) (14 + 4 * intensity);
         for (int i = 0; i < leafCount; i++) {
-            Ellipse leaf = new Ellipse(5 + random.nextDouble() * 4, 10 + random.nextDouble() * 6);
+            Ellipse leaf = new Ellipse(10 + random.nextDouble() * 4, 15 + random.nextDouble() * 6);
             leaf.setFill((i % 2 == 0 ? GRASS_GREEN : GRASS_LIGHT).deriveColor(0, 1, 1, 0.85));
             leaf.setStroke(GRASS_DARK.deriveColor(0, 1, 1, 0.4));
-            leaf.setStrokeWidth(0.8);
+            leaf.setStrokeWidth(1.2);
             leaf.setCenterX(sx + (random.nextDouble() - 0.5) * 14);
             leaf.setCenterY(sy + (random.nextDouble() - 0.5) * 14);
             leaf.setRotate(random.nextDouble() * 360);
@@ -314,18 +297,16 @@ public class GrassEffects {
             registerCleanup(timeline, leaf);
         }
 
-        addGrassFlash(ex, ey, 14 + 8 * intensity, GRASS_LIGHT, leafCount * 45, 180, timeline);
+        addGrassFlash(ex, ey, 20 + 8 * intensity, GRASS_LIGHT, leafCount * 45, 180, timeline);
     }
 
-    // =================================================================
     // Bullet seed – rapid-fire seed pellets
-    // =================================================================
 
     private void addBulletSeed(double sx, double sy, double ex, double ey,
                                double intensity, Timeline timeline) {
-        int seedCount = (int) (4 + 4 * intensity);
+        int seedCount = (int) (14 + 4 * intensity);
         for (int i = 0; i < seedCount; i++) {
-            Circle seed = new Circle(4 + random.nextDouble() * 2.5, GRASS_YELLOW);
+            Circle seed = new Circle(8 + random.nextDouble() * 2.5, GRASS_YELLOW);
             seed.setStroke(GRASS_GREEN.deriveColor(0, 1, 1, 0.5));
             seed.setStrokeWidth(1);
             seed.setEffect(new DropShadow(5, GRASS_DARK));
@@ -351,16 +332,14 @@ public class GrassEffects {
             registerCleanup(timeline, seed);
         }
 
-        addGrassFlash(ex, ey, 12 + 8 * intensity, GRASS_YELLOW, seedCount * 50, 180, timeline);
+        addGrassFlash(ex, ey, 20 + 8 * intensity, GRASS_YELLOW, seedCount * 50, 180, timeline);
     }
 
-    // =================================================================
     // Seed bomb – large bouncing seed that explodes on impact
-    // =================================================================
 
     private void addSeedBomb(double sx, double sy, double ex, double ey,
                              double intensity, Timeline timeline) {
-        Circle bomb = new Circle(10 + 4 * intensity, GRASS_DARK);
+        Circle bomb = new Circle(15 + 4 * intensity, GRASS_DARK);
         bomb.setStroke(GRASS_GREEN);
         bomb.setStrokeWidth(2.5);
         bomb.setEffect(new DropShadow(10, GRASS_DARK));
@@ -389,21 +368,19 @@ public class GrassEffects {
         registerCleanup(timeline, bomb);
 
         addLeafParticles(ex, ey, intensity, 280, timeline);
-        addGrassFlash(ex, ey, 20 + 12 * intensity, GRASS_LIGHT, 280, 200, timeline);
+        addGrassFlash(ex, ey, 25 + 12 * intensity, GRASS_LIGHT, 280, 200, timeline);
     }
 
-    // =================================================================
     // Petal blizzard – storm of petals from all directions
-    // =================================================================
 
     private void addPetalBlizzard(double sx, double sy, double ex, double ey,
                                   double intensity, Timeline timeline) {
-        int count = (int) (10 + 7 * intensity);
+        int count = (int) (18 + 7 * intensity);
         for (int i = 0; i < count; i++) {
             double angle = (i / (double) count) * 2 * Math.PI;
             double startR = 46 + 14 * intensity;
 
-            Ellipse petal = new Ellipse(4 + random.nextDouble() * 3, 8 + random.nextDouble() * 5);
+            Ellipse petal = new Ellipse(9 + random.nextDouble() * 3, 14 + random.nextDouble() * 5);
             petal.setFill((i % 3 == 0 ? GRASS_FRESH : i % 3 == 1 ? GRASS_LIGHT : GRASS_LIME)
                     .deriveColor(0, 1, 1, 0.8));
             petal.setCenterX(ex + Math.cos(angle) * startR);
@@ -427,20 +404,18 @@ public class GrassEffects {
             registerCleanup(timeline, petal);
         }
 
-        addGrassFlash(ex, ey, 18 + 10 * intensity, GRASS_FRESH, count * 22 / 2, 200, timeline);
+        addGrassFlash(ex, ey, 22 + 10 * intensity, GRASS_FRESH, count * 22 / 2, 200, timeline);
     }
 
-    // =================================================================
     // Energy ball – green orb hurled at target
-    // =================================================================
 
     private void addEnergyBall(double sx, double sy, double ex, double ey,
                                double intensity, Timeline timeline) {
-        double orbRadius = 13 + 6 * intensity;
+        double orbRadius = 17 + 6 * intensity;
 
         Circle orb = new Circle(orbRadius, GRASS_TEAL.deriveColor(0, 1, 1, 0.85));
         orb.setStroke(GRASS_LIGHT);
-        orb.setStrokeWidth(2.5);
+        orb.setStrokeWidth(3.5);
         orb.setEffect(new DropShadow(18 + 7 * intensity, GRASS_GREEN));
         orb.setCenterX(sx);
         orb.setCenterY(sy);
@@ -448,7 +423,7 @@ public class GrassEffects {
         prepareTransientNode(orb);
         battleField.getChildren().add(orb);
 
-        Circle glow = new Circle(orbRadius * 0.5, GRASS_FRESH.deriveColor(0, 1, 1, 0.65));
+        Circle glow = new Circle(orbRadius * 0.75, GRASS_FRESH.deriveColor(0, 1, 1, 0.65));
         glow.setEffect(new GaussianBlur(5));
         glow.setCenterX(sx);
         glow.setCenterY(sy);
@@ -484,13 +459,11 @@ public class GrassEffects {
         addLeafParticles(ex, ey, intensity, 280, timeline);
     }
 
-    // =================================================================
     // Leaf storm – a spiralling storm of leaves
-    // =================================================================
 
     private void addLeafStorm(double sx, double sy, double ex, double ey,
                               double intensity, Timeline timeline) {
-        int count = (int) (10 + 7 * intensity);
+        int count = (int) (20 + 7 * intensity);
         double dx = ex - sx;
         double dy = ey - sy;
 
@@ -502,7 +475,7 @@ public class GrassEffects {
             double px = sx + dx * t + Math.cos(angle) * spiralR;
             double py = sy + dy * t + Math.sin(angle) * spiralR;
 
-            Ellipse leaf = new Ellipse(4 + random.nextDouble() * 3, 9 + random.nextDouble() * 5);
+            Ellipse leaf = new Ellipse(10 + random.nextDouble() * 3, 15 + random.nextDouble() * 5);
             leaf.setFill((i % 2 == 0 ? GRASS_GREEN : GRASS_LIGHT).deriveColor(0, 1, 1, 0.8));
             leaf.setEffect(new GaussianBlur(2));
             leaf.setCenterX(px);
@@ -523,12 +496,10 @@ public class GrassEffects {
             registerCleanup(timeline, leaf);
         }
 
-        addGrassFlash(ex, ey, 20 + 12 * intensity, GRASS_LIME, count / 2 * 22, 200, timeline);
+        addGrassFlash(ex, ey, 25 + 12 * intensity, GRASS_LIME, count / 2 * 22, 200, timeline);
     }
 
-    // =================================================================
     // Solar beam – charging bright beam
-    // =================================================================
 
     private void addSolarBeam(double sx, double sy, double ex, double ey,
                               double intensity, Timeline timeline) {
@@ -553,7 +524,7 @@ public class GrassEffects {
         // Bright beam lancing forward
         Line beam = new Line(sx, sy, sx, sy);
         beam.setStroke(GRASS_YELLOW.deriveColor(0, 1, 1, 0.9));
-        beam.setStrokeWidth(8 + 3 * intensity);
+        beam.setStrokeWidth(12 + 3 * intensity);
         beam.setEffect(new DropShadow(18 + 7 * intensity, GRASS_LIGHT));
         beam.setOpacity(0);
         prepareTransientNode(beam);
@@ -561,7 +532,7 @@ public class GrassEffects {
 
         Line core = new Line(sx, sy, sx, sy);
         core.setStroke(Color.WHITE);
-        core.setStrokeWidth(4 + intensity);
+        core.setStrokeWidth(8 + intensity);
         core.setEffect(new GaussianBlur(2));
         core.setOpacity(0);
         prepareTransientNode(core);
@@ -583,15 +554,13 @@ public class GrassEffects {
         registerCleanup(timeline, beam);
         registerCleanup(timeline, core);
 
-        addGrassFlash(ex, ey, 26 + 14 * intensity, GRASS_YELLOW, 200, 220, timeline);
+        addGrassFlash(ex, ey, 30 + 14 * intensity, GRASS_YELLOW, 200, 220, timeline);
     }
 
-    // =================================================================
     // Frenzy plant – roots erupting from the ground
-    // =================================================================
 
     private void addFrenzyPlant(double x, double y, double intensity, Timeline timeline) {
-        int rootCount = (int) (4 + 3 * intensity);
+        int rootCount = (int) (14 + 3 * intensity);
         for (int i = 0; i < rootCount; i++) {
             double angle = -60 + (i / (double) (rootCount - 1)) * 120;
             double rad = Math.toRadians(angle);
@@ -599,7 +568,7 @@ public class GrassEffects {
 
             Line root = new Line(x, y + 10, x, y + 10);
             root.setStroke(i % 2 == 0 ? GRASS_BROWN : GRASS_DARK);
-            root.setStrokeWidth(4 + 1.5 * intensity);
+            root.setStrokeWidth(8 + 1.5 * intensity);
             root.setEffect(new DropShadow(6 + 2 * intensity, GRASS_DARK));
             root.setOpacity(0);
             prepareTransientNode(root);
@@ -622,7 +591,7 @@ public class GrassEffects {
         Ellipse crack = new Ellipse(0, 0);
         crack.setFill(Color.TRANSPARENT);
         crack.setStroke(GRASS_BROWN.deriveColor(0, 1, 1, 0.65));
-        crack.setStrokeWidth(3 + intensity);
+        crack.setStrokeWidth(6 + intensity);
         crack.setEffect(new GaussianBlur(3));
         crack.setCenterX(x);
         crack.setCenterY(y + 10);
@@ -644,27 +613,23 @@ public class GrassEffects {
         timeline.getKeyFrames().addAll(cAppear, cExpand, cFade);
         registerCleanup(timeline, crack);
 
-        addGrassFlash(x, y, 22 + 14 * intensity, GRASS_GREEN, 0, 200, timeline);
+        addGrassFlash(x, y, 26 + 14 * intensity, GRASS_GREEN, 0, 200, timeline);
     }
 
-    // =================================================================
     // Default grass burst – leaf particles + flash
-    // =================================================================
 
     private void addDefaultGrassBurst(double x, double y, double intensity, Timeline timeline) {
         addLeafParticles(x, y, intensity, 0, timeline);
-        addGrassFlash(x, y, 16 + 10 * intensity, GRASS_FRESH, 0, 200, timeline);
+        addGrassFlash(x, y, 22 + 10 * intensity, GRASS_FRESH, 0, 200, timeline);
     }
 
-    // =================================================================
     // Shared helpers – leaf particles
-    // =================================================================
 
     private void addLeafParticles(double x, double y, double intensity,
                                   int startDelay, Timeline timeline) {
-        int count = (int) (6 + 5 * intensity);
+        int count = (int) (16 + 5 * intensity);
         for (int i = 0; i < count; i++) {
-            Ellipse leaf = new Ellipse(3 + random.nextDouble() * 3, 7 + random.nextDouble() * 5);
+            Ellipse leaf = new Ellipse(8 + random.nextDouble() * 3, 14 + random.nextDouble() * 5);
             leaf.setFill((i % 2 == 0 ? GRASS_GREEN : GRASS_LIGHT).deriveColor(0, 1, 1, 0.7));
             leaf.setEffect(new GaussianBlur(2));
             double angle = random.nextDouble() * 2 * Math.PI;
@@ -691,12 +656,9 @@ public class GrassEffects {
         }
     }
 
-    // =================================================================
     // Flash circle helper
-    // =================================================================
 
-    private void addGrassFlash(double x, double y, double radius, Color color,
-                               int startDelay, int fadeDuration, Timeline timeline) {
+    private void addGrassFlash(double x, double y, double radius, Color color, int startDelay, int fadeDuration, Timeline timeline) {
         Circle flash = new Circle(0, color.deriveColor(0, 1, 1, 0.7));
         flash.setCenterX(x);
         flash.setCenterY(y);
@@ -714,9 +676,7 @@ public class GrassEffects {
         registerCleanup(timeline, flash);
     }
 
-    // =================================================================
     // Utilities
-    // =================================================================
 
     private double clamp(double v, double min, double max) {
         return Math.max(min, Math.min(max, v));

@@ -34,7 +34,7 @@
     -fx-text-fill: #b8f0f5;
     -fx-alignment: center;
     -fx-wrap-text: true;
-    -fx-min-height: USE_PREF_SIZE;
+    -fx-min-height: -1;
 }
 
 .field-label {
