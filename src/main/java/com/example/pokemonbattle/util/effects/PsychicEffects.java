@@ -16,14 +16,11 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.CycleMethod;
-import javafx.scene.paint.LinearGradient;
-import javafx.scene.paint.Stop;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Ellipse;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Polygon;
-import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.StrokeLineCap;
 import javafx.util.Duration;
 
 public class PsychicEffects {
@@ -154,17 +151,15 @@ public class PsychicEffects {
         double dy = ey - sy;
         double distance = Math.hypot(dx, dy);
         if (distance < 1) return;
-        double angle = Math.toDegrees(Math.atan2(dy, dx));
 
         Color[] beamColors = { PSY_PINK, PSY_PURPLE, PSY_CYAN, PSY_INDIGO, PSY_LIGHT };
 
-        // Outer glow
+        // Outer glow line stays anchored to attacker while extending to defender.
         double glowH = 28 + 8 * intensity;
-        Rectangle glow = new Rectangle(0, glowH);
-        glow.setFill(PSY_PURPLE.deriveColor(0, 1, 1, 0.25));
-        glow.setArcWidth(glowH); glow.setArcHeight(glowH);
-        glow.setX(sx); glow.setY(sy - glowH / 2);
-        glow.setRotate(angle);
+        Line glow = new Line(sx, sy, sx, sy);
+        glow.setStroke(PSY_PURPLE.deriveColor(0, 1, 1, 0.25));
+        glow.setStrokeWidth(glowH);
+        glow.setStrokeLineCap(StrokeLineCap.ROUND);
         glow.setEffect(new GaussianBlur(glowH * 0.45));
         glow.setOpacity(0);
         prepareTransientNode(glow);
@@ -179,13 +174,14 @@ public class PsychicEffects {
         for (int b = 0; b < beamColors.length; b++) {
             double offset = (b - 2) * (2.5 + intensity);
             double stripH = 6 + 2 * intensity;
-            Rectangle strip = new Rectangle(0, stripH);
-            strip.setFill(beamColors[b].deriveColor(0, 1, 1, 0.75));
-            strip.setArcWidth(stripH); strip.setArcHeight(stripH);
-            // Offset the strip perpendicular to beam direction
-            strip.setX(sx + px * offset);
-            strip.setY(sy + py * offset - stripH / 2);
-            strip.setRotate(angle);
+            Line strip = new Line(
+                    sx + px * offset,
+                    sy + py * offset,
+                    sx + px * offset,
+                    sy + py * offset);
+            strip.setStroke(beamColors[b].deriveColor(0, 1, 1, 0.75));
+            strip.setStrokeWidth(stripH);
+            strip.setStrokeLineCap(StrokeLineCap.ROUND);
             strip.setEffect(new GaussianBlur(4 + intensity));
             strip.setOpacity(0);
             prepareTransientNode(strip);
@@ -196,7 +192,8 @@ public class PsychicEffects {
                     new KeyFrame(Duration.millis(beamDelay),
                             new KeyValue(strip.opacityProperty(), 0.85)),
                     new KeyFrame(Duration.millis(beamDelay + 220),
-                            new KeyValue(strip.widthProperty(), distance)),
+                            new KeyValue(strip.endXProperty(), ex + px * offset),
+                            new KeyValue(strip.endYProperty(), ey + py * offset)),
                     new KeyFrame(Duration.millis(beamDelay + 320),
                             new KeyValue(strip.opacityProperty(), 0.7)),
                     new KeyFrame(Duration.millis(beamDelay + 420),
@@ -207,7 +204,9 @@ public class PsychicEffects {
         // Glow extends with slight delay
         timeline.getKeyFrames().addAll(
                 new KeyFrame(Duration.millis(10),  new KeyValue(glow.opacityProperty(), 0.7)),
-                new KeyFrame(Duration.millis(220), new KeyValue(glow.widthProperty(), distance)),
+                new KeyFrame(Duration.millis(220),
+                        new KeyValue(glow.endXProperty(), ex),
+                        new KeyValue(glow.endYProperty(), ey)),
                 new KeyFrame(Duration.millis(420), new KeyValue(glow.opacityProperty(), 0)));
         registerCleanup(timeline, glow);
 
