@@ -26,7 +26,7 @@ import javafx.scene.media.MediaPlayer;
 
 public final class MediaCache {
     private static final String BASE = "/com/example/pokemonbattle/assets/";
-    private static final String[] IMAGE_ASSETS = { "wc_bg.png", "menu1.png", "new_game.png", "fight.png", "battle2.jpg"};
+    private static final String[] IMAGE_ASSETS = { "wc_bg.png", "menu1.png", "new_game.png", "fight.png", "battle2.jpg", "fang.gif", "feet.png"};
     private static final String[] MEDIA_ASSETS = { "intro.mp4", "start.mp4", "Pikachu.mp4" };
 
     public record GifFrameData(WritableImage[] frames, long[] delaysMs) {
@@ -114,6 +114,18 @@ public final class MediaCache {
             System.err.println("[MediaCache] Not found on classpath: " + name);
             return null;
         }
+
+        if (name.toLowerCase().endsWith(".gif")) {
+            GifFrameData gif = getGifFrames(name);
+            if (gif != null && !gif.isEmpty() && gif.frames()[0] != null) {
+                Image firstFrame = gif.frames()[0];
+                IMAGE_CACHE.put(name, firstFrame);
+                System.out.printf("[MediaCache] Loaded GIF first frame: %-25s  %.0f×%.0f%n",
+                        name, firstFrame.getWidth(), firstFrame.getHeight());
+                return firstFrame;
+            }
+        }
+
         Image img = new Image(url.toExternalForm());
         if (img.isError()) {
             System.err.println("[MediaCache] Decode error: " + name);

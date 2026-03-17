@@ -1,8 +1,9 @@
 // FireEffects.java
 package com.example.pokemonbattle.util.effects;
 
-import com.example.pokemonbattle.util.MediaCache;
 import java.util.Random;
+
+import com.example.pokemonbattle.util.MediaCache;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -1265,6 +1266,7 @@ public class FireEffects {
                         imageView.setFitWidth(width);
                         imageView.setFitHeight(height);
                         imageView.setPreserveRatio(true);
+                        imageView.setSmooth(true);
                         imageView.setLayoutX(x - width / 2.0);
                         imageView.setLayoutY(y - height / 2.0);
                         imageView.setOpacity(0);
@@ -1280,7 +1282,8 @@ public class FireEffects {
                         KeyFrame settle = new KeyFrame(Duration.millis(115),
                                 new KeyValue(imageView.scaleXProperty(), 1.0),
                                 new KeyValue(imageView.scaleYProperty(), 1.0));
-                        KeyFrame fade = new KeyFrame(Duration.millis(330),
+                        long fadeMs = (FANG_ASSET.equals(assetName) || FEET_ASSET.equals(assetName)) ? 560L : 330L;
+                        KeyFrame fade = new KeyFrame(Duration.millis(fadeMs),
                                 new KeyValue(imageView.opacityProperty(), 0.0));
 
                         timeline.getKeyFrames().addAll(appear, settle, fade);

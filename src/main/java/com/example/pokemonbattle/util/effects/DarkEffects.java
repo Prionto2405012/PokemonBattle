@@ -1,8 +1,9 @@
 // DarkEffects.java
 package com.example.pokemonbattle.util.effects;
 
-import com.example.pokemonbattle.util.MediaCache;
 import java.util.Random;
+
+import com.example.pokemonbattle.util.MediaCache;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -593,6 +594,7 @@ public class DarkEffects {
                         imageView.setFitWidth(190);
                         imageView.setFitHeight(190);
                         imageView.setPreserveRatio(true);
+                        imageView.setSmooth(true);
                         imageView.setLayoutX(x - 95);
                         imageView.setLayoutY(y - 108);
                         imageView.setOpacity(0);
@@ -608,7 +610,7 @@ public class DarkEffects {
                         KeyFrame settle = new KeyFrame(Duration.millis(115),
                                 new KeyValue(imageView.scaleXProperty(), 1.0),
                                 new KeyValue(imageView.scaleYProperty(), 1.0));
-                        KeyFrame fade = new KeyFrame(Duration.millis(330),
+                        KeyFrame fade = new KeyFrame(Duration.millis(560),
                                 new KeyValue(imageView.opacityProperty(), 0.0));
 
                         timeline.getKeyFrames().addAll(appear, settle, fade);

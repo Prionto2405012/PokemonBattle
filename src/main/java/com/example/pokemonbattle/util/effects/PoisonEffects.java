@@ -519,6 +519,7 @@ public class PoisonEffects {
                         imageView.setFitWidth(200);
                         imageView.setFitHeight(200);
                         imageView.setPreserveRatio(true);
+                        imageView.setSmooth(true);
                         imageView.setLayoutX(x - 100);
                         imageView.setLayoutY(y - 100);
                         imageView.setOpacity(0);
@@ -534,7 +535,7 @@ public class PoisonEffects {
                         KeyFrame settle = new KeyFrame(Duration.millis(115),
                                 new KeyValue(imageView.scaleXProperty(), 1.0),
                                 new KeyValue(imageView.scaleYProperty(), 1.0));
-                        KeyFrame fade = new KeyFrame(Duration.millis(330),
+                        KeyFrame fade = new KeyFrame(Duration.millis(560),
                                 new KeyValue(imageView.opacityProperty(), 0.0));
 
                         timeline.getKeyFrames().addAll(appear, settle, fade);
