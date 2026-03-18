@@ -28,23 +28,22 @@
                mouseTransparent="true"/>
 
     <!-- Progress UI anchored near bottom -->
-    <VBox fx:id="progressContainer" alignment="CENTER" spacing="10" translateY="280" styleClass="progress-container">
+    <VBox alignment="CENTER" spacing="10" translateY="280">
 
         <!-- Track + Fill -->
         <StackPane prefWidth="500" prefHeight="10">
             <!-- Background track -->
             <Rectangle width="500" height="10" arcWidth="10" arcHeight="10"
-                       styleClass="progress-track"/>
+                       style="-fx-fill: rgba(255,255,255,0.25);"/>
             <!-- Animated fill -->
             <Rectangle fx:id="progressFill" width="0" height="10"
-                       StackPane.alignment="CENTER_LEFT"
                        arcWidth="10" arcHeight="10"
-                       styleClass="progress-fill"/>
+                       style="-fx-fill: #ffcb05;"/>
         </StackPane>
 
         <!-- Percentage label -->
         <Label fx:id="loadingLabel" text="Loading... 0%"
-               styleClass="loading-text"/>
+               style="-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold;"/>
 
     </VBox>
 

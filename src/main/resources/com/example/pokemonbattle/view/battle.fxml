@@ -209,9 +209,7 @@
             AnchorPane.rightAnchor="0" />
     </AnchorPane>
 
-    <!-- ============================================================ -->
     <!-- FORCED SWITCH OVERLAY — shown when player's pokemon faints   -->
-    <!-- ============================================================ -->
     <StackPane fx:id="forcedSwitchOverlay" visible="false" managed="false"
         style="-fx-background-color: rgba(0,0,0,0.72);"
         StackPane.alignment="CENTER">
