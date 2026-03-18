@@ -1,6 +1,7 @@
 package com.example.pokemonbattle.controller;
 
 import com.example.pokemonbattle.util.MusicManager;
+import com.example.pokemonbattle.util.PokeballOverlay;
 import com.example.pokemonbattle.util.SceneManager;
 
 import javafx.animation.Interpolator;
@@ -24,7 +25,9 @@ public class LoadingScreenController {
     @FXML private Label loadingLabel;
 
     private MediaPlayer mediaPlayer;
+    private PokeballOverlay fallbackPokeball;
     private Timeline progressTimeline;
+    private static final String PRIMARY_LOADING_VIDEO = "Pikachu.mp4";
 
     // Total loading duration in milliseconds
     private static final double LOAD_DURATION_MS = 3000.0;
@@ -41,22 +44,71 @@ public class LoadingScreenController {
     }
 
     private void setupVideo() {
-        mediaPlayer = com.example.pokemonbattle.util.MediaCache.claimMediaPlayer("Pikachu.mp4");
-
+        mediaPlayer = claimPrimaryLoadingVideoPlayer();
         if (mediaPlayer == null) {
-            System.err.println("LoadingScreenController: Pikachu.mp4 player unavailable.");
+            System.err.println("LoadingScreenController: Pikachu loading video unavailable. Falling back to pokeball overlay.");
+            enablePokeballFallback();
             return;
         }
-        mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
-        bgVideo.setMediaPlayer(mediaPlayer);
+        final MediaPlayer activePlayer = mediaPlayer;
+        activePlayer.setCycleCount(MediaPlayer.INDEFINITE);
+        bgVideo.setMediaPlayer(activePlayer);
         bgVideo.fitWidthProperty().bind(rootPane.widthProperty());
         bgVideo.fitHeightProperty().bind(rootPane.heightProperty());
         bgVideo.setPreserveRatio(false);
-        mediaPlayer.setOnReady(() -> {
-            if (mediaPlayer.getStatus() != MediaPlayer.Status.PLAYING) {
-                mediaPlayer.play();
+        activePlayer.setOnReady(() -> {
+            if (activePlayer.getStatus() != MediaPlayer.Status.PLAYING) {
+                activePlayer.play();
             }
         });
+        activePlayer.setOnError(() -> {
+            Throwable error = activePlayer.getError();
+            System.err.println("LoadingScreenController: " + PRIMARY_LOADING_VIDEO + " failed: "
+                    + (error != null ? error.getMessage() : "unknown"));
+            if (mediaPlayer == activePlayer) {
+                try {
+                    activePlayer.stop();
+                    activePlayer.dispose();
+                } catch (Exception ignored) {
+                }
+                mediaPlayer = null;
+            }
+            enablePokeballFallback();
+        });
+        if (activePlayer.getStatus() == MediaPlayer.Status.READY
+                && activePlayer.getStatus() != MediaPlayer.Status.PLAYING) {
+            activePlayer.play();
+        }
+    }
+
+    private MediaPlayer claimPrimaryLoadingVideoPlayer() {
+        MediaPlayer primary = com.example.pokemonbattle.util.MediaCache.claimMediaPlayer(PRIMARY_LOADING_VIDEO);
+        if (primary == null || primary.getError() != null) return null;
+        return primary;
+    }
+
+    private void enablePokeballFallback() {
+        if (fallbackPokeball != null || rootPane == null) {
+            return;
+        }
+        bgVideo.setMediaPlayer(null);
+        fallbackPokeball = PokeballOverlay.showOn(rootPane);
+        fallbackPokeball.toFront();
+
+        if (progressFill != null && progressFill.getParent() != null) {
+            progressFill.getParent().toFront();
+        }
+        if (loadingLabel != null) {
+            loadingLabel.toFront();
+        }
+    }
+
+    private void clearFallbackPokeball() {
+        if (fallbackPokeball == null || rootPane == null) {
+            return;
+        }
+        PokeballOverlay.hideFrom(rootPane, fallbackPokeball, null);
+        fallbackPokeball = null;
     }
 
     private void setupProgressBar() {
@@ -96,6 +148,7 @@ public class LoadingScreenController {
             mediaPlayer.dispose();
             mediaPlayer = null;
         }
+        clearFallbackPokeball();
         SceneManager.switchScene("menu.fxml", "Pokemon Battle - Menu", 1200, 700);
     }
 
@@ -118,6 +171,7 @@ public class LoadingScreenController {
                 mediaPlayer.dispose();
                 mediaPlayer = null;
             }
+            clearFallbackPokeball();
             if (onSuccess != null) {
                 onSuccess.run();
             }

@@ -29,6 +29,9 @@ public class StartController {
     @FXML private Region vignetteOverlay;
     private MediaPlayer mediaPlayer;
 
+    private static final Duration START_OVERLAY_MIN_HOLD = Duration.millis(450);
+    private static final Duration START_OVERLAY_MAX_WAIT = Duration.seconds(12);
+
     @FXML
     public void initialize() {
         if (vignetteOverlay != null && rootPane != null) {
@@ -65,18 +68,53 @@ public class StartController {
             fadeOutBall.setFromValue(1.0);
             fadeOutBall.setToValue(0.0);
             fadeOutBall.setOnFinished(e -> {
-                pb.stop();
-                rootPane.getChildren().remove(pb);
+                if (pb != null) {
+                    pb.stop();
+                    rootPane.getChildren().remove(pb);
+                }
             });
         }
-        javafx.animation.PauseTransition timeout =
-            new javafx.animation.PauseTransition(Duration.seconds(1.5));
-        timeout.setOnFinished(e -> {
+        AtomicBoolean minHoldElapsed = new AtomicBoolean(false);
+        AtomicBoolean firstFrameSeen = new AtomicBoolean(false);
+        AtomicBoolean revealDone = new AtomicBoolean(false);
+
+        Runnable tryReveal = () -> {
+            if (!minHoldElapsed.get() || !firstFrameSeen.get()) {
+                return;
+            }
+            if (!revealDone.compareAndSet(false, true)) {
+                return;
+            }
             if (blackOverlay.getOpacity() > 0) {
                 fadeOutBg.play();
-                if (fadeOutBall != null) fadeOutBall.play();
+            }
+            if (fadeOutBall != null) {
+                fadeOutBall.play();
+            }
+        };
+
+        javafx.animation.PauseTransition minHold =
+            new javafx.animation.PauseTransition(START_OVERLAY_MIN_HOLD);
+        minHold.setOnFinished(e -> {
+            minHoldElapsed.set(true);
+            tryReveal.run();
+        });
+
+        javafx.animation.PauseTransition maxWait =
+            new javafx.animation.PauseTransition(START_OVERLAY_MAX_WAIT);
+        maxWait.setOnFinished(e -> {
+            if (!revealDone.compareAndSet(false, true)) {
+                return;
+            }
+            System.err.println("StartController: video first frame timeout; forcing overlay reveal.");
+            if (blackOverlay.getOpacity() > 0) {
+                fadeOutBg.play();
+            }
+            if (fadeOutBall != null) {
+                fadeOutBall.play();
             }
         });
+
         mediaPlayer = MediaCache.claimMediaPlayer("start.mp4");
         if (mediaPlayer != null) {
             mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
@@ -85,12 +123,14 @@ public class StartController {
             bgVideo.fitHeightProperty().bind(rootPane.heightProperty());
             bgVideo.setPreserveRatio(false);
 
-            mediaPlayer.setOnError(() ->
+            mediaPlayer.setOnError(() -> {
+                Throwable error = mediaPlayer.getError();
                 System.err.println("StartController: MediaPlayer error — "
-                    + (mediaPlayer.getError() != null ? mediaPlayer.getError().getMessage() : "unknown"))
-            );
+                    + (error != null ? error.getMessage() : "unknown"));
+                firstFrameSeen.set(true);
+                tryReveal.run();
+            });
 
-            final FadeTransition ballFade = fadeOutBall;
             javafx.beans.value.ChangeListener<Duration> firstFrameListener =
                 new javafx.beans.value.ChangeListener<>() {
                     @Override
@@ -98,9 +138,8 @@ public class StartController {
                                        Duration old, Duration now) {
                         if (now != null && now.greaterThan(Duration.ZERO)) {
                             mediaPlayer.currentTimeProperty().removeListener(this);
-                            timeout.stop();
-                            fadeOutBg.play();
-                            if (ballFade != null) ballFade.play();
+                            firstFrameSeen.set(true);
+                            tryReveal.run();
                         }
                     }
                 };
@@ -108,17 +147,23 @@ public class StartController {
             mediaPlayer.setOnReady(() -> {
                 mediaPlayer.seek(Duration.ZERO);
                 mediaPlayer.play();
+                if (mediaPlayer.getCurrentTime() != null && mediaPlayer.getCurrentTime().greaterThan(Duration.ZERO)) {
+                    firstFrameSeen.set(true);
+                    tryReveal.run();
+                }
             });
             if (mediaPlayer.getStatus() == MediaPlayer.Status.READY) {
                 mediaPlayer.seek(Duration.ZERO);
                 mediaPlayer.play();
             }
-            timeout.play();
         } else {
             System.err.println("StartController: start.mp4 player unavailable.");
-            timeout.play();
+            firstFrameSeen.set(true);
+            tryReveal.run();
         }
-        timeout.play();
+
+        minHold.play();
+        maxWait.play();
         MusicManager.getInstance().attachClickSounds(rootPane);
         Button startBtn = (Button) rootPane.lookup(".start-btn");
         if (startBtn != null) {

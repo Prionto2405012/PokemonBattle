@@ -10,6 +10,7 @@ import javafx.stage.Stage;
 public class SceneManager {
     private static Stage primaryStage;
     private static final String RESOURCE_PATH = "/com/example/pokemonbattle/";
+    private static final long DEFAULT_LOADING_MIN_MS = 900L;
     private static final Map<String, Object> sceneData = new HashMap<>();
     public static void initialize(Stage stage) {
         primaryStage = stage;
@@ -48,9 +49,15 @@ public class SceneManager {
         }
     }
     public static void switchSceneWithLoading(String fxmlFile, String title, int width, int height) {
-        switchSceneWithLoading(fxmlFile, title, width, height, null);
+        switchSceneWithLoading(fxmlFile, title, width, height, null, DEFAULT_LOADING_MIN_MS);
+    }
+    public static void switchSceneWithLoading(String fxmlFile, String title, int width, int height, long minimumLoadingMs) {
+        switchSceneWithLoading(fxmlFile, title, width, height, null, minimumLoadingMs);
     }
     public static void switchSceneWithLoading(String fxmlFile, String title, int width, int height, Map<String, Object> data) {
+        switchSceneWithLoading(fxmlFile, title, width, height, data, DEFAULT_LOADING_MIN_MS);
+    }
+    public static void switchSceneWithLoading(String fxmlFile, String title, int width, int height, Map<String, Object> data, long minimumLoadingMs) {
         try {
             var loadingUrl = SceneManager.class.getResource(RESOURCE_PATH + "view/loading_screen.fxml");
             if (loadingUrl == null) throw new RuntimeException("loading_screen.fxml not found");
@@ -65,9 +72,11 @@ public class SceneManager {
             javafx.concurrent.Task<Void> loadingTask = new javafx.concurrent.Task<>() {
                 @Override
                 protected Void call() throws Exception {
+                    long minDurationMs = Math.max(300L, minimumLoadingMs);
+                    long prepMs = 120L;
                     updateMessage("Loading...");
                     updateProgress(0, 100);
-                    Thread.sleep(100);
+                    Thread.sleep(prepMs);
 
                     sceneData.clear();
                     if (data != null) sceneData.putAll(data);
@@ -75,7 +84,10 @@ public class SceneManager {
 
                     updateMessage("Almost ready...");
                     updateProgress(80, 100);
-                    Thread.sleep(800);
+                    long holdMs = Math.max(0L, minDurationMs - prepMs);
+                    if (holdMs > 0) {
+                        Thread.sleep(holdMs);
+                    }
                     updateProgress(100, 100);
                     updateMessage("Done!");
                     return null;

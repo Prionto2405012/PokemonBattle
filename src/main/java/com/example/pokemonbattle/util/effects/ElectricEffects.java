@@ -3,6 +3,8 @@ package com.example.pokemonbattle.util.effects;
 
 import java.util.Random;
 
+import com.example.pokemonbattle.util.MediaCache;
+
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
@@ -11,11 +13,12 @@ import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.GaussianBlur;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
-import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Polyline;
 import javafx.scene.shape.StrokeLineCap;
 import javafx.util.Duration;
@@ -30,6 +33,8 @@ public class ElectricEffects {
     private static final Color ELECTRIC_GOLD   = Color.web("#FFB300");
     private static final Color ELECTRIC_WHITE  = Color.WHITE;
     private static final Color ELECTRIC_BLUE   = Color.web("#42A5F5");
+    private static final String PUNCH_ASSET    = "punch.png";
+    private static final String FANG_ASSET     = "fang.gif";
 
     public ElectricEffects(Pane battleField) {
         this.battleField = battleField;
@@ -106,9 +111,14 @@ public class ElectricEffects {
      */
     public void createImpactEffect(double x, double y, String moveName, int movePower, Timeline timeline) {
         switch (moveName) {
-            case "thunder-fang"    -> { addFangVisual(x, y, timeline);
-                                        addDefaultZaps(x, y, movePower, timeline); }
-            case "thunder-punch"   -> addPunchZaps(x, y, movePower, timeline);
+            case "thunder-fang"    -> {
+                addFangImage(x, y, timeline);
+                addDefaultZaps(x, y, movePower, timeline);
+            }
+            case "thunder-punch"   -> {
+                addPunchImage(x, y, timeline);
+                addPunchZaps(x, y, movePower, timeline);
+            }
             case "supercell-slam"  -> addGroundSlamBurst(x, y, movePower, timeline);
             case "volt-tackle",
                  "wild-charge"     -> addExplosionBurst(x, y, movePower, timeline);
@@ -433,9 +443,11 @@ public class ElectricEffects {
     // RANGED – volt-switch: quick bolt then flash
 
     private void addVoltSwitch(double sx, double sy, double ex, double ey, int power, Timeline tl) {
+        double intensity = Math.max(0.8, power / 100.0);
+
         // Fast single bolt
         Polyline bolt = createBolt(sx, sy, ex, ey, 15, 16);
-        bolt.setStrokeWidth(10);
+        bolt.setStrokeWidth(8 + 2 * intensity);
         battleField.getChildren().add(bolt);
 
         tl.getKeyFrames().addAll(
@@ -445,7 +457,7 @@ public class ElectricEffects {
         registerCleanup(tl, bolt);
 
         // Quick flash at defender
-        Circle flash = new Circle(35, ELECTRIC_YELLOW);
+        Circle flash = new Circle(30 + 5 * intensity, ELECTRIC_YELLOW);
         flash.setCenterX(ex);
         flash.setCenterY(ey);
         flash.setOpacity(0);
@@ -456,7 +468,7 @@ public class ElectricEffects {
         tl.getKeyFrames().addAll(
             new KeyFrame(Duration.millis(30),  new KeyValue(flash.opacityProperty(), 0.95)),
             new KeyFrame(Duration.millis(120), new KeyValue(flash.opacityProperty(), 0),
-                new KeyValue(flash.radiusProperty(), 55.0)));
+                new KeyValue(flash.radiusProperty(), 48 + 7 * intensity)));
         registerCleanup(tl, flash);
     }
 
@@ -726,46 +738,6 @@ public class ElectricEffects {
         registerCleanup(timeline, flare);
     }
 
-    private void addFangVisual(double x, double y, Timeline timeline) {
-        for (int i = 0; i < 2; i++) {
-            Polygon fang = new Polygon();
-            fang.getPoints().addAll(
-                0.0, 0.0,
-                -25.0, -30.0,
-                0.0, -65.0,
-                25.0, -30.0
-            );
-
-            fang.setFill(ELECTRIC_YELLOW);
-            fang.setStroke(ELECTRIC_GOLD);
-            fang.setStrokeWidth(10);
-            fang.setEffect(new DropShadow(20, ELECTRIC_GOLD));
-
-            double xOffset = i == 0 ? -20 : 20;
-            fang.setLayoutX(x + xOffset);
-            fang.setLayoutY(y);
-            fang.setOpacity(0);
-            fang.setRotate(i == 0 ? -20 : 20);
-            prepareTransientNode(fang);
-
-            battleField.getChildren().add(fang);
-
-            KeyFrame appear = new KeyFrame(Duration.millis(50),
-                new KeyValue(fang.opacityProperty(), 1.0),
-                new KeyValue(fang.scaleXProperty(), 1.0),
-                new KeyValue(fang.scaleYProperty(), 1.0));
-            KeyFrame bite = new KeyFrame(Duration.millis(100),
-                new KeyValue(fang.scaleXProperty(), 1.4),
-                new KeyValue(fang.scaleYProperty(), 1.4));
-            KeyFrame disappear = new KeyFrame(Duration.millis(200),
-                new KeyValue(fang.opacityProperty(), 0));
-
-            timeline.getKeyFrames().addAll(appear, bite, disappear);
-
-            registerCleanup(timeline, fang);
-        }
-    }
-
     private Polyline createBolt(double startX, double startY, double endX, double endY,
             int segmentCount, double maxOffset) {
         Polyline bolt = new Polyline();
@@ -799,6 +771,54 @@ public class ElectricEffects {
     private void prepareTransientNode(Node node) {
         node.setManaged(false);
         node.setMouseTransparent(true);
+    }
+
+    private void addPunchImage(double x, double y, Timeline timeline) {
+        addStaticImpactImage(PUNCH_ASSET, x, y, 160, 160, timeline);
+    }
+
+    private void addFangImage(double x, double y, Timeline timeline) {
+        addStaticImpactImage(FANG_ASSET, x, y, 190, 190, timeline);
+    }
+
+    private void addStaticImpactImage(String assetName, double x, double y,
+                                      double width, double height,
+                                      Timeline timeline) {
+        try {
+            Image image = MediaCache.getImage(assetName);
+            if (image == null) {
+                return;
+            }
+
+            ImageView imageView = new ImageView(image);
+            imageView.setFitWidth(width);
+            imageView.setFitHeight(height);
+            imageView.setPreserveRatio(true);
+            imageView.setSmooth(true);
+            imageView.setLayoutX(x - width / 2.0);
+            imageView.setLayoutY(y - height / 2.0);
+            imageView.setOpacity(0);
+            imageView.setScaleX(0.55);
+            imageView.setScaleY(0.55);
+            prepareTransientNode(imageView);
+            battleField.getChildren().add(imageView);
+
+            KeyFrame appear = new KeyFrame(Duration.millis(35),
+                new KeyValue(imageView.opacityProperty(), 1.0),
+                new KeyValue(imageView.scaleXProperty(), 1.25),
+                new KeyValue(imageView.scaleYProperty(), 1.25));
+            KeyFrame settle = new KeyFrame(Duration.millis(115),
+                new KeyValue(imageView.scaleXProperty(), 1.0),
+                new KeyValue(imageView.scaleYProperty(), 1.0));
+            long fadeMs = FANG_ASSET.equals(assetName) ? 560L : 330L;
+            KeyFrame fade = new KeyFrame(Duration.millis(fadeMs),
+                new KeyValue(imageView.opacityProperty(), 0.0));
+
+            timeline.getKeyFrames().addAll(appear, settle, fade);
+            registerCleanup(timeline, imageView);
+        } catch (Exception ignored) {
+            // Overlay is optional; the core move effect should still play.
+        }
     }
 
     private void registerCleanup(Timeline timeline, Node node) {

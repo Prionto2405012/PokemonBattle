@@ -194,8 +194,7 @@ public class BattleController implements Battle.BattleListener {
         }
     }
 
-    // ─── Lifecycle ────────────────────────────────────────────────────────────
-
+    //  Lifecycle 
     @FXML
     public void initialize() {
         if (bgImage != null && rootPane != null) {
@@ -226,7 +225,7 @@ public class BattleController implements Battle.BattleListener {
         animationManager.setAnimationEnabled(PlayerSession.getInstance().isMoveAnimationEnabled());
     }
 
-    // ─── Move selection ───────────────────────────────────────────────────────
+    //  Move selection 
 
     private void onMoveSelected(Move move) {
         if (battle.isFinished()) {
@@ -301,8 +300,7 @@ public class BattleController implements Battle.BattleListener {
         actionButtonsBox.setManaged(false);
     }
 
-    // ─── Forced switch overlay ────────────────────────────────────────────────
-
+    //  Forced switch overlay 
     /**
      * Called by Battle when player1's active Pokémon has fainted.
      * Shows a modal overlay forcing the player to pick a replacement.
@@ -479,7 +477,7 @@ public class BattleController implements Battle.BattleListener {
         }
     }
 
-    // ─── Info overlay setup ───────────────────────────────────────────────────
+    //  Info overlay setup 
 
     private void setupInfoOverlay() {
         infoName = styledLabel("move-info-title");
@@ -542,10 +540,10 @@ public class BattleController implements Battle.BattleListener {
         infoName.setText(capitalize(move.getName()));
         String type = (move.getType() != null) ? move.getType() : "normal";
         infoType.setText("Type: " + capitalize(type));
-        int pow = move.getPower();
-        infoPower.setText("Power: " + (pow > 0 ? String.valueOf(pow) : "—"));
-        int acc = move.getAccuracy();
-        infoAccuracy.setText("Accuracy: " + (acc > 0 ? acc + "%" : "—"));
+        Integer pow = move.getPower();
+        infoPower.setText("Power: " + (pow != null && pow > 0 ? String.valueOf(pow) : "—"));
+        Integer acc = move.getAccuracy();
+        infoAccuracy.setText("Accuracy: " + (acc != null && acc > 0 ? acc + "%" : "—"));
         int maxPp = move.getPp() > 0 ? move.getPp() : currentPp;
         infoPp.setText("PP: " + currentPp + " / " + maxPp);
         String desc = move.getDescription();
@@ -632,7 +630,7 @@ public class BattleController implements Battle.BattleListener {
         if (pokemonInfoCard != null) pokemonInfoCard.setVisible(false);
     }
 
-    // ─── VS Intro ─────────────────────────────────────────────────────────────
+    //  VS Intro 
 
     private void playVSIntro() {
         int npcId = new Random().nextInt(VS_NPC_COUNT) + 1;
@@ -698,7 +696,7 @@ public class BattleController implements Battle.BattleListener {
         fadeToBlack.play();
     }
 
-    // ─── Options panel background ─────────────────────────────────────────────
+    //  Options panel background 
 
     private void drawOptionsPanelPattern() {
         if (optionsSection == null) return;
@@ -734,8 +732,7 @@ public class BattleController implements Battle.BattleListener {
         optionsSection.getChildren().addFirst(canvas);
     }
 
-    // ─── Battle data loading ──────────────────────────────────────────────────
-
+    //  Battle data loading 
     private void loadBattleData() {
         player = (Player) SceneManager.getData("player");
         opponent = (Player) SceneManager.getData("opponent");
@@ -770,7 +767,7 @@ public class BattleController implements Battle.BattleListener {
         opponentTeamLabel.setText(sb.toString().trim());
     }
 
-    // ─── Battle start & display ───────────────────────────────────────────────
+    //  Battle start & display 
 
     private void onStartBattle() {
         if (player == null || opponent == null) {
@@ -820,7 +817,7 @@ public class BattleController implements Battle.BattleListener {
         }
     }
 
-    // ─── Move buttons ─────────────────────────────────────────────────────────
+    //  Move buttons 
 
     private void updateMoveButtons() {
         activeMoveButtons.clear();
@@ -926,8 +923,7 @@ public class BattleController implements Battle.BattleListener {
         return label;
     }
 
-    // ─── Type colour helpers ──────────────────────────────────────────────────
-
+    //  Type colour helpers 
     private String getTypeGradient(String type) {
         if (type == null) return "linear-gradient(to bottom,#546e7a,#37474f)";
         return switch (type.toLowerCase()) {
@@ -979,7 +975,7 @@ public class BattleController implements Battle.BattleListener {
         };
     }
 
-    // ─── Sprite helpers ───────────────────────────────────────────────────────
+    //  Sprite helpers 
 
     private static java.util.Map<Integer, Double> loadPokemonHeights() {
         java.util.Map<Integer, Double> map = new java.util.HashMap<>();
@@ -1053,8 +1049,7 @@ public class BattleController implements Battle.BattleListener {
         else bar.setFill(Color.web("#F85888"));
     }
 
-    // ─── Panel switching ──────────────────────────────────────────────────────
-
+    //  Panel switching 
     private void onBack() {
         SceneManager.clearData();
         SceneManager.switchSceneWithLoading("new_game.fxml", "Pokemon Battle - Setup", 1200, 700);
@@ -1174,8 +1169,7 @@ public class BattleController implements Battle.BattleListener {
         pokemonSelectionBox.setVisible(false); pokemonSelectionBox.setManaged(false);
     }
 
-    // ─── Battle listener callbacks ────────────────────────────────────────────
-
+    //  Battle listener callbacks 
     @Override
     public void onDamageDealt(String attacker, String move, String defender, int damage) {
         String entry = capitalize(attacker) + " used " + capitalize(move) + "! " + damage + " dmg!";

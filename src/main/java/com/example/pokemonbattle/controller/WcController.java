@@ -33,6 +33,8 @@ import javafx.util.Duration;
 
 @SuppressWarnings("unused")
 public class WcController {
+    private static final long WC_TO_MENU_LOADING_MS = 1500L;
+
     @FXML
     private StackPane rootPane;
     @FXML
@@ -535,7 +537,7 @@ Color buttonColor  = Color.web("#8bb7bf");
         if (result.isSuccess()) {
             currentUser = result.getUser();
             PlayerSession.getInstance().setCurrentUser(currentUser);
-            SceneManager.switchSceneWithLoading("menu.fxml", "Pokemon Battle - Menu", 1200, 700);
+            SceneManager.switchSceneWithLoading("menu.fxml", "Pokemon Battle - Menu", 1200, 700, WC_TO_MENU_LOADING_MS);
         } else {
             showLoginError(result.getMessage());
         }
@@ -589,7 +591,7 @@ Color buttonColor  = Color.web("#8bb7bf");
         if (result.isSuccess()) {
             currentUser = result.getUser();
             PlayerSession.getInstance().setCurrentUser(currentUser);
-            SceneManager.switchSceneWithLoading("menu.fxml", "Pokemon Battle - Menu", 1200, 700);
+            SceneManager.switchSceneWithLoading("menu.fxml", "Pokemon Battle - Menu", 1200, 700, WC_TO_MENU_LOADING_MS);
         } else {
             showSignupError(result.getMessage());
         }

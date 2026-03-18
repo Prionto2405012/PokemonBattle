@@ -26,8 +26,8 @@ import javafx.scene.media.MediaPlayer;
 
 public final class MediaCache {
     private static final String BASE = "/com/example/pokemonbattle/assets/";
-    private static final String[] IMAGE_ASSETS = { "wc_bg.png", "menu1.png", "new_game.png", "fight.png", "battle2.jpg"};
-    private static final String[] MEDIA_ASSETS = { "intro.mp4", "Pikachu.mp4", "start.mp4", };
+    private static final String[] IMAGE_ASSETS = { "wc_bg.png", "menu1.png", "new_game.png", "fight.png", "battle2.jpg", "fang.gif", "feet.png"};
+    private static final String[] MEDIA_ASSETS = { "intro.mp4", "start.mp4", "Pikachu.mp4" };
 
     public record GifFrameData(WritableImage[] frames, long[] delaysMs) {
         public boolean isEmpty() {
@@ -114,6 +114,18 @@ public final class MediaCache {
             System.err.println("[MediaCache] Not found on classpath: " + name);
             return null;
         }
+
+        if (name.toLowerCase().endsWith(".gif")) {
+            GifFrameData gif = getGifFrames(name);
+            if (gif != null && !gif.isEmpty() && gif.frames()[0] != null) {
+                Image firstFrame = gif.frames()[0];
+                IMAGE_CACHE.put(name, firstFrame);
+                System.out.printf("[MediaCache] Loaded GIF first frame: %-25s  %.0f×%.0f%n",
+                        name, firstFrame.getWidth(), firstFrame.getHeight());
+                return firstFrame;
+            }
+        }
+
         Image img = new Image(url.toExternalForm());
         if (img.isError()) {
             System.err.println("[MediaCache] Decode error: " + name);
@@ -173,7 +185,7 @@ public final class MediaCache {
                         long raw = Long.parseLong(dt) * 10L; // centiseconds → ms
                         delayMs = raw > 0 ? raw : 100;
                     }
-                } catch (Exception ignored) {
+                } catch (IllegalArgumentException ignored) {
                 }
                 delays[i] = delayMs;
             }
@@ -189,12 +201,33 @@ public final class MediaCache {
     }
     public static MediaPlayer claimMediaPlayer(String assetName) {
         MediaPlayer player = PLAYER_CACHE.remove(assetName);
-        if (player != null)
-            return player;
+        if (player != null) {
+            if (player.getError() == null) {
+                return player;
+            }
+            System.err.println("[MediaCache] Discarding errored cached player for " + assetName + ", rebuilding.");
+            try {
+                player.dispose();
+            } catch (Exception ignored) {
+            }
+            return buildMediaPlayer(assetName);
+        }
         CompletableFuture<MediaPlayer> future = PLAYER_IN_FLIGHT.remove(assetName);
         if (future != null) {
             System.out.println("[MediaCache] Waiting for in-flight MediaPlayer: " + assetName);
-            return future.join();
+            MediaPlayer inFlightPlayer = future.join();
+            if (inFlightPlayer == null) {
+                return null;
+            }
+            if (inFlightPlayer.getError() == null) {
+                return inFlightPlayer;
+            }
+            System.err.println("[MediaCache] In-flight player errored for " + assetName + ", rebuilding.");
+            try {
+                inFlightPlayer.dispose();
+            } catch (Exception ignored) {
+            }
+            return buildMediaPlayer(assetName);
         }
         System.err.println("[MediaCache] MediaPlayer cache miss — building now: " + assetName);
         return buildMediaPlayer(assetName);
@@ -225,10 +258,11 @@ private static void constructAndWait(String url, Consumer<MediaPlayer> onReady) 
         System.out.println("[MediaCache] Video READY: " + url);
         onReady.accept(player);
     });
-    player.setOnError(() ->
-        System.err.println("[MediaCache] Video error: " +
-            (player.getError() != null ? player.getError().getMessage() : "unknown"))
-    );
+    player.setOnError(() -> {
+        Throwable error = player.getError();
+        System.err.println("[MediaCache] Video error: "
+            + (error != null ? error.getMessage() : "unknown"));
+    });
 }
     private static void scheduleMediaPlayerBuild(String name) {
         CompletableFuture<MediaPlayer> future = CompletableFuture
@@ -254,10 +288,11 @@ private static void constructAndWait(String url, Consumer<MediaPlayer> onReady) 
         }
         MediaPlayer player = new MediaPlayer(new Media(url));
         player.setAutoPlay(false);
-        player.setOnError(() ->
+        player.setOnError(() -> {
+            Throwable error = player.getError();
             System.err.println("[MediaCache] Pre-built player error for " + name + ": "
-                + (player.getError() != null ? player.getError().getMessage() : "unknown"))
-        );
+                + (error != null ? error.getMessage() : "unknown"));
+        });
         System.out.println("[MediaCache] Pre-built MediaPlayer: " + name);
         return player;
     }

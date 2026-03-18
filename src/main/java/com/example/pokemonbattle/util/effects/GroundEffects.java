@@ -1014,7 +1014,7 @@ public class GroundEffects {
     private void addDustCloud(double x, double y, double intensity, int startDelay, Timeline timeline) {
         int count = (int) (14 + 3 * intensity);
         for (int i = 0; i < count; i++) {
-            double r = 10 + random.nextDouble() * 6;
+            double r = 13 + random.nextDouble() * 6;
             Circle dust = new Circle(r, GROUND_DUST);
             dust.setCenterX(x + (random.nextDouble() - 0.5) * 22);
             dust.setCenterY(y + (random.nextDouble() - 0.5) * 14);
@@ -1046,7 +1046,7 @@ public class GroundEffects {
     private void addGroundOverlay(double x, double y, double radius,
                                   double intensity, int startDelay,
                                   Timeline timeline) {
-        Ellipse overlay = new Ellipse(radius, radius * 0.35);
+        Ellipse overlay = new Ellipse(radius, radius * 0.75);
         overlay.setCenterX(x);
         overlay.setCenterY(y);
         overlay.setFill(GROUND_KHAKI.deriveColor(0, 1, 1, 0.55));
@@ -1075,9 +1075,9 @@ public class GroundEffects {
     private void addBattleFieldShake(double intensity, int startDelay,
                                      Timeline timeline) {
         double origTx = battleField.getTranslateX();
-        double amp = 3 + 3 * intensity;   // shake amplitude in px
+        double amp = 5 + 3 * intensity;   // shake amplitude in px
         int step = 35;                     // ms between keyframes
-        int cycles = 4;
+        int cycles = 7;
 
         for (int i = 0; i < cycles; i++) {
             double offset = (i % 2 == 0 ? amp : -amp);
