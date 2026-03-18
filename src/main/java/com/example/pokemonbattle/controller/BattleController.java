@@ -2,9 +2,11 @@ package com.example.pokemonbattle.controller;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Random;
 import java.util.stream.Collectors;
 
@@ -165,6 +167,32 @@ public class BattleController implements Battle.BattleListener {
     private static final int VS_NPC_COUNT = 7;
 
     private BattleAnimationManager animationManager;
+    private final Queue<PendingAttackAnimation> pendingAttackAnimations = new ArrayDeque<>();
+    private final Queue<PendingSwitchEvent> pendingSwitchEvents = new ArrayDeque<>();
+    private boolean attackAnimationInProgress = false;
+    private boolean pendingForcedSwitchOverlay = false;
+
+    private static final class PendingAttackAnimation {
+        private final ImageView attackerSprite;
+        private final ImageView defenderSprite;
+        private final Move move;
+
+        private PendingAttackAnimation(ImageView attackerSprite, ImageView defenderSprite, Move move) {
+            this.attackerSprite = attackerSprite;
+            this.defenderSprite = defenderSprite;
+            this.move = move;
+        }
+    }
+
+    private static final class PendingSwitchEvent {
+        private final String playerName;
+        private final String pokemonName;
+
+        private PendingSwitchEvent(String playerName, String pokemonName) {
+            this.playerName = playerName;
+            this.pokemonName = pokemonName;
+        }
+    }
 
     // ─── Lifecycle ────────────────────────────────────────────────────────────
 
@@ -206,42 +234,61 @@ public class BattleController implements Battle.BattleListener {
             return;
         }
 
+        if (attackAnimationInProgress) {
+            return;
+        }
+
         disableMoveButtons();
         hideActionButtons();
+        pendingAttackAnimations.clear();
+        attackAnimationInProgress = true;
 
         PokemonInstance playerPokemon = player.getCurrentPokemon();
         PokemonInstance opponentPokemon = opponent.getCurrentPokemon();
         Move aiMove = battle.getAIMove(opponentPokemon, playerPokemon);
 
-        boolean playerMovesFirst = playerPokemon.getSpeed() >= opponentPokemon.getSpeed();
+        battle.executeRound(move, aiMove);
+        playNextAttackAnimation();
+    }
 
-        if (playerMovesFirst) {
-            battleStatusLabel.setText(capitalize(playerPokemon.getName()) + " used " + capitalize(move.getName()) + "!");
-            animationManager.playAttackAnimation(playerSpriteImage, opponentSpriteImage, move, () -> {
-                if (!opponentPokemon.isFainted() && aiMove != null) {
-                    battleStatusLabel.setText(capitalize(opponentPokemon.getName()) + " used " + capitalize(aiMove.getName()) + "!");
-                    animationManager.playAttackAnimation(opponentSpriteImage, playerSpriteImage, aiMove, () -> finalizeBattleRound(move, aiMove));
-                } else {
-                    finalizeBattleRound(move, aiMove);
-                }
-            });
+    private void playNextAttackAnimation() {
+        PendingAttackAnimation nextAnimation = pendingAttackAnimations.poll();
+        if (nextAnimation == null) {
+            finalizeBattleRound();
+            return;
+        }
+
+        if (animationManager != null && nextAnimation.attackerSprite != null && nextAnimation.defenderSprite != null) {
+            animationManager.playAttackAnimation(
+                    nextAnimation.attackerSprite,
+                    nextAnimation.defenderSprite,
+                    nextAnimation.move,
+                    this::playNextAttackAnimation
+            );
         } else {
-            battleStatusLabel.setText(capitalize(opponentPokemon.getName()) + " used " + capitalize(aiMove.getName()) + "!");
-            animationManager.playAttackAnimation(opponentSpriteImage, playerSpriteImage, aiMove, () -> {
-                if (!playerPokemon.isFainted()) {
-                    battleStatusLabel.setText(capitalize(playerPokemon.getName()) + " used " + capitalize(move.getName()) + "!");
-                    animationManager.playAttackAnimation(playerSpriteImage, opponentSpriteImage, move, () -> finalizeBattleRound(move, aiMove));
-                } else {
-                    finalizeBattleRound(move, aiMove);
-                }
-            });
+            playNextAttackAnimation();
         }
     }
 
-    private void finalizeBattleRound(Move playerMove, Move aiMove) {
-        battle.executeRound(playerMove, aiMove);
+    private void finalizeBattleRound() {
+        attackAnimationInProgress = false;
+
+        while (!pendingSwitchEvents.isEmpty()) {
+            PendingSwitchEvent switchEvent = pendingSwitchEvents.poll();
+            if (switchEvent != null) {
+                applySwitchEvent(switchEvent.playerName, switchEvent.pokemonName, false);
+            }
+        }
+
         updateBattleDisplay();
         updateMoveButtons();
+
+        if (pendingForcedSwitchOverlay) {
+            pendingForcedSwitchOverlay = false;
+            showForcedSwitchOverlay();
+            return;
+        }
+
         // Action buttons shown only if no forced switch is pending
         // (onPlayerPokemonFaintedNeedsSwitch will show overlay instead)
         if (!battle.isFinished() && !player.getCurrentPokemon().isFainted()) {
@@ -262,7 +309,13 @@ public class BattleController implements Battle.BattleListener {
      */
     @Override
     public void onPlayerPokemonFaintedNeedsSwitch(String playerName) {
-        Platform.runLater(this::showForcedSwitchOverlay);
+        Platform.runLater(() -> {
+            if (attackAnimationInProgress) {
+                pendingForcedSwitchOverlay = true;
+            } else {
+                showForcedSwitchOverlay();
+            }
+        });
     }
 
     private void showForcedSwitchOverlay() {
@@ -1128,6 +1181,13 @@ public class BattleController implements Battle.BattleListener {
         String entry = capitalize(attacker) + " used " + capitalize(move) + "! " + damage + " dmg!";
         battleStatusLabel.setText(entry);
         battleLog.add(entry);
+
+        pendingAttackAnimations.offer(new PendingAttackAnimation(
+                getDefenderSprite(attacker),
+                getDefenderSprite(defender),
+                resolveMoveByName(move)
+        ));
+
         // Show floating damage number beside the defender
         if (damage > 0 && animationManager != null) {
             ImageView defenderSprite = getDefenderSprite(defender);
@@ -1146,13 +1206,24 @@ public class BattleController implements Battle.BattleListener {
 
     @Override
     public void onPokemonSwitched(String playerName, String pokemonName) {
+        if (attackAnimationInProgress) {
+            pendingSwitchEvents.offer(new PendingSwitchEvent(playerName, pokemonName));
+            return;
+        }
+
+        applySwitchEvent(playerName, pokemonName, true);
+    }
+
+    private void applySwitchEvent(String playerName, String pokemonName, boolean refreshUiNow) {
         String entry = playerName + " sent out " + capitalize(pokemonName) + "!";
         battleStatusLabel.setText(entry);
         battleLog.add(entry);
         if (playerName.equals(player.getName())) displayPlayerTeam();
         else displayOpponentTeam();
-        updateBattleDisplay();
-        updateMoveButtons();
+        if (refreshUiNow) {
+            updateBattleDisplay();
+            updateMoveButtons();
+        }
     }
 
     @Override
@@ -1194,6 +1265,36 @@ public class BattleController implements Battle.BattleListener {
                 && opponent.getCurrentPokemon().getName().equalsIgnoreCase(pokemonName)) {
             return opponentSpriteImage;
         }
+        return null;
+    }
+
+    private Move resolveMoveByName(String moveName) {
+        if (moveName == null) {
+            return null;
+        }
+
+        PokemonInstance currentPlayerPokemon = player != null ? player.getCurrentPokemon() : null;
+        if (currentPlayerPokemon != null && currentPlayerPokemon.getBattleMoves() != null) {
+            for (PokemonInstance.MoveSlot slot : currentPlayerPokemon.getBattleMoves()) {
+                Move candidate = slot != null ? slot.getMove() : null;
+                if (candidate != null && candidate.getName() != null
+                        && candidate.getName().equalsIgnoreCase(moveName)) {
+                    return candidate;
+                }
+            }
+        }
+
+        PokemonInstance currentOpponentPokemon = opponent != null ? opponent.getCurrentPokemon() : null;
+        if (currentOpponentPokemon != null && currentOpponentPokemon.getBattleMoves() != null) {
+            for (PokemonInstance.MoveSlot slot : currentOpponentPokemon.getBattleMoves()) {
+                Move candidate = slot != null ? slot.getMove() : null;
+                if (candidate != null && candidate.getName() != null
+                        && candidate.getName().equalsIgnoreCase(moveName)) {
+                    return candidate;
+                }
+            }
+        }
+
         return null;
     }
 

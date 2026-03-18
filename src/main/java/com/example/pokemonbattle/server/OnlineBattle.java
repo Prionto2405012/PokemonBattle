@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import com.example.pokemonbattle.database.GameDataDAO;
 import com.example.pokemonbattle.model.Battle;
@@ -38,6 +39,7 @@ public class OnlineBattle {
     
     private boolean battleActive = true;
     private int turnCount = 0;
+    private final Random random = new Random();
 
     private final String player1AvatarPath;
     private final String player2AvatarPath;
@@ -187,14 +189,31 @@ public class OnlineBattle {
             if (action1.isAttack()) attacks.add(new AttackEntry(action1, player1, player2, player1Name, player2Name));
             if (action2.isAttack()) attacks.add(new AttackEntry(action2, player2, player1, player2Name, player1Name));
             
-            // Sort by attacker speed (descending)
-            attacks.sort((a, b) -> Integer.compare(
-                    b.attacker.getCurrentPokemon().getSpeed(),
-                    a.attacker.getCurrentPokemon().getSpeed()));
+            // Order attacks by speed (descending); randomize only equal-speed ties
+            if (attacks.size() == 2) {
+                int speed1 = attacks.get(0).attacker.getCurrentPokemon().getSpeed();
+                int speed2 = attacks.get(1).attacker.getCurrentPokemon().getSpeed();
+                if (speed2 > speed1 || (speed1 == speed2 && random.nextBoolean())) {
+                    AttackEntry first = attacks.get(0);
+                    attacks.set(0, attacks.get(1));
+                    attacks.set(1, first);
+                }
+            } else {
+                attacks.sort((a, b) -> Integer.compare(
+                        b.attacker.getCurrentPokemon().getSpeed(),
+                        a.attacker.getCurrentPokemon().getSpeed()));
+            }
             
+            boolean stopRemainingAttacks = false;
             for (AttackEntry atk : attacks) {
-                if (!battleActive) break;
-                executeMove(atk.action, atk.attacker, atk.defender, atk.attackerName, atk.defenderName);
+                if (!battleActive || stopRemainingAttacks) break;
+                if (atk.attacker.getCurrentPokemon() == null || atk.attacker.getCurrentPokemon().isFainted()) {
+                    continue;
+                }
+                if (atk.defender.getCurrentPokemon() == null || atk.defender.getCurrentPokemon().isFainted()) {
+                    continue;
+                }
+                stopRemainingAttacks = executeMove(atk.action, atk.attacker, atk.defender, atk.attackerName, atk.defenderName);
             }
         } catch (Exception e) {
             System.err.println("[Battle #" + battleId + "] Error processing turn: " + e.getMessage());
@@ -268,13 +287,13 @@ public class OnlineBattle {
     /**
      * Execute a single ATTACK action and send damage results to both players.
      */
-    private void executeMove(ActionMessage actionMsg, Player attacker, Player defender,
+    private boolean executeMove(ActionMessage actionMsg, Player attacker, Player defender,
                             String attackerName, String defenderName) throws IOException {
         // Find the move in game data
         Move move = gameDataDAO.getMove(actionMsg.getMoveId());
         if (move == null) {
             System.err.println("[Battle #" + battleId + "] Move not found: " + actionMsg.getMoveId());
-            return;
+            return false;
         }
         
         // Calculate damage (using simplified calculation for now)
@@ -333,6 +352,8 @@ public class OnlineBattle {
                 player2Handler.sendMessage(updateMsg);
             }
         }
+
+        return targetFainted;
     }
     
     /**

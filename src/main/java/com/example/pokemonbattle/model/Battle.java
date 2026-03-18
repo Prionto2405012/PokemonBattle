@@ -95,7 +95,12 @@ public class Battle {
             return;
         }
 
-        boolean player1First = p1Pokemon.getSpeed() >= p2Pokemon.getSpeed();
+        boolean player1First;
+        if (p1Pokemon.getSpeed() == p2Pokemon.getSpeed()) {
+            player1First = random.nextBoolean();
+        } else {
+            player1First = p1Pokemon.getSpeed() > p2Pokemon.getSpeed();
+        }
 
         if (player1First) {
             executeMove(p1Pokemon, player1Move, p2Pokemon);

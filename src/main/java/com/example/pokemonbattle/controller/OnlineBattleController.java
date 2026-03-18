@@ -241,6 +241,7 @@ public class OnlineBattleController {
 
     private BattleAnimationManager animationManager;
     private final Queue<DamageMessage> pendingDamageMessages = new ArrayDeque<>();
+    private final Queue<SwitchNotifyMessage> pendingSwitchNotifies = new ArrayDeque<>();
     private boolean damageAnimationInProgress = false;
 
     // Lifecycle
@@ -606,6 +607,7 @@ public class OnlineBattleController {
 
         DamageMessage msg = pendingDamageMessages.poll();
         if (msg == null) {
+            flushPendingSwitchNotifies();
             return;
         }
 
@@ -645,15 +647,10 @@ public class OnlineBattleController {
 
             if (msg.isTargetFainted()) {
                 targetPok.setFainted(true);
-                PokemonInstance next = target.getFirstAvailablePokemon();
-                if (next != null) {
-                    target.setCurrentPokemon(next);
-                    String faintEntry = cap(targetPok.getName()) + " fainted! " + cap(target.getName()) + " sends out "
-                            + cap(next.getName()) + "!";
-                    battleStatusLabel.setText(faintEntry);
-                    battleLog.add(faintEntry);
-                    updateBattleDisplay();
-                }
+                String faintEntry = cap(targetPok.getName()) + " fainted!";
+                battleStatusLabel.setText(faintEntry);
+                battleLog.add(faintEntry);
+                updateBattleDisplay();
             }
 
             damageAnimationInProgress = false;
@@ -674,6 +671,24 @@ public class OnlineBattleController {
     }
 
     private void applySwitchNotify(SwitchNotifyMessage msg) {
+        if (damageAnimationInProgress || !pendingDamageMessages.isEmpty()) {
+            pendingSwitchNotifies.offer(msg);
+            return;
+        }
+
+        applySwitchNotifyNow(msg);
+    }
+
+    private void flushPendingSwitchNotifies() {
+        while (!pendingSwitchNotifies.isEmpty()) {
+            SwitchNotifyMessage switchMsg = pendingSwitchNotifies.poll();
+            if (switchMsg != null) {
+                applySwitchNotifyNow(switchMsg);
+            }
+        }
+    }
+
+    private void applySwitchNotifyNow(SwitchNotifyMessage msg) {
         boolean isMe = player.getName().equals(msg.getPlayerName());
         Player side = isMe ? player : opponent;
         for (PokemonInstance p : side.getTeam()) {
@@ -691,6 +706,7 @@ public class OnlineBattleController {
     }
 
     private void onTurnReady(TurnReadyMessage msg) {
+        flushPendingSwitchNotifies();
         turnCount = msg.getTurnNumber();
         moveSent = false;
         setVisible(waitingLabel, false);
@@ -703,6 +719,7 @@ public class OnlineBattleController {
         if (battleEnded)
             return;
         pendingDamageMessages.clear();
+        pendingSwitchNotifies.clear();
         damageAnimationInProgress = false;
         battleEnded = true;
         boolean playerWon = player.getName().equals(msg.getWinnerName());
@@ -714,6 +731,7 @@ public class OnlineBattleController {
         if (battleEnded)
             return;
         pendingDamageMessages.clear();
+        pendingSwitchNotifies.clear();
         damageAnimationInProgress = false;
         battleEnded = true;
         battleStatusLabel.setText("Connection lost!");
