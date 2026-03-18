@@ -9,6 +9,8 @@ import java.util.Random;
  * Manages turn-based combat between two players.
  */
 public class Battle {
+    private static final double GLOBAL_DAMAGE_MULTIPLIER = 2.0;
+
     private final Player player1;
     private final Player player2;
     private boolean finished = false;
@@ -176,6 +178,7 @@ public class Battle {
         damage *= effectiveness;
         double randomFactor = 0.85 + (random.nextDouble() * 0.15);
         damage *= randomFactor;
+        damage *= GLOBAL_DAMAGE_MULTIPLIER;
         return Math.max(1, (int) damage);
     }
 

@@ -19,6 +19,7 @@ import com.example.pokemonbattle.model.PokemonInstance;
  */
 public class OnlineBattle {
     private static int battleIdCounter = 1000;
+    private static final double GLOBAL_DAMAGE_MULTIPLIER = 2.0;
     
     private final Integer battleId;
     private final Integer player1Id;
@@ -358,6 +359,8 @@ public class OnlineBattle {
         // Random variation (85-100%)
         double variance = 0.85 + (Math.random() * 0.15);
         damage = damage * variance;
+
+        damage = damage * GLOBAL_DAMAGE_MULTIPLIER;
         
         // Accuracy check
         if (move.getAccuracy() != null && move.getAccuracy() < 100) {
