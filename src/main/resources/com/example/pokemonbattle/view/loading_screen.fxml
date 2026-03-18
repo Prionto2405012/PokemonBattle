@@ -2,6 +2,7 @@
 
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.media.MediaView?>
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.control.Label?>
@@ -16,6 +17,12 @@
     <MediaView fx:id="bgVideo" mouseTransparent="true"
                fitWidth="1200" fitHeight="700"
                preserveRatio="false"/>
+
+    <ImageView fx:id="fallbackImage"
+               fitWidth="1200" fitHeight="700"
+               preserveRatio="false"
+               visible="false"
+               mouseTransparent="true"/>
 
     <!-- Progress UI anchored near bottom -->
     <VBox alignment="CENTER" spacing="10" translateY="280">
@@ -38,4 +45,3 @@
     </VBox>
 
 </StackPane>
-

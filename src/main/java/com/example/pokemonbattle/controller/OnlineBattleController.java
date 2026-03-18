@@ -35,6 +35,7 @@ import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.ParallelTransition;
+import javafx.animation.PauseTransition;
 import javafx.animation.SequentialTransition;
 import javafx.animation.Timeline;
 import javafx.animation.TranslateTransition;
@@ -684,7 +685,25 @@ public class OnlineBattleController {
 
         Runnable afterAnimation = () -> {
             targetPok.setCurrentHp(msg.getTargetCurrentHp());
+            PokemonInstance attackerPok = null;
+            if (player.getName().equals(msg.getAttackerName())) {
+                attackerPok = player.getCurrentPokemon();
+            } else if (opponent.getName().equals(msg.getAttackerName())) {
+                attackerPok = opponent.getCurrentPokemon();
+            }
+            if (attackerPok != null && msg.getAttackerCurrentHp() != null) {
+                attackerPok.setCurrentHp(msg.getAttackerCurrentHp());
+            }
             updateBattleDisplay();
+
+            if (animationManager != null) {
+                if (msg.getDamageDealt() != null && msg.getDamageDealt() > 0) {
+                    animationManager.showDamageNumber(defenderSprite, msg.getDamageDealt());
+                }
+                if (msg.getHealAmount() != null && msg.getHealAmount() > 0) {
+                    animationManager.showHealNumber(attackerSprite, msg.getHealAmount());
+                }
+            }
 
             String effText = "";
             if (msg.getEffectiveness() != null && msg.getEffectiveness() > 1.0f)
@@ -708,7 +727,10 @@ public class OnlineBattleController {
             }
 
             damageAnimationInProgress = false;
-            processNextDamageMessage();
+            // Small gap keeps sequential move execution readable in online mode.
+            PauseTransition delay = new PauseTransition(Duration.millis(140));
+            delay.setOnFinished(e -> processNextDamageMessage());
+            delay.play();
         };
 
         if (animationManager != null) {

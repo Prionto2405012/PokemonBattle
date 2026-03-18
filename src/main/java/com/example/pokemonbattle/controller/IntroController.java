@@ -11,6 +11,7 @@ import com.example.pokemonbattle.util.SceneManager;
 import javafx.animation.FadeTransition;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
+import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.scene.layout.StackPane;
@@ -26,18 +27,13 @@ public class IntroController {
     private MediaPlayer mediaPlayer;
     private Rectangle startupMask;
     private static final double TRIGGER_BEFORE_END_MS = 1000.0;
+    private static final Duration INTRO_RETRY_DELAY = Duration.millis(900);
     private volatile boolean transitionTriggered = false;
     private final AtomicBoolean startupRevealTriggered = new AtomicBoolean(false);
+    private PauseTransition retryTimer;
 
     @FXML
     public void initialize() {
-        mediaPlayer = com.example.pokemonbattle.util.MediaCache.claimMediaPlayer("intro.mp4");
-        if (mediaPlayer == null) {
-            System.err.println("IntroController: intro.mp4 player unavailable, skipping intro.");
-            goToStartScreen();
-            return;
-        }
-
         startupMask = new Rectangle();
         startupMask.setFill(Color.BLACK);
         startupMask.widthProperty().bind(rootPane.widthProperty());
@@ -46,13 +42,38 @@ public class IntroController {
         startupMask.setOpacity(1.0);
         rootPane.getChildren().add(startupMask);
 
-        mediaView.setMediaPlayer(mediaPlayer);
+        attemptIntroPlayback();
+    }
+
+    private void attemptIntroPlayback() {
+        if (mediaPlayer != null) {
+            return;
+        }
+        MediaPlayer candidate = com.example.pokemonbattle.util.MediaCache.claimMediaPlayer("intro.mp4");
+        if (candidate == null) {
+            com.example.pokemonbattle.util.MediaCache.buildVideoPlayer("intro.mp4", this::attachAndStart);
+            scheduleIntroRetry("IntroController: intro.mp4 player unavailable, retrying live build.");
+            return;
+        }
+        attachAndStart(candidate);
+    }
+
+    private void attachAndStart(MediaPlayer player) {
+        if (retryTimer != null) {
+            retryTimer.stop();
+            retryTimer = null;
+        }
+
+        mediaPlayer = player;
+        final MediaPlayer activePlayer = player;
+
+        mediaView.setMediaPlayer(activePlayer);
         mediaView.fitWidthProperty().bind(rootPane.widthProperty());
         mediaView.fitHeightProperty().bind(rootPane.heightProperty());
 
-        mediaPlayer.currentTimeProperty().addListener((obs, oldTime, newTime) -> {
-            if (transitionTriggered) return;
-            Duration total = mediaPlayer.getTotalDuration();
+        activePlayer.currentTimeProperty().addListener((obs, oldTime, newTime) -> {
+            if (transitionTriggered || mediaPlayer != activePlayer) return;
+            Duration total = activePlayer.getTotalDuration();
             if (total == null || total.isUnknown() || total.isIndefinite()) return;
             double remainingMs = total.subtract(newTime).toMillis();
             if (remainingMs <= TRIGGER_BEFORE_END_MS) {
@@ -60,14 +81,26 @@ public class IntroController {
                 startFlashTransition();
             }
         });
-        mediaPlayer.setOnEndOfMedia(this::handleEndOfMedia);
-        mediaPlayer.setOnError(() -> {
-            Throwable error = mediaPlayer.getError();
-            System.err.println("IntroController: MediaPlayer error — " + (error != null ? error.getMessage() : "Unknown error"));
-            goToStartScreen();
+
+        activePlayer.setOnEndOfMedia(() -> {
+            if (mediaPlayer == activePlayer) {
+                handleEndOfMedia();
+            }
         });
 
-        mediaPlayer.currentTimeProperty().addListener((obs, oldTime, newTime) -> {
+        activePlayer.setOnError(() -> {
+            if (mediaPlayer != activePlayer) {
+                return;
+            }
+            Throwable error = activePlayer.getError();
+            System.err.println("IntroController: MediaPlayer error — "
+                    + (error != null ? error.getMessage() : "Unknown error")
+                    + ". Retrying intro render.");
+            releaseActivePlayer();
+            scheduleIntroRetry(null);
+        });
+
+        activePlayer.currentTimeProperty().addListener((obs, oldTime, newTime) -> {
             if (newTime == null || !newTime.greaterThan(Duration.ZERO)) {
                 return;
             }
@@ -93,14 +126,52 @@ public class IntroController {
             reveal.play();
         });
 
-        mediaPlayer.setOnReady(() -> {
-            mediaPlayer.seek(Duration.ZERO);
-            mediaPlayer.play();
+        activePlayer.setOnReady(() -> {
+            if (mediaPlayer != activePlayer) {
+                return;
+            }
+            activePlayer.seek(Duration.ZERO);
+            activePlayer.play();
         });
-        if (mediaPlayer.getStatus() == MediaPlayer.Status.READY) {
-            mediaPlayer.seek(Duration.ZERO);
-            mediaPlayer.play();
+        if (activePlayer.getStatus() == MediaPlayer.Status.READY) {
+            activePlayer.seek(Duration.ZERO);
+            activePlayer.play();
         }
+    }
+
+    private void scheduleIntroRetry(String reason) {
+        if (transitionTriggered) {
+            return;
+        }
+        if (reason != null && !reason.isBlank()) {
+            System.err.println(reason);
+        }
+        if (retryTimer != null) {
+            retryTimer.stop();
+        }
+        retryTimer = new PauseTransition(INTRO_RETRY_DELAY);
+        retryTimer.setOnFinished(e -> {
+            if (!transitionTriggered) {
+                attemptIntroPlayback();
+            }
+        });
+        retryTimer.play();
+    }
+
+    private void releaseActivePlayer() {
+        MediaPlayer active = mediaPlayer;
+        mediaPlayer = null;
+        if (active == null) {
+            mediaView.setMediaPlayer(null);
+            return;
+        }
+        try {
+            active.stop();
+            active.dispose();
+        } catch (Exception e) {
+            System.err.println("IntroController: error disposing MediaPlayer — " + e.getMessage());
+        }
+        mediaView.setMediaPlayer(null);
     }
 
     private void handleEndOfMedia() {
@@ -159,6 +230,10 @@ public class IntroController {
     }
 
     private void disposeMediaPlayer() {
+        if (retryTimer != null) {
+            retryTimer.stop();
+            retryTimer = null;
+        }
         if (mediaPlayer != null) {
             try {
                 mediaPlayer.stop();
@@ -169,9 +244,5 @@ public class IntroController {
                 mediaPlayer = null;
             }
         }
-    }
-
-    private void goToStartScreen() {
-        SceneManager.switchScene("start.fxml", "Pokemon Battle", 1200, 700);
     }
 }

@@ -295,14 +295,57 @@ public class OnlineBattle {
             System.err.println("[Battle #" + battleId + "] Move not found: " + actionMsg.getMoveId());
             return false;
         }
-        
-        // Calculate damage (using simplified calculation for now)
-        int damage = calculateDamage(attacker, defender, move);
-        
+
+        PokemonInstance attackerPokemon = attacker.getCurrentPokemon();
         PokemonInstance targetPokemon = defender.getCurrentPokemon();
-        targetPokemon.takeDamage(damage);
+        if (attackerPokemon == null || targetPokemon == null || attackerPokemon.isFainted()) {
+            return false;
+        }
+
+        // Match offline behavior for self-heal status move.
+        if ("lunar-blessing".equals(move.getName())) {
+            int healAmount = Math.max(1, attackerPokemon.getMaxHp() / 2);
+            int actualHeal = Math.min(healAmount, attackerPokemon.getMaxHp() - attackerPokemon.getCurrentHp());
+            if (actualHeal > 0) {
+                attackerPokemon.heal(actualHeal);
+            }
+
+            DamageMessage healMsg = new DamageMessage(
+                    battleId,
+                    attackerName,
+                    defenderName,
+                    0,
+                    targetPokemon.getCurrentHp(),
+                    targetPokemon.getMaxHp(),
+                    attackerPokemon.getCurrentHp(),
+                    attackerPokemon.getMaxHp(),
+                    actualHeal,
+                    false,
+                    1.0f,
+                    move.getName()
+            );
+            player1Handler.sendMessage(healMsg);
+            player2Handler.sendMessage(healMsg);
+            return false;
+        }
+
+        // Calculate damage using offline-equivalent formula.
+        DamageResult result = calculateDamage(attackerPokemon, targetPokemon, move);
+        int damage = result.damage();
+
+        if (damage > 0) {
+            targetPokemon.takeDamage(damage);
+        }
         
-        float effectiveness = 1.0f;  // TODO: retrieve from battle engine's type effectiveness
+        int actualHeal = 0;
+        if (isDrainMove(move.getName()) && damage > 0) {
+            int healAmount = Math.max(1, damage / 2);
+            actualHeal = Math.min(healAmount, attackerPokemon.getMaxHp() - attackerPokemon.getCurrentHp());
+            if (actualHeal > 0) {
+                attackerPokemon.heal(actualHeal);
+            }
+        }
+        
         boolean targetFainted = targetPokemon.isFainted();
         
         // Create and send damage message to both players
@@ -313,8 +356,11 @@ public class OnlineBattle {
             damage,
             targetPokemon.getCurrentHp(),
             targetPokemon.getMaxHp(),
+            attackerPokemon.getCurrentHp(),
+            attackerPokemon.getMaxHp(),
+            actualHeal,
             targetFainted,
-            effectiveness,
+            result.effectiveness(),
             move.getName()
         );
         
@@ -359,39 +405,64 @@ public class OnlineBattle {
     /**
      * Simple damage calculation (can be enhanced with game engine logic).
      */
-    private int calculateDamage(Player attacker, Player defender, Move move) {
-        if (move.getPower() == null || move.getPower() == 0) {
-            return 0;  // Status move
+    private DamageResult calculateDamage(PokemonInstance attackerPokemon, PokemonInstance defenderPokemon, Move move) {
+        if (move.getPower() == null || move.getPower() == 0
+                || "status".equalsIgnoreCase(move.getDamage_class())) {
+            return new DamageResult(0, 1.0f);
         }
-        
-        PokemonInstance attackerPokemon = attacker.getCurrentPokemon();
-        PokemonInstance defenderPokemon = defender.getCurrentPokemon();
-        
-        double baseDamage = 0.5 * attackerPokemon.getLevel() / 5.0 + 2;
-        double attack = move.getDamage_class().equalsIgnoreCase("special") 
-            ? attackerPokemon.getSpAttack() 
-            : attackerPokemon.getAttack();
-        double defense = move.getDamage_class().equalsIgnoreCase("special")
-            ? defenderPokemon.getSpDefense()
-            : defenderPokemon.getDefense();
-        
-        double damage = baseDamage * move.getPower() * (attack / defense) / 50.0 + 2;
-        
-        // Random variation (85-100%)
-        double variance = 0.85 + (Math.random() * 0.15);
-        damage = damage * variance;
 
-        damage = damage * GLOBAL_DAMAGE_MULTIPLIER;
-        
-        // Accuracy check
+        // Accuracy check first so misses remain 0 damage.
         if (move.getAccuracy() != null && move.getAccuracy() < 100) {
-            if (Math.random() * 100 > move.getAccuracy()) {
-                damage = 0;  // Move missed
+            if (random.nextDouble() * 100 > move.getAccuracy()) {
+                return new DamageResult(0, 1.0f);
             }
         }
-        
-        return Math.max(1, (int)damage);
+
+        int atkStat = "special".equalsIgnoreCase(move.getDamage_class())
+                ? attackerPokemon.getSpAttack()
+                : attackerPokemon.getAttack();
+        int defStat = "special".equalsIgnoreCase(move.getDamage_class())
+                ? defenderPokemon.getSpDefense()
+                : defenderPokemon.getDefense();
+
+        double damage = ((2.0 * attackerPokemon.getLevel() / 5.0 + 2.0) * move.getPower()
+                * atkStat / (double) defStat) / 50.0 + 2.0;
+
+        float effectiveness = Battle.getTypeEffectivenessMultiplier(move.getType(), defenderPokemon.getTypes());
+        damage *= effectiveness;
+
+        double stab = 1.0;
+        if (attackerPokemon.getTypes() != null && move.getType() != null) {
+            for (String type : attackerPokemon.getTypes()) {
+                if (type.equalsIgnoreCase(move.getType())) {
+                    stab = 1.5;
+                    break;
+                }
+            }
+        }
+        damage *= stab;
+
+        double variance = 0.85 + (random.nextDouble() * 0.15);
+        damage *= variance;
+        damage *= GLOBAL_DAMAGE_MULTIPLIER;
+
+        int finalDamage = Math.max(1, (int) damage);
+        return new DamageResult(finalDamage, effectiveness);
     }
+
+    private boolean isDrainMove(String moveName) {
+        if (moveName == null) {
+            return false;
+        }
+        return switch (moveName) {
+            case "drain-punch", "giga-drain", "mega-drain", "absorb",
+                    "leech-life", "draining-kiss", "dream-eater",
+                    "horn-leech", "oblivion-wing", "parabolic-charge" -> true;
+            default -> false;
+        };
+    }
+
+    private record DamageResult(int damage, float effectiveness) { }
     
     /**
      * Check if the battle should end.

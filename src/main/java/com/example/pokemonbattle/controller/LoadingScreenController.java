@@ -11,6 +11,8 @@ import javafx.animation.Timeline;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
@@ -21,6 +23,7 @@ public class LoadingScreenController {
 
     @FXML private StackPane rootPane;
     @FXML private MediaView bgVideo;
+    @FXML private ImageView fallbackImage;
     @FXML private Rectangle progressFill;
     @FXML private Label loadingLabel;
 
@@ -44,6 +47,13 @@ public class LoadingScreenController {
     }
 
     private void setupVideo() {
+        if (fallbackImage != null) {
+            fallbackImage.fitWidthProperty().bind(rootPane.widthProperty());
+            fallbackImage.fitHeightProperty().bind(rootPane.heightProperty());
+            fallbackImage.setVisible(false);
+            fallbackImage.setManaged(false);
+        }
+
         mediaPlayer = claimPrimaryLoadingVideoPlayer();
         if (mediaPlayer == null) {
             System.err.println("LoadingScreenController: Pikachu loading video unavailable. Falling back to pokeball overlay.");
@@ -92,7 +102,23 @@ public class LoadingScreenController {
             return;
         }
         bgVideo.setMediaPlayer(null);
+
+        if (fallbackImage != null) {
+            if (fallbackImage.getImage() == null) {
+                Image image = com.example.pokemonbattle.util.MediaCache.getImage("loading.png");
+                if (image != null) {
+                    fallbackImage.setImage(image);
+                } else {
+                    System.err.println("LoadingScreenController: loading.png fallback unavailable.");
+                }
+            }
+            fallbackImage.setVisible(true);
+            fallbackImage.toFront();
+        }
+
         fallbackPokeball = PokeballOverlay.showOn(rootPane);
+        fallbackPokeball.setScaleX(0.58);
+        fallbackPokeball.setScaleY(0.58);
         fallbackPokeball.toFront();
 
         if (progressFill != null && progressFill.getParent() != null) {
@@ -105,10 +131,16 @@ public class LoadingScreenController {
 
     private void clearFallbackPokeball() {
         if (fallbackPokeball == null || rootPane == null) {
+            if (fallbackImage != null) {
+                fallbackImage.setVisible(false);
+            }
             return;
         }
         PokeballOverlay.hideFrom(rootPane, fallbackPokeball, null);
         fallbackPokeball = null;
+        if (fallbackImage != null) {
+            fallbackImage.setVisible(false);
+        }
     }
 
     private void setupProgressBar() {
