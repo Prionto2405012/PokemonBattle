@@ -1160,16 +1160,6 @@
     "description": "Power: 70\nAccuracy: 100\nPP: 10\n\nThe user throws scorching sand at the target to attack. This may also leave the target with a burn."
   },
   {
-    "id": 179,
-    "name": "dragon-cheer",
-    "power": 0,
-    "accuracy": 0,
-    "pp": 15,
-    "type": "dragon",
-    "damage_class": "status",
-    "description": "Power: -\nAccuracy: -\nPP: 15\n\nThe user raises its allies\u2019 morale with a draconic cry so that their future attacks have a heightened chance of landing critical hits. This rouses Dragon types more."
-  },
-  {
     "id": 180,
     "name": "ice-punch",
     "power": 75,

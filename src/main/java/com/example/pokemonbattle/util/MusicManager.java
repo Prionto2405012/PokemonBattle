@@ -19,6 +19,11 @@ public class MusicManager {
         "/com/example/pokemonbattle/audio/gen2.mp3",
         "/com/example/pokemonbattle/audio/gen3.mp3"
     };
+    private static final String[] BATTLE_BGM_TRACKS = {
+        "/com/example/pokemonbattle/audio/battle1.mp3",
+        "/com/example/pokemonbattle/audio/battle2.mp3",
+        "/com/example/pokemonbattle/audio/battle3.mp3"
+    };
     private static final String CLICK= "/com/example/pokemonbattle/audio/click.mp3";
     private static final String VICTORY= "/com/example/pokemonbattle/audio/victory.mp3";
     private static final ExecutorService BGM_OP = Executors.newSingleThreadExecutor(r -> {
@@ -35,6 +40,8 @@ public class MusicManager {
     private volatile double  masterVolume  = 0.2;
     private volatile boolean soundEnabled  = true;
     private volatile String  currentTrackPath;
+    private volatile boolean battleMusicEnabled = true;
+    private volatile String selectedBattleTrackPath;
 
     private MusicManager() {
         clickClip   = buildAudioClip(CLICK);
@@ -47,12 +54,80 @@ public class MusicManager {
     public void playRandomBGM() {
         switchBGM(BGM_TRACKS[new Random().nextInt(BGM_TRACKS.length)]);
     }
+
+    public void startBattleMusicForEncounter() {
+        if (!soundEnabled || !battleMusicEnabled) {
+            return;
+        }
+        String track = selectedBattleTrackPath;
+        if (track == null) {
+            track = BATTLE_BGM_TRACKS[new Random().nextInt(BATTLE_BGM_TRACKS.length)];
+        }
+        switchBattleBGM(track);
+    }
+
+    public void setBattleMusicEnabled(boolean enabled) {
+        battleMusicEnabled = enabled;
+        if (!enabled && isBattleTrackPath(currentTrackPath)) {
+            stopBGM();
+        }
+    }
+
+    public boolean isBattleMusicEnabled() {
+        return battleMusicEnabled;
+    }
+
+    public void setBattleMusicTrack(String resourcePath) {
+        selectedBattleTrackPath = resourcePath;
+    }
+
+    public String getSelectedBattleTrack() {
+        return selectedBattleTrackPath;
+    }
+
+    private boolean isBattleTrackPath(String path) {
+        if (path == null) {
+            return false;
+        }
+        for (String track : BATTLE_BGM_TRACKS) {
+            if (track.equals(path)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    public void switchToBattleMusic() {
+        if (soundEnabled && battleMusicEnabled) {
+            startBattleMusicForEncounter();
+        }
+    }
     public void switchBGM(String resourcePath) {
         currentTrackPath = resourcePath;
         if (soundEnabled) startBGM(resourcePath);
     }
     public void playBGM(String resourcePath) { switchBGM(resourcePath); }
+    public void switchBattleBGM(String resourcePath) {
+        currentTrackPath = resourcePath;
+        if (soundEnabled) startBattleBGM(resourcePath);
+    }
+    private void startBattleBGM(String path) {
+        BGM_OP.execute(() -> {
+            MediaPlayer old = bgmRef.getAndSet(null);
+            if (old != null) { old.stop(); old.dispose(); }
 
+            URL url = getClass().getResource(path);
+            if (url == null) { System.err.println("[MusicManager] Battle BGM not found: " + path); return; }
+            MediaPlayer player = new MediaPlayer(new Media(url.toExternalForm()));
+            player.setVolume(masterVolume);
+            player.setCycleCount(MediaPlayer.INDEFINITE);
+            bgmRef.set(player);
+            Runnable tryPlay = () -> {
+                if (soundEnabled && bgmRef.get() == player) player.play();
+            };
+            player.setOnReady(tryPlay);
+            if (player.getStatus() == MediaPlayer.Status.READY) tryPlay.run();
+        });
+    }
     private void startBGM(String path) {
         BGM_OP.execute(() -> {
             MediaPlayer old = bgmRef.getAndSet(null);
@@ -88,8 +163,10 @@ public class MusicManager {
     public void setSoundEnabled(boolean enabled) {
         this.soundEnabled = enabled;
         if (!enabled) stopBGM();
-        else if (currentTrackPath != null) startBGM(currentTrackPath);
-        else playRandomBGM();
+        else if (currentTrackPath != null) {
+            if (isBattleTrackPath(currentTrackPath)) startBattleBGM(currentTrackPath);
+            else startBGM(currentTrackPath);
+        } else playRandomBGM();
     }
     public void setMasterVolume(double volume) {
         this.masterVolume = Math.max(0.0, Math.min(1.0, volume));

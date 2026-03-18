@@ -633,6 +633,8 @@ public class BattleController implements Battle.BattleListener {
     //  VS Intro 
 
     private void playVSIntro() {
+        MusicManager.getInstance().startBattleMusicForEncounter();
+
         int npcId = new Random().nextInt(VS_NPC_COUNT) + 1;
         String npcPath = "/com/example/pokemonbattle/sprites/trainer/npc/" + npcId + ".png";
         var npcUrl = getClass().getResource(npcPath);
@@ -1051,6 +1053,9 @@ public class BattleController implements Battle.BattleListener {
 
     //  Panel switching 
     private void onBack() {
+        MusicManager mm = MusicManager.getInstance();
+        mm.stopBGM();
+        mm.playRandomBGM(); // resume game OST on the setup screen
         SceneManager.clearData();
         SceneManager.switchSceneWithLoading("new_game.fxml", "Pokemon Battle - Setup", 1200, 700);
     }
@@ -1240,8 +1245,8 @@ public class BattleController implements Battle.BattleListener {
     public void onBattleEnd(String winnerName) {
         boolean playerWon = winnerName.equals(player.getName());
         saveBattleResult(playerWon);
+        MusicManager.getInstance().stopBGM();
         if (playerWon) {
-            MusicManager.getInstance().stopBGM();
             MusicManager.getInstance().playVictorySFX();
         }
         Platform.runLater(() -> showResultOverlay(playerWon));

@@ -54,7 +54,7 @@ public class FireEffects {
         this.battleField = battleField;
     }
 
-    // ── PUBLIC ENTRY POINT ────────────────────────────────────────────────────
+    //  PUBLIC ENTRY POINT 
 
     public void createImpactEffect(double x, double y, String moveName, int movePower, Timeline timeline) {
         createImpactEffect(x, y, x, y, moveName, movePower, timeline);
@@ -100,7 +100,7 @@ public class FireEffects {
         }
     }
 
-    // ── MOVEMENT EFFECT ───────────────────────────────────────────────────────
+    //  MOVEMENT EFFECT ─
 
     public void addChargeTrailForMove(String moveName, double ax, double ay,
             boolean attackingRight, Timeline timeline) {
@@ -109,7 +109,7 @@ public class FireEffects {
                 moveName.equals("flame-wheel"), timeline);
     }
 
-    // ── 1) FIRE PUNCH ─────────────────────────────────────────────────────────
+    //  1) FIRE PUNCH ─
 
     private void addFirePunchEmbers(double x, double y, double intensity, Timeline timeline) {
         int count = (int)(18 * intensity);
@@ -134,7 +134,7 @@ public class FireEffects {
         }
     }
 
-    // ── 2) EMBER ──────────────────────────────────────────────────────────────
+    //  2) EMBER 
 
     private void addEmberBurst(double sx, double sy, double ex, double ey,
             double intensity, Timeline timeline) {
@@ -171,7 +171,7 @@ public class FireEffects {
         addFlashCircle(ex, ey, 24 * intensity, FIRE_ORANGE, 185, 80, timeline);
     }
 
-    // ── 3) FLAMETHROWER ───────────────────────────────────────────────────────
+    //  3) FLAMETHROWER 
 
     private void addFlamethrowerStream(double sx, double sy, double ex, double ey,
             double intensity, Timeline timeline) {
@@ -179,7 +179,7 @@ public class FireEffects {
         double dist  = Math.hypot(ex - sx, ey - sy);
         double w     = 25 + 12 * intensity;
 
-        // ── Fixed-pivot beam via Group ────────────────────────────────────────
+        //  Fixed-pivot beam via Group 
         Rectangle beam = new Rectangle(0, w);
         beam.setX(0);
         beam.setY(-w / 2);
@@ -229,7 +229,7 @@ public class FireEffects {
         addFlashCircle(ex, ey, 75 * intensity, FIRE_ORANGE, 240, 180, timeline);
     }
 
-    // ── 4) FIRE SPIN ──────────────────────────────────────────────────────────
+    //  4) FIRE SPIN 
 
     private void addFireVortex(double x, double y, double intensity, Timeline timeline) {
         for (int ring = 0; ring < 2; ring++) {
@@ -261,7 +261,7 @@ public class FireEffects {
         addFlashCircle(x, y, 30 * intensity, FIRE_RED, 0, 120, timeline);
     }
 
-    // ── 5) FIRE BLAST ─────────────────────────────────────────────────────────
+    //  5) FIRE BLAST ─
 
     private void addExplosionCore(double x, double y, double intensity,
             boolean fiveSpoke, Timeline timeline) {
@@ -317,7 +317,7 @@ public class FireEffects {
         }
     }
 
-    // ── 6) HEAT WAVE ──────────────────────────────────────────────────────────
+    //  6) HEAT WAVE 
 
     private void addHeatWaveDistortion(double sx, double sy, double ex, double ey,
             double intensity, Timeline timeline) {
@@ -357,7 +357,7 @@ public class FireEffects {
         addFlashCircle(ex, ey, 50 * intensity, FIRE_RED.deriveColor(0, 1, 1, 0.5), 260, 160, timeline);
     }
 
-    // ── 7) OVERHEAT ───────────────────────────────────────────────────────────
+    //  7) OVERHEAT ─
 
     private void addOverheatOverdrive(double sx, double sy, double ex, double ey,
             double intensity, Timeline timeline) {
@@ -407,7 +407,7 @@ public class FireEffects {
         addExplosionCore(ex, ey, intensity * 0.85, false, timeline);
     }
 
-    // ── 8) FLARE BLITZ rebound ────────────────────────────────────────────────
+    //  8) FLARE BLITZ rebound 
 
     private void addReboundSpark(double ax, double ay, Timeline timeline) {
         int count = 16;
@@ -428,7 +428,7 @@ public class FireEffects {
         }
     }
 
-    // ── 9) FIRE FANG ─────────────────────────────────────────────────────────
+    //  9) FIRE FANG ─
 
     public void addFangVisual(double x, double y, Timeline timeline) {
         for (int i = 0; i < 2; i++) {
@@ -454,7 +454,7 @@ public class FireEffects {
         }
     }
 
-    // ── 10) FLAME BURST ───────────────────────────────────────────────────────
+    //  10) FLAME BURST ─
 
     private void addBurstSplash(double x, double y, double intensity, Timeline timeline) {
         Circle core = new Circle(0, FIRE_ORANGE);
@@ -491,7 +491,7 @@ public class FireEffects {
         }
     }
 
-    // ── 11) CHARGE FLARE TRAIL ────────────────────────────────────────────────
+    //  11) CHARGE FLARE TRAIL 
 
     private void addChargeFlareTrail(double sx, double sy, double ex, double ey,
             double intensity, boolean isWheel, Timeline timeline) {
@@ -523,13 +523,13 @@ public class FireEffects {
         addFlashCircle(ex, ey, isWheel ? 40 * intensity : 22 * intensity, FIRE_ORANGE, count * 22, 100, timeline);
     }
 
-    // ── 12) INCINERATE ───────────────────────────────────────────────────────
+    //  12) INCINERATE 
 
     private void addBerryIncinerateAsh(double x, double y, double intensity, Timeline timeline) {
         addFlashCircle(x, y, 30 * intensity, FIRE_RED, 0, 100, timeline);
         int ashCount = (int)(28 * intensity);
         for (int i = 0; i < ashCount; i++) {
-            Circle ash = new Circle(7 + random.nextDouble() * 3, ASH_GRAY);
+            Circle ash = new Circle(10 + random.nextDouble() * 3, ASH_GRAY);
             double ox = (random.nextDouble() - 0.5) * 50;
             ash.setCenterX(x + ox); ash.setCenterY(y + 10);
             ash.setOpacity(0);
@@ -546,7 +546,7 @@ public class FireEffects {
         }
     }
 
-    // ── 13) INFERNO ──────────────────────────────────────────────────────────
+    //  13) INFERNO 
 
     private void addInfernoPillar(double x, double y, double intensity, Timeline timeline) {
         int layerCount = (int)(10 + 3 * intensity);
@@ -577,10 +577,11 @@ public class FireEffects {
                             new KeyValue(col.opacityProperty(), 0)));
             registerCleanup(timeline, col);
         }
+        addTemperFlareBacklash(x, y, 18* intensity, timeline);
         addFlashCircle(x, y, 40 * intensity, FIRE_ORANGE, 0, 120, timeline);
     }
 
-    // ── 14) FIRE PLEDGE ──────────────────────────────────────────────────────
+    //  14) FIRE PLEDGE 
 
     private void addPledgeColumn(double x, double y, double intensity, Timeline timeline) {
         double w   = 38 + 10 * intensity;
@@ -607,7 +608,7 @@ public class FireEffects {
         addFlashCircle(x, y, 28 * intensity, FIRE_YELLOW, 0, 100, timeline);
     }
 
-    // ── 15) TEMPER FLARE ─────────────────────────────────────────────────────
+    //  15) TEMPER FLARE ─
 
     private void addTemperFlareBacklash(double x, double y, double intensity, Timeline timeline) {
         addBurstSplash(x, y, intensity * 0.9, timeline);
@@ -629,7 +630,7 @@ public class FireEffects {
         addFlashCircle(x, y, 35 * intensity, LAVA_RED, 90, 120, timeline);
     }
 
-    // ── 16) BLAZE KICK ───────────────────────────────────────────────────────
+    //  16) BLAZE KICK ─
 
     private void addKickArcFlame(double x, double y, double intensity, Timeline timeline) {
         int segments = 18;
@@ -670,7 +671,7 @@ public class FireEffects {
         }
     }
 
-    // ── 17) BLAST BURN ───────────────────────────────────────────────────────
+    //  17) BLAST BURN ─
 
     private void addBlastBurnDetonation(double sx, double sy, double ex, double ey,
             double intensity, Timeline timeline) {
@@ -735,7 +736,7 @@ public class FireEffects {
         }
     }
 
-    // ── 18) MYSTICAL FIRE ────────────────────────────────────────────────────
+    //  18) MYSTICAL FIRE 
 
     private void addMysticFlameSpiral(double sx, double sy, double ex, double ey,
             double intensity, Timeline timeline) {
@@ -781,7 +782,7 @@ public class FireEffects {
         registerCleanup(timeline, bloom);
     }
 
-    // ── 19) FLAME WHEEL ──────────────────────────────────────────────────────
+    //  19) FLAME WHEEL 
 
     private void addWheelSpinRing(double sx, double sy, double ex, double ey,
             double intensity, Timeline timeline) {
@@ -808,7 +809,7 @@ public class FireEffects {
         addBurstSplash(ex, ey, intensity * 0.9, timeline);
     }
 
-    // ── 20) BURNING JEALOUSY ─────────────────────────────────────────────────
+    //  20) BURNING JEALOUSY ─
 
     private void addJealousyDarkFlare(double x, double y, double intensity, Timeline timeline) {
         for (int pulse = 0; pulse < 2; pulse++) {
@@ -852,7 +853,7 @@ public class FireEffects {
         }
     }
 
-    // ── 21) BURN UP ──────────────────────────────────────────────────────────
+    //  21) BURN UP 
 
     private void addBurnUpCollapse(double sx, double sy, double ex, double ey,
             double intensity, Timeline timeline) {
@@ -889,7 +890,7 @@ public class FireEffects {
         }
     }
 
-    // ── 22) RAGING FURY ──────────────────────────────────────────────────────
+    //  22) RAGING FURY 
 
     private void addRagingFuryMultiBursts(double x, double y, double intensity, Timeline timeline) {
         for (int burst = 0; burst < 3; burst++) {
@@ -916,7 +917,7 @@ public class FireEffects {
         }
     }
 
-    // ── 23) LAVA PLUME ───────────────────────────────────────────────────────
+    //  23) LAVA PLUME ─
 
     private void addLavaPlumeGroundPlume(double x, double y, double intensity, Timeline timeline) {
         Ellipse crack = new Ellipse(40 * intensity, 8);
@@ -976,7 +977,7 @@ public class FireEffects {
         }
     }
 
-    // ── 24) ERUPTION ─────────────────────────────────────────────────────────
+    //  24) ERUPTION ─
 
     private void addEruptionRadialColumns(double x, double y, double intensity, Timeline timeline) {
         int colCount = (int) clamp(10 + intensity * 6, 3, 10);
@@ -1010,7 +1011,7 @@ public class FireEffects {
         addFlashCircle(x, y, 55 * intensity, LAVA_ORANGE, 0, 140, timeline);
     }
 
-    // ── 25) SACRED FIRE ──────────────────────────────────────────────────────
+    //  25) SACRED FIRE 
 
     private void addSacredFireWhiteCore(double x, double y, double intensity, Timeline timeline) {
         addFlashCircle(x, y, 70 * intensity, FIRE_WHITE,  90,  60, timeline);
@@ -1050,7 +1051,7 @@ public class FireEffects {
         }
     }
 
-    // ── 26) MAGMA STORM ──────────────────────────────────────────────────────
+    //  26) MAGMA STORM 
 
     private void addMagmaStormTrapRing(double x, double y, double intensity, Timeline timeline) {
         addExplosionCore(x, y, intensity * 0.8, false, timeline);
@@ -1095,7 +1096,7 @@ public class FireEffects {
         }
     }
 
-    // ── FALLBACK ─────────────────────────────────────────────────────────────
+    //  FALLBACK ─
 
     private void addDefaultFlames(double x, double y, double intensity, Timeline timeline) {
         int flameCount = (int)(30 + 10 * intensity);
@@ -1123,7 +1124,7 @@ public class FireEffects {
         }
     }
 
-    // ── SHARED HELPERS ────────────────────────────────────────────────────────
+    //  SHARED HELPERS 
 
     private void addFlashCircle(double x, double y, double radius, Color color,
             int startDelay, int fadeDuration, Timeline timeline) {

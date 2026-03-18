@@ -59,7 +59,7 @@ public class SettingsController {
     @FXML
     private Button langEnBtn, langJpBtn;
     private final BooleanProperty gameSoundOn = new SimpleBooleanProperty(true);
-    private final BooleanProperty battleSoundOn = new SimpleBooleanProperty(false);
+    private final BooleanProperty battleSoundOn = new SimpleBooleanProperty(true);
     private final BooleanProperty animationOn = new SimpleBooleanProperty(
             PlayerSession.getInstance().isMoveAnimationEnabled());
 
@@ -70,6 +70,20 @@ public class SettingsController {
     @FXML
     public void initialize() {
         MusicManager mm = MusicManager.getInstance();
+        gameSoundOn.set(mm.isSoundEnabled());
+        battleSoundOn.set(mm.isBattleMusicEnabled());
+
+        String selectedBattleTrack = mm.getSelectedBattleTrack();
+        if (selectedBattleTrack != null) {
+            if (selectedBattleTrack.endsWith("battle2.mp3")) {
+                selectedBattleGen = 2;
+            } else if (selectedBattleTrack.endsWith("battle3.mp3")) {
+                selectedBattleGen = 3;
+            } else {
+                selectedBattleGen = 1;
+            }
+        }
+
         installPokeballKnob(gameSoundKnob);
         installPokeballKnob(battleSoundKnob);
         installPokeballKnob(animationKnob);
@@ -111,6 +125,7 @@ public class SettingsController {
         boolean nowOn = !battleSoundOn.get();
         battleSoundOn.set(nowOn);
         animateToggle(battleSoundToggle, battleSoundKnob, nowOn);
+        MusicManager.getInstance().setBattleMusicEnabled(nowOn); // was missing
     }
 
     @FXML
@@ -125,13 +140,15 @@ public class SettingsController {
         selectedGameGen = parseGen((Button) e.getSource());
         markGenSelected(gameGen1Btn, gameGen2Btn, gameGen3Btn, selectedGameGen);
         if (gameSoundOn.get()) {
-            MusicManager.getInstance().switchBGM(genPath(selectedGameGen));
+            MusicManager.getInstance().switchBGM(gameGenPath(selectedGameGen));
         }
     }
+
     @FXML
     void onBattleGenSelect(ActionEvent e) {
         selectedBattleGen = parseGen((Button) e.getSource());
         markGenSelected(battleGen1Btn, battleGen2Btn, battleGen3Btn, selectedBattleGen);
+        MusicManager.getInstance().setBattleMusicTrack(battleGenPath(selectedBattleGen));
     }
 
     @FXML
@@ -363,11 +380,19 @@ public class SettingsController {
             return 1;
         }
     }
-    private String genPath(int gen) {
+    private String gameGenPath(int gen) {
         return switch (gen) {
             case 2 -> "/com/example/pokemonbattle/audio/gen2.mp3";
             case 3 -> "/com/example/pokemonbattle/audio/gen3.mp3";
             default -> "/com/example/pokemonbattle/audio/gen1.mp3";
+        };
+    }
+
+    private String battleGenPath(int gen) {
+        return switch (gen) {
+            case 2 -> "/com/example/pokemonbattle/audio/battle2.mp3";
+            case 3 -> "/com/example/pokemonbattle/audio/battle3.mp3";
+            default -> "/com/example/pokemonbattle/audio/battle1.mp3";
         };
     }
 

@@ -566,6 +566,8 @@ public class OnlineBattleController {
     //  VS Intro 
 
     private void playVSIntro() {
+        MusicManager.getInstance().startBattleMusicForEncounter();
+
         boolean oppLoaded = false;
         if (opponentAvatarPath != null && !opponentAvatarPath.isEmpty()) {
             var oppUrl = getClass().getResource(opponentAvatarPath);
@@ -859,8 +861,8 @@ public class OnlineBattleController {
     //  Result overlay 
 
     private void showResultOverlay(boolean playerWon) {
+        MusicManager.getInstance().stopBGM();
         if (playerWon) {
-            MusicManager.getInstance().stopBGM();
             MusicManager.getInstance().playVictorySFX();
             startConfetti();
         }
@@ -980,6 +982,7 @@ public class OnlineBattleController {
             try { serverConnection.disconnect(); }
             catch (Exception e) { System.err.println("[OnlineBattle] Failed to close connection: " + e.getMessage()); }
         }
+        MusicManager.getInstance().playRandomBGM(); // restore game OST
         SceneManager.clearData();
         SceneManager.switchSceneWithLoading("new_game.fxml", "Battle Setup", 1200, 700);
     }
@@ -1001,6 +1004,7 @@ public class OnlineBattleController {
 
     private void onRunClicked() {
         if (battleEnded) { doDisconnectAndLeave(); return; }
+        MusicManager.getInstance().stopBGM();
         showForfeitOverlay();
     }
 

@@ -10,10 +10,12 @@ import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.scene.shape.Rectangle;
@@ -24,6 +26,7 @@ public class LoadingScreenController {
     @FXML private StackPane rootPane;
     @FXML private MediaView bgVideo;
     @FXML private ImageView fallbackImage;
+    @FXML private VBox progressContainer;
     @FXML private Rectangle progressFill;
     @FXML private Label loadingLabel;
 
@@ -31,6 +34,10 @@ public class LoadingScreenController {
     private PokeballOverlay fallbackPokeball;
     private Timeline progressTimeline;
     private static final String PRIMARY_LOADING_VIDEO = "Pikachu.mp4";
+    private static final String FALLBACK_LOADING_IMAGE = "loading.png";
+    private static final double FALLBACK_POKEBALL_SCALE = 0.48;
+    private static final boolean USE_VIDEO_BACKGROUND = true;
+    private static final double FALLBACK_IMAGE_ZOOM = 1.04;
 
     // Total loading duration in milliseconds
     private static final double LOAD_DURATION_MS = 3000.0;
@@ -50,8 +57,17 @@ public class LoadingScreenController {
         if (fallbackImage != null) {
             fallbackImage.fitWidthProperty().bind(rootPane.widthProperty());
             fallbackImage.fitHeightProperty().bind(rootPane.heightProperty());
+            fallbackImage.setPreserveRatio(true);
+            fallbackImage.setScaleX(FALLBACK_IMAGE_ZOOM);
+            fallbackImage.setScaleY(FALLBACK_IMAGE_ZOOM);
+            StackPane.setAlignment(fallbackImage, Pos.CENTER);
             fallbackImage.setVisible(false);
             fallbackImage.setManaged(false);
+        }
+
+        if (!USE_VIDEO_BACKGROUND) {
+            enablePokeballFallback();
+            return;
         }
 
         mediaPlayer = claimPrimaryLoadingVideoPlayer();
@@ -105,11 +121,11 @@ public class LoadingScreenController {
 
         if (fallbackImage != null) {
             if (fallbackImage.getImage() == null) {
-                Image image = com.example.pokemonbattle.util.MediaCache.getImage("loading.png");
+                Image image = com.example.pokemonbattle.util.MediaCache.getImage(FALLBACK_LOADING_IMAGE);
                 if (image != null) {
                     fallbackImage.setImage(image);
                 } else {
-                    System.err.println("LoadingScreenController: loading.png fallback unavailable.");
+                    System.err.println("LoadingScreenController: " + FALLBACK_LOADING_IMAGE + " fallback unavailable.");
                 }
             }
             fallbackImage.setVisible(true);
@@ -117,12 +133,15 @@ public class LoadingScreenController {
         }
 
         fallbackPokeball = PokeballOverlay.showOn(rootPane);
-        fallbackPokeball.setScaleX(0.58);
-        fallbackPokeball.setScaleY(0.58);
+        fallbackPokeball.setScaleX(FALLBACK_POKEBALL_SCALE);
+        fallbackPokeball.setScaleY(FALLBACK_POKEBALL_SCALE);
         fallbackPokeball.toFront();
+        ensureLoadingUiOnTop();
+    }
 
-        if (progressFill != null && progressFill.getParent() != null) {
-            progressFill.getParent().toFront();
+    private void ensureLoadingUiOnTop() {
+        if (progressContainer != null) {
+            progressContainer.toFront();
         }
         if (loadingLabel != null) {
             loadingLabel.toFront();
@@ -145,19 +164,18 @@ public class LoadingScreenController {
 
     private void setupProgressBar() {
         progressFill.setWidth(0);
-        progressFill.setTranslateX(-(BAR_WIDTH / 2.0));
+        progressFill.setTranslateX(0);
         loadingLabel.setText("Loading... 0%");
+        ensureLoadingUiOnTop();
     }
 
     private void startLoading() {
         progressTimeline = new Timeline(
             new KeyFrame(Duration.ZERO,
-                new KeyValue(progressFill.widthProperty(), 0, Interpolator.LINEAR),
-                new KeyValue(progressFill.translateXProperty(), -(BAR_WIDTH / 2.0), Interpolator.LINEAR)
+                new KeyValue(progressFill.widthProperty(), 0, Interpolator.LINEAR)
             ),
             new KeyFrame(Duration.millis(LOAD_DURATION_MS),
-                new KeyValue(progressFill.widthProperty(), BAR_WIDTH, Interpolator.LINEAR),
-                new KeyValue(progressFill.translateXProperty(), 0, Interpolator.LINEAR)
+                new KeyValue(progressFill.widthProperty(), BAR_WIDTH, Interpolator.LINEAR)
             )
         );
 
@@ -190,12 +208,8 @@ public class LoadingScreenController {
             progressTimeline = null;
         }
         progressFill.setWidth(0);
-        progressFill.setTranslateX(-(BAR_WIDTH / 2.0));
+        progressFill.setTranslateX(0);
         progressFill.widthProperty().bind(task.progressProperty().multiply(BAR_WIDTH));
-        task.progressProperty().addListener((obs, oldP, newP) -> {
-            double w = Math.max(0, newP.doubleValue()) * BAR_WIDTH;
-            progressFill.setTranslateX(-(BAR_WIDTH - w) / 2.0);
-        });
         loadingLabel.textProperty().bind(task.messageProperty());
         task.setOnSucceeded(event -> {
             if (mediaPlayer != null) {
