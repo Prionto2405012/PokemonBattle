@@ -1,5 +1,6 @@
 package com.example.pokemonbattle.controller;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.ArrayDeque;
@@ -41,9 +42,11 @@ import javafx.animation.Timeline;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
@@ -65,6 +68,7 @@ import javafx.util.Duration;
  * Controller for ONLINE battle screen.
  * Server is the single source of truth for damage; no local calculation.
  */
+@SuppressWarnings("unused")
 public class OnlineBattleController {
 
     // FXML injections
@@ -125,6 +129,14 @@ public class OnlineBattleController {
     @FXML private VBox forfeitDialog;
     @FXML private Button forfeitYesButton;
     @FXML private Button forfeitNoButton;
+
+    @FXML private Button battleSettingsButton;
+    @FXML private VBox battleQuickMenu;
+    @FXML private StackPane exitOverlay;
+    @FXML private Region exitBackdrop;
+    @FXML private VBox exitDialog;
+    @FXML private Button exitYesButton;
+    @FXML private Button exitNoButton;
 
     // Forced switch overlay
     @FXML private StackPane forcedSwitchOverlay;
@@ -238,6 +250,38 @@ public class OnlineBattleController {
         backButton.setOnAction(e -> onRunClicked());
         if (itemsButton != null)
             itemsButton.setOnAction(e -> onItemsClicked());
+        if (battleSettingsButton != null)
+            battleSettingsButton.setOnAction(e -> onBattleMenuToggleClicked());
+
+        if (optionsSection != null)
+            optionsSection.setPickOnBounds(false);
+        if (actionButtonsBox != null)
+            actionButtonsBox.setPickOnBounds(false);
+
+        if (exitOverlay != null) {
+            exitOverlay.setVisible(false);
+            exitOverlay.setManaged(false);
+            exitOverlay.setMouseTransparent(true);
+        }
+        if (forfeitOverlay != null) {
+            forfeitOverlay.setVisible(false);
+            forfeitOverlay.setManaged(false);
+            forfeitOverlay.setMouseTransparent(true);
+        }
+        if (forcedSwitchOverlay != null) {
+            forcedSwitchOverlay.setVisible(false);
+            forcedSwitchOverlay.setManaged(false);
+            forcedSwitchOverlay.setMouseTransparent(true);
+        }
+        if (battleResultOverlay != null) {
+            battleResultOverlay.setMouseTransparent(true);
+        }
+        if (vsScreenPane != null) {
+            vsScreenPane.setMouseTransparent(false);
+        }
+        if (rootBlackFade != null) {
+            rootBlackFade.setMouseTransparent(true);
+        }
 
         setVisible(waitingLabel, false);
         drawOptionsPanelPattern();
@@ -407,6 +451,145 @@ public class OnlineBattleController {
         if (pokemonInfoCard != null) pokemonInfoCard.setVisible(false);
     }
 
+    @FXML
+    private void onBattleMenuToggleClicked() {
+        if (battleQuickMenu == null)
+            return;
+        boolean isVisible = !battleQuickMenu.isVisible();
+        battleQuickMenu.setVisible(isVisible);
+        battleQuickMenu.setManaged(isVisible);
+    }
+
+    @FXML
+    private void onBattleGuideClicked() {
+        hideBattleQuickMenu();
+        SceneManager.switchSceneWithLoading("wc.fxml", "Welcome", 1200, 700);
+    }
+
+    @FXML
+    private void onQuitToHomeClicked() {
+        hideBattleQuickMenu();
+        doDisconnectAndLeave();
+    }
+
+    @FXML
+    private void onQuitToDesktopClicked() {
+        hideBattleQuickMenu();
+        showExitOverlay();
+    }
+
+    private void showExitOverlay() {
+        if (exitOverlay == null || exitDialog == null)
+            return;
+        exitOverlay.setVisible(true);
+        exitOverlay.setManaged(true);
+        exitOverlay.setMouseTransparent(false);
+
+        exitOverlay.setOpacity(0);
+        exitDialog.setScaleX(0.85);
+        exitDialog.setScaleY(0.85);
+        exitDialog.setOpacity(0);
+
+        FadeTransition backdropFade = new FadeTransition(Duration.millis(220), exitOverlay);
+        backdropFade.setFromValue(0);
+        backdropFade.setToValue(1);
+        backdropFade.setInterpolator(Interpolator.EASE_OUT);
+
+        Timeline dialogPop = new Timeline(
+                new KeyFrame(Duration.ZERO,
+                        new KeyValue(exitDialog.scaleXProperty(), 0.85),
+                        new KeyValue(exitDialog.scaleYProperty(), 0.85),
+                        new KeyValue(exitDialog.opacityProperty(), 0)),
+                new KeyFrame(Duration.millis(260),
+                        new KeyValue(exitDialog.scaleXProperty(), 1.0, Interpolator.SPLINE(0.2, 0.9, 0.3, 1)),
+                        new KeyValue(exitDialog.scaleYProperty(), 1.0, Interpolator.SPLINE(0.2, 0.9, 0.3, 1)),
+                        new KeyValue(exitDialog.opacityProperty(), 1.0, Interpolator.EASE_OUT)));
+
+        backdropFade.play();
+        dialogPop.play();
+    }
+
+    private void hideExitOverlay(Runnable onFinished) {
+        if (exitOverlay == null || exitDialog == null) {
+            if (onFinished != null)
+                onFinished.run();
+            return;
+        }
+        Timeline dismiss = new Timeline(
+                new KeyFrame(Duration.ZERO,
+                        new KeyValue(exitDialog.scaleXProperty(), 1.0),
+                        new KeyValue(exitDialog.scaleYProperty(), 1.0),
+                        new KeyValue(exitDialog.opacityProperty(), 1.0)),
+                new KeyFrame(Duration.millis(180),
+                        new KeyValue(exitDialog.scaleXProperty(), 0.88, Interpolator.EASE_IN),
+                        new KeyValue(exitDialog.scaleYProperty(), 0.88, Interpolator.EASE_IN),
+                        new KeyValue(exitDialog.opacityProperty(), 0.0, Interpolator.EASE_IN)));
+        FadeTransition backdropFade = new FadeTransition(Duration.millis(200), exitOverlay);
+        backdropFade.setFromValue(1);
+        backdropFade.setToValue(0);
+        backdropFade.setInterpolator(Interpolator.EASE_IN);
+        backdropFade.setOnFinished(e -> {
+            exitOverlay.setVisible(false);
+            exitOverlay.setManaged(false);
+            exitOverlay.setMouseTransparent(true);
+            if (onFinished != null)
+                onFinished.run();
+        });
+        dismiss.play();
+        backdropFade.play();
+    }
+
+    @FXML
+    private void onExitConfirmed() {
+        hideExitOverlay(() -> System.exit(0));
+    }
+
+    @FXML
+    private void onExitCancelled() {
+        hideExitOverlay(null);
+    }
+
+    @FXML
+    private void onBackClicked() {
+        hideBattleQuickMenu();
+    }
+
+    private void hideBattleQuickMenu() {
+        if (battleQuickMenu == null)
+            return;
+        battleQuickMenu.setVisible(false);
+        battleQuickMenu.setManaged(false);
+    }
+
+    @FXML
+    private void onBattleSettingsClicked() {
+        if (rootPane == null) {
+            return;
+        }
+
+        boolean alreadyOpen = rootPane.getChildren().stream()
+                .anyMatch(node -> node.getStyleClass().contains("overlay-root"));
+        if (alreadyOpen) {
+            return;
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/com/example/pokemonbattle/view/settings.fxml"));
+            javafx.scene.Node overlay = loader.load();
+            overlay.setOpacity(0.0);
+            rootPane.getChildren().add(overlay);
+            MusicManager.getInstance().attachClickSounds((Parent) overlay);
+
+            FadeTransition ft = new FadeTransition(Duration.millis(200), overlay);
+            ft.setFromValue(0.0);
+            ft.setToValue(1.0);
+            ft.play();
+        } catch (IOException e) {
+            System.err.println("Error loading settings overlay: " + e.getMessage());
+        }
+    }
+
     //  Forced switch overlay 
     /**
      * Shows a modal overlay forcing the player to pick a replacement when their
@@ -433,6 +616,7 @@ public class OnlineBattleController {
         forcedSwitchOverlay.setOpacity(0);
         forcedSwitchOverlay.setVisible(true);
         forcedSwitchOverlay.setManaged(true);
+        forcedSwitchOverlay.setMouseTransparent(false);
         FadeTransition ft = new FadeTransition(Duration.millis(280), forcedSwitchOverlay);
         ft.setToValue(1.0);
         ft.play();
@@ -556,6 +740,7 @@ public class OnlineBattleController {
         ft.setOnFinished(e -> {
             forcedSwitchOverlay.setVisible(false);
             forcedSwitchOverlay.setManaged(false);
+            forcedSwitchOverlay.setMouseTransparent(true);
         });
         ft.play();
 
@@ -853,6 +1038,7 @@ public class OnlineBattleController {
         battleResultOverlay.setOpacity(0);
         battleResultOverlay.setVisible(true);
         battleResultOverlay.setManaged(true);
+        battleResultOverlay.setMouseTransparent(false);
         FadeTransition ft = new FadeTransition(Duration.millis(450), battleResultOverlay);
         ft.setToValue(1.0);
         ft.play();
@@ -887,6 +1073,7 @@ public class OnlineBattleController {
         battleResultOverlay.setOpacity(0);
         battleResultOverlay.setVisible(true);
         battleResultOverlay.setManaged(true);
+        battleResultOverlay.setMouseTransparent(false);
         FadeTransition ft = new FadeTransition(Duration.millis(450), battleResultOverlay);
         ft.setToValue(1.0);
         ft.play();
@@ -948,6 +1135,7 @@ public class OnlineBattleController {
         backdropFade.setOnFinished(e -> {
             forfeitOverlay.setVisible(false);
             forfeitOverlay.setManaged(false);
+            forfeitOverlay.setMouseTransparent(true);
             if (onFinished != null) onFinished.run();
         });
         dismiss.play();
@@ -1003,6 +1191,7 @@ public class OnlineBattleController {
     }
 
     private void onRunClicked() {
+        hideBattleQuickMenu();
         if (battleEnded) { doDisconnectAndLeave(); return; }
         MusicManager.getInstance().stopBGM();
         showForfeitOverlay();
@@ -1423,21 +1612,55 @@ public class OnlineBattleController {
     //  Panel visibility 
 
     private void showActionButtons() {
-        setVisible(actionButtonsBox, true);
-        setVisible(moveSelectionBox, false);
-        setVisible(pokemonSelectionBox, false);
+        actionButtonsBox.setDisable(false);
+        actionButtonsBox.setMouseTransparent(false);
+        actionButtonsBox.setVisible(true);
+        actionButtonsBox.setManaged(true);
+        actionButtonsBox.toFront();
+
+        if (attackButton != null)
+            attackButton.setDisable(false);
+        if (changePokemonMainButton != null)
+            changePokemonMainButton.setDisable(false);
+        if (itemsButton != null)
+            itemsButton.setDisable(false);
+        if (backButton != null)
+            backButton.setDisable(false);
+
+        moveSelectionBox.setVisible(false);
+        moveSelectionBox.setManaged(false);
+        moveSelectionBox.setMouseTransparent(true);
+        pokemonSelectionBox.setVisible(false);
+        pokemonSelectionBox.setManaged(false);
+        pokemonSelectionBox.setMouseTransparent(true);
     }
 
     private void showMoveSelection() {
-        setVisible(moveSelectionBox, true);
-        setVisible(actionButtonsBox, false);
-        setVisible(pokemonSelectionBox, false);
+        moveSelectionBox.setVisible(true);
+        moveSelectionBox.setManaged(true);
+        moveSelectionBox.setMouseTransparent(false);
+        moveSelectionBox.toFront();
+
+        actionButtonsBox.setVisible(false);
+        actionButtonsBox.setManaged(false);
+        actionButtonsBox.setMouseTransparent(true);
+        pokemonSelectionBox.setVisible(false);
+        pokemonSelectionBox.setManaged(false);
+        pokemonSelectionBox.setMouseTransparent(true);
     }
 
     private void showPokemonSelection() {
-        setVisible(pokemonSelectionBox, true);
-        setVisible(actionButtonsBox, false);
-        setVisible(moveSelectionBox, false);
+        pokemonSelectionBox.setVisible(true);
+        pokemonSelectionBox.setManaged(true);
+        pokemonSelectionBox.setMouseTransparent(false);
+        pokemonSelectionBox.toFront();
+
+        actionButtonsBox.setVisible(false);
+        actionButtonsBox.setManaged(false);
+        actionButtonsBox.setMouseTransparent(true);
+        moveSelectionBox.setVisible(false);
+        moveSelectionBox.setManaged(false);
+        moveSelectionBox.setMouseTransparent(true);
     }
 
     private void setVisible(javafx.scene.Node node, boolean v) {

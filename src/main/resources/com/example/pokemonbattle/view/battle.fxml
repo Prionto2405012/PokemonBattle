@@ -185,10 +185,69 @@
                 </VBox>
 
             </VBox>
+
+            <VBox StackPane.alignment="TOP_RIGHT" translateX="-16" translateY="16"
+                spacing="8" alignment="TOP_RIGHT" pickOnBounds="false">
+                <Button fx:id="battleSettingsButton" onAction="#onBattleMenuToggleClicked"
+                    styleClass="hamburger-trigger"
+                    pickOnBounds="true" focusTraversable="false">
+                    <graphic>
+                        <StackPane styleClass="hamburger-circle" mouseTransparent="true">
+                            <VBox spacing="4" alignment="CENTER" mouseTransparent="true">
+                                <Region styleClass="hamburger-line" />
+                                <Region styleClass="hamburger-line" />
+                                <Region styleClass="hamburger-line" />
+                            </VBox>
+                        </StackPane>
+                    </graphic>
+                </Button>
+                <VBox fx:id="battleQuickMenu" visible="false" managed="false" spacing="8"
+                    styleClass="battle-quick-menu" pickOnBounds="true">
+                    <Button text="Guide" onAction="#onBattleGuideClicked"
+                        styleClass="battle-quick-menu-button" prefWidth="230" prefHeight="36" />
+                    <Button text="Settings" onAction="#onBattleSettingsClicked"
+                        styleClass="battle-quick-menu-button" prefWidth="230" prefHeight="36" />
+                    <Button text="Quit to Home" onAction="#onQuitToHomeClicked"
+                        styleClass="battle-quick-menu-button" prefWidth="230" prefHeight="36" />
+                    <Button text="Quit to Desktop" onAction="#onQuitToDesktopClicked"
+                        styleClass="battle-quick-menu-button" prefWidth="230" prefHeight="36" />
+                    <Button text="Cancel" onAction="#onBackClicked"
+                        styleClass="battle-quick-menu-button, battle-quick-menu-cancel-btn"
+                        prefWidth="230" prefHeight="36" />
+                </VBox>
+            </VBox>
         </StackPane>
-
     </HBox>
+    <StackPane fx:id="exitOverlay" visible="false" managed="false"
+        mouseTransparent="false"
+        StackPane.alignment="CENTER">
+        <!-- Dim backdrop -->
+        <Region fx:id="exitBackdrop" styleClass="exit-backdrop"
+            mouseTransparent="false" />
 
+        <!-- Dialog card -->
+        <VBox fx:id="exitDialog" styleClass="exit-dialog"
+            alignment="CENTER" spacing="24"
+            maxWidth="400" maxHeight="220"
+            StackPane.alignment="CENTER">
+            <padding>
+                <Insets top="36" bottom="32" left="36" right="36" />
+            </padding>
+
+            <Label text="Exit Game?" styleClass="exit-dialog-title" />
+            <Label text="Are you sure you want to quit?" styleClass="exit-dialog-body" />
+
+            <HBox spacing="16" alignment="CENTER">
+                <Button fx:id="exitYesButton" text="Yes"
+                    styleClass="exit-btn-yes"
+                    onAction="#onExitConfirmed" />
+                <Button fx:id="exitNoButton" text="No"
+                    styleClass="exit-btn-no"
+                    onAction="#onExitCancelled" />
+            </HBox>
+        </VBox>
+    </StackPane>
+    
     <!-- VS INTRO SCREEN -->
     <AnchorPane fx:id="vsScreenPane">
         <ImageView fx:id="vsBgImage" pickOnBounds="true" preserveRatio="false"
@@ -215,8 +274,8 @@
         StackPane.alignment="CENTER">
 
         <VBox alignment="CENTER" spacing="0"
-              maxWidth="680" minWidth="520"
-              style="-fx-background-color: rgba(18,32,28,0.97);
+            maxWidth="680" minWidth="520"
+            style="-fx-background-color: rgba(18,32,28,0.97);
                      -fx-background-radius: 18;
                      -fx-border-color: rgba(120,200,80,0.45);
                      -fx-border-radius: 18;
@@ -224,7 +283,7 @@
 
             <!-- Header -->
             <VBox alignment="CENTER" spacing="6"
-                  style="-fx-background-color: rgba(200,60,60,0.22);
+                style="-fx-background-color: rgba(200,60,60,0.22);
                          -fx-background-radius: 16 16 0 0;
                          -fx-padding: 18 24 14 24;
                          -fx-border-color: transparent transparent rgba(255,255,255,0.10) transparent;
@@ -243,11 +302,11 @@
 
             <!-- Scrollable pokemon list -->
             <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
-                        maxHeight="440"
-                        style="-fx-background: transparent; -fx-background-color: transparent;
+                maxHeight="440"
+                style="-fx-background: transparent; -fx-background-color: transparent;
                                -fx-padding: 0;">
                 <VBox fx:id="forcedSwitchPokemonList" spacing="10" alignment="TOP_CENTER"
-                      style="-fx-padding: 14 20 14 20;" />
+                    style="-fx-padding: 14 20 14 20;" />
             </ScrollPane>
 
         </VBox>

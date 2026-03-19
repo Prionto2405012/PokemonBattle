@@ -28,7 +28,7 @@
                mouseTransparent="true"/>
 
     <!-- Progress UI anchored near bottom -->
-    <VBox alignment="CENTER" spacing="10" translateY="280">
+    <VBox fx:id="progressContainer" alignment="CENTER" spacing="10" translateY="280" mouseTransparent="true">
 
         <!-- Track + Fill -->
         <StackPane prefWidth="500" prefHeight="10">

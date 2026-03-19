@@ -9,7 +9,7 @@
     -move-info-accuracy: #a5d6a7;
     -move-info-pp: #e0e0e0;
     -move-info-description: #f2f5ff;
-    -move-eff-size: 12px;
+    -move-eff-size: 12;
     -move-eff-super: #7CFF6B;
     -move-eff-notvery: #ffcc66;
     -move-eff-immune: #b0b0b0;
@@ -103,6 +103,87 @@
 
 .options-content {
     -fx-background-color: transparent;
+}
+
+.hamburger-trigger{
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+    -fx-cursor: hand;
+}
+.hamburger-circle{
+    -fx-min-height:44;
+    -fx-pref-height: 44;
+    -fx-max-height: 44;
+    -fx-min-width: 44;
+    -fx-pref-width: 44;
+    -fx-max-width: 44;
+    -fx-background-radius: 999;
+    -fx-background-color: linear-gradient(to bottom, #afc5db62, #93d8ba70);
+    -fx-border-color: rgba(210, 245, 255, 0.75);
+    -fx-border-width: 1.4;
+    -fx-border-radius: 999;
+    -fx-effect: 
+        dropshadow(gaussian, rgba(120, 220, 255, 0.45), 18, 0.25, 0, 0),
+        dropshadow(gaussian, rgba(0, 0, 0, 0.35), 10, 0.10, 0, 2);
+}
+.hamburger-trigger:hover .hamburger-circle {
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+    -fx-border-color: rgba(225, 250, 255, 0.95);
+    -fx-effect:
+        dropshadow(gaussian, rgba(120, 230, 255, 0.70), 26, 0.30, 0, 0),
+        dropshadow(gaussian, rgba(120, 230, 255, 0.28), 40, 0.20, 0, 0),
+        dropshadow(gaussian, rgba(0, 0, 0, 0.35), 10, 0.10, 0, 2);
+}
+.hamburger-trigger:pressed .hamburger-circle{
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
+}
+.hamburger-line{
+    -fx-min-height: 2.4;
+    -fx-pref-height: 2.4;
+    -fx-max-height: 2.4;
+    -fx-min-width: 16;
+    -fx-pref-width: 16;
+    -fx-max-width: 16;
+    -fx-background-color: rgba(255, 255, 255, 0.95);
+    -fx-background-radius: 999;
+}
+
+.battle-quick-menu{
+    -fx-padding: 10;
+    -fx-background-color: rgba(39, 65, 72, 0.62);
+    -fx-background-radius: 12;
+    -fx-border-color: rgba(255, 255, 255, 0.25);
+    -fx-border-width: 1.2;
+    -fx-border-radius: 14;
+    -fx-effect: dropshadow(gaussian, rgba(33, 35, 35, 0.45), 18, 0.2, 0, 6);
+}
+.battle-quick-menu-button{
+    -fx-min-width: 230;
+    -fx-pref-width: 230;
+    -fx-max-width: 230;
+    -fx-padding: 9 14;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+    -fx-font-family: "SPACE NOVA";
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #ffffff;
+    -fx-border-color: rgba(255, 255, 255, 0.34);
+    -fx-border-width: 1.2;
+    -fx-background-color: linear-gradient(to bottom, #78909c, #546e7a);
+}
+.battle-quick-menu-button:hover {
+    -fx-background-color: linear-gradient(to bottom, #90a4ae, #607d8b);
+    -fx-scale-x: 1.04;
+    -fx-scale-y: 1.04;
+}
+.battle-quick-menu-button:pressed {
+    -fx-background-color: linear-gradient(to bottom, #546e7a, #37474f);
+    -fx-scale-x: 0.97;
+    -fx-scale-y: 0.97;
+    -fx-translate-y: 1;
 }
 
 .fight-btn {
@@ -510,7 +591,7 @@
 /* Move effectiveness indicator */
 .move-eff-indicator {
     -fx-font-family: "SPACE NOVA";
-    -fx-font-size: -move-eff-size;
+    -fx-font-size: 12px;
     -fx-font-weight: bold;
     -fx-effect: dropshadow(gaussian, -move-eff-shadow, 8, 0.25, 0, 1);
 }

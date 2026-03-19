@@ -1,7 +1,5 @@
 
 .loading-root {
-    -fx-background-image: url('../assets/menu3.png');
-    -fx-background-size: cover;
     -fx-background-position: center;
     -fx-background-repeat: no-repeat;
 }
@@ -38,7 +36,7 @@
     -fx-fill: linear-gradient(
         to right,
         #c6e22b 0%,
-        #d3dbaf 30%,
+        #d1dbaf 30%,
         #bcff7d 70%,
         #f1ffaa 100%
     );

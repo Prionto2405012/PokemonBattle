@@ -55,6 +55,8 @@ public class BattleAnimationManager {
     private static final double RETURN_DURATION_MS     = 550.0;
     private static final double IMPACT_SHAKE_DISTANCE  = 8.0;
     private static final double IMPACT_SCALE_REDUCTION = 0.88;
+    private static final double RANGED_ADVANCE_DISTANCE = 24.0;
+    private static final double RANGED_ADVANCE_DURATION_MS = 170.0;
     private static final double ANIMATION_SPEED_MULTIPLIER = 1.2;
 
     private final ElectricEffects electricEffects;
@@ -130,6 +132,7 @@ public class BattleAnimationManager {
 
         if (isRangedMove(moveName, moveType, damageClass)) {
             playRangedAnimation(attacker, defender, moveName, moveType, movePower,
+                    attackerOriginalX, attackerOriginalY,
                     defenderOriginalX, defenderOriginalY,
                     defenderOriginalScaleX, defenderOriginalScaleY, onComplete);
             return;
@@ -367,6 +370,7 @@ public class BattleAnimationManager {
 
     private void playRangedAnimation(ImageView attacker, ImageView defender,
             String moveName, String moveType, int movePower,
+            double attackerOriginalX, double attackerOriginalY,
             double defenderOriginalX, double defenderOriginalY,
             double defenderOriginalScaleX, double defenderOriginalScaleY,
             Runnable onComplete) {
@@ -376,17 +380,42 @@ public class BattleAnimationManager {
         double defenderX = getCenterX(defender);
         double defenderY = getCenterY(defender);
 
+        boolean shouldAdvance = shouldUseRangedAdvance(moveName);
+        double sourceX = attackerX;
+        double sourceY = attackerY;
+        TranslateTransition rangedAdvance = null;
+
+        if (shouldAdvance) {
+            double dx = defenderX - attackerX;
+            double dy = defenderY - attackerY;
+            double dist = Math.hypot(dx, dy);
+            if (dist > 0.0) {
+            double advanceDistance = Math.min(RANGED_ADVANCE_DISTANCE, dist * 0.25);
+            double unitX = dx / dist;
+            double unitY = dy / dist;
+            sourceX = attackerX + unitX * advanceDistance;
+            sourceY = attackerY + unitY * advanceDistance;
+            rangedAdvance = createRangedAdvance(attacker,
+                attackerOriginalX, attackerOriginalY,
+                unitX * advanceDistance, unitY * advanceDistance);
+            }
+        }
+
+        final double finalSourceX = sourceX;
+        final double finalSourceY = sourceY;
+        final TranslateTransition finalRangedAdvance = rangedAdvance;
+
         Animation leadEffect = null;
 
         switch (moveType) {
             case "ice" -> leadEffect = iceEffects.createBeamEffect(
-                    attackerX, attackerY, defenderX, defenderY, moveName, movePower);
+                sourceX, sourceY, defenderX, defenderY, moveName, movePower);
             case "electric" -> leadEffect = electricEffects.createRangedEffect(
-                    attackerX, attackerY, defenderX, defenderY, moveName, movePower);
+                sourceX, sourceY, defenderX, defenderY, moveName, movePower);
             case "water" -> {
                 Timeline wt = new Timeline();
                 waterEffects.createImpactEffect(
-                        attackerX, attackerY, defenderX, defenderY, moveName, movePower, wt);
+                sourceX, sourceY, defenderX, defenderY, moveName, movePower, wt);
                 if (moveName.equals("dive")) {
                     double origOpacity = attacker.getOpacity();
                     double origTransX  = attacker.getTranslateX();
@@ -424,96 +453,111 @@ public class BattleAnimationManager {
             case "fire" -> {
                 Timeline ft = new Timeline();
                 fireEffects.createImpactEffect(
-                        attackerX, attackerY, defenderX, defenderY, moveName, movePower, ft);
+                        sourceX, sourceY, defenderX, defenderY, moveName, movePower, ft);
                 leadEffect = ft;
             }
             case "rock" -> {
                 Timeline rt = new Timeline();
                 rockEffects.createRangedEffect(
-                        attackerX, attackerY, defenderX, defenderY, moveName, movePower, rt);
+                        sourceX, sourceY, defenderX, defenderY, moveName, movePower, rt);
                 leadEffect = rt;
             }
             case "ghost" -> {
                 Timeline gt = new Timeline();
                 ghostEffects.createRangedEffect(
-                        attackerX, attackerY, defenderX, defenderY, moveName, movePower, gt);
+                        sourceX, sourceY, defenderX, defenderY, moveName, movePower, gt);
                 leadEffect = gt;
             }
             case "psychic" -> {
                 Timeline pt = new Timeline();
                 psychicEffects.createRangedEffect(
-                        attackerX, attackerY, defenderX, defenderY, moveName, movePower, pt);
+                        sourceX, sourceY, defenderX, defenderY, moveName, movePower, pt);
                 leadEffect = pt;
             }
             case "dark" -> {
                 Timeline dt = new Timeline();
                 darkEffects.createRangedEffect(
-                        attackerX, attackerY, defenderX, defenderY, moveName, movePower, dt);
+                        sourceX, sourceY, defenderX, defenderY, moveName, movePower, dt);
                 leadEffect = dt;
             }
             case "ground" -> {
                 Timeline grt = new Timeline();
                 groundEffects.createRangedEffect(
-                        attackerX, attackerY, defenderX, defenderY, moveName, movePower, grt);
+                        sourceX, sourceY, defenderX, defenderY, moveName, movePower, grt);
                 leadEffect = grt;
             }
             case "flying" -> {
                 Timeline flyingTimeline = new Timeline();
                 flyingEffects.createRangedEffect(
-                        attackerX, attackerY, defenderX, defenderY, moveName, movePower, flyingTimeline);
+                        sourceX, sourceY, defenderX, defenderY, moveName, movePower, flyingTimeline);
                 leadEffect = flyingTimeline;
             }
             case "poison" -> {
                 Timeline poisonTimeline = new Timeline();
                 poisonEffects.createRangedEffect(
-                        attackerX, attackerY, defenderX, defenderY, moveName, movePower, poisonTimeline);
+                        sourceX, sourceY, defenderX, defenderY, moveName, movePower, poisonTimeline);
                 leadEffect = poisonTimeline;
             }
             case "fairy" -> {
                 Timeline fairyTimeline = new Timeline();
                 fairyEffects.createRangedEffect(
-                        attackerX, attackerY, defenderX, defenderY, moveName, movePower, fairyTimeline);
+                        sourceX, sourceY, defenderX, defenderY, moveName, movePower, fairyTimeline);
                 leadEffect = fairyTimeline;
             }
             case "steel" -> {
                 Timeline steelTimeline = new Timeline();
                 steelEffects.createRangedEffect(
-                        attackerX, attackerY, defenderX, defenderY, moveName, movePower, steelTimeline);
+                        sourceX, sourceY, defenderX, defenderY, moveName, movePower, steelTimeline);
                 leadEffect = steelTimeline;
             }
             case "dragon" -> {
                 Timeline dragonTimeline = new Timeline();
                 dragonEffects.createRangedEffect(
-                        attackerX, attackerY, defenderX, defenderY, moveName, movePower, dragonTimeline);
+                        sourceX, sourceY, defenderX, defenderY, moveName, movePower, dragonTimeline);
                 leadEffect = dragonTimeline;
             }
             case "bug" -> {
                 Timeline bugTimeline = new Timeline();
                 bugEffects.createRangedEffect(
-                        attackerX, attackerY, defenderX, defenderY, moveName, movePower, bugTimeline);
+                        sourceX, sourceY, defenderX, defenderY, moveName, movePower, bugTimeline);
                 leadEffect = bugTimeline;
             }
             case "grass" -> {
                 Timeline grassTimeline = new Timeline();
                 grassEffects.createRangedEffect(
-                        attackerX, attackerY, defenderX, defenderY, moveName, movePower, grassTimeline);
+                        sourceX, sourceY, defenderX, defenderY, moveName, movePower, grassTimeline);
                 leadEffect = grassTimeline;
             }
             default -> {}
         }
 
         if (leadEffect != null) {
-            EventHandler<ActionEvent> previous = leadEffect.getOnFinished();
-            leadEffect.setOnFinished(e -> {
+            Animation leadAndAdvance = (finalRangedAdvance != null)
+                ? new ParallelTransition(leadEffect, finalRangedAdvance)
+                    : leadEffect;
+            EventHandler<ActionEvent> previous = leadAndAdvance.getOnFinished();
+            leadAndAdvance.setOnFinished(e -> {
                 if (previous != null) previous.handle(e);
                 ParallelTransition impact = createImpactEffect(
-                        defender, attackerX, attackerY,
+                defender, finalSourceX, finalSourceY,
                         moveName, moveType, movePower, defenderOriginalX);
                 ParallelTransition recovery = createRecoveryEffect(
                         defender, defenderOriginalX, defenderOriginalY,
                         defenderOriginalScaleX, defenderOriginalScaleY);
-                SequentialTransition seq = new SequentialTransition(impact, recovery);
+                SequentialTransition seq;
+            if (finalRangedAdvance != null) {
+                    TranslateTransition retreat = new TranslateTransition(
+                            Duration.millis(RANGED_ADVANCE_DURATION_MS), attacker);
+                    retreat.setToX(attackerOriginalX);
+                    retreat.setToY(attackerOriginalY);
+                    retreat.setInterpolator(Interpolator.EASE_OUT);
+                    seq = new SequentialTransition(impact, new ParallelTransition(recovery, retreat));
+                } else {
+                    seq = new SequentialTransition(impact, recovery);
+                }
                 seq.setOnFinished(ev -> {
+                    attacker.setTranslateX(attackerOriginalX);
+                    attacker.setTranslateY(attackerOriginalY);
                     defender.setScaleX(defenderOriginalScaleX);
                     defender.setScaleY(defenderOriginalScaleY);
                     defender.setTranslateX(defenderOriginalX);
@@ -522,10 +566,25 @@ public class BattleAnimationManager {
                 });
                 playAtCurrentSpeed(seq);
             });
-            playAtCurrentSpeed(leadEffect);
+            playAtCurrentSpeed(leadAndAdvance);
         } else {
             if (onComplete != null) onComplete.run();
         }
+    }
+
+    private boolean shouldUseRangedAdvance(String moveName) {
+        return !moveName.equals("dive");
+    }
+
+    private TranslateTransition createRangedAdvance(ImageView attacker,
+            double attackerOriginalX, double attackerOriginalY,
+            double advanceX, double advanceY) {
+        TranslateTransition advance = new TranslateTransition(
+                Duration.millis(RANGED_ADVANCE_DURATION_MS), attacker);
+        advance.setToX(attackerOriginalX + advanceX);
+        advance.setToY(attackerOriginalY + advanceY);
+        advance.setInterpolator(Interpolator.EASE_IN);
+        return advance;
     }
 
     private Timeline createMovementEffect(ImageView attacker, String moveType,
