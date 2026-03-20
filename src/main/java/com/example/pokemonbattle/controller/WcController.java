@@ -14,6 +14,8 @@ import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
@@ -64,17 +66,27 @@ public class WcController {
     @FXML
     private Button signupTabButton;
     // Login tab decoration lines
-    @FXML private Line loginBorderBottom;
-    @FXML private Line loginBorderTopLeft;
-    @FXML private Line loginBorderTopRight;
-    @FXML private Line loginBorderLeftTop;
-    @FXML private Line loginBorderRightTop;
+    @FXML
+    private Line loginBorderBottom;
+    @FXML
+    private Line loginBorderTopLeft;
+    @FXML
+    private Line loginBorderTopRight;
+    @FXML
+    private Line loginBorderLeftTop;
+    @FXML
+    private Line loginBorderRightTop;
     // Signup tab decoration lines
-    @FXML private Line signupBorderBottom;
-    @FXML private Line signupBorderTopLeft;
-    @FXML private Line signupBorderTopRight;
-    @FXML private Line signupBorderLeftTop;
-    @FXML private Line signupBorderRightTop;
+    @FXML
+    private Line signupBorderBottom;
+    @FXML
+    private Line signupBorderTopLeft;
+    @FXML
+    private Line signupBorderTopRight;
+    @FXML
+    private Line signupBorderLeftTop;
+    @FXML
+    private Line signupBorderRightTop;
     @FXML
     private VBox loginForm;
     @FXML
@@ -107,7 +119,26 @@ public class WcController {
     private Label signupPasswordError;
     @FXML
     private Label signupConfirmPasswordError;
+    @FXML
+    private TextField loginPasswordVisible;
+    @FXML
+    private Button loginEyeBtn;
 
+    @FXML
+    private TextField signupPasswordVisible;
+    @FXML
+    private Button signupEyeBtn;
+
+    @FXML
+    private TextField signupConfirmPasswordVisible;
+    @FXML
+    private Button signupConfirmEyeBtn;
+    @FXML protected void onToggleLoginPassword() {}
+    @FXML protected void onToggleSignupPassword() {}
+    @FXML protected void onToggleSignupConfirmPassword() {}
+    private final boolean loginPassShown = false;
+    private final boolean signupPassShown = false;
+    private final boolean signupConfirmPassShown = false;
     private final AuthService authService;
     private static User currentUser;
     private boolean isLoginMode = true;
@@ -171,10 +202,10 @@ public class WcController {
         if (base == null)
             return;
         // 4-tier colour system
-Color titleColor   = Color.web("#c8f0f7"); 
-Color labelColor   = Color.web("#abf3eb");  
-Color inputColor   = Color.web("#a8d6e8");  
-Color buttonColor  = Color.web("#8bb7bf");   
+        Color titleColor = Color.web("#c8f0f7");
+        Color labelColor = Color.web("#abf3eb");
+        Color inputColor = Color.web("#a8d6e8");
+        Color buttonColor = Color.web("#8bb7bf");
         if (glassBlurLayer != null) {
             glassBlurLayer.setStyle(
                     "-fx-background-color: " + rgba(darkest, 0.55) + ";" +
@@ -251,10 +282,9 @@ Color buttonColor  = Color.web("#8bb7bf");
 
         // Dark-teal gradient: login & sign-up buttons
         // Right edge (#1aa0a0) matches left edge of back button → seamless blend
-        String actionBtnStyle =
-                "-fx-background-color: " +
-                        "linear-gradient(from 0% 0% to 0% 100%, rgba(255,255,255,0.10) 0%, transparent 55%), " +
-                        "linear-gradient(from 0% 50% to 100% 50%, #093f55 0%, #0d7070 50%, #1aa0a0 100%);" +
+        String actionBtnStyle = "-fx-background-color: " +
+                "linear-gradient(from 0% 0% to 0% 100%, rgba(255,255,255,0.10) 0%, transparent 55%), " +
+                "linear-gradient(from 0% 50% to 100% 50%, #093f55 0%, #0d7070 50%, #1aa0a0 100%);" +
                 "-fx-background-insets: 0, 0;" +
                 "-fx-background-radius: 8, 8;" +
                 "-fx-text-fill: #e8fafa;" +
@@ -268,10 +298,9 @@ Color buttonColor  = Color.web("#8bb7bf");
 
         // Light-teal gradient: back button
         // Left edge (#1aa0a0) matches right edge of dark-teal buttons → seamless blend
-        String backStyle =
-                "-fx-background-color: " +
-                        "linear-gradient(from 0% 0% to 0% 100%, rgba(255,255,255,0.10) 0%, transparent 55%), " +
-                        "linear-gradient(from 0% 50% to 100% 50%, #a0dada 0%, #6adcdc 50%, #3cd8d8 100%);" +
+        String backStyle = "-fx-background-color: " +
+                "linear-gradient(from 0% 0% to 0% 100%, rgba(255,255,255,0.10) 0%, transparent 55%), " +
+                "linear-gradient(from 0% 50% to 100% 50%, #a0dada 0%, #6adcdc 50%, #3cd8d8 100%);" +
                 "-fx-background-insets: 0, 0;" +
                 "-fx-background-radius: 8, 8;" +
                 "-fx-text-fill: #e8fafa;" +
@@ -303,7 +332,8 @@ Color buttonColor  = Color.web("#8bb7bf");
             imgClip.setArcHeight(48);
             imagePanel.setClip(imgClip);
         }
-        // Clip the whole cardWrapper so glass layer + image both respect the rounded boundary
+        // Clip the whole cardWrapper so glass layer + image both respect the rounded
+        // boundary
         if (cardWrapper != null) {
             cardWrapper.layoutBoundsProperty().addListener((obs, oldBounds, newBounds) -> {
                 Rectangle cardClip = new Rectangle(newBounds.getWidth(), newBounds.getHeight());
@@ -363,6 +393,11 @@ Color buttonColor  = Color.web("#8bb7bf");
 
         buildPalette();
         applyDynamicTheme();
+        // At the end of initialize(), after applyDynamicTheme():
+        boolean[] lp = {false}, sp = {false}, scp = {false};
+        setupPasswordToggle(loginEyeBtn, loginPasswordField, loginPasswordVisible, lp);
+        setupPasswordToggle(signupEyeBtn, signupPasswordField, signupPasswordVisible, sp);
+        setupPasswordToggle(signupConfirmEyeBtn, signupConfirmPasswordField, signupConfirmPasswordVisible, scp);
         setupInitialLayout();
 
         // Wire Line-based corner decorations for both tab buttons
@@ -379,17 +414,94 @@ Color buttonColor  = Color.web("#8bb7bf");
         MusicManager.getInstance().attachClickSounds(rootPane);
     }
 
+    private Canvas buildEyeIcon(boolean open) {
+        double S = 22;
+        double cx = S / 2, cy = S / 2;
+        double hw = S * 0.42;
+        double vc = S * 0.38;
+
+        Canvas c = new Canvas(S, S);
+        GraphicsContext g = c.getGraphicsContext2D();
+
+        //  Eye outline (drawn in BOTH states) 
+        g.setStroke(Color.web("#a8e8ec"));
+        g.setLineWidth(1.6);
+        g.beginPath();
+        g.moveTo(cx - hw, cy);
+        g.bezierCurveTo(cx - hw * 0.3, cy - vc, cx + hw * 0.3, cy - vc, cx + hw, cy);
+        g.bezierCurveTo(cx + hw * 0.3, cy + vc, cx - hw * 0.3, cy + vc, cx - hw, cy);
+        g.stroke();
+
+        //  Iris + pupil (drawn in BOTH states)
+        g.setFill(Color.web("#a8e8ec"));
+        g.fillOval(cx - S * 0.18, cy - S * 0.18, S * 0.36, S * 0.36);
+        g.setFill(Color.web("#1a3a3a"));
+        g.fillOval(cx - S * 0.12, cy - S * 0.12, S * 0.24, S * 0.24);
+
+        //  Slash overlay (closed/hidden state only) 
+        if (!open) {
+            // Dark gap under the slash so it reads cleanly against the iris
+            g.setStroke(Color.web("#1a3a3a"));
+            g.setLineWidth(3.5);
+            g.strokeLine(cx - hw * 0.55, cy - vc * 0.65, cx + hw * 0.55, cy + vc * 0.65);
+            // The visible slash on top
+            g.setStroke(Color.web("#a8e8ec"));
+            g.setLineWidth(1.8);
+            g.strokeLine(cx - hw * 0.55, cy - vc * 0.65, cx + hw * 0.55, cy + vc * 0.65);
+        }
+
+        return c;
+    }
+    private void setupPasswordToggle(Button eyeBtn,
+            PasswordField pf,
+            TextField tf,
+            boolean[] shownFlag) {
+        // Draw initial icon (eye open = password hidden)
+        eyeBtn.setGraphic(buildEyeIcon(false));
+
+        eyeBtn.setOnAction(e -> {
+            shownFlag[0] = !shownFlag[0];
+            if (shownFlag[0]) {
+                tf.setText(pf.getText());
+                pf.setVisible(false);
+                pf.setManaged(false);
+                tf.setVisible(true);
+                tf.setManaged(true);
+                tf.requestFocus();
+                tf.positionCaret(tf.getText().length());
+            } else {
+                pf.setText(tf.getText());
+                tf.setVisible(false);
+                tf.setManaged(false);
+                pf.setVisible(true);
+                pf.setManaged(true);
+                pf.requestFocus();
+            }
+            eyeBtn.setGraphic(buildEyeIcon(shownFlag[0]));
+        });
+
+        // Keep the two fields in sync as user types
+        pf.textProperty().addListener((obs, o, n) -> {
+            if (!shownFlag[0])
+                tf.setText(n);
+        });
+        tf.textProperty().addListener((obs, o, n) -> {
+            if (shownFlag[0])
+                pf.setText(n);
+        });
+    }
+
     /**
      * Attaches a layoutBounds listener to a tab StackPane so the 5 Line
      * decorations (underline + two short top-corner brackets) are always
      * pixel-perfect regardless of the actual rendered size.
      */
     private void wireTabLines(StackPane wrap,
-                              Line bottom,
-                              Line topLeft, Line topRight,
-                              Line leftTop,  Line rightTop) {
-        for (Line l : new Line[]{bottom, topLeft, topRight, leftTop, rightTop}) {
-            l.setManaged(false);       // don't affect layout
+            Line bottom,
+            Line topLeft, Line topRight,
+            Line leftTop, Line rightTop) {
+        for (Line l : new Line[] { bottom, topLeft, topRight, leftTop, rightTop }) {
+            l.setManaged(false); // don't affect layout
             l.setStrokeWidth(1.8);
         }
         wrap.layoutBoundsProperty().addListener((obs, oldV, bounds) -> {
@@ -398,24 +510,34 @@ Color buttonColor  = Color.web("#8bb7bf");
             double arm = Math.max(12, Math.min(w, h) * 0.28); // ~28 % of shorter side
 
             // Full-width underline
-            bottom.setStartX(0);   bottom.setEndX(w);
-            bottom.setStartY(h - 1); bottom.setEndY(h - 1);
+            bottom.setStartX(0);
+            bottom.setEndX(w);
+            bottom.setStartY(h - 1);
+            bottom.setEndY(h - 1);
 
             // Top-left horizontal arm
-            topLeft.setStartX(0);   topLeft.setEndX(arm);
-            topLeft.setStartY(0);   topLeft.setEndY(0);
+            topLeft.setStartX(0);
+            topLeft.setEndX(arm);
+            topLeft.setStartY(0);
+            topLeft.setEndY(0);
 
             // Top-right horizontal arm
-            topRight.setStartX(w - arm); topRight.setEndX(w);
-            topRight.setStartY(0);       topRight.setEndY(0);
+            topRight.setStartX(w - arm);
+            topRight.setEndX(w);
+            topRight.setStartY(0);
+            topRight.setEndY(0);
 
             // Left vertical arm (downward from top-left corner)
-            leftTop.setStartX(0); leftTop.setEndX(0);
-            leftTop.setStartY(0); leftTop.setEndY(arm);
+            leftTop.setStartX(0);
+            leftTop.setEndX(0);
+            leftTop.setStartY(0);
+            leftTop.setEndY(arm);
 
             // Right vertical arm (downward from top-right corner)
-            rightTop.setStartX(w); rightTop.setEndX(w);
-            rightTop.setStartY(0); rightTop.setEndY(arm);
+            rightTop.setStartX(w);
+            rightTop.setEndX(w);
+            rightTop.setStartY(0);
+            rightTop.setEndY(arm);
         });
     }
 
@@ -452,7 +574,7 @@ Color buttonColor  = Color.web("#8bb7bf");
         authCard.setOpacity(1.0);
         imagePanel.setOpacity(1.0);
 
-        // ── Phase 1: form fades out; image slides over it ──────────────────
+        //  Phase 1: form fades out; image slides over it 
         Timeline phase1 = new Timeline(
                 new KeyFrame(Duration.millis(340),
                         new KeyValue(authCard.opacityProperty(), 0.0, Interpolator.EASE_IN),
@@ -468,7 +590,7 @@ Color buttonColor  = Color.web("#8bb7bf");
             imagePanel.setTranslateX(0);
             authCard.setOpacity(0.0);
 
-            // ── Phase 2: form fades back in on the opposite side ───────────
+            //  Phase 2: form fades back in on the opposite side ─
             Timeline phase2 = new Timeline(
                     new KeyFrame(Duration.millis(300),
                             new KeyValue(authCard.opacityProperty(), 1.0, Interpolator.EASE_OUT)));
@@ -490,8 +612,10 @@ Color buttonColor  = Color.web("#8bb7bf");
         signupForm.setManaged(false);
         loginTabButton.getStyleClass().add("tab-button-active");
         signupTabButton.getStyleClass().remove("tab-button-active");
-        if (loginTabWrap != null)  loginTabWrap.getStyleClass().add("tab-button-wrap-active");
-        if (signupTabWrap != null) signupTabWrap.getStyleClass().remove("tab-button-wrap-active");
+        if (loginTabWrap != null)
+            loginTabWrap.getStyleClass().add("tab-button-wrap-active");
+        if (signupTabWrap != null)
+            signupTabWrap.getStyleClass().remove("tab-button-wrap-active");
         clearAllLoginErrors();
         clearAllSignupErrors();
         slideTransition(false);
@@ -509,8 +633,10 @@ Color buttonColor  = Color.web("#8bb7bf");
         loginForm.setManaged(false);
         signupTabButton.getStyleClass().add("tab-button-active");
         loginTabButton.getStyleClass().remove("tab-button-active");
-        if (signupTabWrap != null) signupTabWrap.getStyleClass().add("tab-button-wrap-active");
-        if (loginTabWrap != null)  loginTabWrap.getStyleClass().remove("tab-button-wrap-active");
+        if (signupTabWrap != null)
+            signupTabWrap.getStyleClass().add("tab-button-wrap-active");
+        if (loginTabWrap != null)
+            loginTabWrap.getStyleClass().remove("tab-button-wrap-active");
         clearAllLoginErrors();
         clearAllSignupErrors();
         slideTransition(true);

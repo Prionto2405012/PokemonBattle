@@ -45,7 +45,7 @@
     -fx-padding: 0 0 2 2;
 }
 
-/* ── Tab wrapper (hosts button + Line decorations) ──────────────────────── */
+/*  Tab wrapper (hosts button + Line decorations)  */
 .tab-button-wrap {
     -fx-background-color: transparent;
     -fx-padding: 4 0;
@@ -63,7 +63,7 @@
     -fx-stroke-width: 2.2;
 }
 
-/* ── Tab button text ─────────────────────────────────────────────────────── */
+/*  Tab button text  */
 .tab-button {
     -fx-font-family: "SPACE NOVA";
     -fx-font-size: 15px;
@@ -103,7 +103,7 @@
     -fx-border-color: transparent transparent rgba(130,210,255,0.8) transparent;
 }
 
-/* ── Lower action buttons base ───────────────────────────────────────── */
+/*  Lower action buttons base  */
 .auth-button {
     -fx-font-family: "SPACE NOVA";
     -fx-pref-height: 44;
@@ -118,7 +118,7 @@
     -fx-text-fill: #e8fafa;
 }
 
-/* ── Dark teal gradient — Login & Sign Up buttons ─────────────────────── */
+/*  Dark teal gradient — Login & Sign Up buttons  */
 .login-btn.auth-button,
 .signup-btn.auth-button {
     /*
@@ -160,7 +160,7 @@
     -fx-scale-y: 0.97;
 }
 
-/* ── Light teal gradient — Back button ────────────────────────────────── */
+/*  Light teal gradient — Back button  */
 .auth-back-button {
     -fx-font-family: "SPACE NOVA";
     -fx-font-size: 12px;
@@ -248,4 +248,19 @@
 }
 .card-wrapper-clip {
     -fx-background-radius: 24;
+}
+/* eye button */
+.eye-toggle-btn {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-cursor: hand;
+    -fx-pref-width: 36px;
+    -fx-pref-height: 36px;
+    -fx-padding: 0;
+    -fx-translate-x: -4px;
+    -fx-shape: "M180,150 Q340,55 460,150 Q340,245 180,150 Z";
+}
+
+.eye-toggle-btn .text {
+    -fx-fill: transparent;
 }

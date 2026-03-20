@@ -102,8 +102,15 @@
                       <Label fx:id="loginUsernameError" styleClass="field-error-label" visible="false"
                         managed="false" wrapText="true" />
                       <Label text="Password" styleClass="field-label" />
-                      <PasswordField fx:id="loginPasswordField" promptText="Enter your password"
-                        styleClass="auth-text-field" />
+                      <StackPane>
+                        <PasswordField fx:id="loginPasswordField" promptText="Enter your password"
+                          styleClass="auth-text-field" />
+                        <TextField fx:id="loginPasswordVisible" promptText="Enter your password"
+                          styleClass="auth-text-field" visible="false" managed="false" />
+                        <Button fx:id="loginEyeBtn" onAction="#onToggleLoginPassword"
+                          styleClass="eye-toggle-btn" alignment="CENTER_RIGHT"
+                          StackPane.alignment="CENTER_RIGHT" />
+                      </StackPane>
                       <Label fx:id="loginPasswordError" styleClass="field-error-label" visible="false"
                         managed="false" wrapText="true" />
                       <Label fx:id="loginErrorLabel" styleClass="error-label" visible="false"
@@ -128,13 +135,27 @@
                       <Label fx:id="signupEmailError" styleClass="field-error-label" visible="false"
                         managed="false" wrapText="true" />
                       <Label text="Password" styleClass="field-label" />
-                      <PasswordField fx:id="signupPasswordField" promptText="Choose a password (min 6 chars)"
-                        styleClass="auth-text-field" />
+                      <StackPane>
+                        <PasswordField fx:id="signupPasswordField" promptText="Choose a password (min 6 chars)"
+                          styleClass="auth-text-field" />
+                        <TextField fx:id="signupPasswordVisible" promptText="Choose a password (min 6 chars)"
+                          styleClass="auth-text-field" visible="false" managed="false" />
+                        <Button fx:id="signupEyeBtn" onAction="#onToggleSignupPassword"
+                          styleClass="eye-toggle-btn" alignment="CENTER_RIGHT"
+                          StackPane.alignment="CENTER_RIGHT" />
+                      </StackPane>
                       <Label fx:id="signupPasswordError" styleClass="field-error-label" visible="false"
                         managed="false" wrapText="true" />
                       <Label text="Confirm Password" styleClass="field-label" />
-                      <PasswordField fx:id="signupConfirmPasswordField"
-                        promptText="Re-enter your password" styleClass="auth-text-field" />
+                      <StackPane>
+                        <PasswordField fx:id="signupConfirmPasswordField" promptText="Re-enter your password"
+                          styleClass="auth-text-field" />
+                        <TextField fx:id="signupConfirmPasswordVisible" promptText="Re-enter your password"
+                          styleClass="auth-text-field" visible="false" managed="false" />
+                        <Button fx:id="signupConfirmEyeBtn" onAction="#onToggleSignupConfirmPassword"
+                          styleClass="eye-toggle-btn" alignment="CENTER_RIGHT"
+                          StackPane.alignment="CENTER_RIGHT" />
+                      </StackPane>
                       <Label fx:id="signupConfirmPasswordError" styleClass="field-error-label" visible="false"
                         managed="false" wrapText="true" />
                       <Label fx:id="signupErrorLabel" styleClass="error-label" visible="false"
