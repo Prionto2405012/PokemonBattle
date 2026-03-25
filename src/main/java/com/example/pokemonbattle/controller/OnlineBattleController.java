@@ -1655,6 +1655,9 @@ public class OnlineBattleController {
         pokemonSelectionBox.setVisible(false);
         pokemonSelectionBox.setManaged(false);
         pokemonSelectionBox.setMouseTransparent(true);
+
+        // Keep chat section visible
+        showChatSection();
     }
 
     private void showMoveSelection() {
@@ -1669,6 +1672,9 @@ public class OnlineBattleController {
         pokemonSelectionBox.setVisible(false);
         pokemonSelectionBox.setManaged(false);
         pokemonSelectionBox.setMouseTransparent(true);
+
+        // Keep chat section visible
+        showChatSection();
     }
 
     private void showPokemonSelection() {
@@ -1683,6 +1689,9 @@ public class OnlineBattleController {
         moveSelectionBox.setVisible(false);
         moveSelectionBox.setManaged(false);
         moveSelectionBox.setMouseTransparent(true);
+
+        // Keep chat section visible
+        showChatSection();
     }
 
     private void setVisible(javafx.scene.Node node, boolean v) {

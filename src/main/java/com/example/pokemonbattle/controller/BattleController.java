@@ -1440,6 +1440,9 @@ public class BattleController implements Battle.BattleListener {
         moveSelectionBox.setMouseTransparent(false);
         moveSelectionBox.toFront();
         updateMoveButtons();
+
+        // Keep chat section visible
+        showChatSection();
     }
 
     private void onChangePokemonClicked() {
@@ -1458,6 +1461,9 @@ public class BattleController implements Battle.BattleListener {
         pokemonSelectionBox.setMouseTransparent(false);
         pokemonSelectionBox.toFront();
         updatePokemonButtons();
+
+        // Keep chat section visible
+        showChatSection();
     }
 
     private void onItemsClicked() {
@@ -1590,6 +1596,9 @@ public class BattleController implements Battle.BattleListener {
         pokemonSelectionBox.setVisible(false);
         pokemonSelectionBox.setManaged(false);
         pokemonSelectionBox.setMouseTransparent(true);
+
+        // Keep chat section visible
+        showChatSection();
     }
 
     // Battle listener callbacks
