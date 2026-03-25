@@ -1,6 +1,9 @@
 package com.example.pokemonbattle.server;
 
-import java.io.*;
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.function.Consumer;
 
@@ -108,7 +111,13 @@ public class ServerConnection {
                     
                     // Call message listener if set
                     if (messageListener != null) {
-                        messageListener.accept(message);
+                        try {
+                            messageListener.accept(message);
+                        } catch (Exception listenerError) {
+                            System.err.println("[Client] Error in message listener for "
+                                    + message.getMessageType() + ": " + listenerError.getMessage());
+                            listenerError.printStackTrace();
+                        }
                     }
                 }
             } catch (EOFException e) {

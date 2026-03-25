@@ -541,6 +541,19 @@ public class OnlineBattle {
         System.out.println("[Battle #" + battleId + "] " + loserName + " forfeited! Winner: " + winnerName);
     }
 
+    /**
+     * Relay a chat message from one player to the opponent.
+     */
+    public synchronized void relayChatMessage(Integer senderId, BattleChatMessage chatMessage) throws IOException {
+        if (!battleActive || chatMessage == null || senderId == null) return;
+        ClientHandler receiver;
+        if (senderId.equals(player1Id)) receiver = player2Handler;
+        else if (senderId.equals(player2Id)) receiver = player1Handler;
+        else return;
+        BattleChatMessage outbound = new BattleChatMessage(battleId, chatMessage.getSenderName(), chatMessage.getMessageText());
+        receiver.sendMessage(outbound);
+    }
+
     // Getters
     public Integer getBattleId() { return battleId; }
     public boolean isBattleActive() { return battleActive; }

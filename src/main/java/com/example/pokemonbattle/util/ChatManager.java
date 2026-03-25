@@ -1,12 +1,5 @@
 package com.example.pokemonbattle.util;
 
-import javafx.application.Platform;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.VBox;
-import javafx.geometry.Pos;
-import javafx.geometry.Insets;
-
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -14,11 +7,11 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-/**
- * ChatManager handles chat messages in a separate thread to prevent
- * collision with the ongoing battle thread. Messages are queued and
- * processed asynchronously.
- */
+import javafx.application.Platform;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.VBox;
+
 public class ChatManager {
 
     private final VBox chatMessagesContainer;
@@ -36,11 +29,13 @@ public class ChatManager {
     private static class ChatMessage {
         final String text;
         final MessageType type;
+        final String senderName;
         final long timestamp;
 
-        ChatMessage(String text, MessageType type) {
+        ChatMessage(String text, MessageType type, String senderName) {
             this.text = text;
             this.type = type;
+            this.senderName = senderName;
             this.timestamp = System.currentTimeMillis();
         }
     }
@@ -60,10 +55,8 @@ public class ChatManager {
     public static final String[] QUICK_MESSAGES = {
         "Well played!",
         "Good luck!",
-        "Congrats!",
         "Better luck next time!",
-        "Nice move!",
-        "That was close!"
+        "Nice move!"
     };
 
     public ChatManager(VBox chatMessagesContainer, ScrollPane chatScrollPane) {
@@ -83,10 +76,17 @@ public class ChatManager {
      * Add a message to the chat queue
      */
     public void addMessage(String text, MessageType type) {
+        addMessage(text, type, null);
+    }
+
+    /**
+     * Add a message to the chat queue with optional sender name.
+     */
+    public void addMessage(String text, MessageType type, String senderName) {
         if (text == null || text.trim().isEmpty()) {
             return;
         }
-        messageQueue.offer(new ChatMessage(text.trim(), type));
+        messageQueue.offer(new ChatMessage(text.trim(), type, senderName));
     }
 
     /**
@@ -100,7 +100,15 @@ public class ChatManager {
      * Add an opponent message (for online battles)
      */
     public void receiveOpponentMessage(String text) {
-        addMessage(text, MessageType.OPPONENT);
+        addMessage(text, MessageType.OPPONENT, "Opponent");
+    }
+
+    /**
+     * Add an opponent message with explicit sender name.
+     */
+    public void receiveOpponentMessage(String senderName, String text) {
+        String resolvedSender = (senderName == null || senderName.isBlank()) ? "Opponent" : senderName.trim();
+        addMessage(text, MessageType.OPPONENT, resolvedSender);
     }
 
     /**
@@ -169,7 +177,10 @@ public class ChatManager {
                 styleClass = "chat-message-player";
                 break;
             case OPPONENT:
-                displayText = String.format("[%s] Opponent: %s", timeStr, message.text);
+                String sender = (message.senderName == null || message.senderName.isBlank())
+                        ? "Opponent"
+                        : message.senderName;
+                displayText = String.format("[%s] %s: %s", timeStr, sender, message.text);
                 styleClass = "chat-message-opponent";
                 break;
             case SYSTEM:

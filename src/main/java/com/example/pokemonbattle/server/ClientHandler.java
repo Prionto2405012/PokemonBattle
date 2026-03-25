@@ -124,6 +124,9 @@ public class ClientHandler extends Thread {
                 case "FORFEIT":
                     handleForfeit((ForfeitMessage) message);
                     break;
+                case "BATTLE_CHAT":
+                    handleBattleChat((BattleChatMessage) message);
+                    break;
                 case "MOVE":
                     handleMove((MoveMessage) message);
                     break;
@@ -373,6 +376,31 @@ public class ClientHandler extends Thread {
             sendMessage(new ErrorMessage("MOVE_ERROR", "Failed to process move"));
         }
     }
+
+    /**
+     * Handle chat message submission during battle.
+     */
+    private void handleBattleChat(BattleChatMessage chatMsg) throws IOException {
+        if (currentBattle == null || !currentBattle.isBattleActive()) {
+            sendMessage(new ErrorMessage("NO_ACTIVE_BATTLE", "No active battle"));
+            return;
+        }
+
+        if (chatMsg == null || chatMsg.getMessageText() == null || chatMsg.getMessageText().trim().isEmpty()) {
+            return;
+        }
+
+        if (!currentBattle.getBattleId().equals(chatMsg.getBattleId())) {
+            return;
+        }
+
+        try {
+            currentBattle.relayChatMessage(userId, chatMsg);
+        } catch (IOException e) {
+            System.err.println("[Client #" + clientId + "] Error relaying chat message: " + e.getMessage());
+            sendMessage(new ErrorMessage("CHAT_ERROR", "Failed to send chat message"));
+        }
+    }
     
     /**
      * Send a message to this client.
@@ -385,7 +413,7 @@ public class ClientHandler extends Thread {
         try {
             outputStream.writeObject(message);
             outputStream.flush();
-            outputStream.reset(); // Clear serialization cache to prevent stream corruption
+            outputStream.reset();//Cleared cache to prevent stream corruption bascially
             System.out.println("[Client #" + clientId + "] Sent: " + message.getMessageType());
         } catch (IOException e) {
             System.err.println("[Client #" + clientId + "] Error sending message: " + e.getMessage());
@@ -394,9 +422,6 @@ public class ClientHandler extends Thread {
         }
     }
     
-    /**
-     * Set the current battle for this client.
-     */
     public void setBattle(OnlineBattle battle) {
         this.currentBattle = battle;
     }
