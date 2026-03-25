@@ -46,6 +46,7 @@ public class WaitingController {
     private ServerConnection serverConnection;
     private Player player;
     private volatile boolean cancelled = false;
+    private volatile boolean battleStartReceived = false;
     private boolean useDiscovery = false; // true = LAN discovery, false = localhost
 
     // Dots animation timeline
@@ -243,33 +244,45 @@ public class WaitingController {
     }
 
     private void onBattleStart(BattleStartMessage msg) {
+        if (battleStartReceived) {
+            return;
+        }
+        battleStartReceived = true;
+
         // Build opponent Player from the data the server sent
-        Player opponentPlayer = new Player(msg.getOpponentName());
-        Integer[] oppIds     = msg.getOpponentPokemonIds();
-        Integer[] oppLevels  = msg.getOpponentPokemonLevels();
-        Integer[] oppMoveIds = msg.getOpponentMoveIds(); // flat: 4 per pokemon
+        Player opponentPlayer = new Player(msg.getOpponentName() != null ? msg.getOpponentName() : "Opponent");
+        try {
+            Integer[] oppIds     = msg.getOpponentPokemonIds();
+            Integer[] oppLevels  = msg.getOpponentPokemonLevels();
+            Integer[] oppMoveIds = msg.getOpponentMoveIds(); // flat: 4 per pokemon
 
-        for (int i = 0; i < oppIds.length; i++) {
-            try {
-                PokemonInstance p = new PokemonInstance(oppIds[i], oppLevels[i]);
+            if (oppIds != null && oppLevels != null) {
+                int count = Math.min(oppIds.length, oppLevels.length);
+                for (int i = 0; i < count; i++) {
+                    try {
+                        PokemonInstance p = new PokemonInstance(oppIds[i], oppLevels[i]);
 
-                // Override moves with the exact set the opponent has on the server
-                if (oppMoveIds != null) {
-                    p.clearMoves();
-                    for (int j = 0; j < 4; j++) {
-                        int idx = i * 4 + j;
-                        if (idx < oppMoveIds.length && oppMoveIds[idx] != null) {
-                            com.example.pokemonbattle.model.Move move =
-                                    PokemonInstance.getMoveById(oppMoveIds[idx]);
-                            if (move != null) p.addMove(move);
+                        // Override moves with the exact set the opponent has on the server
+                        if (oppMoveIds != null) {
+                            p.clearMoves();
+                            for (int j = 0; j < 4; j++) {
+                                int idx = i * 4 + j;
+                                if (idx < oppMoveIds.length && oppMoveIds[idx] != null) {
+                                    com.example.pokemonbattle.model.Move move =
+                                            PokemonInstance.getMoveById(oppMoveIds[idx]);
+                                    if (move != null) p.addMove(move);
+                                }
+                            }
                         }
+
+                        opponentPlayer.addToTeam(p);
+                    } catch (Exception e) {
+                        System.err.println("[WaitingController] Bad opponent pokemon data at index " + i + ": " + e.getMessage());
                     }
                 }
-
-                opponentPlayer.addToTeam(p);
-            } catch (Exception e) {
-                System.err.println("[WaitingController] Bad opponent pokemon id=" + oppIds[i] + ": " + e.getMessage());
             }
+        } catch (Exception e) {
+            System.err.println("[WaitingController] Failed to parse BATTLE_START payload: " + e.getMessage());
         }
 
         // Pass everything to the battle screen via SceneManager

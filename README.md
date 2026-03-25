@@ -90,6 +90,33 @@ Run server (custom port):
 mvn exec:java -Dexec.mainClass="com.example.pokemonbattle.server.BattleServer" -Dexec.args="7777"
 ```
 
+## 4.1) Build a No-Java-Required Windows App (.exe)
+
+You can build a Windows package that includes its own runtime, so target machines do not need Java installed.
+
+From project root:
+
+```powershell
+.\build-windows-package.bat
+```
+
+This script creates:
+- Portable app executable: `dist/PokemonBattle/PokemonBattle.exe`
+- Windows installer (optional): `dist/PokemonBattle-1.0.0.exe`
+
+Installer prerequisite:
+- To generate the installer `.exe`, install WiX Toolset and add `candle.exe` and `light.exe` to `PATH`.
+- Without WiX, the script still builds the portable app image (`dist/PokemonBattle/PokemonBattle.exe`).
+
+Distribution usage:
+- If installer was generated, share `dist/PokemonBattle-1.0.0.exe` and install normally.
+- Otherwise, share the `dist/PokemonBattle` folder and run `PokemonBattle.exe` directly.
+- No separate Java installation is required on that machine.
+
+Important platform note:
+- Native packages are OS-specific.
+- Build on Windows for Windows `.exe`, on macOS for `.dmg/.pkg`, and on Linux for `.deb/.rpm` (or app-image style bundles).
+
 Important runtime note:
 
 - `New Game -> Local Player` currently uses the same online pipeline over `localhost:5555`.

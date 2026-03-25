@@ -1,6 +1,7 @@
 package com.example.pokemonbattle.server;
 
 import java.io.IOException;
+import java.net.BindException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
@@ -310,6 +311,10 @@ public class BattleServer {
             }
             
             scanner.close();
+        } catch (BindException e) {
+            System.err.println("BattleServer is already running on port " + port + ".");
+            System.err.println("Stop the existing server first, or launch with another port (example: BattleServer 5556).");
+            System.exit(1);
         } catch (IOException e) {
             System.err.println("Fatal error: " + e.getMessage());
             e.printStackTrace();

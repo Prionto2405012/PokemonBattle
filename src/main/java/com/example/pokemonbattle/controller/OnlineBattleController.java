@@ -17,6 +17,7 @@ import com.example.pokemonbattle.model.Player;
 import com.example.pokemonbattle.model.PokemonInstance;
 import com.example.pokemonbattle.model.User;
 import com.example.pokemonbattle.server.ActionMessage;
+import com.example.pokemonbattle.server.BattleChatMessage;
 import com.example.pokemonbattle.server.BattleEndMessage;
 import com.example.pokemonbattle.server.BattleUpdateMessage;
 import com.example.pokemonbattle.server.DamageMessage;
@@ -26,6 +27,7 @@ import com.example.pokemonbattle.server.ServerConnection;
 import com.example.pokemonbattle.server.SwitchNotifyMessage;
 import com.example.pokemonbattle.server.TurnReadyMessage;
 import com.example.pokemonbattle.util.BattleAnimationManager;
+import com.example.pokemonbattle.util.ChatManager;
 import com.example.pokemonbattle.util.MusicManager;
 import com.example.pokemonbattle.util.PlayerSession;
 import com.example.pokemonbattle.util.SceneManager;
@@ -51,6 +53,8 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
@@ -143,6 +147,21 @@ public class OnlineBattleController {
     @FXML private Label forcedSwitchTitleLabel;
     @FXML private VBox forcedSwitchPokemonList;
 
+    // Chat section
+    @FXML private VBox chatSection;
+    @FXML private ScrollPane chatScrollPane;
+    @FXML private VBox chatMessagesContainer;
+    @FXML private Button chatToggleButton;
+    @FXML private VBox quickMessagesBox;
+    @FXML private Button quickMsg1;
+    @FXML private Button quickMsg2;
+    @FXML private Button quickMsg3;
+    @FXML private Button quickMsg4;
+    @FXML private Button quickMsg5;
+    @FXML private Button quickMsg6;
+    @FXML private TextField chatInputField;
+    @FXML private Button chatSendButton;
+
     // Move list constants
     private static final double MOVE_BTN_HEIGHT = 50.0;
     private static final double INFO_BTN_WIDTH = 18.0;
@@ -151,6 +170,8 @@ public class OnlineBattleController {
     private static final double INFO_BTN_INSET_RIGHT = 4.0;
     private static final double EFF_ICON_INSET_RIGHT = 8.0;
     private static final double EFF_ICON_INSET_BOTTOM = 6.0;
+    private static final double CHAT_SECTION_EXPANDED_HEIGHT = 260.0;
+    private static final double CHAT_SECTION_COLLAPSED_HEIGHT = 46.0;
 
     // Pokemon selection constants
     private static final double POKEMON_BTN_HEIGHT = 70.0;
@@ -212,6 +233,8 @@ public class OnlineBattleController {
     private static final double VS_OFFSCREEN_OFFSET = 700.0;
 
     private BattleAnimationManager animationManager;
+    private ChatManager chatManager;
+    private boolean chatExpanded = true;
     private final Queue<DamageMessage> pendingDamageMessages = new ArrayDeque<>();
     private final Queue<SwitchNotifyMessage> pendingSwitchNotifies = new ArrayDeque<>();
     private boolean damageAnimationInProgress = false;
@@ -296,6 +319,9 @@ public class OnlineBattleController {
         Platform.runLater(this::playVSIntro);
         animationManager = new BattleAnimationManager(playerSpriteImage, opponentSpriteImage, battleField);
         animationManager.setAnimationEnabled(PlayerSession.getInstance().isMoveAnimationEnabled());
+
+        // Initialize chat manager
+        initializeChat();
     }
 
     //  Info overlay 
@@ -836,9 +862,21 @@ public class OnlineBattleController {
                 case "BATTLE_UPDATE"-> applyBattleUpdate((BattleUpdateMessage) msg);
                 case "TURN_READY"   -> onTurnReady((TurnReadyMessage) msg);
                 case "BATTLE_END"   -> applyBattleEnd((BattleEndMessage) msg);
+                case "BATTLE_CHAT"  -> applyBattleChat((BattleChatMessage) msg);
                 default             -> System.out.println("[OnlineBattle] Unknown msg: " + msg.getMessageType());
             }
         });
+    }
+
+    private void applyBattleChat(BattleChatMessage msg) {
+        if (chatManager == null || msg == null || msg.getMessageText() == null) return;
+
+        String sender = msg.getSenderName();
+        if (sender != null && player != null && sender.equals(player.getName())) {
+            return;
+        }
+
+        chatManager.receiveOpponentMessage(sender, msg.getMessageText());
     }
 
     private void applyDamage(DamageMessage msg) {
@@ -1083,12 +1121,14 @@ public class OnlineBattleController {
     @FXML
     private void onGoBackClicked() {
         if (confettiTimer != null) { confettiTimer.stop(); confettiTimer = null; }
+        if (chatManager != null) { chatManager.shutdown(); }
         doDisconnectAndLeave();
     }
 
     @FXML
     private void onBattleAgainClicked() {
         if (confettiTimer != null) { confettiTimer.stop(); confettiTimer = null; }
+        if (chatManager != null) { chatManager.shutdown(); }
         doDisconnectAndLeave();
     }
 
@@ -1633,6 +1673,9 @@ public class OnlineBattleController {
         pokemonSelectionBox.setVisible(false);
         pokemonSelectionBox.setManaged(false);
         pokemonSelectionBox.setMouseTransparent(true);
+
+        // Keep chat section visible
+        showChatSection();
     }
 
     private void showMoveSelection() {
@@ -1647,6 +1690,9 @@ public class OnlineBattleController {
         pokemonSelectionBox.setVisible(false);
         pokemonSelectionBox.setManaged(false);
         pokemonSelectionBox.setMouseTransparent(true);
+
+        // Keep chat section visible
+        showChatSection();
     }
 
     private void showPokemonSelection() {
@@ -1661,6 +1707,9 @@ public class OnlineBattleController {
         moveSelectionBox.setVisible(false);
         moveSelectionBox.setManaged(false);
         moveSelectionBox.setMouseTransparent(true);
+
+        // Keep chat section visible
+        showChatSection();
     }
 
     private void setVisible(javafx.scene.Node node, boolean v) {
@@ -1798,7 +1847,153 @@ public class OnlineBattleController {
         t.start();
     }
 
-    //  Utility 
+    // ---- Chat Section Methods ----
+
+    /**
+     * Initialize the chat section and manager
+     */
+    private void initializeChat() {
+        if (chatSection != null && chatMessagesContainer != null && chatScrollPane != null) {
+            chatManager = new ChatManager(chatMessagesContainer, chatScrollPane);
+
+            // Set up quick message button handlers
+            if (quickMsg1 != null) quickMsg1.setOnAction(e -> onQuickMessage1());
+            if (quickMsg2 != null) quickMsg2.setOnAction(e -> onQuickMessage2());
+            if (quickMsg3 != null) quickMsg3.setOnAction(e -> onQuickMessage3());
+            if (quickMsg4 != null) quickMsg4.setOnAction(e -> onQuickMessage4());
+            if (quickMsg5 != null) quickMsg5.setOnAction(e -> onQuickMessage5());
+            if (quickMsg6 != null) quickMsg6.setOnAction(e -> onQuickMessage6());
+            if (chatSendButton != null) chatSendButton.setOnAction(e -> onChatSendClicked());
+            if (chatInputField != null) chatInputField.setOnAction(e -> onChatSendClicked());
+
+            // Set up toggle button handler
+            if (chatToggleButton != null) {
+                chatToggleButton.setOnAction(e -> onChatToggleClicked());
+            }
+
+            chatExpanded = true;
+            applyChatExpansionState();
+
+            // Show chat section - it's always visible for online battles
+            showChatSection();
+
+            // Add welcome message
+            chatManager.addSystemMessage("Online battle chat is ready!");
+        }
+    }
+
+    /**
+     * Show the chat section
+     */
+    private void showChatSection() {
+        if (chatSection != null) {
+            chatSection.setVisible(true);
+            chatSection.setManaged(true);
+        }
+    }
+
+    /**
+     * Hide the chat section
+     */
+    private void hideChatSection() {
+        if (chatSection != null) {
+            chatSection.setVisible(false);
+            chatSection.setManaged(false);
+        }
+    }
+
+    /**
+     * Toggle chat messages visibility
+     */
+    @FXML
+    private void onChatToggleClicked() {
+        if (chatScrollPane != null && quickMessagesBox != null && chatToggleButton != null) {
+            chatExpanded = !chatExpanded;
+            applyChatExpansionState();
+        }
+    }
+
+    private void applyChatExpansionState() {
+        if (chatSection == null || chatScrollPane == null || quickMessagesBox == null || chatToggleButton == null) {
+            return;
+        }
+
+        chatScrollPane.setVisible(chatExpanded);
+        chatScrollPane.setManaged(chatExpanded);
+        quickMessagesBox.setVisible(chatExpanded);
+        quickMessagesBox.setManaged(chatExpanded);
+
+        double targetHeight = chatExpanded ? CHAT_SECTION_EXPANDED_HEIGHT : CHAT_SECTION_COLLAPSED_HEIGHT;
+        chatSection.setMinHeight(targetHeight);
+        chatSection.setPrefHeight(targetHeight);
+        chatSection.setMaxHeight(targetHeight);
+        chatToggleButton.setText(chatExpanded ? "−" : "+");
+    }
+
+    private void sendQuickChatMessage(String text) {
+        if (text == null || text.isBlank() || chatManager == null) {
+            return;
+        }
+
+        chatManager.sendPlayerMessage(text);
+
+        if (serverConnection == null || !serverConnection.isConnected() || battleId == null) {
+            return;
+        }
+
+        String senderName = (player != null && player.getName() != null) ? player.getName() : "Player";
+        try {
+            serverConnection.sendMessage(new BattleChatMessage(battleId, senderName, text));
+        } catch (IOException e) {
+            chatManager.addSystemMessage("Failed to deliver chat message.");
+            System.err.println("[OnlineBattle] Failed to send chat message: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Quick message handlers
+     */
+    @FXML
+    private void onQuickMessage1() {
+        sendQuickChatMessage(ChatManager.QUICK_MESSAGES[0]);
+    }
+
+    @FXML
+    private void onQuickMessage2() {
+        sendQuickChatMessage(ChatManager.QUICK_MESSAGES[1]);
+    }
+
+    @FXML
+    private void onQuickMessage3() {
+        sendQuickChatMessage(ChatManager.QUICK_MESSAGES[2]);
+    }
+
+    @FXML
+    private void onQuickMessage4() {
+        sendQuickChatMessage(ChatManager.QUICK_MESSAGES[3]);
+    }
+
+    @FXML
+    private void onQuickMessage5() {
+        sendQuickChatMessage(ChatManager.QUICK_MESSAGES[4]);
+    }
+
+    @FXML
+    private void onQuickMessage6() {
+        sendQuickChatMessage(ChatManager.QUICK_MESSAGES[5]);
+    }
+
+    @FXML
+    private void onChatSendClicked() {
+        if (chatInputField == null) return;
+        String text = chatInputField.getText();
+        if (text == null || text.isBlank()) return;
+
+        sendQuickChatMessage(text.trim());
+        chatInputField.clear();
+    }
+
+    //  Utility
     public List<String> getBattleLog() {
         return new ArrayList<>(battleLog);
     }

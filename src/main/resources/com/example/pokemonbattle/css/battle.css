@@ -635,3 +635,142 @@
     -fx-text-fill: #78C850;
     -fx-padding: 4px 0 2px 0;
 }
+
+/* ---- Chat Section Styles ---- */
+.chat-section {
+    -fx-background-color: rgba(0, 0, 0, 0.3);
+    -fx-background-radius: 16;
+    -fx-border-color: rgba(255, 255, 255, 0.15);
+    -fx-border-width: 1;
+    -fx-border-radius: 16;
+}
+
+.chat-header {
+    -fx-padding: 4 0;
+}
+
+.chat-title-label {
+    -fx-font-family: "SPACE NOVA";
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #ffffff;
+}
+
+.chat-toggle-btn {
+    -fx-background-color: rgba(255, 255, 255, 0.15);
+    -fx-background-radius: 4;
+    -fx-border-color: rgba(255, 255, 255, 0.25);
+    -fx-border-width: 1;
+    -fx-border-radius: 4;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-padding: 0;
+}
+
+.chat-toggle-btn:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.25);
+    -fx-scale-x: 1.1;
+    -fx-scale-y: 1.1;
+}
+
+.chat-toggle-btn:pressed {
+    -fx-scale-x: 0.95;
+    -fx-scale-y: 0.95;
+}
+
+.chat-scroll-pane {
+    -fx-background-color: rgba(0, 0, 0, 0.4);
+    -fx-background-radius: 8;
+    -fx-border-color: rgba(255, 255, 255, 0.1);
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+}
+
+.chat-scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+.chat-scroll-pane .scroll-bar:vertical {
+    -fx-background-color: transparent;
+    -fx-padding: 0 2 0 2;
+}
+
+.chat-scroll-pane .scroll-bar:vertical .thumb {
+    -fx-background-color: rgba(255, 255, 255, 0.3);
+    -fx-background-radius: 4;
+}
+
+.chat-scroll-pane .scroll-bar:vertical .track {
+    -fx-background-color: rgba(0, 0, 0, 0.2);
+    -fx-background-radius: 4;
+}
+
+.chat-messages-container {
+    -fx-background-color: transparent;
+}
+
+.chat-message-player {
+    -fx-font-family: "menu";
+    -fx-font-size: 11px;
+    -fx-text-fill: #90caf9;
+    -fx-background-color: rgba(33, 150, 243, 0.15);
+    -fx-background-radius: 6;
+    -fx-padding: 4 8;
+}
+
+.chat-message-opponent {
+    -fx-font-family: "menu";
+    -fx-font-size: 11px;
+    -fx-text-fill: #ffab91;
+    -fx-background-color: rgba(255, 87, 34, 0.15);
+    -fx-background-radius: 6;
+    -fx-padding: 4 8;
+}
+
+.chat-message-system {
+    -fx-font-family: "menu";
+    -fx-font-size: 11px;
+    -fx-text-fill: #b0bec5;
+    -fx-background-color: rgba(120, 120, 120, 0.15);
+    -fx-background-radius: 6;
+    -fx-padding: 4 8;
+}
+
+.quick-msg-btn {
+    -fx-font-family: "menu";
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #ffffff;
+    -fx-background-color: linear-gradient(to bottom, #546e7a, #37474f);
+    -fx-background-radius: 8;
+    -fx-border-color: rgba(255, 255, 255, 0.2);
+    -fx-border-radius: 8;
+    -fx-border-width: 1;
+    -fx-cursor: hand;
+    -fx-padding: 4 8;
+}
+
+.quick-msg-btn:hover {
+    -fx-background-color: linear-gradient(to bottom, #607d8b, #455a64);
+    -fx-scale-x: 1.03;
+    -fx-scale-y: 1.03;
+}
+
+.quick-msg-btn:pressed {
+    -fx-background-color: linear-gradient(to bottom, #37474f, #263238);
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
+}
+
+.chat-input-area {
+    -fx-background-color: rgb(197, 230, 223);
+    -fx-background-radius: 8;
+    -fx-border-color: rgb(2, 49, 36);
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-text-fill: #022628;
+    -fx-font-size: 11px;
+    -fx-padding: 6 8;
+}
