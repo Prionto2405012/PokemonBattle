@@ -153,37 +153,6 @@
                     </HBox>
                 </VBox>
 
-                <VBox fx:id="moveSelectionBox" alignment="CENTER" spacing="8" managed="false"
-                    visible="false"
-                    styleClass="move-selection-box">
-                    <padding>
-                        <Insets top="10" bottom="10" left="10" right="10" />
-                    </padding>
-                    <VBox fx:id="moveButtonsContainer" alignment="CENTER" spacing="7" maxWidth="310" />
-                    <Button text="← Back" styleClass="move-back-btn" onAction="#onBackToActions"
-                        prefWidth="120" prefHeight="36">
-                        <font>
-                            <Font size="12" />
-                        </font>
-                    </Button>
-                </VBox>
-
-                <VBox fx:id="pokemonSelectionBox" alignment="CENTER" spacing="10" managed="false"
-                    visible="false"
-                    styleClass="pokemon-selection-box">
-                    <padding>
-                        <Insets top="10" bottom="10" left="10" right="10" />
-                    </padding>
-                    <Label text="Choose Pokémon:" styleClass="section-header-label" />
-                    <VBox fx:id="pokemonButtonsBox" alignment="CENTER" spacing="8" />
-                    <Button text="← Back" styleClass="move-back-btn" onAction="#onBackToActions"
-                        prefWidth="120" prefHeight="36">
-                        <font>
-                            <Font size="12" />
-                        </font>
-                    </Button>
-                </VBox>
-
                 <!-- ── Chat section (only visible in local/online battles) ── -->
                 <VBox fx:id="chatSection" alignment="CENTER" spacing="8" managed="false"
                     visible="false" styleClass="chat-section" maxHeight="300" VBox.vgrow="ALWAYS">
@@ -261,6 +230,37 @@
                             </Button>
                         </HBox>
                     </VBox>
+                </VBox>
+
+                <VBox fx:id="moveSelectionBox" alignment="CENTER" spacing="8" managed="false"
+                    visible="false"
+                    styleClass="move-selection-box">
+                    <padding>
+                        <Insets top="10" bottom="10" left="10" right="10" />
+                    </padding>
+                    <VBox fx:id="moveButtonsContainer" alignment="CENTER" spacing="7" maxWidth="310" />
+                    <Button text="← Back" styleClass="move-back-btn" onAction="#onBackToActions"
+                        prefWidth="120" prefHeight="36">
+                        <font>
+                            <Font size="12" />
+                        </font>
+                    </Button>
+                </VBox>
+
+                <VBox fx:id="pokemonSelectionBox" alignment="CENTER" spacing="10" managed="false"
+                    visible="false"
+                    styleClass="pokemon-selection-box">
+                    <padding>
+                        <Insets top="10" bottom="10" left="10" right="10" />
+                    </padding>
+                    <Label text="Choose Pokémon:" styleClass="section-header-label" />
+                    <VBox fx:id="pokemonButtonsBox" alignment="CENTER" spacing="8" />
+                    <Button text="← Back" styleClass="move-back-btn" onAction="#onBackToActions"
+                        prefWidth="120" prefHeight="36">
+                        <font>
+                            <Font size="12" />
+                        </font>
+                    </Button>
                 </VBox>
 
             </VBox>
