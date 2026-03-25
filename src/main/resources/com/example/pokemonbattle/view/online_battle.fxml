@@ -191,6 +191,85 @@
                     </Button>
                 </VBox>
 
+                <!-- ── Chat section (only visible in local/online battles) ── -->
+                <VBox fx:id="chatSection" alignment="CENTER" spacing="8" managed="false"
+                    visible="false" styleClass="chat-section" maxHeight="300" VBox.vgrow="ALWAYS">
+                    <padding>
+                        <Insets top="10" bottom="10" left="10" right="10" />
+                    </padding>
+
+                    <!-- Chat header -->
+                    <HBox alignment="CENTER" spacing="8" styleClass="chat-header">
+                        <Label text="Chat" styleClass="chat-title-label">
+                            <font>
+                                <Font name="SPACE NOVA" size="14" />
+                            </font>
+                        </Label>
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Button fx:id="chatToggleButton" text="−" styleClass="chat-toggle-btn"
+                            onAction="#onChatToggleClicked"
+                            prefWidth="24" prefHeight="24" />
+                    </HBox>
+
+                    <!-- Chat messages area -->
+                    <ScrollPane fx:id="chatScrollPane" fitToWidth="true" hbarPolicy="NEVER"
+                        vbarPolicy="AS_NEEDED" styleClass="chat-scroll-pane"
+                        prefHeight="150" maxHeight="180" VBox.vgrow="ALWAYS">
+                        <VBox fx:id="chatMessagesContainer" spacing="4" alignment="TOP_LEFT"
+                            styleClass="chat-messages-container">
+                            <padding>
+                                <Insets top="6" bottom="6" left="8" right="8" />
+                            </padding>
+                        </VBox>
+                    </ScrollPane>
+
+                    <!-- Quick messages buttons -->
+                    <VBox fx:id="quickMessagesBox" spacing="4" alignment="CENTER">
+                        <HBox spacing="4" alignment="CENTER">
+                            <Button fx:id="quickMsg1" text="Well played!" styleClass="quick-msg-btn"
+                                onAction="#onQuickMessage1" prefWidth="140" prefHeight="28">
+                                <font>
+                                    <Font size="10" />
+                                </font>
+                            </Button>
+                            <Button fx:id="quickMsg2" text="Good luck!" styleClass="quick-msg-btn"
+                                onAction="#onQuickMessage2" prefWidth="140" prefHeight="28">
+                                <font>
+                                    <Font size="10" />
+                                </font>
+                            </Button>
+                        </HBox>
+                        <HBox spacing="4" alignment="CENTER">
+                            <Button fx:id="quickMsg3" text="Congrats!" styleClass="quick-msg-btn"
+                                onAction="#onQuickMessage3" prefWidth="140" prefHeight="28">
+                                <font>
+                                    <Font size="10" />
+                                </font>
+                            </Button>
+                            <Button fx:id="quickMsg4" text="Better luck next time!" styleClass="quick-msg-btn"
+                                onAction="#onQuickMessage4" prefWidth="140" prefHeight="28">
+                                <font>
+                                    <Font size="10" />
+                                </font>
+                            </Button>
+                        </HBox>
+                        <HBox spacing="4" alignment="CENTER">
+                            <Button fx:id="quickMsg5" text="Nice move!" styleClass="quick-msg-btn"
+                                onAction="#onQuickMessage5" prefWidth="140" prefHeight="28">
+                                <font>
+                                    <Font size="10" />
+                                </font>
+                            </Button>
+                            <Button fx:id="quickMsg6" text="That was close!" styleClass="quick-msg-btn"
+                                onAction="#onQuickMessage6" prefWidth="140" prefHeight="28">
+                                <font>
+                                    <Font size="10" />
+                                </font>
+                            </Button>
+                        </HBox>
+                    </VBox>
+                </VBox>
+
             </VBox>
 
             <VBox StackPane.alignment="TOP_RIGHT" translateX="-16" translateY="16"
