@@ -4,17 +4,26 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import javafx.animation.FadeTransition;
+import javafx.animation.Interpolator;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 public class SceneManager {
     private static Stage primaryStage;
     private static final String RESOURCE_PATH = "/com/example/pokemonbattle/";
     private static final long DEFAULT_LOADING_MIN_MS = 900L;
+
+    /** Duration the black overlay takes to fade IN over the outgoing scene. */
+    private static final int FADE_OUT_MS = 300;
+
     private static final Map<String, Object> sceneData = new HashMap<>();
 
     public static void initialize(Stage stage) {
@@ -50,6 +59,7 @@ public class SceneManager {
                 throw new RuntimeException("FXML file not found: " + RESOURCE_PATH + "view/" + fxmlFile);
             FXMLLoader loader = new FXMLLoader(fxmlUrl);
             Scene scene = new Scene(loader.load(), width, height);
+            scene.setFill(Color.BLACK);
             primaryStage.setTitle(title);
             primaryStage.setScene(scene);
             primaryStage.show();
@@ -58,7 +68,9 @@ public class SceneManager {
         }
     }
 
-    public static void switchSceneWithLoading( String fxmlFile, String title, int width, int height, Map<String, Object> data, long minimumLoadingMs) {
+    public static void switchSceneWithLoading(String fxmlFile, String title, int width, int height,
+            Map<String, Object> data, long minimumLoadingMs) {
+
         Runnable doSwitch = () -> {
             try {
                 var loadingUrl = SceneManager.class.getResource(RESOURCE_PATH + "view/loading_screen.fxml");
@@ -66,12 +78,13 @@ public class SceneManager {
 
                 FXMLLoader loadingLoader = new FXMLLoader(loadingUrl);
                 Scene loadingScene = new Scene(loadingLoader.load(), 1200, 700);
+                loadingScene.setFill(Color.BLACK);
                 com.example.pokemonbattle.controller.LoadingScreenController lsc = loadingLoader.getController();
 
                 primaryStage.setScene(loadingScene);
                 primaryStage.show();
 
-                // Curtain rises on the loading scene (new scene reveal).
+                // Loading screen uncovers itself from black
                 if (lsc != null) {
                     lsc.playCurtainReveal();
                 }
@@ -112,8 +125,8 @@ public class SceneManager {
                         FXMLLoader loader = new FXMLLoader(fxmlUrl);
                         Parent newRoot = loader.load();
                         Scene scene = new Scene(newRoot, width, height);
+                        scene.setFill(Color.BLACK);
                         primaryStage.setTitle(title);
-                        // Clear the loading scene's root first to detach all nodes
                         if (primaryStage.getScene() != null) {
                             primaryStage.getScene().setRoot(new javafx.scene.layout.Pane());
                         }
@@ -130,13 +143,15 @@ public class SceneManager {
             }
         };
 
+        // Add a black overlay on top of the current scene and fade it IN (0 → 1),
+        // exactly like IntroController does before switching to StartController.
+        // Once fully black, switch to the loading screen.
         Runnable start = () -> {
-            Parent currentRoot = (primaryStage != null && primaryStage.getScene() != null)
-                    ? primaryStage.getScene().getRoot()
-                    : null;
+            Scene currentScene = primaryStage != null ? primaryStage.getScene() : null;
+            Parent currentRoot = currentScene != null ? currentScene.getRoot() : null;
 
             if (currentRoot instanceof Pane pane) {
-                CurtainTransitionManager.fallOn(pane, doSwitch);
+                fadeInBlackOverlayThen(pane, doSwitch);
             } else {
                 doSwitch.run();
             }
@@ -147,6 +162,33 @@ public class SceneManager {
         } else {
             Platform.runLater(start);
         }
+    }
+
+    /**
+     * Mirrors the IntroController pattern: adds a black Rectangle on top of the
+     * current scene's root and fades it from opacity 0 → 1. Once fully opaque
+     * (screen is black), calls {@code onCovered} to do the scene switch.
+     */
+    private static void fadeInBlackOverlayThen(Pane pane, Runnable onCovered) {
+        Rectangle overlay = new Rectangle();
+        overlay.setFill(Color.BLACK);
+        overlay.widthProperty().bind(pane.widthProperty());
+        overlay.heightProperty().bind(pane.heightProperty());
+        overlay.setOpacity(0);
+        overlay.setManaged(false);
+        pane.getChildren().add(overlay);
+
+        FadeTransition fadeIn = new FadeTransition(Duration.millis(FADE_OUT_MS), overlay);
+        fadeIn.setFromValue(0.0);
+        fadeIn.setToValue(1.0);
+        fadeIn.setInterpolator(Interpolator.EASE_IN);
+        fadeIn.setOnFinished(e -> {
+            overlay.widthProperty().unbind();
+            overlay.heightProperty().unbind();
+            pane.getChildren().remove(overlay);
+            if (onCovered != null) onCovered.run();
+        });
+        fadeIn.play();
     }
 
     public static void switchSceneWithLoading(String fxmlFile, String title, int width, int height) {
