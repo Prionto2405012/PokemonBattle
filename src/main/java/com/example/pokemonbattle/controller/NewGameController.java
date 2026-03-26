@@ -84,8 +84,6 @@ public class NewGameController {
     @FXML
     private ToggleButton aiOpponentButton;
     @FXML
-    private ToggleButton localOpponentButton;
-    @FXML
     private ToggleButton onlineOpponentButton;
     @FXML
     private Label matchingStatusLabel;
@@ -187,7 +185,6 @@ public class NewGameController {
         // Opponent toggle group
         opponentToggleGroup = new ToggleGroup();
         aiOpponentButton.setToggleGroup(opponentToggleGroup);
-        localOpponentButton.setToggleGroup(opponentToggleGroup);
         onlineOpponentButton.setToggleGroup(opponentToggleGroup);
 
         // Team toggle group
@@ -216,16 +213,13 @@ public class NewGameController {
                 ToggleButton btn = (ToggleButton) newToggle;
                 if (btn.getText().toUpperCase().contains("AI")) {
                     selectedOpponent = "AI";
-                } else if (btn.getText().toUpperCase().contains("ONLINE")) {
-                    selectedOpponent = "ONLINE";
                 } else {
-                    selectedOpponent = "LOCAL";
+                    selectedOpponent = "ONLINE";
                 }
                 
                 // Apply border style only after interaction
                 if (opponentInteracted) {
                     applySelectionStyle(aiOpponentButton, aiOpponentButton == newToggle);
-                    applySelectionStyle(localOpponentButton, localOpponentButton == newToggle);
                     applySelectionStyle(onlineOpponentButton, onlineOpponentButton == newToggle);
                 }
                 
@@ -268,19 +262,11 @@ public class NewGameController {
         aiOpponentButton.setOnMouseClicked(e -> {
             opponentInteracted = true;
             applySelectionStyle(aiOpponentButton, aiOpponentButton.isSelected());
-            applySelectionStyle(localOpponentButton, localOpponentButton.isSelected());
-            applySelectionStyle(onlineOpponentButton, onlineOpponentButton.isSelected());
-        });
-        localOpponentButton.setOnMouseClicked(e -> {
-            opponentInteracted = true;
-            applySelectionStyle(aiOpponentButton, aiOpponentButton.isSelected());
-            applySelectionStyle(localOpponentButton, localOpponentButton.isSelected());
             applySelectionStyle(onlineOpponentButton, onlineOpponentButton.isSelected());
         });
         onlineOpponentButton.setOnMouseClicked(e -> {
             opponentInteracted = true;
             applySelectionStyle(aiOpponentButton, aiOpponentButton.isSelected());
-            applySelectionStyle(localOpponentButton, localOpponentButton.isSelected());
             applySelectionStyle(onlineOpponentButton, onlineOpponentButton.isSelected());
         });
         
@@ -380,12 +366,9 @@ public class NewGameController {
         } else if ("AI".equals(selectedOpponent)) {
             matchingStatusLabel.setText("AI Opponent Ready ✓");
             matchingStatusLabel.setStyle("-fx-font-size:13px; -fx-text-fill:#78C850; -fx-font-weight:bold;");
-        } else if ("ONLINE".equals(selectedOpponent)) {
+        } else {
             matchingStatusLabel.setText("Will search for server on WiFi network");
             matchingStatusLabel.setStyle("-fx-font-size:12px; -fx-text-fill:#a890f0; -fx-font-style:italic;");
-        } else {
-            matchingStatusLabel.setText("Waiting for local player...");
-            matchingStatusLabel.setStyle("-fx-font-size:12px; -fx-text-fill:#ffffff; -fx-font-style:italic;");
         }
         updateStartButtonState();
     }
@@ -764,11 +747,7 @@ public class NewGameController {
     private void updateStartButtonState() {
         if (startBattleButton == null) return;
         
-        // LOCAL/ONLINE battles don't need a mode selection (server handles it)
-        boolean isLocalReady = "LOCAL".equals(selectedOpponent) &&
-                               selectedTeamType != null &&
-                               !playerTeam.isEmpty();
-
+        // ONLINE battles don't need a mode selection (server handles it)
         boolean isOnlineReady = "ONLINE".equals(selectedOpponent) &&
                                 selectedTeamType != null &&
                                 !playerTeam.isEmpty();
@@ -778,7 +757,7 @@ public class NewGameController {
                             !playerTeam.isEmpty() &&
                             "SOLO".equals(selectedMode);
 
-        boolean canStart = isLocalReady || isOnlineReady || isAiReady;
+        boolean canStart = isOnlineReady || isAiReady;
         
         startBattleButton.setDisable(!canStart);
         
@@ -794,8 +773,8 @@ public class NewGameController {
      */
     private void onStartBattle() {
         // Validate all selections are made
-        // (mode is optional for LOCAL/ONLINE battles — server handles pairing)
-        if (selectedMode == null && !"LOCAL".equals(selectedOpponent) && !"ONLINE".equals(selectedOpponent)) {
+        // (mode is optional for ONLINE battles — server handles pairing)
+        if (selectedMode == null && !"ONLINE".equals(selectedOpponent)) {
             matchingStatusLabel.setText("Please select a game mode first!");
             matchingStatusLabel.setStyle("-fx-font-size:13px; -fx-text-fill:#F08030; -fx-font-weight:bold;");
             return;
@@ -828,19 +807,19 @@ public class NewGameController {
         Player player = new Player(playerName);
         playerTeam.forEach(player::addToTeam);
 
-        // ── LOCAL battle (same machine → localhost) ──────────────────────────
-        if ("LOCAL".equals(selectedOpponent)) {
-            System.out.println("\n=== LOCAL ONLINE BATTLE — Connecting to localhost ===");
-            System.out.println("Player: " + playerName);
-            playerTeam.forEach(p -> System.out.println("  - " + p.getName() + " Lv." + p.getLevel()));
+        // LOCAL battle (same machine → localhost)
+        // if ("LOCAL".equals(selectedOpponent)) {
+        //     System.out.println("\n=== LOCAL ONLINE BATTLE — Connecting to localhost ===");
+        //     System.out.println("Player: " + playerName);
+        //     playerTeam.forEach(p -> System.out.println("  - " + p.getName() + " Lv." + p.getLevel()));
 
-            SceneManager.switchSceneWithData("waiting_online.fxml",
-                    "Pokemon Battle - Matchmaking", 1200, 700,
-                    Map.of("player", player, "connectionMode", "LOCAL"));
-            return;
-        }
+        //     SceneManager.switchSceneWithData("waiting_online.fxml",
+        //             "Pokemon Battle - Matchmaking", 1200, 700,
+        //             Map.of("player", player, "connectionMode", "LOCAL"));
+        //     return;
+        // }
 
-        // ── ONLINE battle (LAN discovery → find server on WiFi) ─────────────
+        //  ONLINE battle (LAN discovery → find server on WiFi) 
         if ("ONLINE".equals(selectedOpponent)) {
             System.out.println("\n=== ONLINE BATTLE — Discovering server on LAN ===");
             System.out.println("Player: " + playerName);
@@ -852,7 +831,7 @@ public class NewGameController {
             return;
         }
 
-        // ── LOCAL AI battle ──────────────────────────────────────────────────
+        //  LOCAL AI battle 
         if (!"SOLO".equals(selectedMode)) {
             matchingStatusLabel.setText("Please select SOLO mode for AI battles!");
             matchingStatusLabel.setStyle("-fx-font-size:13px; -fx-text-fill:#F08030; -fx-font-weight:bold;");
@@ -1140,12 +1119,12 @@ public class NewGameController {
 
         BattleHistoryManager historyMgr = BattleHistoryManager.getInstance();
 
-        // ── Root overlay (semi-transparent dark background) ──────────────────
+        //  Root overlay (semi-transparent dark background) 
         StackPane overlayRoot = new StackPane();
         overlayRoot.setAlignment(Pos.CENTER);
         overlayRoot.setStyle("-fx-background-color: rgba(0,0,0,0.65);");
 
-        // ── Inner card ───────────────────────────────────────────────────────
+        //  Inner card 
         VBox container = new VBox(15);
         container.setAlignment(Pos.TOP_CENTER);
         container.setMaxWidth(620);
@@ -1185,7 +1164,7 @@ public class NewGameController {
 
         summary.getChildren().addAll(winLbl, lossLbl, totalLbl);
 
-        // ── Filter buttons ───────────────────────────────────────────────────
+        //  Filter buttons 
         HBox filterRow = new HBox(10);
         filterRow.setAlignment(Pos.CENTER);
         filterRow.setPadding(new Insets(2, 0, 4, 0));

@@ -322,7 +322,7 @@ public class Battle {
         int defStat = "special".equals(move.getDamage_class())
                 ? defender.getSpDefense()
                 : defender.getDefense();
-        double damage = ((2.0 * attacker.getLevel() / 5.0 + 2.0) * move.getPower()
+        double damage = ((1.5 * attacker.getLevel() / 8.0 + 1.5) * move.getPower()
                 * atkStat / (double) defStat) / 50.0 + 2.0;
         float effectiveness = getTypeEffectivenessMultiplier(move.getType(), defender.getTypes());
         damage *= effectiveness;

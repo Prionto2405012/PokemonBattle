@@ -17,7 +17,6 @@ import com.example.pokemonbattle.model.Move;
 import com.example.pokemonbattle.model.Player;
 import com.example.pokemonbattle.model.PokemonInstance;
 import com.example.pokemonbattle.util.BattleAnimationManager;
-import com.example.pokemonbattle.util.ChatManager;
 import com.example.pokemonbattle.util.MusicManager;
 import com.example.pokemonbattle.util.PlayerSession;
 import com.example.pokemonbattle.util.SceneManager;
@@ -42,8 +41,6 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
@@ -170,34 +167,6 @@ public class BattleController implements Battle.BattleListener {
     private Label forcedSwitchTitleLabel;
     @FXML
     private VBox forcedSwitchPokemonList;
-    // Chat section (injected from FXML)
-    @FXML
-    private VBox chatSection;
-    @FXML
-    private ScrollPane chatScrollPane;
-    @FXML
-    private VBox chatMessagesContainer;
-    @FXML
-    private Button chatToggleButton;
-    @FXML
-    private VBox quickMessagesBox;
-    @FXML
-    private Button quickMsg1;
-    @FXML
-    private Button quickMsg2;
-    @FXML
-    private Button quickMsg3;
-    @FXML
-    private Button quickMsg4;
-    @FXML
-    private Button quickMsg5;
-    @FXML
-    private Button quickMsg6;
-    @FXML
-    private TextField chatInputField;
-    @FXML
-    private Button chatSendButton;
-
     // Move list constants
     private static final double MOVE_BTN_HEIGHT = 50.0;
     private static final double INFO_BTN_WIDTH = 18.0;
@@ -206,8 +175,6 @@ public class BattleController implements Battle.BattleListener {
     private static final double INFO_BTN_INSET_RIGHT = 4.0;
     private static final double EFF_ICON_INSET_RIGHT = 8.0;
     private static final double EFF_ICON_INSET_BOTTOM = 6.0;
-    private static final double CHAT_SECTION_EXPANDED_HEIGHT = 260.0;
-    private static final double CHAT_SECTION_COLLAPSED_HEIGHT = 46.0;
 
     // Pokemon selection constants
     private static final double POKEMON_BTN_HEIGHT = 70.0;
@@ -272,8 +239,6 @@ public class BattleController implements Battle.BattleListener {
     private static final int VS_NPC_COUNT = 7;
 
     private BattleAnimationManager animationManager;
-    private ChatManager chatManager;
-    private boolean chatExpanded = true;
     private final Queue<PendingAttackAnimation> pendingAttackAnimations = new ArrayDeque<>();
     private final Queue<PendingSwitchEvent> pendingSwitchEvents = new ArrayDeque<>();
     private boolean attackAnimationInProgress = false;
@@ -358,9 +323,6 @@ public class BattleController implements Battle.BattleListener {
         Platform.runLater(this::playVSIntro);
         animationManager = new BattleAnimationManager(playerSpriteImage, opponentSpriteImage, battleField);
         animationManager.setAnimationEnabled(PlayerSession.getInstance().isMoveAnimationEnabled());
-
-        // Initialize chat manager
-        initializeChat();
     }
 
     @FXML
@@ -1447,9 +1409,6 @@ public class BattleController implements Battle.BattleListener {
         moveSelectionBox.setMouseTransparent(false);
         moveSelectionBox.toFront();
         updateMoveButtons();
-
-        // Keep chat section visible
-        showChatSection();
     }
 
     private void onChangePokemonClicked() {
@@ -1468,9 +1427,6 @@ public class BattleController implements Battle.BattleListener {
         pokemonSelectionBox.setMouseTransparent(false);
         pokemonSelectionBox.toFront();
         updatePokemonButtons();
-
-        // Keep chat section visible
-        showChatSection();
     }
 
     private void onItemsClicked() {
@@ -1603,9 +1559,6 @@ public class BattleController implements Battle.BattleListener {
         pokemonSelectionBox.setVisible(false);
         pokemonSelectionBox.setManaged(false);
         pokemonSelectionBox.setMouseTransparent(true);
-
-        // Keep chat section visible
-        showChatSection();
     }
 
     // Battle listener callbacks
@@ -1768,9 +1721,6 @@ public class BattleController implements Battle.BattleListener {
             confettiTimer.stop();
             confettiTimer = null;
         }
-        if (chatManager != null) {
-            chatManager.shutdown();
-        }
         onBack();
     }
 
@@ -1783,9 +1733,6 @@ public class BattleController implements Battle.BattleListener {
         if (confettiCanvas != null) {
             rootPane.getChildren().remove(confettiCanvas);
             confettiCanvas = null;
-        }
-        if (chatManager != null) {
-            chatManager.shutdown();
         }
         Player freshPlayer = new Player(player.getName());
         if (randomTeam) {
@@ -1908,150 +1855,6 @@ public class BattleController implements Battle.BattleListener {
         t.setDaemon(true);
         t.start();
     }
-
-    // ---- Chat Section Methods ----
-
-    /**
-     * Initialize the chat section and manager
-     */
-    private void initializeChat() {
-        if (chatSection != null && chatMessagesContainer != null && chatScrollPane != null) {
-            chatManager = new ChatManager(chatMessagesContainer, chatScrollPane);
-
-            // Set up quick message button handlers
-            if (quickMsg1 != null) quickMsg1.setOnAction(e -> onQuickMessage1());
-            if (quickMsg2 != null) quickMsg2.setOnAction(e -> onQuickMessage2());
-            if (quickMsg3 != null) quickMsg3.setOnAction(e -> onQuickMessage3());
-            if (quickMsg4 != null) quickMsg4.setOnAction(e -> onQuickMessage4());
-            if (quickMsg5 != null) quickMsg5.setOnAction(e -> onQuickMessage5());
-            if (quickMsg6 != null) quickMsg6.setOnAction(e -> onQuickMessage6());
-            if (chatSendButton != null) chatSendButton.setOnAction(e -> onChatSendClicked());
-            if (chatInputField != null) chatInputField.setOnAction(e -> onChatSendClicked());
-
-            // Set up toggle button handler
-            if (chatToggleButton != null) {
-                chatToggleButton.setOnAction(e -> onChatToggleClicked());
-            }
-
-            chatExpanded = true;
-            applyChatExpansionState();
-
-            // Show chat section - it's always visible for local battles
-            showChatSection();
-
-            // Add welcome message
-            chatManager.addSystemMessage("Battle chat is ready!");
-        }
-    }
-
-    /**
-     * Show the chat section
-     */
-    private void showChatSection() {
-        if (chatSection != null) {
-            chatSection.setVisible(true);
-            chatSection.setManaged(true);
-        }
-    }
-
-    /**
-     * Hide the chat section
-     */
-    private void hideChatSection() {
-        if (chatSection != null) {
-            chatSection.setVisible(false);
-            chatSection.setManaged(false);
-        }
-    }
-
-    /**
-     * Toggle chat messages visibility
-     */
-    @FXML
-    private void onChatToggleClicked() {
-        if (chatScrollPane != null && quickMessagesBox != null && chatToggleButton != null) {
-            chatExpanded = !chatExpanded;
-            applyChatExpansionState();
-        }
-    }
-
-    private void applyChatExpansionState() {
-        if (chatSection == null || chatScrollPane == null || quickMessagesBox == null || chatToggleButton == null) {
-            return;
-        }
-
-        chatScrollPane.setVisible(chatExpanded);
-        chatScrollPane.setManaged(chatExpanded);
-        quickMessagesBox.setVisible(chatExpanded);
-        quickMessagesBox.setManaged(chatExpanded);
-
-        double targetHeight = chatExpanded ? CHAT_SECTION_EXPANDED_HEIGHT : CHAT_SECTION_COLLAPSED_HEIGHT;
-        chatSection.setMinHeight(targetHeight);
-        chatSection.setPrefHeight(targetHeight);
-        chatSection.setMaxHeight(targetHeight);
-        chatToggleButton.setText(chatExpanded ? "−" : "+");
-    }
-
-    /**
-     * Quick message handlers
-     */
-    @FXML
-    private void onQuickMessage1() {
-        if (chatManager != null) {
-            chatManager.sendPlayerMessage(ChatManager.QUICK_MESSAGES[0]);
-        }
-    }
-
-    @FXML
-    private void onQuickMessage2() {
-        if (chatManager != null) {
-            chatManager.sendPlayerMessage(ChatManager.QUICK_MESSAGES[1]);
-        }
-    }
-
-    @FXML
-    private void onQuickMessage3() {
-        if (chatManager != null) {
-            chatManager.sendPlayerMessage(ChatManager.QUICK_MESSAGES[2]);
-        }
-    }
-
-    @FXML
-    private void onQuickMessage4() {
-        if (chatManager != null) {
-            chatManager.sendPlayerMessage(ChatManager.QUICK_MESSAGES[3]);
-        }
-    }
-
-    @FXML
-    private void onQuickMessage5() {
-        if (chatManager != null) {
-            chatManager.sendPlayerMessage(ChatManager.QUICK_MESSAGES[4]);
-        }
-    }
-
-    @FXML
-    private void onQuickMessage6() {
-        if (chatManager != null) {
-            chatManager.sendPlayerMessage(ChatManager.QUICK_MESSAGES[5]);
-        }
-    }
-
-    @FXML
-    private void onChatSendClicked() {
-        if (chatManager == null || chatInputField == null) {
-            return;
-        }
-
-        String text = chatInputField.getText();
-        if (text == null || text.isBlank()) {
-            return;
-        }
-
-        chatManager.sendPlayerMessage(text.trim());
-        chatInputField.clear();
-    }
-
     // Utility
 
     private String capitalize(String s) {
