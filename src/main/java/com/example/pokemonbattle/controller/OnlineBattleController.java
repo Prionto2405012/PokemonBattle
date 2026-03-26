@@ -1248,50 +1248,36 @@ public class OnlineBattleController {
 
     private void onMoveSelected(Move move) {
         if (moveSent || battleEnded) return;
-        moveSent = true;
-        disableMoveButtons();
-        showActionButtons();
-        setVisible(waitingLabel, true);
-        waitingLabel.setText("⏳ Waiting for opponent's move...");
-        attackButton.setDisable(true);
-        changePokemonMainButton.setDisable(true);
-
         String logEntry = "You chose " + cap(move.getName()) + "!";
-        battleStatusLabel.setText(logEntry + " Waiting for opponent...");
-        battleLog.add(logEntry);
-
         ActionMessage msg = ActionMessage.attack(battleId, move.getId(), move.getName(), turnCount);
-        try {
-            serverConnection.sendMessage(msg);
-        } catch (Exception e) {
-            System.err.println("[OnlineBattle] Failed to send action: " + e.getMessage());
-            battleStatusLabel.setText("Error sending move: " + e.getMessage());
-            moveSent = false;
-            attackButton.setDisable(false);
-        }
+        submitTurnAction(msg, logEntry, "Error sending move: ");
     }
 
     private void onPokemonSelected(PokemonInstance pokemon) {
         if (moveSent || battleEnded) return;
-        moveSent = true;
         int teamIndex = player.getTeam().indexOf(pokemon);
-        player.setCurrentPokemon(pokemon);
         String logEntry = "Switching to " + cap(pokemon.getName()) + "!";
-        battleStatusLabel.setText(logEntry + " Waiting for opponent...");
-        battleLog.add(logEntry);
-        updateBattleDisplay();
+        ActionMessage msg = ActionMessage.switchPokemon(battleId, teamIndex, turnCount);
+        submitTurnAction(msg, logEntry, "Error sending switch: ");
+    }
+
+    private void submitTurnAction(ActionMessage actionMessage, String logEntry, String errorPrefix) {
+        moveSent = true;
+        disableMoveButtons();
         showActionButtons();
         setVisible(waitingLabel, true);
-        waitingLabel.setText("⏳ Waiting for opponent's move...");
+        waitingLabel.setText("⏳ Waiting for opponent's action...");
         attackButton.setDisable(true);
         changePokemonMainButton.setDisable(true);
 
-        ActionMessage msg = ActionMessage.switchPokemon(battleId, teamIndex, turnCount);
+        battleStatusLabel.setText(logEntry + " Waiting for opponent...");
+        battleLog.add(logEntry);
+
         try {
-            serverConnection.sendMessage(msg);
+            serverConnection.sendMessage(actionMessage);
         } catch (Exception e) {
-            System.err.println("[OnlineBattle] Failed to send switch: " + e.getMessage());
-            battleStatusLabel.setText("Error sending switch: " + e.getMessage());
+            System.err.println("[OnlineBattle] Failed to send action: " + e.getMessage());
+            battleStatusLabel.setText(errorPrefix + e.getMessage());
             moveSent = false;
             attackButton.setDisable(false);
             changePokemonMainButton.setDisable(false);

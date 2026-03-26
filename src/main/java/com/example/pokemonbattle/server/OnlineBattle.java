@@ -143,15 +143,43 @@ public class OnlineBattle {
      * When both players submit actions, process the turn.
      */
     public synchronized void submitAction(Integer playerId, ActionMessage action) throws IOException {
-        if (playerId.equals(player1Id)) {
-            pendingActions.put(player1Id, action);
-            System.out.println("[Battle #" + battleId + "] Player 1 (" + player1Name + ") submitted action: " + action.getActionType()
-                    + (action.isAttack() ? " — " + action.getMoveName() : " — switch to index " + action.getSwitchPokemonIndex()));
-        } else if (playerId.equals(player2Id)) {
-            pendingActions.put(player2Id, action);
-            System.out.println("[Battle #" + battleId + "] Player 2 (" + player2Name + ") submitted action: " + action.getActionType()
-                    + (action.isAttack() ? " — " + action.getMoveName() : " — switch to index " + action.getSwitchPokemonIndex()));
+        if (!battleActive || action == null || playerId == null) {
+            return;
         }
+
+        String senderName;
+        Player senderPlayer;
+        Integer senderBattlePlayerId;
+        if (playerId.equals(player1Id)) {
+            senderName = player1Name;
+            senderPlayer = battleEngine.getPlayer1();
+            senderBattlePlayerId = player1Id;
+        } else if (playerId.equals(player2Id)) {
+            senderName = player2Name;
+            senderPlayer = battleEngine.getPlayer2();
+            senderBattlePlayerId = player2Id;
+        } else {
+            return;
+        }
+
+        if (!battleId.equals(action.getBattleId())) {
+            System.err.println("[Battle #" + battleId + "] Ignoring action with mismatched battle ID from " + senderName);
+            return;
+        }
+
+        if (pendingActions.containsKey(senderBattlePlayerId)) {
+            System.out.println("[Battle #" + battleId + "] " + senderName + " already submitted an action for this turn. Ignoring duplicate.");
+            return;
+        }
+
+        if (!isValidActionForPlayer(action, senderPlayer)) {
+            System.err.println("[Battle #" + battleId + "] Ignoring invalid action from " + senderName + ": " + action.getActionType());
+            return;
+        }
+
+        pendingActions.put(senderBattlePlayerId, action);
+        System.out.println("[Battle #" + battleId + "] " + senderName + " submitted action: " + action.getActionType()
+                + (action.isAttack() ? " — " + action.getMoveName() : " — switch to index " + action.getSwitchPokemonIndex()));
 
         // If both players have submitted actions, process the turn
         if (pendingActions.size() == 2) {
@@ -170,7 +198,10 @@ public class OnlineBattle {
         ActionMessage action1 = pendingActions.get(player1Id);
         ActionMessage action2 = pendingActions.get(player2Id);
         
-        if (action1 == null || action2 == null) return;
+        if (action1 == null || action2 == null) {
+            pendingActions.clear();
+            return;
+        }
         
         Player player1 = battleEngine.getPlayer1();
         Player player2 = battleEngine.getPlayer2();
@@ -250,6 +281,27 @@ public class OnlineBattle {
             this.attackerName = attackerName;
             this.defenderName = defenderName;
         }
+    }
+
+    private boolean isValidActionForPlayer(ActionMessage action, Player player) {
+        if (action.isAttack()) {
+            return action.getMoveId() != null;
+        }
+        if (action.isSwitch()) {
+            Integer switchIndex = action.getSwitchPokemonIndex();
+            if (switchIndex == null) {
+                return false;
+            }
+            List<PokemonInstance> team = player.getTeam();
+            if (switchIndex < 0 || switchIndex >= team.size()) {
+                return false;
+            }
+            PokemonInstance selectedPokemon = team.get(switchIndex);
+            return selectedPokemon != null
+                    && !selectedPokemon.isFainted()
+                    && selectedPokemon != player.getCurrentPokemon();
+        }
+        return false;
     }
     
     /**
