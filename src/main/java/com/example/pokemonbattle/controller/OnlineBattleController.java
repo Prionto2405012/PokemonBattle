@@ -21,6 +21,7 @@ import com.example.pokemonbattle.server.BattleChatMessage;
 import com.example.pokemonbattle.server.BattleEndMessage;
 import com.example.pokemonbattle.server.BattleUpdateMessage;
 import com.example.pokemonbattle.server.DamageMessage;
+import com.example.pokemonbattle.server.ForceSwitchMessage;
 import com.example.pokemonbattle.server.ForfeitMessage;
 import com.example.pokemonbattle.server.GameMessage;
 import com.example.pokemonbattle.server.ServerConnection;
@@ -238,6 +239,7 @@ public class OnlineBattleController {
     private final Queue<DamageMessage> pendingDamageMessages = new ArrayDeque<>();
     private final Queue<SwitchNotifyMessage> pendingSwitchNotifies = new ArrayDeque<>();
     private boolean damageAnimationInProgress = false;
+    private boolean pendingForcedSwitch = false;
 
     //  Lifecycle 
     @FXML
@@ -760,7 +762,7 @@ public class OnlineBattleController {
     }
 
     private void onForcedSwitchSelected(PokemonInstance pokemon) {
-        // Hide overlay
+        // Dismiss overlay first.
         FadeTransition ft = new FadeTransition(Duration.millis(200), forcedSwitchOverlay);
         ft.setToValue(0.0);
         ft.setOnFinished(e -> {
@@ -770,8 +772,21 @@ public class OnlineBattleController {
         });
         ft.play();
 
-        // Send switch action to server
-        onPokemonSelected(pokemon);
+        int teamIndex = player.getTeam().indexOf(pokemon);
+        if (teamIndex < 0 || serverConnection == null || battleId == null) {
+            return;
+        }
+
+        ActionMessage switchMsg = ActionMessage.switchPokemon(battleId, teamIndex, turnCount);
+        String logEntry = cap(pokemon.getName()) + " go!";
+        battleStatusLabel.setText(logEntry);
+        battleLog.add(logEntry);
+
+        try {
+            serverConnection.sendMessage(switchMsg);
+        } catch (IOException e) {
+            System.err.println("[OnlineBattle] Failed to send forced switch: " + e.getMessage());
+        }
     }
 
     //  VS Intro 
@@ -858,6 +873,7 @@ public class OnlineBattleController {
         Platform.runLater(() -> {
             switch (msg.getMessageType()) {
                 case "DAMAGE"       -> applyDamage((DamageMessage) msg);
+                case "FORCE_SWITCH" -> applyForceSwitch((ForceSwitchMessage) msg);
                 case "SWITCH_NOTIFY"-> applySwitchNotify((SwitchNotifyMessage) msg);
                 case "BATTLE_UPDATE"-> applyBattleUpdate((BattleUpdateMessage) msg);
                 case "TURN_READY"   -> onTurnReady((TurnReadyMessage) msg);
@@ -884,12 +900,24 @@ public class OnlineBattleController {
         processNextDamageMessage();
     }
 
+    private void applyForceSwitch(ForceSwitchMessage msg) {
+        if (damageAnimationInProgress || !pendingDamageMessages.isEmpty()) {
+            pendingForcedSwitch = true;
+            return;
+        }
+        showForcedSwitchOverlay();
+    }
+
     private void processNextDamageMessage() {
         if (damageAnimationInProgress) return;
 
         DamageMessage msg = pendingDamageMessages.poll();
         if (msg == null) {
             flushPendingSwitchNotifies();
+            if (pendingForcedSwitch) {
+                pendingForcedSwitch = false;
+                showForcedSwitchOverlay();
+            }
             return;
         }
 
@@ -1049,6 +1077,7 @@ public class OnlineBattleController {
         pendingDamageMessages.clear();
         pendingSwitchNotifies.clear();
         damageAnimationInProgress = false;
+        pendingForcedSwitch = false;
         battleEnded = true;
         boolean playerWon = player.getName().equals(msg.getWinnerName());
         saveBattleResult(playerWon, msg.getWinnerName());
@@ -1060,6 +1089,7 @@ public class OnlineBattleController {
         pendingDamageMessages.clear();
         pendingSwitchNotifies.clear();
         damageAnimationInProgress = false;
+        pendingForcedSwitch = false;
         battleEnded = true;
         battleStatusLabel.setText("Connection lost!");
         battleLog.add("Connection to server lost.");

@@ -164,7 +164,7 @@ Core domain types such as:
 - `ClientHandler`: per-client processing thread
 - `OnlineBattle`: server-side authoritative battle resolution
 - `ServerConnection`: client-side network bridge
-- Message protocol classes: `GameMessage` and subclasses (`LoginRequest`, `MoveMessage`, `DamageMessage`, etc.)
+- Message protocol classes: `GameMessage` and subclasses (`LoginRequest`, `ActionMessage`, `ForceSwitchMessage`, `DamageMessage`, etc.)
 
 ### Utilities (`src/main/java/com/example/pokemonbattle/util`)
 
@@ -257,9 +257,10 @@ Representative message lifecycle:
 1. `LoginRequest` -> `LoginResponse`
 2. `FindOpponentRequest` -> `BattleStartMessage`
 3. `ActionMessage`/`MoveMessage` -> `DamageMessage` and `BattleUpdateMessage`
-4. Turn synchronization -> `TurnReadyMessage`
-5. End condition -> `BattleEndMessage`
-6. Exceptional path -> `ErrorMessage` or `ForfeitMessage`
+4. Forced replacement (when active pokemon faints) -> `ForceSwitchMessage` -> required `ActionMessage` switch response
+5. Turn synchronization -> `TurnReadyMessage`
+6. End condition -> `BattleEndMessage`
+7. Exceptional path -> `ErrorMessage` or `ForfeitMessage`
 
 All protocol classes are in `src/main/java/com/example/pokemonbattle/server`.
 

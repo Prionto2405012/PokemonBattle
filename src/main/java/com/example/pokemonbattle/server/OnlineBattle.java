@@ -40,6 +40,8 @@ public class OnlineBattle {
     private boolean battleActive = true;
     private int turnCount = 0;
     private final Random random = new Random();
+    private boolean waitingForForcedSwitch1 = false;
+    private boolean waitingForForcedSwitch2 = false;
 
     private final String player1AvatarPath;
     private final String player2AvatarPath;
@@ -167,6 +169,37 @@ public class OnlineBattle {
             return;
         }
 
+        // Forced-switch response path (pokemon fainted and replacement is required).
+        if (action.isSwitch()) {
+            boolean isForcedSwitch1 = playerId.equals(player1Id) && waitingForForcedSwitch1;
+            boolean isForcedSwitch2 = playerId.equals(player2Id) && waitingForForcedSwitch2;
+            if (isForcedSwitch1 || isForcedSwitch2) {
+                Integer switchIndex = action.getSwitchPokemonIndex();
+                List<PokemonInstance> team = senderPlayer.getTeam();
+                if (switchIndex == null || switchIndex < 0 || switchIndex >= team.size()
+                        || team.get(switchIndex).isFainted()) {
+                    System.err.println("[Battle #" + battleId + "] Invalid forced-switch index from " + senderName);
+                    return;
+                }
+
+                executeSwitch(action, senderPlayer, senderName);
+                if (isForcedSwitch1) {
+                    waitingForForcedSwitch1 = false;
+                } else {
+                    waitingForForcedSwitch2 = false;
+                }
+
+                checkAndSendTurnReady();
+                return;
+            }
+        }
+
+        if (waitingForForcedSwitch1 || waitingForForcedSwitch2) {
+            System.out.println("[Battle #" + battleId + "] Ignoring action from " + senderName
+                    + " while a forced switch is pending.");
+            return;
+        }
+
         if (pendingActions.containsKey(senderBattlePlayerId)) {
             System.out.println("[Battle #" + battleId + "] " + senderName + " already submitted an action for this turn. Ignoring duplicate.");
             return;
@@ -257,14 +290,25 @@ public class OnlineBattle {
         }
         
         pendingActions.clear();
-        
-        // Signal both clients that the turn is complete and they may submit next action
+
         if (battleActive) {
-            TurnReadyMessage turnReady = new TurnReadyMessage(battleId, turnCount);
-            player1Handler.sendMessage(turnReady);
-            player2Handler.sendMessage(turnReady);
-            System.out.println("[Battle #" + battleId + "] Turn " + turnCount + " complete. Waiting for next actions.");
+            checkAndSendTurnReady();
         }
+    }
+
+    /**
+     * Sends TurnReady only when the battle is active and no forced-switch
+     * response is still pending from either side.
+     */
+    private void checkAndSendTurnReady() throws IOException {
+        if (!battleActive || waitingForForcedSwitch1 || waitingForForcedSwitch2) {
+            return;
+        }
+
+        TurnReadyMessage turnReady = new TurnReadyMessage(battleId, turnCount);
+        player1Handler.sendMessage(turnReady);
+        player2Handler.sendMessage(turnReady);
+        System.out.println("[Battle #" + battleId + "] Turn " + turnCount + " complete. Waiting for next actions.");
     }
     
     /** Helper record for sorting attacks by speed. */
@@ -429,25 +473,24 @@ public class OnlineBattle {
                 // All pokemon fainted - battle is over
                 battleActive = false;
             } else {
-                defender.setCurrentPokemon(nextPokemon);
-
-                // Notify both clients about the forced switch so sprites/HP update
-                SwitchNotifyMessage switchMsg = new SwitchNotifyMessage(
-                    battleId, defenderName,
-                    nextPokemon.getId(), nextPokemon.getName(), nextPokemon.getLevel(),
-                    nextPokemon.getCurrentHp(), nextPokemon.getMaxHp()
+                BattleUpdateMessage faintMsg = new BattleUpdateMessage(
+                        battleId,
+                        defenderName + "'s " + targetPokemon.getName() + " fainted!",
+                        turnCount,
+                        "faint"
                 );
-                player1Handler.sendMessage(switchMsg);
-                player2Handler.sendMessage(switchMsg);
+                player1Handler.sendMessage(faintMsg);
+                player2Handler.sendMessage(faintMsg);
 
-                BattleUpdateMessage updateMsg = new BattleUpdateMessage(
-                    battleId,
-                    defenderName + "'s " + targetPokemon.getName() + " fainted! Switching to " + nextPokemon.getName(),
-                    turnCount,
-                    "all_waiting"
-                );
-                player1Handler.sendMessage(updateMsg);
-                player2Handler.sendMessage(updateMsg);
+                boolean defenderIsPlayer1 = defenderName.equals(player1Name);
+                ForceSwitchMessage forceSwitchMsg = new ForceSwitchMessage(battleId, targetPokemon.getName());
+                if (defenderIsPlayer1) {
+                    waitingForForcedSwitch1 = true;
+                    player1Handler.sendMessage(forceSwitchMsg);
+                } else {
+                    waitingForForcedSwitch2 = true;
+                    player2Handler.sendMessage(forceSwitchMsg);
+                }
             }
         }
 
