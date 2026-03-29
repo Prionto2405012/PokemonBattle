@@ -1642,7 +1642,6 @@ public class OnlineBattleController {
         actionButtonsBox.setMouseTransparent(false);
         actionButtonsBox.setVisible(true);
         actionButtonsBox.setManaged(true);
-        actionButtonsBox.toFront();
 
         if (attackButton != null)
             attackButton.setDisable(false);
@@ -1668,7 +1667,6 @@ public class OnlineBattleController {
         moveSelectionBox.setVisible(true);
         moveSelectionBox.setManaged(true);
         moveSelectionBox.setMouseTransparent(false);
-        moveSelectionBox.toFront();
 
         actionButtonsBox.setVisible(false);
         actionButtonsBox.setManaged(false);
@@ -1685,7 +1683,6 @@ public class OnlineBattleController {
         pokemonSelectionBox.setVisible(true);
         pokemonSelectionBox.setManaged(true);
         pokemonSelectionBox.setMouseTransparent(false);
-        pokemonSelectionBox.toFront();
 
         actionButtonsBox.setVisible(false);
         actionButtonsBox.setManaged(false);
