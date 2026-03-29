@@ -195,8 +195,8 @@
                 </StackPane>
 
                 <!-- ── Chat section (only visible in local/online battles) ── -->
-                <VBox fx:id="chatSection" alignment="CENTER" spacing="8" managed="false"
-                    visible="false" styleClass="chat-section" maxHeight="300" prefHeight="260" minHeight="46" VBox.vgrow="NEVER">
+                <VBox fx:id="chatSection" alignment="CENTER" spacing="8" managed="true"
+                    visible="true" styleClass="chat-section" maxHeight="300" prefHeight="260" minHeight="46" VBox.vgrow="NEVER">
                     <padding>
                         <Insets top="10" bottom="10" left="10" right="10" />
                     </padding>

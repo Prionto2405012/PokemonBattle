@@ -1732,6 +1732,7 @@ public class OnlineBattleController {
         Canvas canvas = new Canvas(w, h);
         canvas.setId("patternCanvas");
         canvas.setMouseTransparent(true);
+        canvas.setManaged(false);
         GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.setFill(new javafx.scene.paint.LinearGradient(0, 0, 0, 1, true, javafx.scene.paint.CycleMethod.NO_CYCLE,
                 new javafx.scene.paint.Stop(0, Color.web("#5cbdb0")),
@@ -1910,7 +1911,7 @@ public class OnlineBattleController {
         quickMessagesBox.setManaged(chatExpanded);
 
         double targetHeight = chatExpanded ? CHAT_SECTION_EXPANDED_HEIGHT : CHAT_SECTION_COLLAPSED_HEIGHT;
-        chatSection.setMinHeight(targetHeight);
+        chatSection.setMinHeight(chatExpanded ?  0: targetHeight);
         chatSection.setPrefHeight(targetHeight);
         chatSection.setMaxHeight(targetHeight);
         chatToggleButton.setText(chatExpanded ? "−" : "+");
