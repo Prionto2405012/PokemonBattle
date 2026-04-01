@@ -36,6 +36,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.Tooltip;
 import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -76,6 +77,8 @@ public class NewGameController {
     private ToggleButton soloModeButton;
     @FXML
     private ToggleButton duoModeButton;
+    @FXML
+    private Label duoInfoBadge;
     private ToggleGroup modeToggleGroup;
 
     // Opponent Selection
@@ -324,6 +327,17 @@ public class NewGameController {
     }
     private void setupUI() {
         updateTeamCountLabel();
+
+        if (duoModeButton != null) {
+            duoModeButton.setDisable(true);
+        }
+
+        if (duoInfoBadge != null) {
+            Tooltip duoModeTooltip = new Tooltip("Will be added in the next patch");
+            duoModeTooltip.setShowDelay(Duration.millis(120));
+            duoModeTooltip.getStyleClass().add("duo-info-tooltip");
+            Tooltip.install(duoInfoBadge, duoModeTooltip);
+        }
 
         // Setup start button
         startBattleButton.setOnAction(e -> onStartBattle());

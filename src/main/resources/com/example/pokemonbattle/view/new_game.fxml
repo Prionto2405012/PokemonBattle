@@ -112,8 +112,14 @@
                         <HBox fx:id="modeSelectionBox" alignment="CENTER" spacing="20">
                             <ToggleButton fx:id="soloModeButton" prefHeight="30" prefWidth="150"
                                           styleClass="button-blue" text="SOLO"/>
-                            <ToggleButton fx:id="duoModeButton" prefHeight="30" prefWidth="150"
-                                          styleClass="button-purple" text="DUO"/>
+                            <StackPane prefWidth="150" prefHeight="30">
+                                <children>
+                                    <ToggleButton fx:id="duoModeButton" disable="true" prefHeight="30" prefWidth="150"
+                                                  styleClass="button-purple" text="DUO"/>
+                                    <Label fx:id="duoInfoBadge" text="i" styleClass="duo-info-badge"
+                                           StackPane.alignment="TOP_RIGHT" translateX="6" translateY="-6"/>
+                                </children>
+                            </StackPane>
                         </HBox>
                     </VBox>
 

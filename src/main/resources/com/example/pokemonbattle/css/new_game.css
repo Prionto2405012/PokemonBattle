@@ -34,6 +34,45 @@
     -fx-border-insets: -3px;
 }
 
+#duoModeButton:disabled {
+    -fx-opacity: 0.62;
+    -fx-cursor: default;
+}
+
+.duo-info-badge {
+    -fx-min-width: 16px;
+    -fx-min-height: 16px;
+    -fx-max-width: 16px;
+    -fx-max-height: 16px;
+    -fx-alignment: center;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #eef7ff;
+    -fx-background-color: linear-gradient(from 0% 0% to 0% 100%, #4fb4ff, #1c7ed6);
+    -fx-background-radius: 4;
+    -fx-border-color: rgba(255, 255, 255, 0.75);
+    -fx-border-width: 1;
+    -fx-border-radius: 4;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0, 40, 90, 0.45), 6, 0, 0, 1);
+}
+
+.duo-info-badge:hover {
+    -fx-scale-x: 1.08;
+    -fx-scale-y: 1.08;
+}
+
+.duo-info-tooltip {
+    -fx-background-color: rgba(12, 34, 64, 0.96);
+    -fx-text-fill: #d7ebff;
+    -fx-font-size: 11px;
+    -fx-padding: 6 9;
+    -fx-background-radius: 6;
+    -fx-border-color: rgba(95, 173, 255, 0.8);
+    -fx-border-radius: 6;
+    -fx-border-width: 1;
+}
+
 /* Pokemon Card Styles */
 .pokemon-card {
     -fx-background-color: linear-gradient(from 0% 0% to 100% 100%, rgba(175, 239, 235, 0.92), rgba(167, 231, 199, 0.95));
