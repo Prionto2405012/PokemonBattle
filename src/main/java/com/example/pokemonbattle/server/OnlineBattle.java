@@ -284,16 +284,16 @@ public class OnlineBattle {
             e.printStackTrace();
         }
         
-        // Check if battle is over
-        if (battleActive && checkBattleStatus()) {
-            endBattle();
-        }
-        
+        // Check if battle is over. A final KO can set battleActive=false in
+        // executeMove(), so we must still call endBattle() to notify clients.
+        boolean battleOver = !battleActive || checkBattleStatus();
         pendingActions.clear();
-
-        if (battleActive) {
-            checkAndSendTurnReady();
+        if (battleOver) {
+            endBattle();
+            return;
         }
+
+        checkAndSendTurnReady();
     }
 
     /**
@@ -473,15 +473,6 @@ public class OnlineBattle {
                 // All pokemon fainted - battle is over
                 battleActive = false;
             } else {
-                BattleUpdateMessage faintMsg = new BattleUpdateMessage(
-                        battleId,
-                        defenderName + "'s " + targetPokemon.getName() + " fainted!",
-                        turnCount,
-                        "faint"
-                );
-                player1Handler.sendMessage(faintMsg);
-                player2Handler.sendMessage(faintMsg);
-
                 boolean defenderIsPlayer1 = defenderName.equals(player1Name);
                 ForceSwitchMessage forceSwitchMsg = new ForceSwitchMessage(battleId, targetPokemon.getName());
                 if (defenderIsPlayer1) {
