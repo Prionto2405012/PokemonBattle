@@ -240,6 +240,7 @@ public class OnlineBattleController {
     private final Queue<SwitchNotifyMessage> pendingSwitchNotifies = new ArrayDeque<>();
     private boolean damageAnimationInProgress = false;
     private boolean pendingForcedSwitch = false;
+    private BattleEndMessage pendingBattleEndMessage;
 
     //  Lifecycle 
     @FXML
@@ -896,11 +897,13 @@ public class OnlineBattleController {
     }
 
     private void applyDamage(DamageMessage msg) {
+        if (battleEnded) return;
         pendingDamageMessages.offer(msg);
         processNextDamageMessage();
     }
 
     private void applyForceSwitch(ForceSwitchMessage msg) {
+        if (battleEnded || pendingBattleEndMessage != null) return;
         if (damageAnimationInProgress || !pendingDamageMessages.isEmpty()) {
             pendingForcedSwitch = true;
             return;
@@ -914,6 +917,9 @@ public class OnlineBattleController {
         DamageMessage msg = pendingDamageMessages.poll();
         if (msg == null) {
             flushPendingSwitchNotifies();
+            if (tryFinalizeBattleEndIfReady()) {
+                return;
+            }
             if (pendingForcedSwitch) {
                 pendingForcedSwitch = false;
                 showForcedSwitchOverlay();
@@ -1072,6 +1078,13 @@ public class OnlineBattleController {
     }
 
     private void onTurnReady(TurnReadyMessage msg) {
+        if (battleEnded) return;
+        if (pendingBattleEndMessage != null) {
+            if (tryFinalizeBattleEndIfReady()) {
+                return;
+            }
+            return;
+        }
         flushPendingSwitchNotifies();
         turnCount = msg.getTurnNumber();
         moveSent = false;
@@ -1083,14 +1096,29 @@ public class OnlineBattleController {
 
     private void applyBattleEnd(BattleEndMessage msg) {
         if (battleEnded) return;
-        pendingDamageMessages.clear();
-        pendingSwitchNotifies.clear();
-        damageAnimationInProgress = false;
+        pendingBattleEndMessage = msg;
+        tryFinalizeBattleEndIfReady();
+    }
+
+    private boolean tryFinalizeBattleEndIfReady() {
+        if (battleEnded || pendingBattleEndMessage == null) {
+            return false;
+        }
+        if (damageAnimationInProgress || !pendingDamageMessages.isEmpty()) {
+            return false;
+        }
+
+        flushPendingSwitchNotifies();
         pendingForcedSwitch = false;
+
+        BattleEndMessage endMessage = pendingBattleEndMessage;
+        pendingBattleEndMessage = null;
         battleEnded = true;
-        boolean playerWon = player.getName().equals(msg.getWinnerName());
-        saveBattleResult(playerWon, msg.getWinnerName());
+
+        boolean playerWon = player.getName().equals(endMessage.getWinnerName());
+        saveBattleResult(playerWon, endMessage.getWinnerName());
         showResultOverlay(playerWon);
+        return true;
     }
 
     private void handleDisconnect() {
@@ -1099,6 +1127,7 @@ public class OnlineBattleController {
         pendingSwitchNotifies.clear();
         damageAnimationInProgress = false;
         pendingForcedSwitch = false;
+        pendingBattleEndMessage = null;
         battleEnded = true;
         battleStatusLabel.setText("Connection lost!");
         battleLog.add("Connection to server lost.");

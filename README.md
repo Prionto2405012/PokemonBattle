@@ -90,7 +90,7 @@ Run server (custom port):
 mvn exec:java -Dexec.mainClass="com.example.pokemonbattle.server.BattleServer" -Dexec.args="7777"
 ```
 
-## 4.1) Build a No-Java-Required Windows App (.exe)
+## 4.1) Build No-Java-Required Windows Apps (.exe)
 
 You can build a Windows package that includes its own runtime, so target machines do not need Java installed.
 
@@ -100,9 +100,12 @@ From project root:
 .\build-windows-package.bat
 ```
 
-This script creates:
-- Portable app executable: `dist/PokemonBattle/PokemonBattle.exe`
-- Windows installer (optional): `dist/PokemonBattle-1.0.0.exe`
+This script creates a portable app folder with two executables:
+- Client launcher: `dist/PokemonBattle/PokemonBattle.exe`
+- Host launcher: `dist/PokemonBattle/PokemonBattleHost.exe`
+
+Optional installer output:
+- `dist/PokemonBattle-1.0.0.exe`
 
 Installer prerequisite:
 - To generate the installer `.exe`, install WiX Toolset and add `candle.exe` and `light.exe` to `PATH`.
@@ -110,8 +113,12 @@ Installer prerequisite:
 
 Distribution usage:
 - If installer was generated, share `dist/PokemonBattle-1.0.0.exe` and install normally.
-- Otherwise, share the `dist/PokemonBattle` folder and run `PokemonBattle.exe` directly.
+- Otherwise, share the full `dist/PokemonBattle` folder (do not copy only one `.exe`).
 - No separate Java installation is required on that machine.
+
+Launcher usage:
+- `PokemonBattle.exe`: App-only client. Use this when connecting to an already running server.
+- `PokemonBattleHost.exe`: Host mode. Starts the server and app together in one process.
 
 Important platform note:
 - Native packages are OS-specific.
@@ -120,8 +127,9 @@ Important platform note:
 Important runtime note:
 
 - `New Game -> Local Player` currently uses the same online pipeline over `localhost:5555`.
-- If the battle server is not running, `waiting_online.fxml` will show a connection failure.
-- For now, start `BattleServer` before trying both `Online` and `Local Player` multiplayer paths.
+- If no server is running, `waiting_online.fxml` will show a connection failure.
+- To avoid manual setup on the host machine, run `PokemonBattleHost.exe`.
+- On additional client machines, run `PokemonBattle.exe` and connect via Online mode.
 
 ## 5) What Is Done Where
 

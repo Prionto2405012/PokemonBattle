@@ -243,6 +243,8 @@ public class BattleController implements Battle.BattleListener {
     private final Queue<PendingSwitchEvent> pendingSwitchEvents = new ArrayDeque<>();
     private boolean attackAnimationInProgress = false;
     private boolean pendingForcedSwitchOverlay = false;
+    private Boolean pendingBattleEndPlayerWon = null;
+    private boolean battleEndOverlayShown = false;
 
     private static final class PendingAttackAnimation {
         private final ImageView attackerSprite;
@@ -520,6 +522,10 @@ public class BattleController implements Battle.BattleListener {
         updateBattleDisplay();
         updateMoveButtons();
 
+        if (tryShowPendingBattleEnd()) {
+            return;
+        }
+
         if (pendingForcedSwitchOverlay) {
             pendingForcedSwitchOverlay = false;
             showForcedSwitchOverlay();
@@ -531,6 +537,31 @@ public class BattleController implements Battle.BattleListener {
         if (!battle.isFinished() && !player.getCurrentPokemon().isFainted()) {
             showActionButtons();
         }
+    }
+
+    private boolean tryShowPendingBattleEnd() {
+        if (battleEndOverlayShown || pendingBattleEndPlayerWon == null) {
+            return false;
+        }
+        if (attackAnimationInProgress || !pendingAttackAnimations.isEmpty()) {
+            return false;
+        }
+
+        while (!pendingSwitchEvents.isEmpty()) {
+            PendingSwitchEvent switchEvent = pendingSwitchEvents.poll();
+            if (switchEvent != null) {
+                applySwitchEvent(switchEvent.playerName, switchEvent.pokemonName, false);
+            }
+        }
+
+        updateBattleDisplay();
+        updateMoveButtons();
+
+        boolean playerWon = pendingBattleEndPlayerWon;
+        pendingBattleEndPlayerWon = null;
+        battleEndOverlayShown = true;
+        Platform.runLater(() -> showResultOverlay(playerWon));
+        return true;
     }
 
     private void hideActionButtons() {
@@ -1637,7 +1668,8 @@ public class BattleController implements Battle.BattleListener {
         if (playerWon) {
             MusicManager.getInstance().playVictorySFX();
         }
-        Platform.runLater(() -> showResultOverlay(playerWon));
+        pendingBattleEndPlayerWon = playerWon;
+        tryShowPendingBattleEnd();
     }
 
     /**

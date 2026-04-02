@@ -114,6 +114,23 @@ Interactive command-line interface for monitoring:
 
 ## Running the Server
 
+### Packaged Windows Host Mode (Recommended for end users)
+After running `build-windows-package.bat`, use:
+
+```bash
+dist\PokemonBattle\PokemonBattleHost.exe
+```
+
+This starts both the TCP server and the desktop app together.
+
+On other machines, run:
+
+```bash
+dist\PokemonBattle\PokemonBattle.exe
+```
+
+This starts the app only (client mode), which can connect to the host server.
+
 ### Prerequisites
 - Java 11 or higher
 - Maven project properly built

@@ -511,7 +511,7 @@ public class OnlineBattle {
                 ? defenderPokemon.getSpDefense()
                 : defenderPokemon.getDefense();
 
-        double damage = ((1.5 * attackerPokemon.getLevel() / 8.0 + 1.5) * move.getPower()
+        double damage = ((1.8 * attackerPokemon.getLevel() / 8.0 + 1.5) * move.getPower()
                 * atkStat / (double) defStat) / 50.0 + 2.0;
 
         float effectiveness = Battle.getTypeEffectivenessMultiplier(move.getType(), defenderPokemon.getTypes());

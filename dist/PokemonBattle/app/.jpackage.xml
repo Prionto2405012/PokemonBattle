@@ -4,4 +4,5 @@
   <main-launcher>PokemonBattle</main-launcher>
   <main-class>com.example.pokemonbattle.Launcher</main-class>
   <signed>false</signed>
-  <app-store>false</app-store></jpackage-state>
+  <app-store>false</app-store>
+  <add-launcher name="PokemonBattleHost" shortcut="true" menu="true" service="false"></add-launcher></jpackage-state>
