@@ -65,22 +65,6 @@
     -fx-text-fill: #176b1d;;
 }
 
-.menu-btn-signout {
-    -fx-text-fill: #ffb6ba;
-}
-
-.menu-btn-signout.menu-selected {
-    -fx-background-color: linear-gradient(to right, #6f2732, #a43f53);
-    -fx-border-color: rgba(255, 182, 186, 0.8);
-    -fx-text-fill: #ffe4e6;
-}
-
-.menu-btn-signout.menu-hovered {
-    -fx-background-color: linear-gradient(to right, rgba(164, 63, 83, 0.45), rgba(111, 39, 50, 0.45));
-    -fx-border-color: rgba(255, 182, 186, 0.55);
-    -fx-text-fill: #ffd3d7;
-}
-
 .exit-backdrop {
     -fx-background-color: rgba(0, 0, 0, 0.62);
 }

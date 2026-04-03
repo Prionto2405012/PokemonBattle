@@ -106,6 +106,15 @@
                         <HBox.margin><Insets top="2"/></HBox.margin>
                     </Button>
                 </HBox>
+
+                <HBox alignment="CENTER_LEFT" spacing="0" maxWidth="Infinity">
+                    <Button fx:id="quitDesktopButton" text="Quit to Desktop"
+                            onAction="#onQuitToDesktopClick"
+                            prefWidth="190" styleClass="button-dark,settings-quit-btn"
+                            visible="false" managed="false">
+                        <HBox.margin><Insets top="8"/></HBox.margin>
+                    </Button>
+                </HBox>
             </VBox>
 
             <Button fx:id="closeButton" text="Close"

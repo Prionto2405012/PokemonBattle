@@ -155,30 +155,113 @@
 }
 
 .guide-overlay-root {
-    -fx-background-color: rgba(0, 0, 0, 0.54);
+    -fx-background-color: rgba(0, 0, 0, 0.52);
 }
 
+/* Main card — light cyan, frosted-glass style */
 .guide-overlay-card {
-    -fx-background-color: rgba(14, 38, 44, 0.92);
-    -fx-background-radius: 14;
-    -fx-border-color: rgba(167, 229, 255, 0.48);
-    -fx-border-width: 1.2;
-    -fx-border-radius: 14;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.65), 20, 0.2, 0, 4);
+    -fx-background-color: rgba(178, 235, 242, 0.88);
+    -fx-background-radius: 18;
+    -fx-border-color: rgba(0, 172, 193, 0.70);
+    -fx-border-width: 2.5;
+    -fx-border-radius: 18;
+    -fx-effect:
+        dropshadow(gaussian, rgba(0, 150, 180, 0.45), 32, 0.18, 0, 0),
+        dropshadow(gaussian, rgba(0,   0,   0,   0.55), 20, 0.12, 0, 6);
 }
 
+/* Header strip — slightly deeper cyan tint */
+.guide-overlay-header {
+    -fx-background-color: rgba(0, 172, 193, 0.22);
+    -fx-background-radius: 16 16 0 0;
+}
+
+/* Thin accent divider */
+.guide-overlay-divider {
+    -fx-background-color: rgba(0, 172, 193, 0.50);
+}
+
+/* Title */
 .guide-overlay-title {
     -fx-font-family: "menu";
-    -fx-font-size: 20px;
+    -fx-font-size: 24px;
     -fx-font-weight: bold;
-    -fx-text-fill: #d7f5ff;
+    -fx-text-fill: #00363a;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.18), 3, 0, 0, 1);
 }
 
+/* Step heading (bold coloured line) */
+.guide-overlay-step-heading {
+    -fx-font-family: "menu";
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #00695c;
+}
+
+/* Body text */
 .guide-overlay-body {
     -fx-font-family: "menu";
-    -fx-font-size: 13px;
-    -fx-line-spacing: 1.8px;
-    -fx-text-fill: #dbeef3;
+    -fx-font-size: 14px;
+    -fx-line-spacing: 3px;
+    -fx-text-fill: #1a3a3a;
+    -fx-wrap-text: true;
+}
+
+/* Circular ✕ dismiss button */
+.guide-overlay-x-btn {
+    -fx-min-width: 34px;
+    -fx-pref-width: 34px;
+    -fx-max-width: 34px;
+    -fx-min-height: 34px;
+    -fx-pref-height: 34px;
+    -fx-max-height: 34px;
+    -fx-background-radius: 999;
+    -fx-border-radius: 999;
+    -fx-background-color: rgba(0, 0, 0, 0.12);
+    -fx-border-color: rgba(0, 105, 92, 0.55);
+    -fx-border-width: 1.5;
+    -fx-text-fill: #00363a;
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-padding: 0;
+    -fx-alignment: center;
+}
+.guide-overlay-x-btn:hover {
+    -fx-background-color: rgba(0, 172, 193, 0.30);
+    -fx-border-color: rgba(0, 105, 92, 0.85);
+    -fx-scale-x: 1.10;
+    -fx-scale-y: 1.10;
+}
+.guide-overlay-x-btn:pressed {
+    -fx-scale-x: 0.95;
+    -fx-scale-y: 0.95;
+    -fx-background-color: rgba(0, 105, 92, 0.22);
+}
+
+/* Bottom close button */
+.guide-overlay-close-btn {
+    -fx-background-color: linear-gradient(to bottom, #00acc1, #00838f);
+    -fx-background-radius: 10;
+    -fx-border-color: #004d61;
+    -fx-border-radius: 10;
+    -fx-border-width: 1.5;
+    -fx-text-fill: #ffffff;
+    -fx-font-family: "menu";
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0, 150, 180, 0.5), 10, 0.15, 0, 2);
+}
+.guide-overlay-close-btn:hover {
+    -fx-background-color: linear-gradient(to bottom, #26c6da, #00acc1);
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+.guide-overlay-close-btn:pressed {
+    -fx-scale-x: 0.97;
+    -fx-scale-y: 0.97;
+    -fx-translate-y: 1;
 }
 
 /* Pokemon Card Styles */
@@ -289,7 +372,7 @@
     -fx-effect: dropshadow(gaussian, rgba(240, 128, 48, 0.4), 6, 0, 0, 1);
 }
 
-/* ── Battle Setup Sections (right panel) ─────────────────────── */
+/* Battle Setup Sections (right panel) */
 
 .setup-section {
     -fx-background-color: rgba(255,255,255,0.08);
@@ -299,7 +382,7 @@
     -fx-border-radius: 12;
 }
 
-/* ── Battle History Overlay ──────────────────────────────────── */
+/* Battle History Overlay */
 
 .history-overlay-root {
     -fx-background-color: rgba(0, 0, 0, 0.55);
@@ -335,7 +418,7 @@
     -fx-border-color: rgba(100, 200, 177, 0.5);
 }
 
-/* ── View Selected Pokémon Overlay ───────────────────────────── */
+/* View Selected Pokémon Overlay */
 
 .view-pokemon-overlay-root {
     -fx-background-color: rgba(0, 0, 0, 0.5);
