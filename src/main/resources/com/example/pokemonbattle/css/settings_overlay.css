@@ -257,6 +257,30 @@
     -fx-scale-y: 0.97;
 }
 
+.settings-signout-btn {
+    -fx-background-color: linear-gradient(to bottom, #6d2f38, #b35a6c);
+    -fx-border-color: rgba(255, 170, 180, 0.65);
+    -fx-border-width: 1;
+    -fx-text-fill: #ffe7ea;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-padding: 8 20 8 20;
+    -fx-background-radius: 10;
+    -fx-border-radius: 10;
+}
+
+.settings-signout-btn:hover {
+    -fx-background-color: linear-gradient(to bottom, #8b3d4a, #c8677a);
+    -fx-scale-x: 1.03;
+    -fx-scale-y: 1.03;
+}
+
+.settings-signout-btn:pressed {
+    -fx-background-color: linear-gradient(to bottom, #5a2730, #9d4c5e);
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
+}
+
 /* ── Volume row ──────────────────────────────────────────────────────────── */
 
 .volume-row {

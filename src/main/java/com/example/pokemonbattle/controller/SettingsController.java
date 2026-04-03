@@ -2,6 +2,7 @@ package com.example.pokemonbattle.controller;
 
 import com.example.pokemonbattle.util.MusicManager;
 import com.example.pokemonbattle.util.PlayerSession;
+import com.example.pokemonbattle.util.SceneManager;
 
 import javafx.animation.FadeTransition;
 import javafx.animation.Interpolator;
@@ -16,7 +17,9 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.input.MouseEvent;
@@ -58,6 +61,8 @@ public class SettingsController {
 
     @FXML
     private Button langEnBtn, langJpBtn;
+    @FXML
+    private Button signOutButton;
     private final BooleanProperty gameSoundOn = new SimpleBooleanProperty(true);
     private final BooleanProperty battleSoundOn = new SimpleBooleanProperty(true);
     private final BooleanProperty animationOn = new SimpleBooleanProperty(
@@ -161,6 +166,25 @@ public class SettingsController {
     @FXML
     void onCloseButtonClick(ActionEvent e) {
         closeOverlay();
+    }
+
+    @FXML
+    void onSignOutClick(ActionEvent e) {
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
+                "Sign out from the current account? You will return to the login screen.",
+                ButtonType.YES, ButtonType.NO);
+        confirm.setTitle("Sign Out");
+        confirm.setHeaderText("Confirm sign out");
+
+        ButtonType choice = confirm.showAndWait().orElse(ButtonType.NO);
+        if (choice != ButtonType.YES) {
+            return;
+        }
+
+        WcController.logout();
+        PlayerSession.getInstance().clearSession();
+        SceneManager.clearData();
+        SceneManager.switchSceneWithLoading("wc.fxml", "Welcome", 1200, 700);
     }
 
     @FXML

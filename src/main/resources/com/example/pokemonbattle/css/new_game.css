@@ -57,6 +57,29 @@
     -fx-effect: dropshadow(gaussian, rgba(0, 40, 90, 0.45), 6, 0, 0, 1);
 }
 
+.solo-info-badge {
+    -fx-min-width: 16px;
+    -fx-min-height: 16px;
+    -fx-max-width: 16px;
+    -fx-max-height: 16px;
+    -fx-alignment: center;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #eef7ff;
+    -fx-background-color: linear-gradient(from 0% 0% to 0% 100%, #58c7ff, #2590df);
+    -fx-background-radius: 4;
+    -fx-border-color: rgba(255, 255, 255, 0.75);
+    -fx-border-width: 1;
+    -fx-border-radius: 4;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0, 58, 108, 0.45), 6, 0, 0, 1);
+}
+
+.solo-info-badge:hover {
+    -fx-scale-x: 1.08;
+    -fx-scale-y: 1.08;
+}
+
 .duo-info-badge:hover {
     -fx-scale-x: 1.08;
     -fx-scale-y: 1.08;
@@ -71,6 +94,91 @@
     -fx-border-color: rgba(95, 173, 255, 0.8);
     -fx-border-radius: 6;
     -fx-border-width: 1;
+}
+
+.newgame-gear-button {
+    -fx-min-width: 46px;
+    -fx-pref-width: 46px;
+    -fx-max-width: 46px;
+    -fx-min-height: 46px;
+    -fx-pref-height: 46px;
+    -fx-max-height: 46px;
+    -fx-font-size: 21px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI Symbol";
+    -fx-text-fill: #ecfbff;
+    -fx-background-radius: 999;
+    -fx-background-color: linear-gradient(to bottom, rgba(106, 204, 255, 0.78), rgba(72, 148, 232, 0.82));
+    -fx-border-radius: 999;
+    -fx-border-color: rgba(200, 244, 255, 0.95);
+    -fx-border-width: 1.6;
+    -fx-padding: 0;
+    -fx-text-overrun: clip;
+    -fx-cursor: hand;
+    -fx-effect:
+        dropshadow(gaussian, rgba(120, 220, 255, 0.88), 28, 0.30, 0, 0),
+        dropshadow(gaussian, rgba(120, 220, 255, 0.45), 44, 0.20, 0, 0),
+        dropshadow(gaussian, rgba(0, 0, 0, 0.34), 10, 0.10, 0, 2);
+}
+
+.newgame-gear-button:hover {
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+    -fx-background-color: linear-gradient(to bottom, rgba(132, 216, 255, 0.9), rgba(84, 166, 242, 0.95));
+}
+
+.newgame-guide-button {
+    -fx-min-width: 44px;
+    -fx-pref-width: 44px;
+    -fx-max-width: 44px;
+    -fx-min-height: 44px;
+    -fx-pref-height: 44px;
+    -fx-max-height: 44px;
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-font-family: "Segoe UI";
+    -fx-text-fill: #0d3f6e;
+    -fx-background-radius: 999;
+    -fx-background-color: linear-gradient(to bottom, #c4ecff, #8ed6ff);
+    -fx-border-radius: 999;
+    -fx-border-color: rgba(255, 255, 255, 0.88);
+    -fx-border-width: 1.4;
+    -fx-padding: 0;
+    -fx-text-overrun: clip;
+    -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(80, 178, 255, 0.5), 18, 0.2, 0, 0);
+}
+
+.newgame-guide-button:hover {
+    -fx-scale-x: 1.06;
+    -fx-scale-y: 1.06;
+}
+
+.guide-overlay-root {
+    -fx-background-color: rgba(0, 0, 0, 0.54);
+}
+
+.guide-overlay-card {
+    -fx-background-color: rgba(14, 38, 44, 0.92);
+    -fx-background-radius: 14;
+    -fx-border-color: rgba(167, 229, 255, 0.48);
+    -fx-border-width: 1.2;
+    -fx-border-radius: 14;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.65), 20, 0.2, 0, 4);
+}
+
+.guide-overlay-title {
+    -fx-font-family: "menu";
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #d7f5ff;
+}
+
+.guide-overlay-body {
+    -fx-font-family: "menu";
+    -fx-font-size: 13px;
+    -fx-line-spacing: 1.8px;
+    -fx-text-fill: #dbeef3;
 }
 
 /* Pokemon Card Styles */

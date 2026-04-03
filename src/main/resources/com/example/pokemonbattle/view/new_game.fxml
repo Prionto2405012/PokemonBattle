@@ -7,6 +7,7 @@
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
@@ -110,8 +111,14 @@
                                style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #06847c;"
                                text="Select Game Mode"/>
                         <HBox fx:id="modeSelectionBox" alignment="CENTER" spacing="20">
-                            <ToggleButton fx:id="soloModeButton" prefHeight="30" prefWidth="150"
-                                          styleClass="button-blue" text="SOLO"/>
+                            <StackPane prefWidth="150" prefHeight="30">
+                                <children>
+                                    <ToggleButton fx:id="soloModeButton" prefHeight="30" prefWidth="150"
+                                                  styleClass="button-blue" text="SOLO"/>
+                                    <Label fx:id="soloInfoBadge" text="i" styleClass="solo-info-badge"
+                                           StackPane.alignment="TOP_RIGHT" translateX="6" translateY="-6"/>
+                                </children>
+                            </StackPane>
                             <StackPane prefWidth="150" prefHeight="30">
                                 <children>
                                     <ToggleButton fx:id="duoModeButton" disable="true" prefHeight="30" prefWidth="150"
@@ -202,6 +209,21 @@
                     </HBox>
                 </VBox>
             </HBox>
+
+            <VBox StackPane.alignment="TOP_RIGHT" translateX="-18" translateY="18"
+                  spacing="8" alignment="TOP_RIGHT" pickOnBounds="false">
+                <Button fx:id="newGameSettingsButton" onAction="#onNewGameSettingsClicked"
+                        styleClass="newgame-gear-button"
+                        pickOnBounds="true" focusTraversable="false" text="⚙"
+                        mnemonicParsing="false" />
+            </VBox>
+
+            <AnchorPane StackPane.alignment="BOTTOM_RIGHT" pickOnBounds="false">
+                <Button fx:id="quickGuideButton" text="?" styleClass="newgame-guide-button"
+                        onAction="#onQuickGuideClicked"
+                        AnchorPane.bottomAnchor="16" AnchorPane.rightAnchor="18"
+                        prefWidth="44" prefHeight="44" />
+            </AnchorPane>
         </StackPane>
     </children>
 </VBox>

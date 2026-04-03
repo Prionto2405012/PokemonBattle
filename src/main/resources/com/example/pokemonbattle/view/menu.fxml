@@ -42,6 +42,8 @@
                     onAction="#onSettingsButtonClick" />
                 <Button fx:id="backButton" styleClass="menu-btn" text="Go Back"
                     onAction="#onBackButtonClick" />
+                <Button fx:id="signOutButton" styleClass="menu-btn,menu-btn-signout" text="Sign Out"
+                    onAction="#onSignOutButtonClick" />
                 <Button fx:id="exitButton" styleClass="menu-btn" text="Exit Game"
                     onAction="#onExitButtonClick" />
             </VBox>

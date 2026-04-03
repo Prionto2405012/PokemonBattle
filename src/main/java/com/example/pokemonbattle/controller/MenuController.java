@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import com.example.pokemonbattle.util.MusicManager;
+import com.example.pokemonbattle.util.PlayerSession;
 import com.example.pokemonbattle.util.SceneManager;
 
 import javafx.animation.FadeTransition;
@@ -16,7 +17,9 @@ import javafx.animation.TranslateTransition;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -45,6 +48,8 @@ public class MenuController {
     private Button settingsButton;
     @FXML
     private Button backButton;
+    @FXML
+    private Button signOutButton;
     @FXML
     private Button exitButton;
     @FXML
@@ -152,7 +157,7 @@ public class MenuController {
             bgImage.fitHeightProperty().bind(rootPane.heightProperty());
         }
 
-        menuButtons = List.of(playGameButton, settingsButton, backButton, exitButton);
+        menuButtons = List.of(playGameButton, settingsButton, backButton, signOutButton, exitButton);
         selectedIndex = -1;
         selectBall.setVisible(false);
         selectBall.setManaged(false);
@@ -256,6 +261,25 @@ public class MenuController {
 
     @FXML
     void onBackButtonClick() {
+        SceneManager.switchSceneWithLoading("wc.fxml", "Welcome", 1200, 700);
+    }
+
+    @FXML
+    void onSignOutButtonClick() {
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
+                "Sign out from the current account? You will return to the login screen.",
+                ButtonType.YES, ButtonType.NO);
+        confirm.setTitle("Sign Out");
+        confirm.setHeaderText("Confirm sign out");
+
+        ButtonType choice = confirm.showAndWait().orElse(ButtonType.NO);
+        if (choice != ButtonType.YES) {
+            return;
+        }
+
+        WcController.logout();
+        PlayerSession.getInstance().clearSession();
+        SceneManager.clearData();
         SceneManager.switchSceneWithLoading("wc.fxml", "Welcome", 1200, 700);
     }
 

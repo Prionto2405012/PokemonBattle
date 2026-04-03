@@ -45,6 +45,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.TextAlignment;
 import javafx.util.Duration;
 
 @SuppressWarnings("unused")
@@ -75,6 +78,8 @@ public class NewGameController {
     private HBox modeSelectionBox;
     @FXML
     private ToggleButton soloModeButton;
+    @FXML
+    private Label soloInfoBadge;
     @FXML
     private ToggleButton duoModeButton;
     @FXML
@@ -118,6 +123,10 @@ public class NewGameController {
     private Button startBattleButton;
     @FXML
     private Button backButton;
+    @FXML
+    private Button newGameSettingsButton;
+    @FXML
+    private Button quickGuideButton;
 
     // Data
     private List<PokemonSpecies> allPokemon;
@@ -138,9 +147,12 @@ public class NewGameController {
     // Overlay for custom Pokemon selection
     private Parent overlayNode;
     private PokemonSelectionOverlayController overlayController;
+    private String menuFontFamily = "System";
 
     @FXML
     public void initialize() {
+        loadMenuFontForGuides();
+
         // Bind background image
         if (bgImage != null && rootPane != null) {
             bgImage.fitWidthProperty().bind(rootPane.widthProperty());
@@ -337,6 +349,13 @@ public class NewGameController {
             duoModeTooltip.setShowDelay(Duration.millis(120));
             duoModeTooltip.getStyleClass().add("duo-info-tooltip");
             Tooltip.install(duoInfoBadge, duoModeTooltip);
+        }
+
+        if (soloInfoBadge != null) {
+            Tooltip soloModeTooltip = new Tooltip("Solo: single-trainer battle (you vs AI or online rival)");
+            soloModeTooltip.setShowDelay(Duration.millis(120));
+            soloModeTooltip.getStyleClass().add("duo-info-tooltip");
+            Tooltip.install(soloInfoBadge, soloModeTooltip);
         }
 
         // Setup start button
@@ -1003,6 +1022,118 @@ public class NewGameController {
      */
     private void onBack() {
         SceneManager.switchSceneWithLoading("menu.fxml", "Pokemon Battle - Menu", 1200, 700);
+    }
+
+    @FXML
+    private void onNewGameSettingsClicked() {
+        if (rootPane == null) {
+            return;
+        }
+
+        boolean alreadyOpen = rootPane.getChildren().stream()
+                .anyMatch(node -> node.getStyleClass().contains("overlay-root"));
+        if (alreadyOpen) {
+            return;
+        }
+
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    getClass().getResource("/com/example/pokemonbattle/view/settings.fxml"));
+            Node overlay = loader.load();
+            overlay.setOpacity(0.0);
+            rootPane.getChildren().add(overlay);
+            MusicManager.getInstance().attachClickSounds((Parent) overlay);
+
+            FadeTransition ft = new FadeTransition(Duration.millis(200), overlay);
+            ft.setFromValue(0.0);
+            ft.setToValue(1.0);
+            ft.play();
+        } catch (IOException e) {
+            System.err.println("Error loading settings overlay: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    private void onQuickGuideClicked() {
+        showNewGameGuideOverlay();
+    }
+
+    private void showNewGameGuideOverlay() {
+        if (rootPane == null) {
+            return;
+        }
+
+        StackPane overlayRoot = new StackPane();
+        overlayRoot.getStyleClass().add("guide-overlay-root");
+
+        VBox card = new VBox(8);
+        card.getStyleClass().add("guide-overlay-card");
+        card.setMaxWidth(640);
+        card.setPadding(new Insets(16, 22, 14, 22));
+        card.setAlignment(Pos.TOP_LEFT);
+        card.setFillWidth(true);
+
+        Label title = new Label("Quick Guide");
+        title.getStyleClass().add("guide-overlay-title");
+        title.setFont(Font.font(menuFontFamily, FontWeight.BOLD, 21));
+        title.setTextAlignment(TextAlignment.LEFT);
+
+        Label line1 = new Label("1. Select Mode\n   - SOLO is available now.\n   - DUO is planned for a future patch.");
+        Label line2 = new Label("2. Select Opponent\n   - AI: instant local match.\n   - Online: waits for another player and syncs turns via server.");
+        Label line3 = new Label("3. Build Team\n   - RANDOM auto-generates a team.\n   - CUSTOM lets you pick up to 6 Pokemon.");
+        Label line4 = new Label("4. Start Battle\n   - Press START once opponent and team are ready.");
+
+        for (Label line : List.of(line1, line2, line3, line4)) {
+            line.getStyleClass().add("guide-overlay-body");
+            line.setWrapText(true);
+            line.setFont(Font.font(menuFontFamily, 13));
+            line.setTextAlignment(TextAlignment.LEFT);
+            line.setAlignment(Pos.TOP_LEFT);
+            line.setMaxWidth(Double.MAX_VALUE);
+        }
+
+        Button close = new Button("Close");
+        close.getStyleClass().add("button-blue");
+        close.setPrefWidth(120);
+        close.setOnAction(e -> {
+            FadeTransition fadeOut = new FadeTransition(Duration.millis(180), overlayRoot);
+            fadeOut.setToValue(0.0);
+            fadeOut.setOnFinished(ev -> rootPane.getChildren().remove(overlayRoot));
+            fadeOut.play();
+        });
+
+        card.getChildren().addAll(title, line1, line2, line3, line4, close);
+        overlayRoot.getChildren().add(card);
+        overlayRoot.setOnMouseClicked(e -> {
+            if (e.getTarget() == overlayRoot) {
+                FadeTransition fadeOut = new FadeTransition(Duration.millis(180), overlayRoot);
+                fadeOut.setToValue(0.0);
+                fadeOut.setOnFinished(ev -> rootPane.getChildren().remove(overlayRoot));
+                fadeOut.play();
+            }
+        });
+        card.setOnMouseClicked(e -> e.consume());
+
+        overlayRoot.setOpacity(0.0);
+        rootPane.getChildren().add(overlayRoot);
+        MusicManager.getInstance().attachClickSounds(overlayRoot);
+
+        FadeTransition fadeIn = new FadeTransition(Duration.millis(200), overlayRoot);
+        fadeIn.setToValue(1.0);
+        fadeIn.play();
+    }
+
+    private void loadMenuFontForGuides() {
+        try {
+            Font loaded = Font.loadFont(
+                    getClass().getResourceAsStream("/com/example/pokemonbattle/fonts/menu.ttf"),
+                    14);
+            if (loaded != null && loaded.getFamily() != null && !loaded.getFamily().isBlank()) {
+                menuFontFamily = loaded.getFamily();
+            }
+        } catch (Exception ignored) {
+            menuFontFamily = "System";
+        }
     }
 
     /**
