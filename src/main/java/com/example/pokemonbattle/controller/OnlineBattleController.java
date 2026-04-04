@@ -21,6 +21,7 @@ import com.example.pokemonbattle.server.BattleChatMessage;
 import com.example.pokemonbattle.server.BattleEndMessage;
 import com.example.pokemonbattle.server.BattleUpdateMessage;
 import com.example.pokemonbattle.server.DamageMessage;
+import com.example.pokemonbattle.server.ForceSwitchMessage;
 import com.example.pokemonbattle.server.ForfeitMessage;
 import com.example.pokemonbattle.server.GameMessage;
 import com.example.pokemonbattle.server.ServerConnection;
@@ -238,6 +239,8 @@ public class OnlineBattleController {
     private final Queue<DamageMessage> pendingDamageMessages = new ArrayDeque<>();
     private final Queue<SwitchNotifyMessage> pendingSwitchNotifies = new ArrayDeque<>();
     private boolean damageAnimationInProgress = false;
+    private boolean pendingForcedSwitch = false;
+    private BattleEndMessage pendingBattleEndMessage;
 
     //  Lifecycle 
     @FXML
@@ -489,7 +492,64 @@ public class OnlineBattleController {
     @FXML
     private void onBattleGuideClicked() {
         hideBattleQuickMenu();
-        SceneManager.switchSceneWithLoading("wc.fxml", "Welcome", 1200, 700);
+        showBattleGuideOverlay();
+    }
+
+    private void showBattleGuideOverlay() {
+        if (rootPane == null) {
+            return;
+        }
+
+        StackPane overlayRoot = new StackPane();
+        overlayRoot.getStyleClass().add("guide-overlay-root");
+
+        VBox card = new VBox(8);
+        card.getStyleClass().add("guide-overlay-card");
+        card.setMaxWidth(640);
+        card.setPadding(new Insets(16, 22, 14, 22));
+
+        Label title = new Label("Battle Guide");
+        title.getStyleClass().add("guide-overlay-title");
+
+        Label line1 = new Label("1. Turn Actions\n   - FIGHT attacks.\n   - POKEMON switches.\n   - BAG is disabled.\n   - RUN forfeits.");
+        Label line2 = new Label("2. Turn Resolution\n   - Online: both players lock actions, then server resolves order.\n   - AI: actions resolve locally with the same battle rules.");
+        Label line3 = new Label("3. Fainted Pokemon\n   - If your active Pokemon faints, select a valid replacement.");
+        Label line4 = new Label("4. Win Condition\n   - Match ends when one side has no usable Pokemon remaining.");
+
+        for (Label line : List.of(line1, line2, line3, line4)) {
+            line.getStyleClass().add("guide-overlay-body");
+            line.setWrapText(true);
+        }
+
+        Button close = new Button("Close");
+        close.getStyleClass().add("button-blue");
+        close.setPrefWidth(120);
+        close.setOnAction(e -> {
+            FadeTransition fadeOut = new FadeTransition(Duration.millis(180), overlayRoot);
+            fadeOut.setToValue(0.0);
+            fadeOut.setOnFinished(ev -> rootPane.getChildren().remove(overlayRoot));
+            fadeOut.play();
+        });
+
+        card.getChildren().addAll(title, line1, line2, line3, line4, close);
+        overlayRoot.getChildren().add(card);
+        overlayRoot.setOnMouseClicked(e -> {
+            if (e.getTarget() == overlayRoot) {
+                FadeTransition fadeOut = new FadeTransition(Duration.millis(180), overlayRoot);
+                fadeOut.setToValue(0.0);
+                fadeOut.setOnFinished(ev -> rootPane.getChildren().remove(overlayRoot));
+                fadeOut.play();
+            }
+        });
+        card.setOnMouseClicked(e -> e.consume());
+
+        overlayRoot.setOpacity(0.0);
+        rootPane.getChildren().add(overlayRoot);
+        MusicManager.getInstance().attachClickSounds(overlayRoot);
+
+        FadeTransition fadeIn = new FadeTransition(Duration.millis(200), overlayRoot);
+        fadeIn.setToValue(1.0);
+        fadeIn.play();
     }
 
     @FXML
@@ -760,7 +820,7 @@ public class OnlineBattleController {
     }
 
     private void onForcedSwitchSelected(PokemonInstance pokemon) {
-        // Hide overlay
+        // Dismiss overlay first.
         FadeTransition ft = new FadeTransition(Duration.millis(200), forcedSwitchOverlay);
         ft.setToValue(0.0);
         ft.setOnFinished(e -> {
@@ -770,8 +830,21 @@ public class OnlineBattleController {
         });
         ft.play();
 
-        // Send switch action to server
-        onPokemonSelected(pokemon);
+        int teamIndex = player.getTeam().indexOf(pokemon);
+        if (teamIndex < 0 || serverConnection == null || battleId == null) {
+            return;
+        }
+
+        ActionMessage switchMsg = ActionMessage.switchPokemon(battleId, teamIndex, turnCount);
+        String logEntry = cap(pokemon.getName()) + " go!";
+        battleStatusLabel.setText(logEntry);
+        battleLog.add(logEntry);
+
+        try {
+            serverConnection.sendMessage(switchMsg);
+        } catch (IOException e) {
+            System.err.println("[OnlineBattle] Failed to send forced switch: " + e.getMessage());
+        }
     }
 
     //  VS Intro 
@@ -858,6 +931,7 @@ public class OnlineBattleController {
         Platform.runLater(() -> {
             switch (msg.getMessageType()) {
                 case "DAMAGE"       -> applyDamage((DamageMessage) msg);
+                case "FORCE_SWITCH" -> applyForceSwitch((ForceSwitchMessage) msg);
                 case "SWITCH_NOTIFY"-> applySwitchNotify((SwitchNotifyMessage) msg);
                 case "BATTLE_UPDATE"-> applyBattleUpdate((BattleUpdateMessage) msg);
                 case "TURN_READY"   -> onTurnReady((TurnReadyMessage) msg);
@@ -880,8 +954,18 @@ public class OnlineBattleController {
     }
 
     private void applyDamage(DamageMessage msg) {
+        if (battleEnded) return;
         pendingDamageMessages.offer(msg);
         processNextDamageMessage();
+    }
+
+    private void applyForceSwitch(ForceSwitchMessage msg) {
+        if (battleEnded || pendingBattleEndMessage != null) return;
+        if (damageAnimationInProgress || !pendingDamageMessages.isEmpty()) {
+            pendingForcedSwitch = true;
+            return;
+        }
+        showForcedSwitchOverlay();
     }
 
     private void processNextDamageMessage() {
@@ -890,6 +974,13 @@ public class OnlineBattleController {
         DamageMessage msg = pendingDamageMessages.poll();
         if (msg == null) {
             flushPendingSwitchNotifies();
+            if (tryFinalizeBattleEndIfReady()) {
+                return;
+            }
+            if (pendingForcedSwitch) {
+                pendingForcedSwitch = false;
+                showForcedSwitchOverlay();
+            }
             return;
         }
 
@@ -938,18 +1029,24 @@ public class OnlineBattleController {
             else if (msg.getEffectiveness() != null && msg.getEffectiveness() == 0f)
                 effText = " (No effect)";
 
-            String logEntry = cap(msg.getAttackerName()) + " used " + cap(msg.getMoveUsed()) + "! "
-                    + msg.getDamageDealt() + " dmg" + effText;
-            battleStatusLabel.setText(logEntry);
+            String moveName = (msg.getMoveUsed() == null || msg.getMoveUsed().isBlank())
+                    ? "a move"
+                    : cap(msg.getMoveUsed());
+                Integer dealtValue = msg.getDamageDealt();
+                String dealtText = dealtValue == null ? "0" : dealtValue.toString();
+                String logEntry = cap(msg.getAttackerName()) + " used " + moveName + "! " + dealtText + " dmg" + effText;
             battleLog.add(logEntry);
+            String statusEntry = logEntry;
 
             if (msg.isTargetFainted()) {
                 targetPok.setFainted(true);
                 String faintEntry = cap(targetPok.getName()) + " fainted!";
-                battleStatusLabel.setText(faintEntry);
                 battleLog.add(faintEntry);
+                statusEntry = logEntry + " " + faintEntry;
                 updateBattleDisplay();
             }
+
+            battleStatusLabel.setText(statusEntry);
 
             damageAnimationInProgress = false;
             // Small gap keeps sequential move execution readable in online mode.
@@ -994,6 +1091,9 @@ public class OnlineBattleController {
     }
 
     private void applyBattleUpdate(BattleUpdateMessage msg) {
+        if ("faint".equalsIgnoreCase(msg.getCurrentPlayerTurn())) {
+            return;
+        }
         battleStatusLabel.setText(msg.getMessage());
         battleLog.add(msg.getMessage());
         updateBattleDisplay();
@@ -1035,6 +1135,13 @@ public class OnlineBattleController {
     }
 
     private void onTurnReady(TurnReadyMessage msg) {
+        if (battleEnded) return;
+        if (pendingBattleEndMessage != null) {
+            if (tryFinalizeBattleEndIfReady()) {
+                return;
+            }
+            return;
+        }
         flushPendingSwitchNotifies();
         turnCount = msg.getTurnNumber();
         moveSent = false;
@@ -1046,13 +1153,29 @@ public class OnlineBattleController {
 
     private void applyBattleEnd(BattleEndMessage msg) {
         if (battleEnded) return;
-        pendingDamageMessages.clear();
-        pendingSwitchNotifies.clear();
-        damageAnimationInProgress = false;
+        pendingBattleEndMessage = msg;
+        tryFinalizeBattleEndIfReady();
+    }
+
+    private boolean tryFinalizeBattleEndIfReady() {
+        if (battleEnded || pendingBattleEndMessage == null) {
+            return false;
+        }
+        if (damageAnimationInProgress || !pendingDamageMessages.isEmpty()) {
+            return false;
+        }
+
+        flushPendingSwitchNotifies();
+        pendingForcedSwitch = false;
+
+        BattleEndMessage endMessage = pendingBattleEndMessage;
+        pendingBattleEndMessage = null;
         battleEnded = true;
-        boolean playerWon = player.getName().equals(msg.getWinnerName());
-        saveBattleResult(playerWon, msg.getWinnerName());
+
+        boolean playerWon = player.getName().equals(endMessage.getWinnerName());
+        saveBattleResult(playerWon, endMessage.getWinnerName());
         showResultOverlay(playerWon);
+        return true;
     }
 
     private void handleDisconnect() {
@@ -1060,6 +1183,8 @@ public class OnlineBattleController {
         pendingDamageMessages.clear();
         pendingSwitchNotifies.clear();
         damageAnimationInProgress = false;
+        pendingForcedSwitch = false;
+        pendingBattleEndMessage = null;
         battleEnded = true;
         battleStatusLabel.setText("Connection lost!");
         battleLog.add("Connection to server lost.");
@@ -1450,6 +1575,20 @@ public class OnlineBattleController {
     private void updateSide(boolean isPlayer, Player p) {
         PokemonInstance pok = p.getCurrentPokemon();
         if (pok == null) return;
+
+        Label nameLabel = isPlayer ? playerPokemonNameLabel : opponentPokemonNameLabel;
+        Label hpLabel = isPlayer ? playerPokemonHpLabel : opponentPokemonHpLabel;
+        String nameHp = cap(pok.getName()) + "  Lv." + pok.getLevel();
+        nameLabel.setText(nameHp);
+
+        if (pok.isFainted()) {
+            setSideBattleUiVisible(isPlayer, false);
+            hpLabel.setText("0 / " + pok.getMaxHp());
+            return;
+        }
+
+        setSideBattleUiVisible(isPlayer, true);
+
         String direction = isPlayer ? "back" : "front";
         ImageView target = isPlayer ? playerSpriteImage : opponentSpriteImage;
         double basePx = isPlayer ? SPRITE_PLAYER_BASE_PX : SPRITE_OPPONENT_BASE_PX;
@@ -1459,17 +1598,28 @@ public class OnlineBattleController {
         target.setFitWidth(scaledPx);
         target.setFitHeight(scaledPx);
         loadSpriteWithFallback(target, pok.getId(), direction);
-        String nameHp = cap(pok.getName()) + "  Lv." + pok.getLevel();
         if (isPlayer) {
-            playerPokemonNameLabel.setText(nameHp);
             playerPokemonHpLabel.setText(pok.getCurrentHp() + " / " + pok.getMaxHp());
             updateHpBar(playerHpBar, pok.getCurrentHp(), pok.getMaxHp());
             updateTypeBadges(playerTypesBox, pok.getTypes());
         } else {
-            opponentPokemonNameLabel.setText(nameHp);
             opponentPokemonHpLabel.setText(pok.getCurrentHp() + " / " + pok.getMaxHp());
             updateHpBar(opponentHpBar, pok.getCurrentHp(), pok.getMaxHp());
             updateTypeBadges(opponentTypesBox, pok.getTypes());
+        }
+    }
+
+    private void setSideBattleUiVisible(boolean isPlayer, boolean visible) {
+        ImageView sprite = isPlayer ? playerSpriteImage : opponentSpriteImage;
+        Rectangle hpBar = isPlayer ? playerHpBar : opponentHpBar;
+        Label hpLabel = isPlayer ? playerPokemonHpLabel : opponentPokemonHpLabel;
+
+        sprite.setVisible(visible);
+        hpBar.setVisible(visible);
+        hpLabel.setVisible(visible);
+
+        if (!visible) {
+            hpBar.setWidth(0);
         }
     }
 
@@ -1642,7 +1792,6 @@ public class OnlineBattleController {
         actionButtonsBox.setMouseTransparent(false);
         actionButtonsBox.setVisible(true);
         actionButtonsBox.setManaged(true);
-        actionButtonsBox.toFront();
 
         if (attackButton != null)
             attackButton.setDisable(false);
@@ -1668,7 +1817,6 @@ public class OnlineBattleController {
         moveSelectionBox.setVisible(true);
         moveSelectionBox.setManaged(true);
         moveSelectionBox.setMouseTransparent(false);
-        moveSelectionBox.toFront();
 
         actionButtonsBox.setVisible(false);
         actionButtonsBox.setManaged(false);
@@ -1685,7 +1833,6 @@ public class OnlineBattleController {
         pokemonSelectionBox.setVisible(true);
         pokemonSelectionBox.setManaged(true);
         pokemonSelectionBox.setMouseTransparent(false);
-        pokemonSelectionBox.toFront();
 
         actionButtonsBox.setVisible(false);
         actionButtonsBox.setManaged(false);

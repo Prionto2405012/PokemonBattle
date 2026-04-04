@@ -1,7 +1,5 @@
 package com.example.pokemonbattle.server;
 
-import java.io.IOException;
-
 /**
  * Server Launcher Console Application
  * Simple entry point to start the Pokemon Battle Online Server.
@@ -30,23 +28,8 @@ public class PokemonBattleServerLauncher {
                 System.exit(1);
             }
         }
-        
-        // Start the server
-        BattleServer server = new BattleServer(port);
-        
-        try {
-            // Start the server
-            server.start();
-            
-            // Server is now running and accepting connections
-            // The main thread now handles CLI commands via BattleServer.main()
-            BattleServer.main(new String[]{ String.valueOf(port) });
-            
-        } catch (IOException e) {
-            System.err.println("Fatal error: Could not start server");
-            System.err.println(e.getMessage());
-            e.printStackTrace();
-            System.exit(1);
-        }
+
+        // Delegate to BattleServer's CLI loop to avoid double-starting the server.
+        BattleServer.main(new String[]{String.valueOf(port)});
     }
 }

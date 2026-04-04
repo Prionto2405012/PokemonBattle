@@ -243,6 +243,8 @@ public class BattleController implements Battle.BattleListener {
     private final Queue<PendingSwitchEvent> pendingSwitchEvents = new ArrayDeque<>();
     private boolean attackAnimationInProgress = false;
     private boolean pendingForcedSwitchOverlay = false;
+    private Boolean pendingBattleEndPlayerWon = null;
+    private boolean battleEndOverlayShown = false;
 
     private static final class PendingAttackAnimation {
         private final ImageView attackerSprite;
@@ -337,7 +339,64 @@ public class BattleController implements Battle.BattleListener {
     @FXML
     private void onBattleGuideClicked() {
         hideBattleQuickMenu();
-        SceneManager.switchSceneWithLoading("wc.fxml", "Welcome", 1200, 700);
+        showBattleGuideOverlay();
+    }
+
+    private void showBattleGuideOverlay() {
+        if (rootPane == null) {
+            return;
+        }
+
+        StackPane overlayRoot = new StackPane();
+        overlayRoot.getStyleClass().add("guide-overlay-root");
+
+        VBox card = new VBox(8);
+        card.getStyleClass().add("guide-overlay-card");
+        card.setMaxWidth(640);
+        card.setPadding(new Insets(16, 22, 14, 22));
+
+        Label title = new Label("Battle Guide");
+        title.getStyleClass().add("guide-overlay-title");
+
+        Label line1 = new Label("1. Turn Actions\n   - FIGHT attacks.\n   - POKEMON switches.\n   - BAG is disabled.\n   - RUN forfeits.");
+        Label line2 = new Label("2. Turn Resolution\n   - AI battle resolves locally after move selections.\n   - Online battle resolves after both players submit actions.");
+        Label line3 = new Label("3. Fainted Pokemon\n   - When your active Pokemon faints, choose a replacement to continue.");
+        Label line4 = new Label("4. Win Condition\n   - Battle ends when one side has no usable Pokemon left.");
+
+        for (Label line : List.of(line1, line2, line3, line4)) {
+            line.getStyleClass().add("guide-overlay-body");
+            line.setWrapText(true);
+        }
+
+        Button close = new Button("Close");
+        close.getStyleClass().add("button-blue");
+        close.setPrefWidth(120);
+        close.setOnAction(e -> {
+            FadeTransition fadeOut = new FadeTransition(Duration.millis(180), overlayRoot);
+            fadeOut.setToValue(0.0);
+            fadeOut.setOnFinished(ev -> rootPane.getChildren().remove(overlayRoot));
+            fadeOut.play();
+        });
+
+        card.getChildren().addAll(title, line1, line2, line3, line4, close);
+        overlayRoot.getChildren().add(card);
+        overlayRoot.setOnMouseClicked(e -> {
+            if (e.getTarget() == overlayRoot) {
+                FadeTransition fadeOut = new FadeTransition(Duration.millis(180), overlayRoot);
+                fadeOut.setToValue(0.0);
+                fadeOut.setOnFinished(ev -> rootPane.getChildren().remove(overlayRoot));
+                fadeOut.play();
+            }
+        });
+        card.setOnMouseClicked(e -> e.consume());
+
+        overlayRoot.setOpacity(0.0);
+        rootPane.getChildren().add(overlayRoot);
+        MusicManager.getInstance().attachClickSounds(overlayRoot);
+
+        FadeTransition fadeIn = new FadeTransition(Duration.millis(200), overlayRoot);
+        fadeIn.setToValue(1.0);
+        fadeIn.play();
     }
 
     @FXML
@@ -520,6 +579,10 @@ public class BattleController implements Battle.BattleListener {
         updateBattleDisplay();
         updateMoveButtons();
 
+        if (tryShowPendingBattleEnd()) {
+            return;
+        }
+
         if (pendingForcedSwitchOverlay) {
             pendingForcedSwitchOverlay = false;
             showForcedSwitchOverlay();
@@ -531,6 +594,31 @@ public class BattleController implements Battle.BattleListener {
         if (!battle.isFinished() && !player.getCurrentPokemon().isFainted()) {
             showActionButtons();
         }
+    }
+
+    private boolean tryShowPendingBattleEnd() {
+        if (battleEndOverlayShown || pendingBattleEndPlayerWon == null) {
+            return false;
+        }
+        if (attackAnimationInProgress || !pendingAttackAnimations.isEmpty()) {
+            return false;
+        }
+
+        while (!pendingSwitchEvents.isEmpty()) {
+            PendingSwitchEvent switchEvent = pendingSwitchEvents.poll();
+            if (switchEvent != null) {
+                applySwitchEvent(switchEvent.playerName, switchEvent.pokemonName, false);
+            }
+        }
+
+        updateBattleDisplay();
+        updateMoveButtons();
+
+        boolean playerWon = pendingBattleEndPlayerWon;
+        pendingBattleEndPlayerWon = null;
+        battleEndOverlayShown = true;
+        Platform.runLater(() -> showResultOverlay(playerWon));
+        return true;
     }
 
     private void hideActionButtons() {
@@ -1637,7 +1725,8 @@ public class BattleController implements Battle.BattleListener {
         if (playerWon) {
             MusicManager.getInstance().playVictorySFX();
         }
-        Platform.runLater(() -> showResultOverlay(playerWon));
+        pendingBattleEndPlayerWon = playerWon;
+        tryShowPendingBattleEnd();
     }
 
     /**
