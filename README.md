@@ -1,98 +1,122 @@
-# PokemonBattle
+﻿# PokemonBattle
 
-PokemonBattle is a JavaFX desktop game project with:
-- Local battles (player vs AI)
-- Online battles through a TCP server (server-authoritative battle state)
-- "Local Player" battles implemented via localhost TCP matchmaking (not offline hot-seat)
-- SQLite-backed authentication and player history
-- Scene-based UI flow with animated transitions and overlays
+PokemonBattle is a desktop Pokemon-style battle game built with JavaFX.
+You can play quick AI battles, or battle real players over a local network.
 
-This README is a living map of the codebase and workflow. It is designed to help new contributors quickly understand what runs where, what to change for each feature area, and how data moves through the app.
+This README is written for two groups:
+1. Players who just want to install and play.
+2. Developers who want to build, run, and modify the project.
 
-## 1) Tech Stack
+## 1) Player Guide (No Java or JavaFX Setup Needed)
 
-- Language: Java 21
-- UI: JavaFX 21 (FXML + CSS)
-- Build: Maven
-- Database: SQLite
-- JSON parsing: Gson
-- Networking: Java sockets with serializable message protocol
+If you install from the packaged Windows build, you do not need to install Java or JavaFX.
 
-Primary build config: `pom.xml`
-Module system: `src/main/java/module-info.java`
+### 1.1 What You Need
 
-## 2) Repository Layout
+1. A Windows PC.
+2. One of these from the project maintainer:
+   - PokemonBattle-1.0.0.exe installer, or
+   - The full PokemonBattle portable folder.
 
-Top-level structure:
+### 1.2 Install and Launch
 
-```text
-PokemonBattle/
-  src/main/java/com/example/pokemonbattle/
-    controller/   # UI controller logic
-    model/        # Domain models and battle entities
-    database/     # DB access and game data loading
-    service/      # Application services
-    server/       # TCP server + message protocol
-    util/         # Shared managers/helpers
-    security/     # Security-related classes
-    HelloApplication.java
-    Launcher.java
-  src/main/resources/com/example/pokemonbattle/
-    view/         # FXML screens
-    css/          # Screen styling
-    data/         # Data files (pokemon heights)
-    database/     # JSON game data + SQL schema
-    sprites/      # Pokemon/trainer assets
-    audio/        # BGM/SFX
-    fonts/        # UI fonts
-    assets/       # Misc media/assets
-```
+If you got the installer:
+1. Double-click PokemonBattle-1.0.0.exe.
+2. Follow the install wizard.
+3. Launch from desktop or Start menu.
 
-## 3) Entry Points and Runtime Modes
+If you got the portable folder:
+1. Open the folder.
+2. Run PokemonBattle.exe.
 
-### Desktop client (JavaFX)
+Important:
+- Keep the whole portable folder together.
+- Do not copy only one .exe file out of that folder.
 
-- Main launcher class: `com.example.pokemonbattle.Launcher`
-- JavaFX app class: `com.example.pokemonbattle.HelloApplication`
-- Initial scene loaded: `intro.fxml`
+### 1.3 Which EXE Should You Open?
 
-### TCP battle server
+- PokemonBattle.exe
+  - Starts the game client only.
+  - Use for AI battles.
+  - Use to join an online match.
 
-- Primary server class: `com.example.pokemonbattle.server.BattleServer`
-- Convenience launcher: `com.example.pokemonbattle.server.PokemonBattleServerLauncher`
-- Default server port: 5555
+- PokemonBattleHost.exe
+  - Starts the game client and battle server together.
+  - Use this on the host PC when you want friends on the same Wi-Fi to join.
 
-## 4) Build and Run
+### 1.4 How To Play
 
-Windows (from project root):
+Quick single-player:
+1. Open PokemonBattle.exe.
+2. Go to New Game.
+3. Choose AI opponent.
+4. Build your team and start battle.
+
+Local network online battle:
+1. On one PC (host), open PokemonBattleHost.exe.
+2. Keep the host app running.
+3. On other PC(s), open PokemonBattle.exe.
+4. In New Game, choose Online opponent.
+5. Wait for matchmaking.
+
+Notes:
+- AI mode does not require a server.
+- Online mode looks for a server on local network.
+
+### 1.5 Common Problems and Easy Fixes
+
+The app does not open:
+1. Right-click and run once as administrator.
+2. If Windows SmartScreen appears, click More info then Run anyway.
+
+No server found:
+1. Make sure the host opened PokemonBattleHost.exe.
+2. Make sure all devices are on the same Wi-Fi.
+3. Allow the app in Windows Firewall.
+4. Keep the host app open while others connect.
+
+Matchmaking keeps waiting:
+1. Online mode needs at least two players searching.
+2. If you want instant play, select AI mode.
+
+## 2) Developer Quick Start
+
+### 2.1 Tech Stack
+
+- Java 21
+- JavaFX 21
+- Maven
+- SQLite
+- Gson
+- Java sockets (server-authoritative online battles)
+
+Primary config: pom.xml
+Java module config: src/main/java/module-info.java
+
+### 2.2 Build and Run Client (Windows)
+
+From project root:
 
 ```powershell
 .\mvnw.cmd clean compile
 .\mvnw.cmd javafx:run
 ```
 
-If wrapper is unavailable:
+### 2.3 Run Server (Dev)
 
-```powershell
-mvn clean compile
-mvn javafx:run
-```
-
-Run server (default port):
+Default port (5555):
 
 ```powershell
 mvn exec:java -Dexec.mainClass="com.example.pokemonbattle.server.BattleServer"
 ```
 
-Run server (custom port):
+Custom port:
 
 ```powershell
 mvn exec:java -Dexec.mainClass="com.example.pokemonbattle.server.BattleServer" -Dexec.args="7777"
 ```
 
-## 4.1) Build No-Java-Required Windows Apps (.exe)
-
-You can build a Windows package that includes its own runtime, so target machines do not need Java installed.
+### 2.4 Build Windows Package (No Java Required On Target Device)
 
 From project root:
 
@@ -100,249 +124,166 @@ From project root:
 .\build-windows-package.bat
 ```
 
-This script creates a portable app folder with two executables:
-- Client launcher: `dist/PokemonBattle/PokemonBattle.exe`
-- Host launcher: `dist/PokemonBattle/PokemonBattleHost.exe`
+Output:
+- Portable app folder: dist/PokemonBattle/
+- Client launcher: dist/PokemonBattle/PokemonBattle.exe
+- Host launcher: dist/PokemonBattle/PokemonBattleHost.exe
+- Optional installer: dist/PokemonBattle-1.0.0.exe (requires WiX toolset)
 
-Optional installer output:
-- `dist/PokemonBattle-1.0.0.exe`
+## 3) Project Structure
 
-Installer prerequisite:
-- To generate the installer `.exe`, install WiX Toolset and add `candle.exe` and `light.exe` to `PATH`.
-- Without WiX, the script still builds the portable app image (`dist/PokemonBattle/PokemonBattle.exe`).
+```text
+src/main/java/com/example/pokemonbattle/
+  controller/   UI controllers
+  model/        Domain models and battle entities
+  database/     Data access and loaders
+  security/     Security-related classes
+  server/       TCP server and message protocol
+  service/      Business logic services
+  util/         Shared utilities and managers
+  HelloApplication.java
+  Launcher.java
+  HostLauncher.java
 
-Distribution usage:
-- If installer was generated, share `dist/PokemonBattle-1.0.0.exe` and install normally.
-- Otherwise, share the full `dist/PokemonBattle` folder (do not copy only one `.exe`).
-- No separate Java installation is required on that machine.
+src/main/resources/com/example/pokemonbattle/
+  view/         FXML screens
+  css/          JavaFX styles
+  database/     schema.sql, pokemon/move/item JSON data
+  data/         additional data files
+  sprites/      Pokemon and trainer assets
+  audio/        music and SFX
+  fonts/        custom fonts
+  assets/       misc assets
+```
 
-Launcher usage:
-- `PokemonBattle.exe`: App-only client. Use this when connecting to an already running server.
-- `PokemonBattleHost.exe`: Host mode. Starts the server and app together in one process.
+## 4) Runtime Entry Points
 
-Important platform note:
-- Native packages are OS-specific.
-- Build on Windows for Windows `.exe`, on macOS for `.dmg/.pkg`, and on Linux for `.deb/.rpm` (or app-image style bundles).
+Client:
+- com.example.pokemonbattle.Launcher
+- com.example.pokemonbattle.HelloApplication
 
-Important runtime note:
+Host mode:
+- com.example.pokemonbattle.HostLauncher
+- Starts battle server and JavaFX client together.
 
-- `New Game -> Local Player` currently uses the same online pipeline over `localhost:5555`.
-- If no server is running, `waiting_online.fxml` will show a connection failure.
-- To avoid manual setup on the host machine, run `PokemonBattleHost.exe`.
-- On additional client machines, run `PokemonBattle.exe` and connect via Online mode.
+Dedicated server:
+- com.example.pokemonbattle.server.BattleServer
 
-## 5) What Is Done Where
+## 5) Feature Ownership Map
 
-### Controllers (`src/main/java/com/example/pokemonbattle/controller`)
+Controllers:
+- WcController authentication flow
+- MenuController main menu navigation
+- NewGameController mode/opponent/team setup
+- BattleController AI/local battle screen logic
+- OnlineBattleController online battle UI updates
+- WaitingController network discovery, login, matchmaking wait
+- SettingsController settings overlay
+- PokemonSelectionOverlayController team selection overlay
+- AvatarSelectionController avatar selection
+- IntroController, StartController, LoadingScreenController startup transitions
 
-- `WcController`: Login/signup flow, validation feedback, auth handoff
-- `MenuController`: Main menu navigation and settings entry
-- `NewGameController`: Battle setup (mode/opponent/team), route to local or online path
-- `BattleController`: Local battle screen and local battle progression
-- `OnlineBattleController`: Online battle UI, server message handling, turn state
-- `WaitingController`: Matchmaking/wait flow while searching for online opponent
-- `SettingsController`: Game settings overlay logic
-- `PokemonSelectionOverlayController`: Team builder overlay interactions
-- `AvatarSelectionController`: Avatar picker
-- `IntroController`, `StartController`, `LoadingScreenController`: startup/transition screens
+Services:
+- AuthService login/signup business logic
+- BattleHistoryManager battle history aggregation
+- PokemonSearchService pokemon lookup/search helpers
 
-### Models (`src/main/java/com/example/pokemonbattle/model`)
+Server:
+- BattleServer client connections, queue, active battles
+- ClientHandler per-client server thread
+- OnlineBattle server-authoritative turn resolution
+- ServerConnection client-side network bridge
+- GameMessage and subclasses for protocol messaging
 
-Core domain types such as:
-- `User`, `Player`
-- `PokemonSpecies`, `PokemonInstance`, `Move`
-- Battle-related classes (`Battle`, `Action`, etc.)
-- History records (`BattleRecord`)
+Utilities:
+- SceneManager scene routing and cross-scene data
+- PlayerSession logged-in user/session state
+- MusicManager, MediaCache media lifecycle
+- battle visual helpers and transition managers
 
-### Database (`src/main/java/com/example/pokemonbattle/database`)
+## 6) End-to-End Flow
 
-- DB connectivity and initialization
-- Game data loading from JSON
-- SQL schema and data query orchestration
+Startup:
+1. Launcher launches HelloApplication.
+2. SceneManager initializes and loads startup assets.
+3. App enters intro/start flow.
 
-### Services (`src/main/java/com/example/pokemonbattle/service`)
+Authentication:
+1. WcController captures input.
+2. AuthService validates and persists via DB layer.
+3. PlayerSession stores active user.
 
-- `AuthService`: register/login business logic and validation
-- `BattleHistoryManager`: history retrieval and aggregation
-- `PokemonSearchService`: Pokemon lookup/search utilities
+AI Battle:
+1. User selects AI opponent in NewGameController.
+2. Teams are prepared from game data.
+3. BattleController runs battle progression.
 
-### Server (`src/main/java/com/example/pokemonbattle/server`)
+Online Battle:
+1. User selects Online opponent.
+2. WaitingController discovers/connects to server.
+3. Login and matchmaking messages are exchanged.
+4. Server runs authoritative battle in OnlineBattle.
+5. OnlineBattleController renders server updates.
 
-- `BattleServer`: connection handling + matchmaking queue + active battles
-- `ClientHandler`: per-client processing thread
-- `OnlineBattle`: server-side authoritative battle resolution
-- `ServerConnection`: client-side network bridge
-- Message protocol classes: `GameMessage` and subclasses (`LoginRequest`, `ActionMessage`, `ForceSwitchMessage`, `DamageMessage`, etc.)
+## 7) Data and Ownership Rules
 
-### Utilities (`src/main/java/com/example/pokemonbattle/util`)
-
-- `SceneManager`: scene switching, loading flow, cross-scene data
-- `PlayerSession`: authenticated user/session state
-- `MusicManager`, `MediaCache`: audio/media lifecycle and reuse
-- Battle/UI animation helpers (`BattleAnimationManager`, `CurtainTransitionManager`, `PokeballOverlay`, `GifCanvas`)
-
-### Resources (`src/main/resources/com/example/pokemonbattle`)
-
-- `view/`: FXML layouts
-- `css/`: screen-level styles
-- `database/`: `schema.sql`, `pokemon_gen4.json`, `moves_gen4.json`, `battle_items.json`
-- `data/`: `pokemon_heights.json`
-- `sprites/`, `audio/`, `fonts/`, `assets/`: runtime media
-
-## 6) Workflow: End-to-End Application Flow
-
-### A) Startup and Navigation
-
-1. `Launcher` starts `HelloApplication`.
-2. `HelloApplication` initializes `SceneManager`, fonts, media cache.
-3. First scene is switched to `intro.fxml`.
-4. Intro-to-start transition passes temporary overlay state through scene-switch payload data.
-5. Navigation between screens is centralized through `SceneManager`.
-
-### B) Authentication Flow
-
-1. UI input handled in `WcController`.
-2. `WcController` calls `AuthService` for register/login.
-3. `AuthService` validates and delegates persistence to database/DAO layer.
-4. On success, user state is stored in `PlayerSession` and app navigates to menu/new game flows.
-
-### C) Local Battle Flow
-
-1. `NewGameController` collects mode/opponent/team choices.
-2. Player and AI teams are prepared from species/move datasets.
-3. Scene transitions to `battle.fxml` and `BattleController` runs local battle rounds.
-4. Result is persisted to history and shown in UI.
-
-### D) Online Battle Flow
-
-1. Client connects via `ServerConnection`.
-2. Login and matchmaking messages are sent (`LoginRequest`, `FindOpponentRequest`).
-3. `BattleServer` pairs players and starts an `OnlineBattle` instance.
-4. During turns, clients submit actions/moves and receive authoritative updates (`DamageMessage`, `TurnReadyMessage`, `BattleEndMessage`, etc.).
-5. `OnlineBattleController` updates UI state based only on server messages.
-
-### E) Local Player (Same-Machine Multiplayer) Flow
-
-1. `NewGameController` stores `connectionMode=LOCAL` and routes to `waiting_online.fxml`.
-2. `WaitingController` connects to `localhost:5555` using `ServerConnection`.
-3. Matchmaking and battle progression then use the same server-authoritative message flow as online mode.
-4. If no server is listening on port `5555`, the connection attempt fails and the waiting screen reports it.
-
-## 7) Data and State Ownership
-
-- UI transient state: screen controllers
-- Cross-scene state: `SceneManager` data map
-- Session identity/preferences: `PlayerSession`
-- Authoritative online battle state: server (`OnlineBattle`)
-- Persistent user/game history: SQLite database
-- Local-player multiplayer authority: same TCP server stack (`localhost`), not offline in-process battle authority
+- UI transient state: controllers
+- Cross-scene state: SceneManager
+- Session identity: PlayerSession
+- Online battle authority: server (OnlineBattle)
+- Persistent user/history data: SQLite
 
 Rule of thumb:
-- If the change affects battle fairness/validation in online mode, implement it on server side first.
-- If the change is visual/navigation only, keep it in controller/FXML/CSS layers.
+- Fairness and validation changes for online mode belong on server side.
+- Navigation and visuals belong in controllers/FXML/CSS.
 
-## 8) Key Screens to Their Controllers
+## 8) FXML to Controller Map
 
-FXML to controller mapping:
+- wc.fxml -> WcController
+- menu.fxml -> MenuController
+- new_game.fxml -> NewGameController
+- battle.fxml -> BattleController
+- online_battle.fxml -> OnlineBattleController
+- waiting_online.fxml -> WaitingController
+- settings.fxml -> SettingsController
+- pokemon_selection_overlay.fxml -> PokemonSelectionOverlayController
+- avatar_selection.fxml -> AvatarSelectionController
+- intro.fxml -> IntroController
+- start.fxml -> StartController
+- loading_screen.fxml -> LoadingScreenController
 
-- `wc.fxml` -> `WcController`
-- `menu.fxml` -> `MenuController`
-- `new_game.fxml` -> `NewGameController`
-- `battle.fxml` -> `BattleController`
-- `online_battle.fxml` -> `OnlineBattleController`
-- `waiting_online.fxml` -> `WaitingController`
-- `settings.fxml` -> `SettingsController`
-- `pokemon_selection_overlay.fxml` -> `PokemonSelectionOverlayController`
-- `avatar_selection.fxml` -> `AvatarSelectionController`
-- `intro.fxml` -> `IntroController`
-- `start.fxml` -> `StartController`
-- `loading_screen.fxml` -> `LoadingScreenController`
+## 9) Core Data Files
 
-## 9) Online Protocol Overview
+- src/main/resources/com/example/pokemonbattle/database/schema.sql
+- src/main/resources/com/example/pokemonbattle/database/pokemon_gen4.json
+- src/main/resources/com/example/pokemonbattle/database/moves_gen4.json
+- src/main/resources/com/example/pokemonbattle/database/battle_items.json
+- src/main/resources/com/example/pokemonbattle/data/pokemon_heights.json
 
-Representative message lifecycle:
+## 10) Additional Documentation
 
-1. `LoginRequest` -> `LoginResponse`
-2. `FindOpponentRequest` -> `BattleStartMessage`
-3. `ActionMessage`/`MoveMessage` -> `DamageMessage` and `BattleUpdateMessage`
-4. Forced replacement (when active pokemon faints) -> `ForceSwitchMessage` -> required `ActionMessage` switch response
-5. Turn synchronization -> `TurnReadyMessage`
-6. End condition -> `BattleEndMessage`
-7. Exceptional path -> `ErrorMessage` or `ForfeitMessage`
+- AUTHENTICATION_INTEGRATION.md
+- AUTHENTICATION_SUMMARY.md
+- AUTH_API_REFERENCE.md
+- BATTLE_SETUP_IMPLEMENTATION.md
+- TCP_SERVER_README.md
+- TCP_SERVER_QUICKSTART.md
+- LOADING_SCREEN_INTEGRATION.md
+- LOADING_SCREEN_USAGE.md
 
-All protocol classes are in `src/main/java/com/example/pokemonbattle/server`.
+## 11) README Maintenance Rule
 
-## 10) Database and Game Data
+Update this README whenever any of these change:
+- Scene flow/navigation
+- Controller/service/server ownership
+- Message protocol
+- Data file locations
+- Build/package commands
 
-Primary data files:
-- `src/main/resources/com/example/pokemonbattle/database/schema.sql`
-- `src/main/resources/com/example/pokemonbattle/database/pokemon_gen4.json`
-- `src/main/resources/com/example/pokemonbattle/database/moves_gen4.json`
-- `src/main/resources/com/example/pokemonbattle/database/battle_items.json`
-- `src/main/resources/com/example/pokemonbattle/data/pokemon_heights.json`
+PR checklist suggestion:
+- [ ] README updated for architecture or workflow changes
 
-The app uses SQLite and loads game data from JSON resources into model objects used by setup and battle systems.
-
-## 11) Existing Deep-Dive Docs
-
-Use these for subsystem details:
-- `AUTHENTICATION_INTEGRATION.md`
-- `AUTHENTICATION_SUMMARY.md`
-- `AUTH_API_REFERENCE.md`
-- `BATTLE_SETUP_IMPLEMENTATION.md`
-- `TCP_SERVER_README.md`
-- `TCP_SERVER_QUICKSTART.md`
-- `LOADING_SCREEN_INTEGRATION.md`
-- `LOADING_SCREEN_USAGE.md`
-
-## 12) Living README Update Protocol (Always Updated)
-
-This README should be updated in every PR that changes architecture, flow, ownership, protocol, or data files.
-
-### Required update triggers
-
-Update this README when any of the following changes:
-- New controller/service/model/server class added
-- Scene flow/navigation path changed
-- New FXML/CSS screen added or renamed
-- Server message protocol changed
-- Database schema/data-file locations changed
-- Build/run commands changed
-
-### PR checklist item
-
-Add this to your PR checklist:
-
-- [ ] README updated for codebase/workflow changes
-
-### Suggested maintenance routine
-
-1. Before coding: read Sections 5-7 for ownership and flow.
-2. During coding: keep names and paths aligned with existing conventions.
-3. Before merge: verify Section 2 (layout), Section 5 (what is done where), and Section 6 (workflow) still match code.
-4. If flow changed: update both this README and the relevant deep-dive doc.
-
-## 13) Contributor Quick Guide
-
-If you want to change...
-
-- Login/signup behavior: start in `WcController` and `AuthService`
-- Team building/new game setup: start in `NewGameController` and `PokemonSelectionOverlayController`
-- Local battle mechanics/UI: start in `BattleController` and battle models
-- Online match flow/protocol: start in `OnlineBattleController`, `ServerConnection`, and `server/*`
-- Scene transitions/loading behavior: start in `SceneManager` and `LoadingScreenController`
-- Theme/styling: start in `src/main/resources/com/example/pokemonbattle/css`
-
-## 14) Notes and Conventions
-
-- Keep online battle logic server-authoritative.
-- Keep scene transitions centralized through `SceneManager`.
-- Keep persistent state in SQLite/session helpers, not in ad-hoc static UI state.
-- Prefer package-level cohesion: controller for UI orchestration, service for business logic, server for network protocol/authority.
-
----
-
-If you are onboarding to this repo, follow this order:
-1. Read Sections 2, 5, and 6 in this README.
-2. Run the client and server commands in Section 4.
-3. Open the specific deep-dive doc from Section 11 for the feature you are modifying.
+If you are new to this project, start with:
+1. Section 1 (Player Guide) for practical runtime behavior.
+2. Sections 3 to 6 for architecture and workflow.
+3. Section 10 deep-dive docs for your specific feature area.
