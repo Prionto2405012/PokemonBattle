@@ -43,9 +43,6 @@ public class BattleServer {
         this.port = port;
     }
     
-    /**
-     * Start the server and begin accepting client connections.
-     */
     public void start() throws IOException {
         if (running) {
             System.out.println("Server is already running");

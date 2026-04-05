@@ -27,6 +27,7 @@ import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.ParallelTransition;
+import javafx.animation.ScaleTransition;
 import javafx.animation.SequentialTransition;
 import javafx.animation.Timeline;
 import javafx.animation.TranslateTransition;
@@ -343,60 +344,157 @@ public class BattleController implements Battle.BattleListener {
     }
 
     private void showBattleGuideOverlay() {
-        if (rootPane == null) {
+        if (rootPane == null)
             return;
-        }
 
+        // Overlay backdrop
         StackPane overlayRoot = new StackPane();
         overlayRoot.getStyleClass().add("guide-overlay-root");
 
-        VBox card = new VBox(8);
+        // Card
+        VBox card = new VBox(0);
         card.getStyleClass().add("guide-overlay-card");
-        card.setMaxWidth(640);
-        card.setPadding(new Insets(16, 22, 14, 22));
+        card.setMaxWidth(820);
+        card.setMinWidth(700);
+        card.setMaxHeight(440);
+        card.setFillWidth(true);
 
-        Label title = new Label("Battle Guide");
-        title.getStyleClass().add("guide-overlay-title");
+        // Header row: title + x button
+        Label titleLbl = new Label("⚔  Battle Guide");
+        titleLbl.getStyleClass().add("guide-overlay-title");
+        titleLbl.setMaxWidth(Double.MAX_VALUE);
+        titleLbl.setWrapText(false);
 
-        Label line1 = new Label("1. Turn Actions\n   - FIGHT attacks.\n   - POKEMON switches.\n   - BAG is disabled.\n   - RUN forfeits.");
-        Label line2 = new Label("2. Turn Resolution\n   - AI battle resolves locally after move selections.\n   - Online battle resolves after both players submit actions.");
-        Label line3 = new Label("3. Fainted Pokemon\n   - When your active Pokemon faints, choose a replacement to continue.");
-        Label line4 = new Label("4. Win Condition\n   - Battle ends when one side has no usable Pokemon left.");
+        Button xBtn = new Button("✕");
+        xBtn.setStyle(
+                "-fx-background-color: transparent;" +
+                        "-fx-text-fill: rgba(200,220,255,0.75);" +
+                        "-fx-cursor: hand;" +
+                        "-fx-padding: 0 4;" +
+                        "-fx-font-size: 16px;" +
+                        "-fx-font-weight: bold;");
+        xBtn.setOnAction(e -> dismissGuideOverlay(overlayRoot));
 
-        for (Label line : List.of(line1, line2, line3, line4)) {
-            line.getStyleClass().add("guide-overlay-body");
-            line.setWrapText(true);
+        HBox header = new HBox(titleLbl, xBtn);
+        header.setAlignment(Pos.CENTER_LEFT);
+        header.setFillHeight(true);
+        HBox.setHgrow(titleLbl, Priority.ALWAYS);
+        header.setPadding(new Insets(18, 18, 14, 24));
+
+        // Divider
+        Region divider = new Region();
+        divider.setPrefHeight(2);
+        divider.setMaxHeight(2);
+        divider.setStyle("-fx-background-color: rgba(170,215,255,0.25);");
+
+        // Body: step pairs
+        VBox body = new VBox(12);
+        body.setPadding(new Insets(18, 28, 16, 28));
+        body.setFillWidth(true);
+
+        String[][] steps = {
+                {
+                        "1.  Choose Your Action",
+                        """
+                                FIGHT → select one of your Pokémon's moves to attack.
+                                POKÉMON → swap your active Pokémon for another in your team.
+                                BAG → unavailable during battle.
+                                RUN → forfeit and return to the battle setup screen.
+                                """
+                },
+                {
+                        "2.  Turn Order",
+                        """
+                                Each turn, both sides act. The Pokémon with higher Speed strikes first. Equal-Speed ties are broken at random. Switch actions always resolve before attacks.
+                                """
+                },
+                {
+                        "3.  Fainted Pokémon",
+                        """
+                                When your active Pokémon faints you must choose a replacement before the next turn begins. A switch panel will appear automatically — pick wisely, type matchups matter!
+                                """
+                },
+                {
+                        "4.  Winning the Battle",
+                        """
+                                The battle ends when every Pokémon on one side has fainted. Knock out your opponent's entire team to claim victory!
+                                """
+                }
+        };
+
+        for (String[] step : steps) {
+            Label heading = new Label(step[0]);
+            heading.getStyleClass().add("guide-overlay-body");
+            heading.setStyle(
+                    "-fx-font-size: 16px;" +
+                            "-fx-font-weight: bold;" +
+                            "-fx-text-fill: #78C850;");
+            heading.setMaxWidth(Double.MAX_VALUE);
+            heading.setWrapText(false);
+
+            Label detail = new Label(step[1]);
+            detail.getStyleClass().add("guide-overlay-body");
+            detail.setWrapText(true);
+            detail.setMaxWidth(Double.MAX_VALUE);
+
+            VBox stepBox = new VBox(3, heading, detail);
+            stepBox.setFillWidth(true);
+            body.getChildren().add(stepBox);
         }
 
-        Button close = new Button("Close");
-        close.getStyleClass().add("button-blue");
-        close.setPrefWidth(120);
-        close.setOnAction(e -> {
-            FadeTransition fadeOut = new FadeTransition(Duration.millis(180), overlayRoot);
-            fadeOut.setToValue(0.0);
-            fadeOut.setOnFinished(ev -> rootPane.getChildren().remove(overlayRoot));
-            fadeOut.play();
-        });
+        // Footer: close button
+        Button closeBtn = new Button("Close Guide");
+        closeBtn.setStyle(
+                "-fx-background-color: #2d7a6e;" +
+                        "-fx-text-fill: white;" +
+                        "-fx-background-radius: 8;" +
+                        "-fx-cursor: hand;" +
+                        "-fx-font-size: 15px;" +
+                        "-fx-font-weight: bold;" +
+                        "-fx-padding: 8 28;");
+        closeBtn.setPrefWidth(180);
+        closeBtn.setPrefHeight(40);
+        closeBtn.setOnMouseEntered(e -> closeBtn.setStyle(
+                closeBtn.getStyle().replace("#2d7a6e", "#3a9e8f")));
+        closeBtn.setOnMouseExited(e -> closeBtn.setStyle(
+                closeBtn.getStyle().replace("#3a9e8f", "#2d7a6e")));
+        closeBtn.setOnAction(e -> dismissGuideOverlay(overlayRoot));
 
-        card.getChildren().addAll(title, line1, line2, line3, line4, close);
+        HBox footer = new HBox(closeBtn);
+        footer.setAlignment(Pos.CENTER);
+        footer.setPadding(new Insets(0, 24, 20, 24));
+
+        // Assemble
+        card.getChildren().addAll(header, divider, body, footer);
         overlayRoot.getChildren().add(card);
+
         overlayRoot.setOnMouseClicked(e -> {
-            if (e.getTarget() == overlayRoot) {
-                FadeTransition fadeOut = new FadeTransition(Duration.millis(180), overlayRoot);
-                fadeOut.setToValue(0.0);
-                fadeOut.setOnFinished(ev -> rootPane.getChildren().remove(overlayRoot));
-                fadeOut.play();
-            }
+            if (e.getTarget() == overlayRoot)
+                dismissGuideOverlay(overlayRoot);
         });
         card.setOnMouseClicked(e -> e.consume());
 
+        // Animate in: fade + scale
         overlayRoot.setOpacity(0.0);
+        card.setScaleX(0.93);
+        card.setScaleY(0.93);
         rootPane.getChildren().add(overlayRoot);
         MusicManager.getInstance().attachClickSounds(overlayRoot);
 
-        FadeTransition fadeIn = new FadeTransition(Duration.millis(200), overlayRoot);
+        FadeTransition fadeIn = new FadeTransition(Duration.millis(220), overlayRoot);
         fadeIn.setToValue(1.0);
+        ScaleTransition scaleIn = new ScaleTransition(Duration.millis(220), card);
+        scaleIn.setToX(1.0);
+        scaleIn.setToY(1.0);
+        scaleIn.setInterpolator(Interpolator.EASE_OUT);
         fadeIn.play();
+        scaleIn.play();
+    }
+    private void dismissGuideOverlay(StackPane overlayRoot) {
+        FadeTransition fadeOut = new FadeTransition(Duration.millis(160), overlayRoot);
+        fadeOut.setToValue(0.0);
+        fadeOut.setOnFinished(ev -> rootPane.getChildren().remove(overlayRoot));
+        fadeOut.play();
     }
 
     @FXML
@@ -480,7 +578,6 @@ public class BattleController implements Battle.BattleListener {
     void onExitCancelled() {
         hideExitOverlay(null);
     }
-
 
     @FXML
     private void onBackClicked() {
@@ -627,10 +724,6 @@ public class BattleController implements Battle.BattleListener {
     }
 
     // Forced switch overlay
-    /**
-     * Called by Battle when player1's active Pokémon has fainted.
-     * Shows a modal overlay forcing the player to pick a replacement.
-     */
     @Override
     public void onPlayerPokemonFaintedNeedsSwitch(String playerName) {
         Platform.runLater(() -> {
@@ -1774,7 +1867,7 @@ public class BattleController implements Battle.BattleListener {
         return null;
     }
 
-    //  Result overlay 
+    // Result overlay
 
     private void showResultOverlay(boolean playerWon) {
         if (playerWon)

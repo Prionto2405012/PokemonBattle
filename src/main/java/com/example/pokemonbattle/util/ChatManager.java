@@ -39,19 +39,11 @@ public class ChatManager {
             this.timestamp = System.currentTimeMillis();
         }
     }
-
-    /**
-     * Types of chat messages
-     */
     public enum MessageType {
         PLAYER,      // Message from player
         OPPONENT,    // Message from opponent (online mode)
         SYSTEM       // System messages
     }
-
-    /**
-     * Predefined quick messages
-     */
     public static final String[] QUICK_MESSAGES = {
         "Well played!",
         "Good luck!",
@@ -72,16 +64,9 @@ public class ChatManager {
         this.chatProcessorThread.start();
     }
 
-    /**
-     * Add a message to the chat queue
-     */
     public void addMessage(String text, MessageType type) {
         addMessage(text, type, null);
     }
-
-    /**
-     * Add a message to the chat queue with optional sender name.
-     */
     public void addMessage(String text, MessageType type, String senderName) {
         if (text == null || text.trim().isEmpty()) {
             return;
@@ -89,55 +74,30 @@ public class ChatManager {
         messageQueue.offer(new ChatMessage(text.trim(), type, senderName));
     }
 
-    /**
-     * Add a player message
-     */
     public void sendPlayerMessage(String text) {
         addMessage(text, MessageType.PLAYER);
     }
-
-    /**
-     * Add an opponent message (for online battles)
-     */
     public void receiveOpponentMessage(String text) {
         addMessage(text, MessageType.OPPONENT, "Opponent");
     }
-
-    /**
-     * Add an opponent message with explicit sender name.
-     */
     public void receiveOpponentMessage(String senderName, String text) {
         String resolvedSender = (senderName == null || senderName.isBlank()) ? "Opponent" : senderName.trim();
         addMessage(text, MessageType.OPPONENT, resolvedSender);
     }
-
-    /**
-     * Add a system message
-     */
     public void addSystemMessage(String text) {
         addMessage(text, MessageType.SYSTEM);
     }
-
-    /**
-     * Process messages from the queue in a separate thread
-     */
     private void processChatMessages() {
         while (running) {
             try {
                 ChatMessage message = messageQueue.take();
-
-                // Add to history
                 chatHistory.add(String.format("[%s] %s: %s",
                     LocalTime.now().format(TIME_FORMATTER),
                     message.type,
                     message.text));
-
-                // Trim history if too large
                 if (chatHistory.size() > MAX_MESSAGES) {
                     chatHistory.remove(0);
                 }
-
-                // Update UI on JavaFX thread
                 Platform.runLater(() -> displayMessage(message));
 
             } catch (InterruptedException e) {
@@ -146,26 +106,14 @@ public class ChatManager {
             }
         }
     }
-
-    /**
-     * Display a message in the chat UI (must be called on JavaFX thread)
-     */
     private void displayMessage(ChatMessage message) {
         Label messageLabel = createMessageLabel(message);
         chatMessagesContainer.getChildren().add(messageLabel);
-
-        // Trim old messages if container gets too large
         if (chatMessagesContainer.getChildren().size() > MAX_MESSAGES) {
             chatMessagesContainer.getChildren().remove(0);
         }
-
-        // Auto-scroll to bottom
         Platform.runLater(() -> chatScrollPane.setVvalue(1.0));
     }
-
-    /**
-     * Create a styled label for a chat message
-     */
     private Label createMessageLabel(ChatMessage message) {
         String timeStr = LocalTime.now().format(TIME_FORMATTER);
         String displayText;
@@ -199,10 +147,6 @@ public class ChatManager {
 
         return label;
     }
-
-    /**
-     * Clear all messages from chat
-     */
     public void clearChat() {
         Platform.runLater(() -> {
             chatMessagesContainer.getChildren().clear();
@@ -210,16 +154,9 @@ public class ChatManager {
         });
     }
 
-    /**
-     * Get chat history as list of strings
-     */
     public List<String> getChatHistory() {
         return new ArrayList<>(chatHistory);
     }
-
-    /**
-     * Shutdown the chat manager and stop the processing thread
-     */
     public void shutdown() {
         running = false;
         if (chatProcessorThread != null && chatProcessorThread.isAlive()) {
