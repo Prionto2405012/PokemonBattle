@@ -17,23 +17,13 @@ import com.example.pokemonbattle.model.Move;
 import com.example.pokemonbattle.model.PokemonInstance;
 import com.example.pokemonbattle.model.PokemonSpecies;
 
-/**
- * Main TCP Server for Pokemon Online Battles.
- * Listens for client connections and manages multiple concurrent battles.
- * Handles player authentication, matchmaking, and battle coordination.
- */
+//main tcp server
 public class BattleServer {
     private final int port;
     private ServerSocket serverSocket;
     private boolean running = false;
-    
-    // Thread-safe list of connected clients
     private final List<ClientHandler> connectedClients = new CopyOnWriteArrayList<>();
-    
-    // Queue of clients waiting for a battle opponent
     private final Queue<ClientHandler> matchmakingQueue = new LinkedList<>();
-    
-    // Map of active battles
     private final Map<Integer, OnlineBattle> activeBattles = new HashMap<>();
     
     private int nextClientId = 1;
@@ -48,8 +38,7 @@ public class BattleServer {
             System.out.println("Server is already running");
             return;
         }
-        
-        // ── Load game data (Pokemon species & moves) into PokemonInstance statics ──
+        // Load game data (Pokemon species & moves) into PokemonInstance statics
         System.out.println("Loading game data...");
         GameDataDAO dao = new GameDataDAO();
         dao.ensureDataLoaded();
@@ -82,19 +71,12 @@ public class BattleServer {
         
         System.out.println("Server thread started. Waiting for client connections...");
     }
-    
-    /**
-     * Accept incoming client connections and spawn handler threads.
-     */
     private void acceptConnections() {
         while (running) {
             try {
                 Socket clientSocket = serverSocket.accept();
-                
                 int clientId = nextClientId++;
                 ClientHandler handler = new ClientHandler(clientSocket, this, clientId);
-                
-                // Start handler thread
                 handler.start();
                 
                 System.out.println("[Server] Connection accepted. New handler thread created (ID: " + clientId + ")");
@@ -106,29 +88,16 @@ public class BattleServer {
             }
         }
     }
-    
-    /**
-     * Register an authenticated client with the server.
-     */
     public synchronized void registerClient(ClientHandler client) {
         connectedClients.add(client);
         System.out.println("[Server] Client registered: " + client.getPlayerName() + " (Total: " + connectedClients.size() + ")");
     }
-    
-    /**
-     * Unregister a disconnected client.
-     */
     public synchronized void unregisterClient(ClientHandler client) {
         connectedClients.remove(client);
         matchmakingQueue.remove(client);
         System.out.println("[Server] Client unregistered: " + (client.getPlayerName() != null ? client.getPlayerName() : "Unknown") + 
                           " (Total: " + connectedClients.size() + ")");
     }
-    
-    /**
-     * Find and match an opponent for a client.
-     * Returns another waiting client or null if no match available.
-     */
     public synchronized ClientHandler findAndMatchOpponent(ClientHandler client) {
         // Remove client from queue if already there
         matchmakingQueue.remove(client);
@@ -139,48 +108,30 @@ public class BattleServer {
             System.out.println("[Server] Matched " + client.getPlayerName() + " with " + opponent.getPlayerName());
             return opponent;
         }
-        
-        // No opponent available, add to queue
         matchmakingQueue.add(client);
         System.out.println("[Server] Added " + client.getPlayerName() + " to matchmaking queue. Queue size: " + matchmakingQueue.size());
         
         return null;
     }
-    
-    /**
-     * Register an active battle with the server.
-     */
     public synchronized void registerBattle(OnlineBattle battle) {
         activeBattles.put(battle.getBattleId(), battle);
         System.out.println("[Server] Battle registered (ID: " + battle.getBattleId() + ", Total: " + activeBattles.size() + ")");
     }
-    
-    /**
-     * Unregister a completed battle.
-     */
     public synchronized void unregisterBattle(Integer battleId) {
         activeBattles.remove(battleId);
         System.out.println("[Server] Battle unregistered (ID: " + battleId + ", Total: " + activeBattles.size() + ")");
     }
-    
-    /**
-     * Get server statistics.
-     */
     public synchronized String getStats() {
         StringBuilder sb = new StringBuilder();
         sb.append("\n╔════════════════════════════════════════════════════════════╗\n");
         sb.append("║              Server Statistics                            ║\n");
-        sb.append("║────────────────────────────────────────────────────────────║\n");
+        sb.append("║\n");
         sb.append(String.format("║  Connected Clients:      %-41d║\n", connectedClients.size()));
         sb.append(String.format("║  Waiting for Match:      %-41d║\n", matchmakingQueue.size()));
         sb.append(String.format("║  Active Battles:         %-41d║\n", activeBattles.size()));
         sb.append("╚════════════════════════════════════════════════════════════╝\n");
         return sb.toString();
     }
-    
-    /**
-     * Gracefully shutdown the server.
-     */
     public synchronized void shutdown() {
         System.out.println("\n[Server] Shutting down server...");
         running = false;
@@ -208,17 +159,9 @@ public class BattleServer {
         
         System.out.println("[Server] Server shutdown complete.");
     }
-    
-    /**
-     * Check if server is running.
-     */
     public boolean isRunning() {
         return running;
     }
-    
-    /**
-     * Main method to run the server.
-     */
     public static void main(String[] args) {
         int port = 5555;  // Default port
         
