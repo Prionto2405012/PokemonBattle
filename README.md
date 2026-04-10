@@ -1,5 +1,4 @@
 ﻿# PokemonBattle
-
 PokemonBattle is a desktop Pokemon-style battle game built with JavaFX.
 You can play quick AI battles, or battle real players over a local network.
 
@@ -8,18 +7,15 @@ This README is written for two groups:
 2. Developers who want to build, run, and modify the project.
 
 ## 1) Player Guide (No Java or JavaFX Setup Needed)
-
 If you install from the packaged Windows build, you do not need to install Java or JavaFX.
 
 ### 1.1 What You Need
-
 1. A Windows PC.
 2. One of these from the project maintainer:
    - PokemonBattle-1.0.0.exe installer, or
    - The full PokemonBattle portable folder.
 
 ### 1.2 Install and Launch
-
 If you got the installer:
 1. Double-click PokemonBattle-1.0.0.exe.
 2. Follow the install wizard.
@@ -34,7 +30,6 @@ Important:
 - Do not copy only one .exe file out of that folder.
 
 ### 1.3 Which EXE Should You Open?
-
 - PokemonBattle.exe
   - Starts the game client only.
   - Use for AI battles.
@@ -45,7 +40,6 @@ Important:
   - Use this on the host PC when you want friends on the same Wi-Fi to join.
 
 ### 1.4 How To Play
-
 Quick single-player:
 1. Open PokemonBattle.exe.
 2. Go to New Game.
@@ -64,7 +58,6 @@ Notes:
 - Online mode looks for a server on local network.
 
 ### 1.5 Common Problems and Easy Fixes
-
 The app does not open:
 1. Right-click and run once as administrator.
 2. If Windows SmartScreen appears, click More info then Run anyway.
@@ -82,7 +75,6 @@ Matchmaking keeps waiting:
 ## 2) Developer Quick Start
 
 ### 2.1 Tech Stack
-
 - Java 21
 - JavaFX 21
 - Maven
@@ -96,7 +88,6 @@ Java module config: src/main/java/module-info.java
 ### 2.2 Build and Run Client (Windows)
 
 From project root:
-
 ```powershell
 .\mvnw.cmd clean compile
 .\mvnw.cmd javafx:run
@@ -105,13 +96,11 @@ From project root:
 ### 2.3 Run Server (Dev)
 
 Default port (5555):
-
 ```powershell
 mvn exec:java -Dexec.mainClass="com.example.pokemonbattle.server.BattleServer"
 ```
 
 Custom port:
-
 ```powershell
 mvn exec:java -Dexec.mainClass="com.example.pokemonbattle.server.BattleServer" -Dexec.args="7777"
 ```
@@ -119,7 +108,6 @@ mvn exec:java -Dexec.mainClass="com.example.pokemonbattle.server.BattleServer" -
 ### 2.4 Build Windows Package (No Java Required On Target Device)
 
 From project root:
-
 ```powershell
 .\build-windows-package.bat
 ```
